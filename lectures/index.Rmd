@@ -23,6 +23,8 @@ This repository contains material based upon work supported by the National Scie
 # Lectures
 
 - 01 Git/GitHub
+  - [Bash Basics](./01_basic_bash.html)
+  - [Git and Github](./01_git_github.html)
 - 02 R Packages
 - 03 Data Structures
 - 04 Object-oriented Programming
