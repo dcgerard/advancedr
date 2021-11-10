@@ -1,0 +1,35 @@
+---
+title: "Regression"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Synopsis
+
+This website contains the teaching materials for STAT 496/696 Advanced R, taught at American 
+University by [David Gerard](https://dcgerard.github.io/).
+
+This repository contains material based upon work supported by the National Science Foundation under Grant No. [2132247](https://nsf.gov/awardsearch/showAward?AWD_ID=2132247). The opinions, findings, and conclusions or recommendations expressed are those of the author and do not necessarily reflect the views of the National Science Foundation.
+
+# Administrative
+
+- Syllabus
+
+# Lectures
+
+- 01 Git/GitHub
+- 02 R Packages
+- 03 Data Structures
+- 04 Object-oriented Programming
+- 05 Environments
+- 06 Functional Programming
+- 07 Non-standard Evaluation
+- 08 Performance/Profiling/Memory
+- 09 C++ and Rcpp
+
+# Final Project

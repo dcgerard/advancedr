@@ -1,0 +1,15 @@
+name: "advancedr"
+output_dir: "../../docs"
+navbar:
+  title: "Teaching Website for Advanced R"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Data"
+      href: data.html
+  right:
+    - text: GitHub
+      href: https://github.com/dcgerard/advancedr
+output:
+  html_document:
+    theme: yeti
