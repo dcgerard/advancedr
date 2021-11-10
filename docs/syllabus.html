@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="David Gerard" />
+
+
+<title>STAT 415/615 Regression</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link rel="shortcut icon" href="https://dcgerard.github.io/advancedr/au_logo_small.png" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Teaching Website for Advanced R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="data.html">Data</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/dcgerard/advancedr">GitHub</a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">STAT 415/615 Regression</h1>
+<h4 class="author">David Gerard</h4>
+<h4 class="date">Updated: 2021-11-10</h4>
+
+</div>
+
+
+<ul>
+<li><strong>Time</strong>: Tuesdays 5:30 PM to 8:00 PM</li>
+<li><strong>Instructor</strong>: Dr. David Gerard</li>
+<li><strong>Email</strong>: <a href="mailto:dgerard@american.edu" class="email">dgerard@american.edu</a></li>
+<li><strong>Office</strong>: DMTI 106E</li>
+<li><strong>Office Hours</strong>: TBD</li>
+</ul>
+<div id="overview-of-topics-and-course-objectives" class="section level1">
+<h1>Overview of Topics and Course Objectives</h1>
+<p>This course provides an in depth study of the R ecosystem and software development using R. This is less of a statistics course and more of a software development course using the Statistical Programming Language R. By the end of this course, you should be able to design and implement your own R packages using some of the advanced programming methods available from R.</p>
+</div>
+<div id="course-websites" class="section level1">
+<h1>Course Websites</h1>
+<ul>
+<li><p>All lecture material will be posted to my GitHub Pages website: <a href="https://dcgerard.github.io/advancedr/" class="uri">https://dcgerard.github.io/advancedr/</a>.</p></li>
+<li><p>All assignments will be posted on GitHub Classroom: <a href="https://classroom.github.com/" class="uri">https://classroom.github.com/</a></p></li>
+<li><p>All grades will be posted on Canvas: <a href="https://american.instructure.com/" class="uri">https://american.instructure.com/</a></p></li>
+</ul>
+</div>
+<div id="textbooks" class="section level1">
+<h1>Textbooks</h1>
+<ul>
+<li><p>Advanced R (1st Edition): <a href="http://adv-r.had.co.nz/" class="uri">http://adv-r.had.co.nz/</a></p>
+<ul>
+<li>We are using the first edition, not the second, because it focuses more on Base R than the second.</li>
+</ul></li>
+<li><p>R Packages: <a href="https://r-pkgs.org/" class="uri">https://r-pkgs.org/</a></p></li>
+<li><p>Rcpp for Everyone: <a href="https://teuder.github.io/rcpp4everyone_en/" class="uri">https://teuder.github.io/rcpp4everyone_en/</a></p></li>
+</ul>
+</div>
+<div id="computing-and-software" class="section level1">
+<h1>Computing and Software</h1>
+<ul>
+<li><p>R: <a href="http://cran.r-project.org/" class="uri">http://cran.r-project.org/</a></p>
+<ul>
+<li>Make sure this is up-to-date.</li>
+</ul></li>
+<li><p>R Studio: <a href="https://www.rstudio.com/" class="uri">https://www.rstudio.com/</a></p>
+<ul>
+<li>Make sure this is up-to-date.</li>
+</ul></li>
+<li><p>Windows Users will need to install Rtools: <a href="https://cran.r-project.org/bin/windows/Rtools/" class="uri">https://cran.r-project.org/bin/windows/Rtools/</a></p></li>
+<li><p>Git: <a href="https://git-scm.com/" class="uri">https://git-scm.com/</a></p></li>
+<li><p>A GitHub Account: <a href="https://github.com/" class="uri">https://github.com/</a></p></li>
+</ul>
+</div>
+<div id="assignments-and-grading" class="section level1">
+<h1>Assignments and Grading</h1>
+<ul>
+<li><p>Weekly Homeworks: 75%</p></li>
+<li><p>Final Project: 25%</p></li>
+<li><p>Usual grade cutoffs will be used:</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<tbody>
+<tr>
+<td style="text-align:left;">
+<p>Grade</p>
+</td>
+<td style="text-align:left;">
+<p>A</p>
+</td>
+<td style="text-align:left;">
+<p>A-</p>
+</td>
+<td style="text-align:left;">
+<p>B+</p>
+</td>
+<td style="text-align:left;">
+<p>B</p>
+</td>
+<td style="text-align:left;">
+<p>B-</p>
+</td>
+<td style="text-align:left;">
+<p>C+</p>
+</td>
+<td style="text-align:left;">
+<p>C</p>
+</td>
+<td style="text-align:left;">
+<p>C-</p>
+</td>
+<td style="text-align:left;">
+<p>D</p>
+</td>
+<td style="text-align:left;">
+<p>F</p>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<p>Lower</p>
+</td>
+<td style="text-align:left;">
+<p>93</p>
+</td>
+<td style="text-align:left;">
+<p>90</p>
+</td>
+<td style="text-align:left;">
+<p>88</p>
+</td>
+<td style="text-align:left;">
+<p>83</p>
+</td>
+<td style="text-align:left;">
+<p>80</p>
+</td>
+<td style="text-align:left;">
+<p>78</p>
+</td>
+<td style="text-align:left;">
+<p>73</p>
+</td>
+<td style="text-align:left;">
+<p>70</p>
+</td>
+<td style="text-align:left;">
+<p>60</p>
+</td>
+<td style="text-align:left;">
+<p>0</p>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<p>Upper</p>
+</td>
+<td style="text-align:left;">
+<p>100</p>
+</td>
+<td style="text-align:left;">
+<p>92</p>
+</td>
+<td style="text-align:left;">
+<p>89</p>
+</td>
+<td style="text-align:left;">
+<p>87</p>
+</td>
+<td style="text-align:left;">
+<p>82</p>
+</td>
+<td style="text-align:left;">
+<p>79</p>
+</td>
+<td style="text-align:left;">
+<p>77</p>
+</td>
+<td style="text-align:left;">
+<p>72</p>
+</td>
+<td style="text-align:left;">
+<p>69</p>
+</td>
+<td style="text-align:left;">
+<p>59</p>
+</td>
+</tr>
+</tbody>
+</table></li>
+<li><p>Individual assignments will not be curved. However, at the discretion of the instructor, the overall course grade at the end of the semester may be curved.</p></li>
+</ul>
+</div>
+<div id="list-of-topics" class="section level1">
+<h1>List of Topics</h1>
+<ol style="list-style-type: decimal">
+<li>Git/GitHub</li>
+<li>R Packages</li>
+<li>Data Structures</li>
+<li>Object-oriented Programming</li>
+<li>Environments</li>
+<li>Functional Programming</li>
+<li>Metaprogramming</li>
+<li>Performance/Profiling/Memory</li>
+<li>C++ and Rcpp</li>
+</ol>
+</div>
+<div id="important-dates" class="section level1">
+<h1>Important Dates</h1>
+<ul>
+<li>03/08/2022: Spring Break, no class.</li>
+<li>04/26/2022: Spring Study Day, no class.</li>
+<li>05/03/2022: Final exam period (group presentations)</li>
+</ul>
+</div>
+<div id="late-work-policy" class="section level1">
+<h1>Late Work Policy</h1>
+<ul>
+<li>Let me know if you need a couple days.</li>
+</ul>
+</div>
+<div id="sharing-course-content" class="section level1">
+<h1>Sharing Course Content:</h1>
+<ul>
+<li>Students are not permitted to make visual or audio recordings (including livestreams) of lectures or any class-related content or use any type of recording device unless prior permission from the instructor is obtained and there are no objections from any student in the class. If permission is granted, only students registered in the course may use or share recordings and any electronic copies of course materials (e.g., PowerPoints, formulas, lecture notes, and any discussions – online or otherwise). Use is limited to educational purposes even after the end of the course. Exceptions will be made for students who present a signed Letter of Accommodation from the Academic Support and Access Center. Further details are available from the <a href="https://www.american.edu/provost/academic-access/index.cfm">ASAC website</a>.</li>
+</ul>
+</div>
+<div id="academic-integrity-code" class="section level1">
+<h1>Academic Integrity Code</h1>
+<ul>
+<li><p>Standards of academic conduct are set forth in the university’s <a href="http://www.american.edu/academics/integrity/index.cfm">Academic Integrity Code</a>. By registering for this course, students have acknowledged their awareness of the Academic Integrity Code and they are obliged to become familiar with their rights and responsibilities as defined by the Code. Violations of the Academic Integrity Code will not be treated lightly and disciplinary action will be taken should violations occur. This includes cheating, fabrication, and plagiarism.</p></li>
+<li><p>I expect you to work with others and me, and I expect you to use online resources as you work on your assignments/projects. However, your submissions must be composed of your own thoughts, coding, and words. You should be able to explain your work on assignments/projects and your rationale. <strong>Based on your explanation (or lack thereof), I may modify your grade.</strong></p></li>
+<li><p>If you use an online resource, please cite it with a URL (this is perfectly fine!). If you do not understand an online resource, but believe it to be useful for a project/assignment, please ask me for help.</p></li>
+<li><p>A <a href="https://american0.sharepoint.com/sites/ctrl-allstaff/Shared%20Documents/Content%20Management/Academic%20Integrity%20Advice%202019.pdf">short guide for students</a> on how to meet the expectations of the AU’s Academic Integrity Code</p></li>
+</ul>
+</div>
+
+<!DOCTYPE html>
+<hr>
+<a href="https://nsf.gov/awardsearch/showAward?AWD_ID=2132247"><img src="https://dcgerard.github.io/advancedr/nsf_logo.png" alt="National Science Foundation Logo" height="48px"/></a>
+<a href="https://www.american.edu/cas/mathstat/"><img src="https://dcgerard.github.io/advancedr/au_logo.png" alt="American University Logo" height="48px"/></a>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

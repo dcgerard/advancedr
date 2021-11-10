@@ -18,7 +18,7 @@ This repository contains material based upon work supported by the National Scie
 
 # Administrative
 
-- Syllabus
+- [Syllabus](./syllabus.html)
 
 # Lectures
 
@@ -28,7 +28,7 @@ This repository contains material based upon work supported by the National Scie
 - 04 Object-oriented Programming
 - 05 Environments
 - 06 Functional Programming
-- 07 Non-standard Evaluation
+- 07 Metaprogramming
 - 08 Performance/Profiling/Memory
 - 09 C++ and Rcpp
 
