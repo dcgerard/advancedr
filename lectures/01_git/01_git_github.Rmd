@@ -28,5 +28,133 @@ klippy::klippy()
 - [Git Cheat Sheet](https://education.github.com/git-cheat-sheet-education.pdf)
 - [Git Handbook](https://guides.github.com/introduction/git-handbook/)
 
+# Installing
+
+1. Install git:
+    - Windows: <http://git-scm.com/download/win>.
+    - OS X: <http://git-scm.com/download/mac>.
+    - Debian/Ubuntu: `sudo apt-get install git-core`.
+    - Other Linux distros: <http://git-scm.com/download/linux>.
+
+2. Create an account on GitHub: <https://github.com/>
+    - A free plan is fine. Use the same email address you used above.
+    - When you choose your username, remember that you might use this for
+      professional purposes. So I would recommend something related to your name 
+      (e.g. my handle is "dcgerard"). I would recommend against something like 
+      "david_awesome_david_yolo_hahaha".
+      
+3. Tell git your name and email address. Open up a terminal and type:
+
+    ```{bash, eval = FALSE}
+    git config --global user.name "YOUR FULL NAME"
+    git config --global user.email "YOUR EMAIL ADDRESS"
+    ```
+    
+    If you are worried about email privacy, then use "\<username\>@users.noreply.github.com" as your email address, then follow the instructions [here](https://help.github.com/en/articles/setting-your-commit-email-address-on-github) to make your email address private on GitHub.
+
+# Authentication
+
+# Version Control: 
+
+- **Version control system**: a program that tracks iterative changes of files. 
+  Git is the most popular version control system.
+
+- You can go back to previous versions of your code/text, then move forward to 
+  the most recent version, or keep the old version.
+
+- You can create copies of the code, change them, then merge these copies 
+  together later.
+
+## Motivation 1: Change code without the fear of breaking it
+- You want to try out something new, but you aren't sure if it will work.
+
+- Non-git solution: Copy the files
+    - analysis.R, 
+    - analysis2.R, 
+    - analaysis3.R, 
+    - analysis_final.R, 
+    - analysis_final_final.R, 
+    - analysis_absolute_final.R, 
+    - analysis7.R
+    - analysis8.R
+
+- Issues: 
+    - Difficult to remember differences of files.
+    - Which files produced specific results?
+    
+- Git lets you change files, keeping track of old versions, and reverting 
+  to old versions if you decide the new changes don't work.
+
+## Motivation 2: Easy Collaboration
+
+- In a group setting, your collaborators might suggest how to change your 
+  analysis/code.
+  
+- First non-git solution: Email files back/forth. 
+
+- Issues: 
+    - You have to manually incorporate changes.
+    - Only one person can work on the code at a time (otherwise multiple 
+      changes might be incompatible).
+      
+- Second non-git solution: Share a Dropbox or Google Docs folder (a 
+  "centralized" version control system).
+
+- Issues:
+    - Again, only one person can work on the code at a time.
+    - Less user-friendly for tracking changes.
+
+- Git let's each individual work on their own local repository and you can
+  automatically incorporate changes. 
+
+## Motivation 3: Great for job interviews
+
+- In a [Kaggle Survey](https://www.kaggle.com/surveys/2017), 58.5% of data
+  scientists say they primarily use git for sharing code.
+  
+- You can make your final-project repo public so prospective employers can
+  view your work.
+  
+- You can host a website on GitHub, increasing your visibility. I host my 
+  [personal website](http://dcgerard.github.io/) and 
+  [teaching websites](https://data-science-master.github.io/lectures/) 
+  on GitHub.
+
+# List of git commands
+
+- `git init`: Initialize a git repository. *Only do this once per project*.
+- `git status`: Show which files are staged in your working directory, and which are modified but not staged.
+- `git add`: Add modified files from your working directory to the stage.
+- `git diff`: Look at how files in the working directory have been modified.
+- `git diff --staged`: Look at how files in the stage have been modified.
+- `git commit -m "[descriptive message]"`: commit your staged content as a new commit snapshot.
+- `git clone <url>`: Download a fresh copy of a remote repository onto your local machine.
+- `git remote add <remote> <url>`: Link a local repository with a remote repository. The nickname of the remote repository is `<remote>`.
+- `git push <remote> <branch>`: Push the changes from branch `<branch>` to the remote repository named `<remote>`
+- `git pull <remote> <branch>`: Pull any modifications from `<remote>` into your local machine in branch `<branch>`.
+- `git branch <branch>`: Create a branch called `<branch>`. Note that the default branch is called `master`.
+- `git checkout <branch>`: Move to the `<branch>` branch.
+- `git merge <branch>`: Merge the changes in `<branch>` into the current branch.
+
+# Vocabulary List ([Blischak et. al., 2016](https://doi.org/10.1371/journal.pcbi.1004668))
+
+- **Version Control System** (VCS): (*noun*) a program that tracks changes to specified files over time and maintains a library of all past versions of those files
+- **Git**: (*noun*) a version control system
+- **repository** (**repo**): (*noun*) folder containing all tracked files as well as the version control history
+- **commit**: (*noun*) a snapshot of changes made to the staged file(s); (*verb*) to save a snapshot of changes made to the staged file(s)
+- **stage**: (*noun*) the staging area holds the files to be included in the next commit; (*verb*) to mark a file to be included in the next commit
+- **track**: (*noun*) a tracked file is one that is recognized by the Git repository
+- **branch**: (*noun*) a parallel version of the files in a repository
+- **local**: (*noun*) the version of your repository that is stored on your personal computer
+- **remote**: (*noun*) the version of your repository that is stored on a remote server; for instance, on GitHub
+- **clone**: (*verb*) to create a local copy of a remote repository on your personal computer
+- **fork**: (*noun*) a copy of another user’s repository on GitHub; (*verb*) to copy a repository; for instance, from one user’s GitHub account to your own
+- **merge**: (*verb*) to update files by incorporating the changes introduced in new commits
+- **pull**: (*verb*) to retrieve commits from a remote repository and merge them into a local repository
+- **push**: (*verb*) to send commits from a local repository to a remote repository
+- **pull request**: (*noun*) a message sent by one GitHub user to merge the commits in their remote repository into another user’s remote repository
+
+
+
 
 
