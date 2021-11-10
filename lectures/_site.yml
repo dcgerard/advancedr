@@ -8,7 +8,6 @@ navbar:
     - text: "Data"
       href: data.html
   right:
-    - img: https://dcgerard.github.io/advancedr/nsf_logo.png
     - text: GitHub
       href: https://github.com/dcgerard/advancedr
 output:

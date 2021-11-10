@@ -13,3 +13,6 @@ navbar:
 output:
   html_document:
     theme: yeti
+    include:
+      in_header: "../header.html"
+      after_body: "../footer.html"
