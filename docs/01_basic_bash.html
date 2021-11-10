@@ -320,9 +320,20 @@ $(document).ready(function () {
 <li><p>If you are using Linux or Mac, then you can keep going. If you are using Windows, you need to first download and install git (and thus git bash) from here: <a href="http://git-scm.com/download/win" class="uri">http://git-scm.com/download/win</a>. You might need to restart R Studio if you are already running it.</p></li>
 <li><p>Open up the terminal</p>
 <ul>
-<li>Windows:</li>
-<li>Mac:</li>
-<li>Linux:</li>
+<li><p>Windows: Open up the <code>Git Bash</code> app. It should look like this:</p>
+<p><img src="figs/git_bash.png" alt="Git Bash for Windows" width="50%"/></p></li>
+<li><p>Mac: On your Mac, do one of the following:</p>
+<ul>
+<li>Click the Launchpad icon <img src="https://help.apple.com/assets/5FFCB3EC94BE2A0CD2446152/5FFCB3ED94BE2A0CD2446159/en_US/a1f94c9ca0de21571b88a8bf9aef36b8.png" alt="Launchpad icon" originalimagename="SharedGlobalArt/AppIconTopic_Launchpad.png" width="20" height="20"> in the Dock, type Terminal in the search field, then click Terminal.</li>
+<li>In the Finder <img src="https://help.apple.com/assets/5FFCB3EC94BE2A0CD2446152/5FFCB3ED94BE2A0CD2446159/en_US/058e4af8e726290f491044219d2eee73.png" alt="" originalimagename="SharedGlobalArt/AppIconTopic_Finder.png" width="20" height="20">, open the /Applications/Utilities folder, then double-click Terminal.</li>
+</ul></li>
+<li><p>Ubuntu: Do one of the following</p>
+<ul>
+<li><p>Open the dash and search for “terminal”. Open up the terminal.</p></li>
+<li><p>Use keyboard shortcut: Ctrl+Alt+T</p></li>
+<li><p>It should look like this:</p>
+<p><img src="figs/terminal_ubuntu.png" alt="Git Bash for Windows" width="50%"/></p></li>
+</ul></li>
 </ul></li>
 <li><p>All commands get placed after the dollar sign.</p></li>
 <li><p>The path before the dollar sign is the working directory of the terminal, <strong>not</strong> R’s working directory. It’s where the shell will reference all files from.</p></li>
@@ -339,6 +350,7 @@ $(document).ready(function () {
 <pre class="bash"><code>ls</code></pre>
 <pre><code>## 01_basic_bash.Rmd
 ## 01_git_github.Rmd
+## figs
 ## _site.yml</code></pre></li>
 <li><p><code>cd</code>: Change directories. This is like <code>setwd()</code> in R. As when we specified paths in R, using two periods mean “move back a folder”.</p>
 <pre class="bash"><code>cd ../
@@ -375,6 +387,7 @@ pwd</code></pre>
 ls</code></pre>
 <pre><code>## 01_basic_bash.Rmd
 ## 01_git_github.Rmd
+## figs
 ## hellobash.Rmd
 ## _site.yml</code></pre></li>
 <li><p><code>mv</code>: Move/rename a file.</p>
@@ -382,6 +395,7 @@ ls</code></pre>
 ls</code></pre>
 <pre><code>## 01_basic_bash.Rmd
 ## 01_git_github.Rmd
+## figs
 ## goodbyebash.Rmd
 ## _site.yml</code></pre></li>
 <li><p><code>rm</code>: Remove a file.</p>
@@ -389,12 +403,14 @@ ls</code></pre>
 ls</code></pre>
 <pre><code>## 01_basic_bash.Rmd
 ## 01_git_github.Rmd
+## figs
 ## _site.yml</code></pre></li>
 <li><p><code>mkdir</code>: Make a directory/folder.</p>
 <pre class="bash"><code>mkdir tempdir
 ls</code></pre>
 <pre><code>## 01_basic_bash.Rmd
 ## 01_git_github.Rmd
+## figs
 ## _site.yml
 ## tempdir</code></pre></li>
 <li><p><code>rmdir</code>: Remove a directory/folder.</p>
@@ -402,6 +418,7 @@ ls</code></pre>
 ls</code></pre>
 <pre><code>## 01_basic_bash.Rmd
 ## 01_git_github.Rmd
+## figs
 ## _site.yml</code></pre></li>
 </ul>
 </div>
@@ -418,6 +435,7 @@ ls</code></pre>
 <div id="download-data-with-wget" class="section level1">
 <h1>Download data with <code>wget</code></h1>
 <p>Non-interactive downloading of data.</p>
+<p>Not available for Git Bash for Windows.</p>
 <ul>
 <li><code>-nc</code> Don’t download new copies if already there.</li>
 <li><code>-nd</code> Put all files in current working directory.</li>
