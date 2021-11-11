@@ -26,13 +26,20 @@ This repository contains material based upon work supported by the National Scie
   - [Bash Basics](./01_basic_bash.html)
   - [Git and Github](./01_git_github.html)
 - 02 R Packages
-- 03 Data Structures
-- 04 Object-oriented Programming
-- 05 Environments
-- 06 Functional Programming
-- 07 Metaprogramming
-- 08 Performance/Profiling/Memory
-- 09 C++ and Rcpp
+  - Structure of an R package
+  - Documentation
+  - Workflow
+- 03 Best Practices
+  - Unit Tests
+  - Assertions
+  - Continuous Integration
+- 04 Data Structures
+- 05 Object-oriented Programming
+- 06 Environments
+- 07 Functional Programming
+- 08 Metaprogramming
+- 09 Performance/Profiling/Memory
+- 10 C++ and Rcpp
 
 # Final Project
 

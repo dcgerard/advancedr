@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-11-10" />
+<meta name="date" content="2021-11-11" />
 
 <title>Git and GitHub</title>
 
@@ -275,14 +275,14 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Git and GitHub</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-11-10</h4>
+<h4 class="date">2021-11-11</h4>
 
 </div>
 
 <div id="TOC">
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
-<li><a href="#installing">Installing</a></li>
+<li><a href="#installing-git">Installing Git</a></li>
 <li><a href="#authentication">Authentication</a></li>
 <li><a href="#version-control">Version Control:</a>
 <ul>
@@ -306,10 +306,11 @@ $(document).ready(function () {
 <li>Collaboration and software-hosting with GitHub.</li>
 <li><a href="https://education.github.com/git-cheat-sheet-education.pdf">Git Cheat Sheet</a></li>
 <li><a href="https://guides.github.com/introduction/git-handbook/">Git Handbook</a></li>
+<li><a href="https://swcarpentry.github.io/git-novice/">Git Novice</a></li>
 </ul>
 </div>
-<div id="installing" class="section level1">
-<h1>Installing</h1>
+<div id="installing-git" class="section level1">
+<h1>Installing Git</h1>
 <ol style="list-style-type: decimal">
 <li><p>Install git:</p>
 <ul>
@@ -327,6 +328,15 @@ $(document).ready(function () {
 <pre class="bash"><code>git config --global user.name &quot;YOUR FULL NAME&quot;
 git config --global user.email &quot;YOUR EMAIL ADDRESS&quot;</code></pre>
 <p>If you are worried about email privacy, then use “&lt;username&gt;<span class="citation">@users.noreply.github.com</span>” as your email address, then follow the instructions <a href="https://help.github.com/en/articles/setting-your-commit-email-address-on-github">here</a> to make your email address private on GitHub.</p></li>
+<li><p>Choose your favorite editor to be your default</p>
+<ul>
+<li><p>Nano (a simple text editor):</p>
+<pre class="bash"><code>git config --global core.editor &quot;nano -w&quot;</code></pre></li>
+<li><p>Notepad (Windows only):</p>
+<pre class="bash"><code>git config --global core.editor &quot;c:/Windows/System32/notepad.exe&quot;</code></pre></li>
+<li><p>Emacs (for the brave) if it is already installed:</p>
+<pre class="bash"><code>git config --global core.editor &quot;emacs&quot;</code></pre></li>
+</ul></li>
 </ol>
 </div>
 <div id="authentication" class="section level1">
