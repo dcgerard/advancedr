@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-11-10" />
+<meta name="date" content="2021-11-11" />
 
 <title>Basic Bash</title>
 
@@ -271,7 +271,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Basic Bash</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-11-10</h4>
+<h4 class="date">2021-11-11</h4>
 
 </div>
 
@@ -324,8 +324,8 @@ $(document).ready(function () {
 <p><img src="figs/git_bash.png" alt="Git Bash for Windows" width="50%"/></p></li>
 <li><p>Mac: On your Mac, do one of the following:</p>
 <ul>
-<li>Click the Launchpad icon <img src="https://help.apple.com/assets/5FFCB3EC94BE2A0CD2446152/5FFCB3ED94BE2A0CD2446159/en_US/a1f94c9ca0de21571b88a8bf9aef36b8.png" alt="Launchpad icon" originalimagename="SharedGlobalArt/AppIconTopic_Launchpad.png" width="20" height="20"> in the Dock, type Terminal in the search field, then click Terminal.</li>
-<li>In the Finder <img src="https://help.apple.com/assets/5FFCB3EC94BE2A0CD2446152/5FFCB3ED94BE2A0CD2446159/en_US/058e4af8e726290f491044219d2eee73.png" alt="" originalimagename="SharedGlobalArt/AppIconTopic_Finder.png" width="20" height="20">, open the /Applications/Utilities folder, then double-click Terminal.</li>
+<li>Click the Launchpad icon <img src="figs/launchpad.png" alt="Mac Launchpad icon" width="20" height="20"> in the Dock, type Terminal in the search field, then click Terminal.</li>
+<li>In the Finder <img src="figs/finder.png" alt="Mac Finder Icon" width="20" height="20">, open the /Applications/Utilities folder, then double-click Terminal.</li>
 </ul></li>
 <li><p>Ubuntu: Do one of the following</p>
 <ul>
@@ -345,23 +345,23 @@ $(document).ready(function () {
 <ul>
 <li><p><code>pwd</code>: Print working directory. Show the current working directory. This is like <code>getwd()</code> in R.</p>
 <pre class="bash"><code>pwd</code></pre>
-<pre><code>## /home/dgerard/Dropbox/teaching/data_496_696/lectures/01_git</code></pre></li>
+<pre><code>/home/dgerard/Dropbox/teaching/data_496_696/lectures/01_git</code></pre></li>
 <li><p><code>ls</code>: List the current files and folders in a directory.</p>
 <pre class="bash"><code>ls</code></pre>
-<pre><code>## 01_basic_bash.Rmd
-## 01_git_github.Rmd
-## figs
-## _site.yml</code></pre></li>
+<pre><code>01_basic_bash.Rmd
+01_git_github.Rmd
+figs
+_site.yml</code></pre></li>
 <li><p><code>cd</code>: Change directories. This is like <code>setwd()</code> in R. As when we specified paths in R, using two periods mean “move back a folder”.</p>
 <pre class="bash"><code>cd ../
 pwd</code></pre>
-<pre><code>## /home/dgerard/Dropbox/teaching/data_496_696/lectures</code></pre>
+<pre><code>/home/dgerard/Dropbox/teaching/data_496_696/lectures</code></pre>
 <ul>
 <li>If you use <code>cd</code> without specifying a folder to move to, it will move the working directory to the home directory.</li>
 </ul>
 <pre class="bash"><code>cd
 pwd</code></pre>
-<pre><code>## /home/dgerard</code></pre>
+<pre><code>/home/dgerard</code></pre>
 <ul>
 <li>OK, I’m going to move us back to the 01_git directory.</li>
 </ul>
@@ -385,41 +385,41 @@ pwd</code></pre>
 <li><p><code>cp</code>: Copy a file.</p>
 <pre class="bash"><code>cp 01_basic_bash.Rmd hellobash.Rmd
 ls</code></pre>
-<pre><code>## 01_basic_bash.Rmd
-## 01_git_github.Rmd
-## figs
-## hellobash.Rmd
-## _site.yml</code></pre></li>
+<pre><code>01_basic_bash.Rmd
+01_git_github.Rmd
+figs
+hellobash.Rmd
+_site.yml</code></pre></li>
 <li><p><code>mv</code>: Move/rename a file.</p>
 <pre class="bash"><code>mv hellobash.Rmd goodbyebash.Rmd
 ls</code></pre>
-<pre><code>## 01_basic_bash.Rmd
-## 01_git_github.Rmd
-## figs
-## goodbyebash.Rmd
-## _site.yml</code></pre></li>
+<pre><code>01_basic_bash.Rmd
+01_git_github.Rmd
+figs
+goodbyebash.Rmd
+_site.yml</code></pre></li>
 <li><p><code>rm</code>: Remove a file.</p>
 <pre class="bash"><code>rm goodbyebash.Rmd
 ls</code></pre>
-<pre><code>## 01_basic_bash.Rmd
-## 01_git_github.Rmd
-## figs
-## _site.yml</code></pre></li>
+<pre><code>01_basic_bash.Rmd
+01_git_github.Rmd
+figs
+_site.yml</code></pre></li>
 <li><p><code>mkdir</code>: Make a directory/folder.</p>
 <pre class="bash"><code>mkdir tempdir
 ls</code></pre>
-<pre><code>## 01_basic_bash.Rmd
-## 01_git_github.Rmd
-## figs
-## _site.yml
-## tempdir</code></pre></li>
+<pre><code>01_basic_bash.Rmd
+01_git_github.Rmd
+figs
+_site.yml
+tempdir</code></pre></li>
 <li><p><code>rmdir</code>: Remove a directory/folder.</p>
 <pre class="bash"><code>rmdir tempdir
 ls</code></pre>
-<pre><code>## 01_basic_bash.Rmd
-## 01_git_github.Rmd
-## figs
-## _site.yml</code></pre></li>
+<pre><code>01_basic_bash.Rmd
+01_git_github.Rmd
+figs
+_site.yml</code></pre></li>
 </ul>
 </div>
 <div id="string-search-with-grep" class="section level1">
@@ -431,6 +431,26 @@ ls</code></pre>
 <li><code>-e</code> pattern</li>
 <li><code>pdfgrep</code> (need to install separately) for searching text in PDFs.</li>
 </ul>
+<pre class="bash"><code>grep -rnw -e &quot;move&quot;</code></pre>
+<pre><code>01_basic_bash.Rmd:93:  paths in R, using two periods mean &quot;move back a folder&quot;. 
+01_basic_bash.Rmd:100:    - If you use `cd` without specifying a folder to move to, it will move the 
+01_basic_bash.Rmd:108:    - OK, I&#39;m going to move us back to the 01_git directory.  
+01_basic_bash.Rmd:186:grep -rnw -e &quot;move&quot;
+01_git_github.Rmd:62:- You can go back to previous versions of your code/text, then move forward to </code></pre>
+<pre class="bash"><code>grep -rnw -e &quot;mov&quot;</code></pre>
+<pre><code>01_basic_bash.Rmd:190:grep -rnw -e &quot;mov&quot;
+01_basic_bash.Rmd:194:grep -rn -e &quot;mov&quot;</code></pre>
+<pre class="bash"><code>grep -rn -e &quot;mov&quot;</code></pre>
+<pre><code>01_basic_bash.Rmd:93:  paths in R, using two periods mean &quot;move back a folder&quot;. 
+01_basic_bash.Rmd:100:    - If you use `cd` without specifying a folder to move to, it will move the 
+01_basic_bash.Rmd:108:    - OK, I&#39;m going to move us back to the 01_git directory.  
+01_basic_bash.Rmd:156:- `rm`: Remove a file.
+01_basic_bash.Rmd:170:- `rmdir`: Remove a directory/folder.
+01_basic_bash.Rmd:186:grep -rnw -e &quot;move&quot;
+01_basic_bash.Rmd:190:grep -rnw -e &quot;mov&quot;
+01_basic_bash.Rmd:194:grep -rn -e &quot;mov&quot;
+01_basic_bash.Rmd:219:I&#39;ll remove that file now
+01_git_github.Rmd:62:- You can go back to previous versions of your code/text, then move forward to </code></pre>
 </div>
 <div id="download-data-with-wget" class="section level1">
 <h1>Download data with <code>wget</code></h1>
@@ -443,13 +463,35 @@ ls</code></pre>
 <li><code>-r</code> Recursive downloading. Download all files in the directory up to a certain level.</li>
 <li><code>l</code> Determine the level for recursive downloading.</li>
 </ul>
+<p>E.g. to download the HTML file that contains the Wikipedia list of <a href="https://en.wikipedia.org/wiki/List_of_theological_demons">theological demons</a>, we can go</p>
+<pre class="bash"><code>wget -nc -nd https://en.wikipedia.org/wiki/List_of_theological_demons</code></pre>
+<pre><code>--2021-11-11 10:48:06--  https://en.wikipedia.org/wiki/List_of_theological_demons
+Resolving en.wikipedia.org (en.wikipedia.org)... 208.80.154.224, 2620:0:861:ed1a::1
+Connecting to en.wikipedia.org (en.wikipedia.org)|208.80.154.224|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 75077 (73K) [text/html]
+Saving to: ‘List_of_theological_demons’
+
+     0K .......... .......... .......... .......... .......... 68% 13.1M 0s
+    50K .......... .......... ...                             100% 39.2M=0.004s
+
+2021-11-11 10:48:06 (16.6 MB/s) - ‘List_of_theological_demons’ saved [75077/75077]</code></pre>
+<pre class="bash"><code>ls</code></pre>
+<pre><code>01_basic_bash.Rmd
+01_git_github.Rmd
+figs
+List_of_theological_demons
+_site.yml</code></pre>
+<p>I’ll remove that file now</p>
+<pre class="bash"><code>rm List_of_theological_demons</code></pre>
 </div>
 <div id="search-your-command-history-with-reverse-i-search" class="section level1">
 <h1>Search your command history with <code>reverse-i-search</code></h1>
 <ol style="list-style-type: decimal">
 <li><code>ctrl</code>+<code>r</code> to get search prompt</li>
 <li>Type a search term</li>
-<li><code>ctrl</code>+<code>r</code> to navigate through matches</li>
+<li><code>ctrl</code>+<code>r</code> to cycle through matches</li>
+<li>Hit <code>enter</code> if you want to reuse the match. Hit <code>ctrl</code>+<code>c</code> to exit out of the search.</li>
 </ol>
 </div>
 
