@@ -283,7 +283,14 @@ $(document).ready(function () {
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#installing-git">Installing Git</a></li>
-<li><a href="#authentication">Authentication</a></li>
+<li><a href="#authentication">Authentication</a>
+<ul>
+<li><a href="#check-for-existing-ssh-keys">Check for existing SSH Keys</a></li>
+<li><a href="#generate-a-new-ssh-key">Generate a new SSH key</a></li>
+<li><a href="#add-an-ssh-key-to-the-ssh-agent">Add an SSH key to the ssh-agent</a></li>
+<li><a href="#add-public-key-to-github">Add public key to GitHub</a></li>
+<li><a href="#test-to-see-if-it-worked">Test to see if it worked</a></li>
+</ul></li>
 <li><a href="#version-control">Version Control:</a>
 <ul>
 <li><a href="#motivation-1-change-code-without-the-fear-of-breaking-it">Motivation 1: Change code without the fear of breaking it</a></li>
@@ -307,6 +314,7 @@ $(document).ready(function () {
 <li><a href="https://education.github.com/git-cheat-sheet-education.pdf">Git Cheat Sheet</a></li>
 <li><a href="https://guides.github.com/introduction/git-handbook/">Git Handbook</a></li>
 <li><a href="https://swcarpentry.github.io/git-novice/">Git Novice</a></li>
+<li><a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh">Connecting to GitHub with SSH</a></li>
 </ul>
 </div>
 <div id="installing-git" class="section level1">
@@ -341,6 +349,68 @@ git config --global user.email &quot;YOUR EMAIL ADDRESS&quot;</code></pre>
 </div>
 <div id="authentication" class="section level1">
 <h1>Authentication</h1>
+<ul>
+<li><p>To integrate GitHub (the website) with git (the command-line program), you have to set up the proper authorization.</p></li>
+<li><p>GitHub now requires you to use either <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token">Personal Access Tokens</a> or <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh">SSH Keys</a> for interfacing. For this class, we’ll use SSH Keys since its implementation is slightly easier.</p></li>
+<li><p>SSH uses what’s called a <a href="https://en.wikipedia.org/wiki/Public-key_cryptography">key pair</a> where GitHub houses a “public key” (a very long publicly known password) and you have on your computer a “private key” (a very long privately known password).</p></li>
+<li><p>Think about the public key as a padlock, and the private key as the key. You have to use to private key to unlock the public key.</p></li>
+<li><p>You need to generate a new private key, and go through the below steps, for each computer for which you intend to use git.</p></li>
+</ul>
+<div id="check-for-existing-ssh-keys" class="section level2">
+<h2>Check for existing SSH Keys</h2>
+<ul>
+<li><p>In the terminal run</p>
+<pre class="bash"><code>ls -al ~/.ssh</code></pre></li>
+<li><p>This will say something like “ls: cannot access ‘/c/Users/Vlad Dracula/.ssh’: No such file or directory” if you don’t have any public/private key pairs.</p></li>
+<li><p>This will list out files names like “id_rsa.pub”, “id_ecdsa.pub”, or “id_ed25519.pub” if you do have a public/private key pair.</p></li>
+</ul>
+</div>
+<div id="generate-a-new-ssh-key" class="section level2">
+<h2>Generate a new SSH key</h2>
+<ul>
+<li><p>If you <strong>do</strong> have an SSH key, go to the next section (“Add an SSH key to the ssh-agent”)</p></li>
+<li><p>If you <strong>don’t</strong> have an SSH key, follow the below steps.</p></li>
+<li><p>In the terminal, run</p>
+<pre class="bash"><code>ssh-keygen -t ed25519 -C &quot;your_email@example.com&quot;</code></pre></li>
+<li><p>Press enter if prompted where to save the key to accept the default location.</p></li>
+<li><p>At the prompt, type a password that you can remember.</p></li>
+</ul>
+</div>
+<div id="add-an-ssh-key-to-the-ssh-agent" class="section level2">
+<h2>Add an SSH key to the ssh-agent</h2>
+<ol style="list-style-type: decimal">
+<li><p>In the terminal, run the following to start the ssh-agent in the background.</p>
+<pre class="bash"><code>eval &quot;$(ssh-agent -s)&quot;</code></pre></li>
+<li><p>In the terminal, run the following to add your SSH private key to the ssh-agent:</p>
+<pre class="bash"><code>ssh-add ~/.ssh/id_ed25519</code></pre></li>
+</ol>
+</div>
+<div id="add-public-key-to-github" class="section level2">
+<h2>Add public key to GitHub</h2>
+<ol style="list-style-type: decimal">
+<li><p>Run the following in the terminal to show the contents of “id_ed25519.pub”.</p>
+<pre class="bash"><code>cat ~/.ssh/id_ed25519.pub</code></pre></li>
+<li><p>Highlight the output using your mouse and copy the contents.</p></li>
+<li><p>On <a href="https://github.com/">GitHub</a>, in the upper right corner, click on your profile photo and click on “Settings”</p>
+<p><img src="figs/userbar-account-settings.png" alt="GitHub Account Settings Menu" width="20%"/></p></li>
+<li><p>On the left sidebar, click on “SSH and GPG keys”</p>
+<p><img src="figs/settings-sidebar-ssh-keys.png" alt="SSH and GPG Keys" width="20%"/></p></li>
+<li><p>Click on “New SSH key”</p>
+<p><img src="figs/ssh-add-ssh-key.png" alt="SSH and GPG Keys" width="50%"/></p></li>
+<li><p>In the title field, choose a descriptive title, like “Personal Laptop”.</p></li>
+<li><p>Paste your key into the “Key” field.</p></li>
+<li><p>Click “Add SSH key” and confirm your GitHub password.</p></li>
+</ol>
+</div>
+<div id="test-to-see-if-it-worked" class="section level2">
+<h2>Test to see if it worked</h2>
+<ol style="list-style-type: decimal">
+<li><p>Enter the following in the terminal:</p>
+<pre class="bash"><code>ssh -T git@github.com</code></pre></li>
+<li><p>Type “yes” if prompted to continue connecting.</p></li>
+<li><p>You are successful if you see something like <code>Hi dcgerard! You've successfully authenticated, but GitHub does not provide shell access.</code></p></li>
+</ol>
+</div>
 </div>
 <div id="version-control" class="section level1">
 <h1>Version Control:</h1>
