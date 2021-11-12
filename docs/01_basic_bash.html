@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2021-11-12" />
 
 <title>Basic Bash</title>
 
@@ -271,7 +271,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Basic Bash</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-11-11</h4>
+<h4 class="date">2021-11-12</h4>
 
 </div>
 
@@ -424,6 +424,7 @@ _site.yml</code></pre></li>
 </div>
 <div id="string-search-with-grep" class="section level1">
 <h1>String search with <code>grep</code></h1>
+<p>Find any string in any file in the current working directory (or subdirectories or the current working directory).</p>
 <ul>
 <li><code>-r</code> recursive</li>
 <li><code>-n</code> line number</li>
@@ -432,25 +433,29 @@ _site.yml</code></pre></li>
 <li><code>pdfgrep</code> (need to install separately) for searching text in PDFs.</li>
 </ul>
 <pre class="bash"><code>grep -rnw -e &quot;move&quot;</code></pre>
-<pre><code>01_basic_bash.Rmd:93:  paths in R, using two periods mean &quot;move back a folder&quot;. 
+<pre><code>.Rhistory:2:grep -rnwe &quot;move&quot;
+01_git_github.Rmd:173:- You can go back to previous versions of your code/text, then move forward to 
+01_basic_bash.Rmd:93:  paths in R, using two periods mean &quot;move back a folder&quot;. 
 01_basic_bash.Rmd:100:    - If you use `cd` without specifying a folder to move to, it will move the 
 01_basic_bash.Rmd:108:    - OK, I&#39;m going to move us back to the 01_git directory.  
-01_basic_bash.Rmd:186:grep -rnw -e &quot;move&quot;
-01_git_github.Rmd:62:- You can go back to previous versions of your code/text, then move forward to </code></pre>
+01_basic_bash.Rmd:188:grep -rnw -e &quot;move&quot;</code></pre>
 <pre class="bash"><code>grep -rnw -e &quot;mov&quot;</code></pre>
-<pre><code>01_basic_bash.Rmd:190:grep -rnw -e &quot;mov&quot;
-01_basic_bash.Rmd:194:grep -rn -e &quot;mov&quot;</code></pre>
+<pre><code>01_basic_bash.Rmd:192:grep -rnw -e &quot;mov&quot;
+01_basic_bash.Rmd:196:grep -rn -e &quot;mov&quot;</code></pre>
 <pre class="bash"><code>grep -rn -e &quot;mov&quot;</code></pre>
-<pre><code>01_basic_bash.Rmd:93:  paths in R, using two periods mean &quot;move back a folder&quot;. 
+<pre><code>.Rhistory:2:grep -rnwe &quot;move&quot;
+.Rhistory:9:conda_remove(envname = &quot;r-reticulate&quot;)
+.Rhistory:11:conda_remove(&quot;bs4&quot;)
+01_git_github.Rmd:173:- You can go back to previous versions of your code/text, then move forward to 
+01_basic_bash.Rmd:93:  paths in R, using two periods mean &quot;move back a folder&quot;. 
 01_basic_bash.Rmd:100:    - If you use `cd` without specifying a folder to move to, it will move the 
 01_basic_bash.Rmd:108:    - OK, I&#39;m going to move us back to the 01_git directory.  
 01_basic_bash.Rmd:156:- `rm`: Remove a file.
 01_basic_bash.Rmd:170:- `rmdir`: Remove a directory/folder.
-01_basic_bash.Rmd:186:grep -rnw -e &quot;move&quot;
-01_basic_bash.Rmd:190:grep -rnw -e &quot;mov&quot;
-01_basic_bash.Rmd:194:grep -rn -e &quot;mov&quot;
-01_basic_bash.Rmd:219:I&#39;ll remove that file now
-01_git_github.Rmd:62:- You can go back to previous versions of your code/text, then move forward to </code></pre>
+01_basic_bash.Rmd:188:grep -rnw -e &quot;move&quot;
+01_basic_bash.Rmd:192:grep -rnw -e &quot;mov&quot;
+01_basic_bash.Rmd:196:grep -rn -e &quot;mov&quot;
+01_basic_bash.Rmd:221:I&#39;ll remove that file now</code></pre>
 </div>
 <div id="download-data-with-wget" class="section level1">
 <h1>Download data with <code>wget</code></h1>
@@ -465,17 +470,17 @@ _site.yml</code></pre></li>
 </ul>
 <p>E.g. to download the HTML file that contains the Wikipedia list of <a href="https://en.wikipedia.org/wiki/List_of_theological_demons">theological demons</a>, we can go</p>
 <pre class="bash"><code>wget -nc -nd https://en.wikipedia.org/wiki/List_of_theological_demons</code></pre>
-<pre><code>--2021-11-11 10:48:06--  https://en.wikipedia.org/wiki/List_of_theological_demons
+<pre><code>--2021-11-12 15:24:54--  https://en.wikipedia.org/wiki/List_of_theological_demons
 Resolving en.wikipedia.org (en.wikipedia.org)... 208.80.154.224, 2620:0:861:ed1a::1
 Connecting to en.wikipedia.org (en.wikipedia.org)|208.80.154.224|:443... connected.
 HTTP request sent, awaiting response... 200 OK
 Length: 75077 (73K) [text/html]
 Saving to: ‘List_of_theological_demons’
 
-     0K .......... .......... .......... .......... .......... 68% 13.1M 0s
-    50K .......... .......... ...                             100% 39.2M=0.004s
+     0K .......... .......... .......... .......... .......... 68% 3.15M 0s
+    50K .......... .......... ...                             100% 3.00M=0.02s
 
-2021-11-11 10:48:06 (16.6 MB/s) - ‘List_of_theological_demons’ saved [75077/75077]</code></pre>
+2021-11-12 15:24:54 (3.10 MB/s) - ‘List_of_theological_demons’ saved [75077/75077]</code></pre>
 <pre class="bash"><code>ls</code></pre>
 <pre><code>01_basic_bash.Rmd
 01_git_github.Rmd

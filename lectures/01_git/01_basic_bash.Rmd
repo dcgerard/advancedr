@@ -176,6 +176,8 @@ knitr::opts_chunk$set(echo = TRUE, comment = "")
 
 # String search with `grep`
 
+Find any string in any file in the current working  directory (or subdirectories or the current working directory).
+
 - `-r` recursive
 - `-n` line number
 - `-w` whole word only
@@ -221,7 +223,6 @@ I'll remove that file now
 ```{bash}
 rm List_of_theological_demons
 ```
-
 
 # Search your command history with `reverse-i-search`
 

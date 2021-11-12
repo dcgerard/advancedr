@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2021-11-12" />
 
 <title>Git and GitHub</title>
 
@@ -275,7 +275,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Git and GitHub</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-11-11</h4>
+<h4 class="date">2021-11-12</h4>
 
 </div>
 
@@ -296,6 +296,23 @@ $(document).ready(function () {
 <li><a href="#motivation-1-change-code-without-the-fear-of-breaking-it">Motivation 1: Change code without the fear of breaking it</a></li>
 <li><a href="#motivation-2-easy-collaboration">Motivation 2: Easy Collaboration</a></li>
 <li><a href="#motivation-3-great-for-job-interviews">Motivation 3: Great for job interviews</a></li>
+</ul></li>
+<li><a href="#basic-git">Basic Git</a>
+<ul>
+<li><a href="#initialize-a-repository">Initialize a repository</a>
+<ul>
+<li><a href="#on-github">On GitHub</a></li>
+<li><a href="#on-the-terminal">On the terminal</a></li>
+</ul></li>
+<li><a href="#status">Status</a></li>
+<li><a href="#staging">Staging</a></li>
+<li><a href="#committing">Committing</a></li>
+<li><a href="#looking-at-differences">Looking at differences</a></li>
+<li><a href="#cloning">Cloning</a></li>
+<li><a href="#pushing">Pushing</a></li>
+<li><a href="#pulling">Pulling</a></li>
+<li><a href="#branching">Branching</a></li>
+<li><a href="#merge-conflicts">Merge Conflicts</a></li>
 </ul></li>
 <li><a href="#list-of-git-commands">List of git commands</a></li>
 <li><a href="#vocabulary-list-blischak-et.-al.-2016">Vocabulary List (<span>Blischak et. al., 2016</span>)</a></li>
@@ -468,6 +485,78 @@ git config --global user.email &quot;YOUR EMAIL ADDRESS&quot;</code></pre>
 <li><p>You can make your final-project repo public so prospective employers can view your work.</p></li>
 <li><p>You can host a website on GitHub, increasing your visibility. I host my <a href="http://dcgerard.github.io/">personal website</a> and <a href="https://data-science-master.github.io/lectures/">teaching websites</a> on GitHub.</p></li>
 </ul>
+</div>
+</div>
+<div id="basic-git" class="section level1">
+<h1>Basic Git</h1>
+<ul>
+<li><p>A <strong>repository</strong> (or repo, for short) is a collection of files (in a folder and its subfolders) that are together under version control. In data analysis, each repository is typically one project (like a data analysis, a homework, or a collection of code that performs a similar task).</p></li>
+<li><p>The way git works (graphic from Mark Lodato):</p>
+<p><img src="figs/basic-usage.png" alt="https://marklodato.github.io/visual-git-guide/index-en.html" /> </p></li>
+<li><p><strong>Working Directory</strong>: To git, this means the current versions of the files. Changes to files that you haven’t recorded only exist in the working directory and are not yet saved in the history.</p></li>
+<li><p><strong>Stage</strong>: Files that are scheduled to be committed to the history, but not yet committed. Only files in the stage will be committed to the history.</p></li>
+<li><p><strong>History</strong>: The timeline of snapshots of files. You commit a file to the history and then, even if you modify it later, you can always go back to that same file version.</p></li>
+<li><p>We’ll focus on the right-hand-side of this diagram where your workflow is typically:</p>
+<ol style="list-style-type: decimal">
+<li>Modify files in your working directory until you want a snapshot.</li>
+<li>Add these modified files to the staging area.</li>
+<li>Commit staged files to history, where they will be kept forever.</li>
+</ol></li>
+<li><p>The left-hand side of the diagram is used when you want to undo mistakes.</p></li>
+<li><p>All git commands begin with <code>git</code> followed immediately by an argument for the type of command you want to execute.</p></li>
+<li><p>For the right-hand-side of the diagram, the following are the useful git commands:</p>
+<ul>
+<li><code>git init</code>: Initialize a git repository. <em>Only do this once per project</em>.</li>
+<li><code>git status</code>: Show which files are staged in your working directory, and which are modified but not staged.</li>
+<li><code>git add</code>: Add modified files from your working directory to the stage.</li>
+<li><code>git diff</code>: Look at how files in the working directory have been modified.</li>
+<li><code>git diff --staged</code>: Look at how files in the stage have been modified.</li>
+<li><code>git commit -m "[descriptive message]"</code>: commit your staged content as a new commit snapshot.</li>
+</ul></li>
+</ul>
+<div id="initialize-a-repository" class="section level2">
+<h2>Initialize a repository</h2>
+<ul>
+<li><p>Git needs to be told that a folder is a repo. Otherwise, it won’t keep files under version control.</p></li>
+<li><p>In this class, you won’t need to tell git this (I’ll tell git this), but in the real world you will. So we’ll go over how to do this on GitHub and on the terminal.</p></li>
+</ul>
+<div id="on-github" class="section level3">
+<h3>On GitHub</h3>
+<ul>
+<li><p>Git is a version control system, GitHub is a website that hosts git repositories.</p></li>
+<li><p>You can create a git repo on GitHub (GitHub’s server is called the “remote”), then download (“clone”) the repo onto your computer (your computer called the “local”).</p></li>
+</ul>
+</div>
+<div id="on-the-terminal" class="section level3">
+<h3>On the terminal</h3>
+</div>
+</div>
+<div id="status" class="section level2">
+<h2>Status</h2>
+</div>
+<div id="staging" class="section level2">
+<h2>Staging</h2>
+</div>
+<div id="committing" class="section level2">
+<h2>Committing</h2>
+</div>
+<div id="looking-at-differences" class="section level2">
+<h2>Looking at differences</h2>
+</div>
+<div id="cloning" class="section level2">
+<h2>Cloning</h2>
+</div>
+<div id="pushing" class="section level2">
+<h2>Pushing</h2>
+</div>
+<div id="pulling" class="section level2">
+<h2>Pulling</h2>
+</div>
+<div id="branching" class="section level2">
+<h2>Branching</h2>
+</div>
+<div id="merge-conflicts" class="section level2">
+<h2>Merge Conflicts</h2>
 </div>
 </div>
 <div id="list-of-git-commands" class="section level1">

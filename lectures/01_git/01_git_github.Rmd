@@ -230,6 +230,72 @@ klippy::klippy()
   [personal website](http://dcgerard.github.io/) and 
   [teaching websites](https://data-science-master.github.io/lectures/) 
   on GitHub.
+  
+# Basic Git
+
+- A **repository** (or repo, for short) is a collection of files (in a folder and its subfolders) that are together under version control. In data analysis, each repository is typically one project (like a data analysis, a homework, or a collection of code that performs a similar task).
+
+- The way git works (graphic from Mark Lodato):
+
+    ![https://marklodato.github.io/visual-git-guide/index-en.html](./figs/basic-usage.png)\ 
+
+- **Working Directory**: To git, this means the current versions of the files. Changes to files that you haven't recorded only exist in the working directory and are not yet saved in the history.
+- **Stage**: Files that are scheduled to be committed to the history, but not yet committed. Only files in the stage will be committed to the history.
+- **History**: The timeline of snapshots of files. You commit a file to the history and then, even if you modify it later, you can always go back to that same file version.
+
+- We'll focus on the right-hand-side of this diagram where your workflow is typically:
+    1. Modify files in your working directory until you want a snapshot.
+    2. Add these modified files to the staging area.
+    3. Commit staged files to history, where they will be kept forever.
+
+- The left-hand side of the diagram is used when you want to undo mistakes.  
+
+- All git commands begin with `git` followed immediately by an argument for
+  the type of command you want to execute.
+
+- For the right-hand-side of the diagram, the following are the useful 
+  git commands:
+    - `git init`: Initialize a git repository. *Only do this once per project*.
+    - `git status`: Show which files are staged in your working directory, and which
+      are modified but not staged.
+    - `git add`: Add modified files from your working directory to the stage.
+    - `git diff`: Look at how files in the working directory have been
+      modified.
+    - `git diff --staged`: Look at how files in the stage have been modified.
+    - `git commit -m "[descriptive message]"`: commit your staged content as a new 
+      commit snapshot.
+  
+## Initialize a repository
+
+- Git needs to be told that a folder is a repo. Otherwise, it won't keep files under version control.
+
+- In this class, you won't need to tell git this (I'll tell git this), but in the real world you will. So we'll go over how to do this on GitHub and on the terminal.
+
+### On GitHub
+
+- Git is a version control system, GitHub is a website that hosts git repositories.
+
+- You can create a git repo on GitHub (GitHub's server is called the "remote"), then download ("clone") the repo onto your computer (your computer called the "local").
+
+### On the terminal
+
+## Status
+
+## Staging
+
+## Committing
+
+## Looking at differences
+
+## Cloning
+
+## Pushing
+
+## Pulling
+
+## Branching
+
+## Merge Conflicts
 
 # List of git commands
 
