@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-11-16" />
+<meta name="date" content="2021-11-17" />
 
 <title>Git and GitHub</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Git and GitHub</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-11-16</h4>
+<h4 class="date">2021-11-17</h4>
 
 </div>
 
@@ -368,10 +368,15 @@ $(document).ready(function () {
 <li><a href="#installing-git">Installing Git</a></li>
 <li><a href="#authentication">Authentication</a>
 <ul>
+<li><a href="#generate-key-pair-on-r-studio">Generate Key Pair on R Studio</a></li>
+<li><a href="#generate-key-pair-on-the-terminal">Generate Key Pair on the Terminal</a>
+<ul>
 <li><a href="#check-for-existing-ssh-keys">Check for existing SSH Keys</a></li>
 <li><a href="#generate-a-new-ssh-key">Generate a new SSH key</a></li>
 <li><a href="#add-an-ssh-key-to-the-ssh-agent">Add an SSH key to the ssh-agent</a></li>
-<li><a href="#add-public-key-to-github">Add public key to GitHub</a></li>
+<li><a href="#copy-public-key">Copy Public Key</a></li>
+</ul></li>
+<li><a href="#add-public-key-to-github">Add Public Key to GitHub</a></li>
 <li><a href="#test-to-see-if-it-worked">Test to see if it worked</a></li>
 </ul></li>
 <li><a href="#version-control">Version Control:</a>
@@ -461,45 +466,72 @@ $(document).ready(function () {
 <li><p>To integrate GitHub (the website) with git (the command-line program), you have to set up the proper authorization.</p></li>
 <li><p>If you can already integrate with GitHub, then skip this step.</p></li>
 <li><p>GitHub now requires you to use either <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token">Personal Access Tokens</a> or <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh">SSH Keys</a> for interfacing. For this class, we’ll use SSH Keys since its implementation is slightly easier.</p></li>
-<li><p>SSH uses what’s called a <a href="https://en.wikipedia.org/wiki/Public-key_cryptography">key pair</a> where GitHub houses a “public key” (a very long publicly known password) and you have on your computer a “private key” (a very long privately known password).</p></li>
+<li><p>SSH uses what’s called a <a href="https://en.wikipedia.org/wiki/Public-key_cryptography">key pair</a> where GitHub has a “public key” (a very long publicly known password) and you have on your computer a “private key” (a very long privately known password).</p></li>
 <li><p>Think about the public key as a padlock, and the private key as the key. You have to use to private key to unlock the public key.</p></li>
 <li><p>You need to generate a new private key, and go through the below steps, for each computer for which you intend to use git.</p></li>
 </ul>
-<div id="check-for-existing-ssh-keys" class="section level2">
-<h2>Check for existing SSH Keys</h2>
+<div id="generate-key-pair-on-r-studio" class="section level2">
+<h2>Generate Key Pair on R Studio</h2>
+<ul>
+<li><p>R Studio makes it easy to generate a key pair.</p></li>
+<li><p>Check to see if you already have an SSH key pair by running the following in R</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">file.exists</span>(<span class="st">&quot;~/.ssh/id_rsa.pub&quot;</span>)</span></code></pre></div>
+<p>It will return <code>FALSE</code> if you do not have a key pair.</p></li>
+<li><p>Open up Tools &gt; Global Options… &gt; Git/SVN.</p></li>
+<li><p>If you do not have an SSH key pair, then click on “Create RSA Key…”</p>
+<p><img src="01_figs/rstudio_rsa.png" alt="Create RSA Key" width="50%"/></p></li>
+<li><p>Click on “View public key”</p>
+<p><img src="01_figs/rstudio_copy.png" alt="View Public Key" width="50%"/></p></li>
+<li><p>Copy the entire text that shows up. This is your public key.</p></li>
+<li><p>Go to <a href="https://dcgerard.github.io/advancedr/01_git_github.html#add-public-key-to-github">Add Public Key to GitHub</a> to continue authentication setup.</p></li>
+</ul>
+</div>
+<div id="generate-key-pair-on-the-terminal" class="section level2">
+<h2>Generate Key Pair on the Terminal</h2>
+<ul>
+<li>If the R Studio pipeline does not work, then try generating your key pair on the terminal with the following instructions.</li>
+</ul>
+<div id="check-for-existing-ssh-keys" class="section level3">
+<h3>Check for existing SSH Keys</h3>
 <ul>
 <li><p>In the terminal run</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-al</span> ~/.ssh</span></code></pre></div></li>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-al</span> ~/.ssh</span></code></pre></div></li>
 <li><p>This will say something like “ls: cannot access ‘/c/Users/Vlad Dracula/.ssh’: No such file or directory” if you don’t have any public/private key pairs.</p></li>
 <li><p>This will list out files names like “id_rsa.pub”, “id_ecdsa.pub”, or “id_ed25519.pub” if you do have a public/private key pair.</p></li>
 </ul>
 </div>
-<div id="generate-a-new-ssh-key" class="section level2">
-<h2>Generate a new SSH key</h2>
+<div id="generate-a-new-ssh-key" class="section level3">
+<h3>Generate a new SSH key</h3>
 <ul>
 <li><p>If you <strong>do</strong> have an SSH key, go to the next section (“Add an SSH key to the ssh-agent”)</p></li>
 <li><p>If you <strong>don’t</strong> have an SSH key, follow the below steps.</p></li>
 <li><p>In the terminal, run</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-keygen</span> <span class="at">-t</span> ed25519 <span class="at">-C</span> <span class="st">&quot;your_email@example.com&quot;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-keygen</span> <span class="at">-t</span> ed25519 <span class="at">-C</span> <span class="st">&quot;your_email@example.com&quot;</span></span></code></pre></div></li>
 <li><p>Press enter if prompted where to save the key to accept the default location.</p></li>
 <li><p>At the prompt, type a password that you can remember.</p></li>
 </ul>
 </div>
-<div id="add-an-ssh-key-to-the-ssh-agent" class="section level2">
-<h2>Add an SSH key to the ssh-agent</h2>
+<div id="add-an-ssh-key-to-the-ssh-agent" class="section level3">
+<h3>Add an SSH key to the ssh-agent</h3>
 <ol style="list-style-type: decimal">
 <li><p>In the terminal, run the following to start the ssh-agent in the background.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">eval</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">ssh-agent</span> <span class="at">-s</span><span class="va">)</span><span class="st">&quot;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">eval</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">ssh-agent</span> <span class="at">-s</span><span class="va">)</span><span class="st">&quot;</span></span></code></pre></div></li>
 <li><p>In the terminal, run the following to add your SSH private key to the ssh-agent:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-add</span> ~/.ssh/id_ed25519</span></code></pre></div></li>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-add</span> ~/.ssh/id_ed25519</span></code></pre></div></li>
 </ol>
 </div>
-<div id="add-public-key-to-github" class="section level2">
-<h2>Add public key to GitHub</h2>
+<div id="copy-public-key" class="section level3">
+<h3>Copy Public Key</h3>
 <ol style="list-style-type: decimal">
 <li><p>Run the following in the terminal to show the contents of “id_ed25519.pub”.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> ~/.ssh/id_ed25519.pub</span></code></pre></div></li>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> ~/.ssh/id_ed25519.pub</span></code></pre></div></li>
 <li><p>Highlight the output using your mouse and copy the contents.</p></li>
+</ol>
+</div>
+</div>
+<div id="add-public-key-to-github" class="section level2">
+<h2>Add Public Key to GitHub</h2>
+<ol style="list-style-type: decimal">
 <li><p>On <a href="https://github.com/">GitHub</a>, in the upper right corner, click on your profile photo and click on “Settings”</p>
 <p><img src="01_figs/userbar-account-settings.png" alt="GitHub Account Settings Menu" width="20%"/></p></li>
 <li><p>On the left sidebar, click on “SSH and GPG keys”</p>
@@ -515,7 +547,7 @@ $(document).ready(function () {
 <h2>Test to see if it worked</h2>
 <ol style="list-style-type: decimal">
 <li><p>Enter the following in the terminal:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="at">-T</span> git@github.com</span></code></pre></div></li>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="at">-T</span> git@github.com</span></code></pre></div></li>
 <li><p>Type “yes” if prompted to continue connecting.</p></li>
 <li><p>You are successful if you see something like <code>Hi dcgerard! You've successfully authenticated, but GitHub does not provide shell access.</code></p></li>
 </ol>
@@ -618,7 +650,7 @@ $(document).ready(function () {
 <li><p>Don’t initialize on your local for this lecture. These are just the steps you would do if you needed to initialize on your local.</p></li>
 <li><p>Use <code>cd</code> to enter the folder that you would like to keep under version control.</p></li>
 <li><p>The use <code>git init</code></p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> init</span></code></pre></div></li>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> init</span></code></pre></div></li>
 <li><p>This will tell git that the folder is a single repo.</p></li>
 <li><p>Your files are not yet tracked. You’ll need to do the steps below to tell git which files to track. But at least git now knows that this is a repo where tracking is possible.</p></li>
 </ul>
@@ -651,29 +683,29 @@ $(document).ready(function () {
 <li><p>Then click on the <img src="01_figs/github_repo/copy_to_clipboard.png" alt="Copy to Clipboard Button" width="3%"/> button to copy the link.</p>
 <p><img src="01_figs/github_repo/init_3.png" alt="Clone a Repo" width="75%"/></p></li>
 <li><p>In the terminal, navigate to where you want to download the repo, then clone it with <code>git clone</code></p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:dcgerard/test.git</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:dcgerard/test.git</span></code></pre></div>
 <p>Make sure to change the link to what you copied (don’t use my link above).</p></li>
 <li><p>Then move into your new repo</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> test</span></code></pre></div></li>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> test</span></code></pre></div></li>
 </ul>
 </div>
 <div id="status" class="section level2">
 <h2>Status</h2>
 <ul>
 <li><p>Use <code>git_status</code> to see what files git is tracking and which are untracked.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code></pre></div></li>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code></pre></div></li>
 <li><p>Git should tell you that everything is up-to-date ``` On branch main Your branch is up to date with ‘origin/main’.</p>
 <p>nothing to commit, working tree clean ```</p></li>
 <li><p>Edit the README.md file to include your name, so that it looks something like this: ``` # test David Gerard</p>
 <p>Repo for trying out GitHub. ``` Make sure to save your changes.</p></li>
 <li><p>Now check the status again.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code></pre></div></li>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code></pre></div></li>
 <li><p>Git should be telling you that README.md has been modified, and the changes are not yet committed. ``` On branch main Your branch is up to date with ‘origin/main’.</p>
 <p>Changes not staged for commit: (use “git add <file>…” to update what will be committed) (use “git restore <file>…” to discard changes in working directory) modified: README.md</p>
 <p>no changes added to commit (use “git add” and/or “git commit -a”) ```</p></li>
 <li><p>Add a new file, called “empty.txt” by</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> empty.txt</span></code></pre></div></li>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> empty.txt</span></code></pre></div></li>
 <li><p><strong>Exercise</strong>: Check the status again. What do you notice?</p></li>
 </ul>
 </div>
@@ -681,9 +713,9 @@ $(document).ready(function () {
 <h2>Staging</h2>
 <ul>
 <li><p>Use <code>git add</code> to add files to the stage.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add README.md</span></code></pre></div></li>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add README.md</span></code></pre></div></li>
 <li><p>Always check which files have been added:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code></pre></div></li>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code></pre></div></li>
 <li><p>Useful flags for <code>git add</code>:</p>
 <ul>
 <li><code>--all</code> will stage all modified and untracked files.</li>
@@ -695,19 +727,19 @@ $(document).ready(function () {
 <h2>Committing</h2>
 <ul>
 <li><p>Use <code>git commit</code> to commit files that are staged to the commit history.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Add name to README.md.&quot;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Add name to README.md.&quot;</span></span></code></pre></div></li>
 <li><p>Your message (written after the <code>-m</code> argument) should be concise, and describe what has been changed since the last commit.</p></li>
 <li><p>If you forget to add a message, git will open up your default text-editor where you can write down a message, save the file, and exit. The commit will occur after you exit the text editor.</p></li>
 <li><p>If your default text editor is vim, you can exit it using <a href="https://stackoverflow.com/questions/11828270/how-to-exit-the-vim-editor">this</a>.</p></li>
 <li><p><code>git status</code> should no longer have README.md as a modified file.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code></pre></div></li>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code></pre></div></li>
 </ul>
 </div>
 <div id="history-of-changes" class="section level2">
 <h2>History of Changes</h2>
 <ul>
 <li><p>You can use <code>git log</code> to see what commits you have done.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log</span></code></pre></div></li>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log</span></code></pre></div></li>
 <li><p>There should be only two commits right now. One from GitHub and one from adding the name to README.md.</p>
 <pre><code>commit 0301eeaf74062f0b80fdb3c27a60cc5ac6f28ca7 (HEAD -&gt; main)
 Author: dcgerard &lt;gerard.1787@gmail.com&gt;
@@ -729,12 +761,12 @@ Date:   Tue Nov 16 10:04:47 2021 -0500
 <li><p>Add the following lines of text to README.md <code>Never and never, my girl riding far and near     In the land of the hearthstone tales, and spelled asleep,     Fear or believe that the wolf in a sheep white hood     Loping and bleating roughly and blithely leap,     My dear, my dear,     Out of a lair in the flocked leaves in the dew dipped year     To eat your heart in the house in the rosy wood.</code></p>
 <p>And delete the line <code>Repo for trying out GitHub.</code></p></li>
 <li><p>Use <code>git diff</code> to see changes in all modified files.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff</span></code></pre></div></li>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff</span></code></pre></div></li>
 <li><p>Lines after a “<code>+</code>” are being added. Lines after a “<code>-</code>” are being removed.</p></li>
 <li><p>You can exit <code>git diff</code> by hitting <code>q</code>.</p></li>
 <li><p><code>git diff</code> won’t check for changes in the staged files by default. But you can see the differences using <code>git diff --staged</code>.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff <span class="at">--staged</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff <span class="at">--staged</span></span></code></pre></div></li>
 <li><p><strong>Exercise</strong>: Stage and commit your changes.</p></li>
 </ul>
 </div>
@@ -742,14 +774,14 @@ Date:   Tue Nov 16 10:04:47 2021 -0500
 <h2>Pushing</h2>
 <ul>
 <li><p>Use <code>git push</code> to push commits to GitHub.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin main</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin main</span></code></pre></div>
 <p>Do this now.</p></li>
 <li><p>“origin” is the name of the remote.</p></li>
 <li><p>“main” is the name of the branch we are pushing to remote.</p></li>
 <li><p>You can see what the remote is named by typing</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> remote <span class="at">-v</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> remote <span class="at">-v</span></span></code></pre></div></li>
 <li><p>You can see what branch you are on by</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch</span></code></pre></div></li>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch</span></code></pre></div></li>
 </ul>
 </div>
 <div id="pulling" class="section level2">
@@ -758,7 +790,7 @@ Date:   Tue Nov 16 10:04:47 2021 -0500
 <li><p>If a colleague has pushed changes to GitHub, you’ll need to pull those changes ontol your local before you can push anything to GitHub.</p></li>
 <li><p>This is different than cloning. Cloning downloads a repo that wasn’t on your local machine. Pulling updates your local machine with the changes on the remote.</p></li>
 <li><p>Use <code>git pull</code> to pull changes.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> pull origin main</span></code></pre></div></li>
+<div class="sourceCode" id="cb29"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> pull origin main</span></code></pre></div></li>
 <li><p>“origin” is the name of the remote.</p></li>
 <li><p>“main” is the name of the branch we are pulling to.</p></li>
 <li><p>If there are no changes on the remote, you’ll get the following message <code>From github.com:dcgerard/test      * branch            main       -&gt; FETCH_HEAD     Already up to date.</code></p></li>
@@ -781,20 +813,20 @@ Date:   Tue Nov 16 10:04:47 2021 -0500
 <h3>Create a branch</h3>
 <ul>
 <li><p>You create a branch with the name <code>&lt;branch&gt;</code> by</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch <span class="op">&lt;</span>branch<span class="op">&gt;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch <span class="op">&lt;</span>branch<span class="op">&gt;</span></span></code></pre></div></li>
 <li><p>Suppose we wanted to calculate some summary statistics, but we are not sure if we want to include these in the report. Let’s create a branch where we explore these summary statistics.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch sumstat</span></code></pre></div></li>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch sumstat</span></code></pre></div></li>
 <li><p>You can see the list of branches (and the current branch) with</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch</span></code></pre></div></li>
+<div class="sourceCode" id="cb32"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch</span></code></pre></div></li>
 </ul>
 </div>
 <div id="move-between-branches" class="section level3">
 <h3>Move between branches</h3>
 <ul>
 <li><p>You switch between branches with:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="op">&lt;</span>branch<span class="op">&gt;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb33"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="op">&lt;</span>branch<span class="op">&gt;</span></span></code></pre></div></li>
 <li><p>Move to the sumstat branch with</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout sumstat</span></code></pre></div></li>
+<div class="sourceCode" id="cb34"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout sumstat</span></code></pre></div></li>
 </ul>
 </div>
 <div id="edit-branch" class="section level3">
@@ -807,20 +839,20 @@ Date:   Tue Nov 16 10:04:47 2021 -0500
 <h3>Push branch to GitHub</h3>
 <ul>
 <li><p>You can push your new branch to GitHub just like you can push your main branch to GitHub:</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin <span class="op">&lt;</span>branch<span class="op">&gt;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb35"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin <span class="op">&lt;</span>branch<span class="op">&gt;</span></span></code></pre></div></li>
 </ul>
 </div>
 <div id="merge-changes-into-main" class="section level3">
 <h3>Merge changes into main</h3>
 <ul>
 <li><p>Suppose you are satisfied with your changes in your new branch, then you’ll want to merge these into the main branch. You can do this on GitHub (<a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">see here</a>). If you do so, then don’t forget to pull the changes from main back into your local machine.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> pull origin main</span></code></pre></div></li>
+<div class="sourceCode" id="cb36"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> pull origin main</span></code></pre></div></li>
 <li><p>Alternatively, you can merge the changes in your local machine. First, checkout the main branch.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout main</span></code></pre></div></li>
+<div class="sourceCode" id="cb37"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout main</span></code></pre></div></li>
 <li><p>Then use <code>merge</code> to merge the changes from <code>&lt;branch&gt;</code> into main.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> merge sumstat</span></code></pre></div></li>
+<div class="sourceCode" id="cb38"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> merge sumstat</span></code></pre></div></li>
 <li><p>Don’t forget to push your changes to GitHub</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin main</span></code></pre></div></li>
+<div class="sourceCode" id="cb39"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin main</span></code></pre></div></li>
 </ul>
 </div>
 <div id="resolving-merge-conflicts" class="section level3">
