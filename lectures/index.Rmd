@@ -26,15 +26,16 @@ This repository contains material based upon work supported by the National Scie
   - [Bash Basics](./01_basic_bash.html)
   - [Git and Github](./01_git_github.html)
 - 02 R Packages
-  - Structure of an R package
-  - Documentation
-  - Workflow
+  - [R Packages](./02_packages.html)
 - 03 Best Practices
-  - Unit Tests
-  - Assertions
-  - Continuous Integration
-- 04 Data Structures
+  - [Best Practices](./03_practices.html)
+- 04 Foundations
+  - Data Structures
+  - Subsetting
+  - Functions
 - 05 Object-oriented Programming
+  - S3 Objects
+  - S4 Objects
 - 06 Environments
 - 07 Functional Programming
 - 08 Metaprogramming
