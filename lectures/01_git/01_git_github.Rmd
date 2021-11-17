@@ -588,7 +588,7 @@ klippy::klippy()
 
 - If a colleague has pushed changes to GitHub, you'll need to pull those changes ontol your local before you can push anything to GitHub.
 
-- This is different than cloning. Cloning downloads a repo that wasn't on your local machine. Pulling updates your local machine with the changes on the remote.
+- This is different than cloning. "Cloning" downloads a repo that wasn't on your local machine. "Pulling" updates your local machine with the changes on the remote.
 
 - Use `git pull` to pull changes.
 
