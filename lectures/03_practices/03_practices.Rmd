@@ -27,13 +27,17 @@ klippy::klippy()
 - Assertions
 - Unit Tests
 - Package Checking
-- Chapter 12 from [R Packages](https://r-pkgs.org/index.html)
+- Coding Style
+- Chapters 12 and 19 from [R Packages](https://r-pkgs.org/index.html)
+- [The tidyverse style guide](https://style.tidyverse.org/)
 
 # Assertions
 
 # Unit Tests
 
 # Package Checking
+
+# Coding Style
 
 # Other Things
 

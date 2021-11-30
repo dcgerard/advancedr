@@ -57,10 +57,28 @@ This course provides an in depth study of the R ecosystem and software developme
     - Make sure this is up-to-date.
     
 - Windows Users will need to install Rtools: <https://cran.r-project.org/bin/windows/Rtools/>
-    - Make sure to put Rtools on the PATH
+    - Make sure to put Rtools on the [PATH](https://en.wikipedia.org/wiki/PATH_(variable)), as described by the instructions on the Rtools website.
 
 - Mac Users will need to install Xcode and a GNU Fortran Compiler: <https://mac.r-project.org/tools/>
-    - Make sure to put gfortran on the PATH
+    - Make sure to put gfortran on the [PATH](https://en.wikipedia.org/wiki/PATH_(variable)), as described by the mactools website.
+    
+- R packages: After you have completed the above, run this in the R console
+    ```{r, eval = FALSE}
+    install.packages("BiocManager")
+    BiocManager::install(c("usethis", 
+                           "devtools", 
+                           "roxygen2", 
+                           "testthat", 
+                           "knitr",
+                           "Rcpp", 
+                           "RcppArmadillo",
+                           "covr"))
+    ```
+    You can verify that you are all set up for R package development by running the following in R:
+    ```{r}
+    devtools::has_devel()
+    ```
+
 
 - Git: <https://git-scm.com/>
     - See installation instructions [here](./01_git_github.html).

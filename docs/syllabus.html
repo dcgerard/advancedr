@@ -348,7 +348,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">STAT 415/615 Regression</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">Updated: 2021-11-11</h4>
+<h4 class="date">Updated: 2021-11-30</h4>
 
 </div>
 
@@ -386,27 +386,40 @@ div.tocify {
 <div id="computing-and-software" class="section level1">
 <h1>Computing and Software</h1>
 <ul>
-<li>R: <a href="http://cran.r-project.org/" class="uri">http://cran.r-project.org/</a>
+<li><p>R: <a href="http://cran.r-project.org/" class="uri">http://cran.r-project.org/</a></p>
 <ul>
 <li>Make sure this is up-to-date.</li>
 </ul></li>
-<li>R Studio: <a href="https://www.rstudio.com/" class="uri">https://www.rstudio.com/</a>
+<li><p>R Studio: <a href="https://www.rstudio.com/" class="uri">https://www.rstudio.com/</a></p>
 <ul>
 <li>Make sure this is up-to-date.</li>
 </ul></li>
-<li>Windows Users will need to install Rtools: <a href="https://cran.r-project.org/bin/windows/Rtools/" class="uri">https://cran.r-project.org/bin/windows/Rtools/</a>
+<li><p>Windows Users will need to install Rtools: <a href="https://cran.r-project.org/bin/windows/Rtools/" class="uri">https://cran.r-project.org/bin/windows/Rtools/</a></p>
 <ul>
-<li>Make sure to put Rtools on the PATH</li>
+<li>Make sure to put Rtools on the <a href="https://en.wikipedia.org/wiki/PATH_(variable)">PATH</a>, as described by the instructions on the Rtools website.</li>
 </ul></li>
-<li>Mac Users will need to install Xcode and a GNU Fortran Compiler: <a href="https://mac.r-project.org/tools/" class="uri">https://mac.r-project.org/tools/</a>
+<li><p>Mac Users will need to install Xcode and a GNU Fortran Compiler: <a href="https://mac.r-project.org/tools/" class="uri">https://mac.r-project.org/tools/</a></p>
 <ul>
-<li>Make sure to put gfortran on the PATH</li>
+<li>Make sure to put gfortran on the <a href="https://en.wikipedia.org/wiki/PATH_(variable)">PATH</a>, as described by the mactools website.</li>
 </ul></li>
-<li>Git: <a href="https://git-scm.com/" class="uri">https://git-scm.com/</a>
+<li><p>R packages: After you have completed the above, run this in the R console</p>
+<pre class="r"><code>install.packages(&quot;BiocManager&quot;)
+BiocManager::install(c(&quot;usethis&quot;, 
+                       &quot;devtools&quot;, 
+                       &quot;roxygen2&quot;, 
+                       &quot;testthat&quot;, 
+                       &quot;knitr&quot;,
+                       &quot;Rcpp&quot;, 
+                       &quot;RcppArmadillo&quot;,
+                       &quot;covr&quot;))</code></pre>
+<p>You can verify that you are all set up for R package development by running the following in R:</p>
+<pre class="r"><code>devtools::has_devel()</code></pre>
+<pre><code>## Your system is ready to build packages!</code></pre></li>
+<li><p>Git: <a href="https://git-scm.com/" class="uri">https://git-scm.com/</a></p>
 <ul>
 <li>See installation instructions <a href="./01_git_github.html">here</a>.</li>
 </ul></li>
-<li>A GitHub Account: <a href="https://github.com/" class="uri">https://github.com/</a>
+<li><p>A GitHub Account: <a href="https://github.com/" class="uri">https://github.com/</a></p>
 <ul>
 <li>Choose a professional username.</li>
 </ul></li>

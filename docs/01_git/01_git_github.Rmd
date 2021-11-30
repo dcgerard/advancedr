@@ -57,14 +57,19 @@ klippy::klippy()
     
 4. Choose your favorite editor to be your default
     - Nano (a simple text editor): 
+    
         ```{bash, eval = FALSE}
         git config --global core.editor "nano -w"
         ```
+        
     - Notepad (Windows only): 
+    
         ```{bash, eval = FALSE}
         git config --global core.editor "c:/Windows/System32/notepad.exe"
         ```
+        
     - Emacs (for the brave) if it is already installed:
+    
         ```{bash, eval = FALSE}
         git config --global core.editor "emacs"
         ```
@@ -114,6 +119,7 @@ klippy::klippy()
 ### Check for existing SSH Keys
 
 - In the terminal run
+
     ```{bash, eval = FALSE}
     ls -al ~/.ssh
     ```
@@ -129,6 +135,7 @@ klippy::klippy()
 - If you **don't** have an SSH key, follow the below steps. 
 
 - In the terminal, run 
+
     ```{bash, eval = FALSE}
     ssh-keygen -t ed25519 -C "your_email@example.com"
     ```
@@ -140,11 +147,13 @@ klippy::klippy()
 ### Add an SSH key to the ssh-agent
 
 1. In the terminal, run the following to start the ssh-agent in the background.
+
     ```{bash, eval = FALSE}
     eval "$(ssh-agent -s)"
     ```
     
 2. In the terminal, run the following to add your SSH private key to the ssh-agent:
+
     ```{bash, eval = FALSE}
     ssh-add ~/.ssh/id_ed25519
     ```
@@ -152,6 +161,7 @@ klippy::klippy()
 ### Copy Public Key
 
 1. Run the following in the terminal to show the contents of "id_ed25519.pub".
+
     ```{bash, eval = FALSE}
     cat ~/.ssh/id_ed25519.pub
     ```
@@ -189,6 +199,7 @@ klippy::klippy()
 2. Type "yes" if prompted to continue connecting.
 
 3. You are successful if you see something like
+
     ```
     Hi dcgerard! You've successfully authenticated, but GitHub does not provide shell access.
     ```
@@ -373,6 +384,7 @@ klippy::klippy()
     ```
     
 - Git should tell you that everything is up-to-date
+
     ```
     On branch main
     Your branch is up to date with 'origin/main'.
@@ -381,6 +393,7 @@ klippy::klippy()
     ```
     
 - Edit the README.md file to include your name, so that it looks something like this:
+
     ```
     # test
     David Gerard
@@ -395,6 +408,7 @@ klippy::klippy()
     ```
     
 - Git should be telling you that README.md has been modified, and the changes are not yet committed.
+
     ```
     On branch main
     Your branch is up to date with 'origin/main'.
@@ -408,6 +422,7 @@ klippy::klippy()
     ```
     
 - Add a new file, called "empty.txt" by
+
     ```{bash, eval = FALSE}
     touch empty.txt
     ```
@@ -456,6 +471,7 @@ klippy::klippy()
   [this](https://stackoverflow.com/questions/11828270/how-to-exit-the-vim-editor).
     
 - `git status` should no longer have README.md as a modified file.
+
     ```{bash, eval=FALSE}
     git status
     ```
@@ -485,9 +501,11 @@ klippy::klippy()
     ```
     
 - **Exercise**: Add the following line of text to "empty.txt"
+
     ```
     blah blah blah
     ```
+    
     Save the output. Now stage and commit the changes.
     
     ```{bash, eval = FALSE, echo = FALSE}
@@ -498,6 +516,7 @@ klippy::klippy()
 ## Looking at differences
 
 - Add the following lines of text to README.md
+
     ```
     Never and never, my girl riding far and near
     In the land of the hearthstone tales, and spelled asleep,
@@ -509,6 +528,7 @@ klippy::klippy()
     ```
     
     And delete the line
+    
     ```
     Repo for trying out GitHub.
     ```
@@ -553,11 +573,13 @@ klippy::klippy()
 - "main" is the name of the branch we are pushing to remote.
 
 - You can see what the remote is named by typing
+
     ```{bash, eval = FALSE}
     git remote -v
     ```
     
 - You can see what branch you are on by
+
     ```{bash, eval = FALSE}
     git branch
     ```
@@ -566,7 +588,7 @@ klippy::klippy()
 
 - If a colleague has pushed changes to GitHub, you'll need to pull those changes ontol your local before you can push anything to GitHub.
 
-- This is different than cloning. Cloning downloads a repo that wasn't on your local machine. Pulling updates your local machine with the changes on the remote.
+- This is different than cloning. "Cloning" downloads a repo that wasn't on your local machine. "Pulling" updates your local machine with the changes on the remote.
 
 - Use `git pull` to pull changes.
 
@@ -579,6 +601,7 @@ klippy::klippy()
 - "main" is the name of the branch we are pulling to.
 
 - If there are no changes on the remote, you'll get the following message
+
     ```
     From github.com:dcgerard/test
      * branch            main       -> FETCH_HEAD
@@ -613,6 +636,7 @@ klippy::klippy()
     ```
 
 - You can see the list of branches (and the current branch) with
+
     ```{bash, eval = FALSE}
     git branch
     ```
@@ -638,6 +662,7 @@ klippy::klippy()
 ### Push branch to GitHub
 
 - You can push your new branch to GitHub just like you can push your main branch to GitHub:
+
     ```{bash, eval=FALSE}
     git push origin <branch>
     ```
@@ -645,6 +670,7 @@ klippy::klippy()
 ### Merge changes into main
 
 - Suppose you are satisfied with your changes in your new branch, then you'll want to merge these into the main branch. You can do this on GitHub ([see here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests)). If you do so, then don't forget to pull the changes from main back into your local machine.
+
     ```{bash, eval=FALSE}
     git pull origin main
     ```
@@ -709,8 +735,3 @@ klippy::klippy()
 - **pull**: (*verb*) to retrieve commits from a remote repository and merge them into a local repository
 - **push**: (*verb*) to send commits from a local repository to a remote repository
 - **pull request**: (*noun*) a message sent by one GitHub user to merge the commits in their remote repository into another user’s remote repository
-
-
-
-
-
