@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-11-30" />
+<meta name="date" content="2021-12-02" />
 
 <title>R Packages</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">R Packages</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-11-30</h4>
+<h4 class="date">2021-12-02</h4>
 
 </div>
 
@@ -404,7 +404,7 @@ $(document).ready(function () {
 <h1>Prereqs</h1>
 <ul>
 <li><p>Make sure you have the following packages installed.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pkgvec <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;usethis&quot;</span>, <span class="st">&quot;devtools&quot;</span>, <span class="st">&quot;roxygen2&quot;</span>, <span class="st">&quot;testthat&quot;</span>, <span class="st">&quot;knitr&quot;</span>)</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pkgvec <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;usethis&quot;</span>, <span class="st">&quot;devtools&quot;</span>, <span class="st">&quot;roxygen2&quot;</span>, <span class="st">&quot;testthat&quot;</span>, <span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;covr&quot;</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (pkg <span class="cf">in</span> pkgvec) {</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(pkg, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) </span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(pkg)  </span>
@@ -426,16 +426,16 @@ $(document).ready(function () {
 <h1>Package States</h1>
 <ul>
 <li><p>The same R package is in a different format/state depending at different points of development.</p></li>
-<li><p>Source package: A directory of files (R scripts, documentation files, test scripts, etc) with a specific structure. This lecture is about developing source packages.</p></li>
-<li><p>Bundled package: A source package that has been compressed into a single file (along with a few other operations). These usually end in “.tar.gz”. We use the following to create a bundled package from a source package:</p>
+<li><p><strong>Source package</strong>: A directory of files (R scripts, documentation files, test scripts, etc) with a specific structure. This lecture is about developing source packages.</p></li>
+<li><p><strong>Bundled package</strong>: A source package that has been compressed into a single file (along with a few other operations). These usually end in “.tar.gz”. We use the following to create a bundled package from a source package:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build</span>()</span></code></pre></div>
 <p>You typically only do this when you are about to submit to CRAN.</p></li>
-<li><p>Binary package: A ready-to-install version for folks who do not have R development tools. You typically don’t need to worry about this. If you submit to CRAN, then they will create binaries for you.</p></li>
-<li><p>Installed package: Installing a package decompresses/places your package in the library directory. This makes it so that you can use <code>library()</code> to load a package.</p>
+<li><p><strong>Binary package</strong>: A ready-to-install version for folks who do not have R development tools. You typically don’t need to worry about this. If you submit to CRAN, then they will create binaries for you.</p></li>
+<li><p><strong>Installed package</strong>: Installing a package decompresses/places your package in the library directory. This makes it so that you can use <code>library()</code> to load a package.</p>
 <ul>
 <li><p>Terminology: A <strong>package</strong> is a collection of functions, along with documentation, in a specific format. A <strong>library</strong> is a directory (folder) on your computer that contains installed packages.</p></li>
 <li><p>Confusingly, you use the <code>library()</code> function to load a package.</p></li>
-<li><p>You can see your active libraries with</p>
+<li><p>You can see/control your active libraries with</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">.libPaths</span>()</span></code></pre></div>
 <pre><code>## [1] &quot;/home/dgerard/R/x86_64-pc-linux-gnu-library/4.1&quot;
 ## [2] &quot;/usr/local/lib/R/site-library&quot;                  
@@ -449,7 +449,7 @@ $(document).ready(function () {
 <li>From source package: <code>devtools::install()</code>.</li>
 <li>From GitHub <code>devtools::install_github()</code>.</li>
 </ul></li>
-<li><p>In-memory package: makes functions in a package available for use.</p>
+<li><p><strong>In-memory package</strong>: makes functions in a package available for use.</p>
 <ul>
 <li>Use <code>library()</code> to place an installed package in memory.</li>
 <li>Use <code>devtools::load_all()</code> to place a source package in memory. You typically do this</li>
@@ -485,19 +485,22 @@ $(document).ready(function () {
 <li><p><code>.git</code> is a hidden directory that git uses to store your version control history. Don’t touch this.</p></li>
 <li><p><code>.gitignore</code> is a hidden file used to tell git what files/folders to not place under version control.</p></li>
 <li><p><code>LICENSE</code> and <code>LICENSE.md</code> contain the license that your code is distributed under. Typical open-source licenses are <a href="https://opensource.org/licenses/MIT">MIT</a> and <a href="https://www.gnu.org/licenses/gpl-3.0">GPL-3</a>.</p></li>
-<li><p>The <code>man</code> folder contains files that hold your package’s documentation. E.g. whenever you use <code>help()</code> it uses information from a file in the <code>man</code> folder.</p></li>
+<li><p>The <code>man</code> (for “manual”) folder contains files that hold your package’s documentation. E.g. whenever you use <code>help()</code> it uses information from a file in the <code>man</code> folder.</p></li>
 <li><p><code>NAMESPACE</code> is a file that determines</p>
 <ol style="list-style-type: lower-roman">
 <li>What functions you are available to the user of your package (versus what functions are for internal use only), and</li>
 <li>What functions from other packages are you importing.</li>
 </ol></li>
-<li><p>The <code>R</code> folder contains R script files (ending in “.R”) that hold all of your R code.</p></li>
-<li><p><code>.Rbuildignore</code> is a hidden folder which tells R which files/folders to exclude from the package bundle. You use regular expressions to determine which files to ignore.</p>
+<li><p>The <code>R</code> folder contains R script files (ending in “.R”) that hold all of your R code.</p>
+<ul>
+<li>R code only goes in R scripts (ending in “.R”), <strong>not</strong> R Markdown Files (ending in “.Rmd”).</li>
+</ul></li>
+<li><p><code>.Rbuildignore</code> is a hidden file which tells R which files/folders to exclude from the package bundle. You use regular expressions to determine which files to ignore.</p>
 <ul>
 <li>E.g. if you have a website in your package folder, then you can exclude it from the bundle by placing that folder’s name in <code>.Rbuildignore</code>.</li>
 <li>You typically just use <code>usethis::use_build_ignore()</code> to add files/folders to <code>.Rbuildignore</code>.</li>
 </ul></li>
-<li><p><code>README.md</code> is the file developers typically first look at, and it is the frontpage of your package’s GitHub website. <code>README.Rmd</code> is an R markdown file that generates <code>README.md</code>.</p></li>
+<li><p><code>README.md</code> is the file that other developers typically first look at, and it is the frontpage of your package’s GitHub website. <code>README.Rmd</code> is an R markdown file that generates <code>README.md</code>.</p></li>
 <li><p><code>src</code> is a folder that contains C++ files (ending in “.cpp”).</p></li>
 <li><p><code>tests</code> is a folder that contains R code for unit-tests, which are automatic checks that you write to determine if your R package works as you intend.</p></li>
 </ul>
@@ -513,11 +516,38 @@ $(document).ready(function () {
 <li><p>I don’t like RStudio projects, so I typically run</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_package</span>(<span class="at">path =</span> <span class="st">&quot;.&quot;</span>, <span class="at">rstudio =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>You can use RStudio Projects if you want. But I won’t help with any issues you have with RStudio projects.</p></li>
+<li><p><strong>Example</strong>: For this lecture, we will create an R package called together that</p></li>
 </ul>
 </div>
 </div>
 <div id="the-r-folder" class="section level1">
 <h1>The R folder</h1>
+<ul>
+<li><p>Most R code in package should be a function definition.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fname <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">arg1 =</span> val1, <span class="at">arg2 =</span> val2, ...) {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## code here</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(retval)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>Don’t have other R code in your package until you understand the benefits of exceptions to this rule.</p></li>
+<li><p>All R code should go in R scripts (ending in “.R”) <strong>not</strong> R markdowns (ending in “.Rmd”)</p></li>
+<li><p>Use informative file names. Put only related R functions into the same file (e.g. a main function and some helpers).</p></li>
+<li><p>As you add or modify function definitions, you should test interactively test them. That is, iteratively:</p>
+<ol style="list-style-type: decimal">
+<li>Use <code>devtools::load_all()</code> to load a source package into memory.</li>
+<li>Play the function you are working on, edit it.</li>
+<li>Repeat 1 and 2 until you are happy with the function.</li>
+</ol></li>
+<li><p>In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is build. So, for example, if you include the following line of code in your package.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>## [1] &quot;2021-12-02 16:33:43 EST&quot;</code></pre>
+<p>Then <code>x</code> be the time of the package build. If you want the time that a user runs some code, include this statement in a function.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ftime <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">Sys.time</span>())</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ftime</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;2021-12-02 16:33:43 EST&quot;</code></pre></li>
+</ul>
 </div>
 <div id="documentation" class="section level1">
 <h1>Documentation</h1>
@@ -526,7 +556,7 @@ $(document).ready(function () {
 <h1>Namespace</h1>
 <ul>
 <li><p>Include the following in any function that you want a user to have access to.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>export</span></code></pre></div></li>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>export</span></code></pre></div></li>
 </ul>
 </div>
 <div id="using-other-packages" class="section level1">
@@ -534,8 +564,14 @@ $(document).ready(function () {
 <ul>
 <li><p><strong>Never</strong> use <code>library()</code> or <code>require()</code> in an R package.</p></li>
 <li><p>Package dependencies go in the DESCRIPTION folder. You can tell R that your package depends on another package by running:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_package</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_package</span>()</span></code></pre></div></li>
 <li><p>Then, you call functions from other packages via <code>package::function()</code>, where <code>package</code> is the name of the package and <code>function()</code> is the function name from <code>package</code>.</p></li>
+<li><p>You should try to have as few dependencies as possible. When packages change, that can affect (or break) your package, which means more work on your part to maintain your package.</p></li>
+<li><p>Try to avoid dependencies on new packages or on packages from folks who do not have a history of maintaining their packages.</p></li>
+<li><p>Try to avoid dependencies on packages from the tidyverse (dplyr, tidyr, etc). These packages have changed frequently in the past. The maintainers are great about notifying folks about breaking changes, but it still means more work on your part.</p>
+<ul>
+<li>E.g., if you only use string manipulation in one spot in your package, try using <code>grepl()</code> instead of <code>stringr::str_detect()</code>.</li>
+</ul></li>
 </ul>
 </div>
 <div id="description-file" class="section level1">
@@ -561,8 +597,8 @@ $(document).ready(function () {
 <h2>External data</h2>
 <ul>
 <li><p>External data is available to the user. For example, the <code>mpg</code> dataset from the <code>{ggplot2}</code> is available to us by running</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;mpg&quot;</span>, <span class="at">package =</span> <span class="st">&quot;ggplot2&quot;</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(mpg)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;mpg&quot;</span>, <span class="at">package =</span> <span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(mpg)</span></code></pre></div>
 <pre><code>## tibble [234 × 11] (S3: tbl_df/tbl/data.frame)
 ##  $ manufacturer: chr [1:234] &quot;audi&quot; &quot;audi&quot; &quot;audi&quot; &quot;audi&quot; ...
 ##  $ model       : chr [1:234] &quot;a4&quot; &quot;a4&quot; &quot;a4&quot; &quot;a4&quot; ...
@@ -579,29 +615,29 @@ $(document).ready(function () {
 <li><p>You can use <code>usethis::use_data()</code> to save a dataset in the “data” directory. The first argument is the data you want to save.</p></li>
 <li><p>You should document your dataset, using roxygen, in a separate R file in the “R” directory. Typically, folks document all of their data in “R/data.R”.</p></li>
 <li><p>Instead of a function declaration, you just type the name of the dataset. E.g., from my <code>{updog}</code> R package I have the following documentation for the <code>snpdat</code> tibble.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; GBS data from Shirasawa et al (2017)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Contains counts of reference alleles and total read counts </span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; from the GBS data of Shirasawa et al (2017) for</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; the three SNPs used as examples in Gerard et. al. (2018).</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @format A \code{tibble} with 419 rows and 4 columns:</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \describe{</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{id}{The identification label of the individuals.}</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{snp}{The SNP label.}</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{counts}{The number of read-counts that support the reference allele.}</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{size}{The total number of read-counts at a given SNP.}</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @source \doi{10.1038/srep44207}</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @references</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \itemize{</span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Shirasawa, Kenta, Masaru Tanaka, Yasuhiro Takahata, Daifu Ma, Qinghe Cao, Qingchang Liu, Hong Zhai, Sang-Soo Kwak, Jae Cheol Jeong, Ung-Han Yoon, Hyeong-Un Lee, Hideki Hirakawa, and Sahiko Isobe &quot;A high-density SNP genetic map consisting of a complete set of homologous groups in autohexaploid sweetpotato (Ipomoea batatas).&quot; \emph{Scientific Reports 7} (2017). \doi{10.1038/srep44207}}</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Gerard, D., Ferrão, L. F. V., Garcia, A. A. F., &amp; Stephens, M. (2018). Genotyping Polyploids from Messy Sequencing Data. \emph{Genetics}, 210(3), 789-807. \doi{10.1534/genetics.118.301468}.}</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;snpdat&quot;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; GBS data from Shirasawa et al (2017)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Contains counts of reference alleles and total read counts </span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; from the GBS data of Shirasawa et al (2017) for</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; the three SNPs used as examples in Gerard et. al. (2018).</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @format A \code{tibble} with 419 rows and 4 columns:</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \describe{</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{id}{The identification label of the individuals.}</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{snp}{The SNP label.}</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{counts}{The number of read-counts that support the reference allele.}</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{size}{The total number of read-counts at a given SNP.}</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @source \doi{10.1038/srep44207}</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @references</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \itemize{</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Shirasawa, Kenta, Masaru Tanaka, Yasuhiro Takahata, Daifu Ma, Qinghe Cao, Qingchang Liu, Hong Zhai, Sang-Soo Kwak, Jae Cheol Jeong, Ung-Han Yoon, Hyeong-Un Lee, Hideki Hirakawa, and Sahiko Isobe &quot;A high-density SNP genetic map consisting of a complete set of homologous groups in autohexaploid sweetpotato (Ipomoea batatas).&quot; \emph{Scientific Reports 7} (2017). \doi{10.1038/srep44207}}</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Gerard, D., Ferrão, L. F. V., Garcia, A. A. F., &amp; Stephens, M. (2018). Genotyping Polyploids from Messy Sequencing Data. \emph{Genetics}, 210(3), 789-807. \doi{10.1534/genetics.118.301468}.}</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;snpdat&quot;</span></span></code></pre></div></li>
 <li><p>Never export a dataset (via the <code>@export</code> tag).</p></li>
 </ul>
 </div>
@@ -611,9 +647,9 @@ $(document).ready(function () {
 <li><p>To use pre-computed data, you place all internal data in the “R/sysdata.rda” file.</p></li>
 <li><p><code>usethis::use_data()</code> will do this automatically if you use the <code>internal = TRUE</code> argument.</p></li>
 <li><p>E.g. the following will put <code>x</code> and <code>y</code> in “R/sysdata.rda”</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">hello =</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>), <span class="at">goodbye =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(x, y, <span class="at">internal =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">hello =</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>), <span class="at">goodbye =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(x, y, <span class="at">internal =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
 <li><p>You can use internal data in a package as you normally would use an object that is loaded into memory.</p></li>
 </ul>
 </div>

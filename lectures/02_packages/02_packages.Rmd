@@ -34,7 +34,7 @@ klippy::klippy()
 
 - Make sure you have the following packages installed.
     ```{r, eval = FALSE}
-    pkgvec <- c("usethis", "devtools", "roxygen2", "testthat", "knitr")
+    pkgvec <- c("usethis", "devtools", "roxygen2", "testthat", "knitr", "covr")
     for (pkg in pkgvec) {
       if (!requireNamespace(pkg, quietly = TRUE)) 
         install.packages(pkg)  
@@ -55,20 +55,20 @@ klippy::klippy()
 
 - The same R package is in a different format/state depending at different points of development.
 
-- Source package: A directory of files (R scripts, documentation files, test scripts, etc) with a specific structure. This lecture is about developing source packages.
+- **Source package**: A directory of files (R scripts, documentation files, test scripts, etc) with a specific structure. This lecture is about developing source packages.
 
-- Bundled package: A source package that has been compressed into a single file (along with a few other operations). These usually end in ".tar.gz". We use the following to create a bundled package from a source package:
+- **Bundled package**: A source package that has been compressed into a single file (along with a few other operations). These usually end in ".tar.gz". We use the following to create a bundled package from a source package:
     ```{r, eval = FALSE}
     devtools::build()
     ```
     You typically only do this when you are about to submit to CRAN.
 
-- Binary package: A ready-to-install version for folks who do not have R development tools. You typically don't need to worry about this. If you submit to CRAN, then they will create binaries for you.
+- **Binary package**: A ready-to-install version for folks who do not have R development tools. You typically don't need to worry about this. If you submit to CRAN, then they will create binaries for you.
 
-- Installed package: Installing a package decompresses/places your package in the library directory. This makes it so that you can use `library()` to load a package.
+- **Installed package**: Installing a package decompresses/places your package in the library directory. This makes it so that you can use `library()` to load a package.
     - Terminology: A **package** is a collection of functions, along with documentation, in a specific format. A **library** is a directory (folder) on your computer that contains installed packages. 
     - Confusingly, you use the `library()` function to load a package. 
-    - You can see your active libraries with
+    - You can see/control your active libraries with
         ```{r}
         .libPaths()
         ```
@@ -79,7 +79,7 @@ klippy::klippy()
     - From source package: `devtools::install()`.
     - From GitHub `devtools::install_github()`.
 
-- In-memory package: makes functions in a package available for use.
+- **In-memory package**: makes functions in a package available for use.
     - Use `library()` to place an installed package in memory.
     - Use `devtools::load_all()` to place a source package in memory. You typically do this
 
@@ -118,19 +118,20 @@ klippy::klippy()
 
 - `LICENSE` and `LICENSE.md` contain the license that your code is distributed under. Typical open-source licenses are [MIT](https://opensource.org/licenses/MIT) and [GPL-3](https://www.gnu.org/licenses/gpl-3.0).
 
-- The `man` folder contains files that hold your package's documentation. E.g. whenever you use `help()` it uses information from a file in the `man` folder.
+- The `man` (for "manual") folder contains files that hold your package's documentation. E.g. whenever you use `help()` it uses information from a file in the `man` folder.
 
 - `NAMESPACE` is a file that determines 
     i. What functions you are available to the user of your package (versus what functions are for internal use only), and
     ii. What functions from other packages are you importing.
     
 - The `R` folder contains R script files (ending in ".R") that hold all of your R code.
+    - R code only goes in R scripts (ending in ".R"), **not** R Markdown Files (ending in ".Rmd").
 
-- `.Rbuildignore` is a hidden folder which tells R which files/folders to exclude from the package bundle. You use regular expressions to determine which files to ignore. 
+- `.Rbuildignore` is a hidden file which tells R which files/folders to exclude from the package bundle. You use regular expressions to determine which files to ignore. 
     - E.g. if you have a website in your package folder, then you can exclude it from the bundle by placing that folder's name in `.Rbuildignore`. 
     - You typically just use `usethis::use_build_ignore()` to add files/folders to `.Rbuildignore`.
 
-- `README.md` is the file developers typically first look at, and it is the frontpage of your package's GitHub website. `README.Rmd` is an R markdown file that generates `README.md`.
+- `README.md` is the file that other developers typically first look at, and it is the frontpage of your package's GitHub website. `README.Rmd` is an R markdown file that generates `README.md`.
 
 - `src` is a folder that contains C++ files (ending in ".cpp").
 
@@ -157,7 +158,43 @@ klippy::klippy()
     ```
     You can use RStudio Projects if you want. But I won't help with any issues you have with RStudio projects.
 
+- **Example**: For this lecture, we will create an R package called together that
+
 # The R folder
+
+- Most R code in package should be a function definition.
+
+    ```{r, eval = FALSE}
+    fname <- function(arg1 = val1, arg2 = val2, ...) {
+      ## code here
+      return(retval)
+    }
+    ```
+
+- Don't have other R code in your package until you understand the benefits of exceptions to this rule.
+
+- All R code should go in R scripts (ending in ".R") **not** R markdowns (ending in ".Rmd")
+
+- Use informative file names. Put only related R functions into the same file (e.g. a main function and some helpers).
+
+- As you add or modify function definitions, you should test interactively test them. That is, iteratively:
+    1.  Use `devtools::load_all()` to load a source package into memory. 
+    2. Play the function you are working on, edit it.
+    3. Repeat 1 and 2 until you are happy with the function.
+    
+- In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is build. So, for example, if you include the following line of code in your package.
+    ```{r}
+    x <- Sys.time()
+    x
+    ```
+    Then `x` be the time of the package build. If you want the time that a user runs some code, include this statement in a function.
+    ```{r}
+    ftime <- function() {
+      return(Sys.time())
+    }
+    ftime()
+    ```
+    
 
 # Documentation
 
@@ -177,6 +214,13 @@ klippy::klippy()
     ```
     
 - Then, you call functions from other packages via `package::function()`, where `package` is the name of the package and `function()` is the function name from `package`.
+
+- You should try to have as few dependencies as possible. When packages change, that can affect (or break) your package, which means more work on your part to maintain your package.
+
+- Try to avoid dependencies on new packages or on packages from folks who do not have a history of maintaining their packages.
+
+- Try to avoid dependencies on packages from the tidyverse (dplyr, tidyr, etc). These packages have changed frequently in the past. The maintainers are great about notifying folks about breaking changes, but it still means more work on your part.
+    - E.g., if you only use string manipulation in one spot in your package, try using `grepl()` instead of `stringr::str_detect()`.
 
 # DESCRIPTION file
 
