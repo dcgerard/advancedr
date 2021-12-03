@@ -72,6 +72,11 @@ klippy::klippy()
         ```{r}
         .libPaths()
         ```
+    - For example, these are all of the packages in `r .libPaths()[[1]]`
+        ```{r}
+        list.files(path = .libPaths()[[1]])
+        ```
+
 
 - Ways to install a package:
     - From CRAN: `install.packages()`.
@@ -162,7 +167,9 @@ klippy::klippy()
 
 # The R folder
 
-- Most R code in package should be a function definition.
+- Here, we will discuss how programming is a little different compared to working in an R script or an R Markdown file in interactive mode.
+
+- All R code in package should be a function definition (with **very** few exceptions).
 
     ```{r, eval = FALSE}
     fname <- function(arg1 = val1, arg2 = val2, ...) {
@@ -171,7 +178,7 @@ klippy::klippy()
     }
     ```
 
-- Don't have other R code in your package until you understand the benefits of exceptions to this rule.
+- Don't have R code outside of a function definition in your package until you **really** understand the benefits of exceptions to this rule.
 
 - All R code should go in R scripts (ending in ".R") **not** R markdowns (ending in ".Rmd")
 
@@ -194,9 +201,32 @@ klippy::klippy()
     }
     ftime()
     ```
-    
+
+- When you alias a function from another package, don't do
+    ```{r, eval = FALSE}
+    foo <- pkg::bar
+    ```
+    instead, do
+    ```{r, eval = FALSE}
+    foo <- function(...) pkg::bar(...)
+    ```
+    This is since `foo` is defined as `pkg::bar` during build time of your package. So if the `{pkg}` maintainers fix an issue in `bar()`, your aliased function will still be the incorrect version of `bar()` until a user rebuilds your package.
+
+- Don't modify a user's R landscape (the global settings and the behavior of functions/objects outside of your package). With rare exceptions, here are some things to not do:
+    - Never use `setwd()`. 
+    - Never use `library()` or `require()`. 
+        - See below for using other packages in your package.
+    - Never use `source()`.
+        - Use `devtools::load_all()` while developing a package (but *never* have `devtools::load_all()` in your package).
+    - Never change the options via `options()` or `par()`.
+    - Never use `set.seed()` to alter the random number generation for a user.
+        - Except possibly in examples, vignettes, and unit tests. But never in anything in the /R folder.
+    - Never use `Sys.setenv()` or `Sys.setlocale()`.
 
 # Documentation
+
+- You should be writing documentation while you are writing R code
+    - **Not** only after the code is "done".
 
 # Namespace
 
@@ -228,12 +258,14 @@ klippy::klippy()
 
 - Keep working directory at all times at top level of your R package.
 
-- Write all R code in a function.
-
 - Iterate the following until done:
-    1. Tweak a function.
-    2. Run `devtools::load_all()`
-    3. Try out the change by running a small example or some tests.
+    1. Tweak a function
+    2. Update documetnation (if necessary)
+    3. Run `devtools::document()` (if you’ve made any changes that impact help files or NAMESPACE)
+        - Or run `devtools::load_all()` if you haven't made those changes.
+    4. Run some examples interactively.
+    5. Run `devtools::test()`
+    6. Run `devtools::check()`
 
 - `load_all()` is how we can load a source package into memory. This will load all functions (both exported and non-exported).
 

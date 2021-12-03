@@ -37,6 +37,15 @@ klippy::klippy()
 
 # Package Checking
 
+- Don't include non-ASCII characters in your code. This will give you a CRAN note.
+
+- If you accidently include such characters, you can find them with
+    ```{r, eval = FALSE}
+    tools::showNonASCIIfile()
+    ```
+    
+## Continuous Integration
+    
 # Coding Style
 
 # Other Things

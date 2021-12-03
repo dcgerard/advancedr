@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-02" />
+<meta name="date" content="2021-12-03" />
 
 <title>R Packages</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">R Packages</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-02</h4>
+<h4 class="date">2021-12-03</h4>
 
 </div>
 
@@ -441,6 +441,137 @@ $(document).ready(function () {
 ## [2] &quot;/usr/local/lib/R/site-library&quot;                  
 ## [3] &quot;/usr/lib/R/site-library&quot;                        
 ## [4] &quot;/usr/lib/R/library&quot;</code></pre></li>
+<li><p>For example, these are all of the packages in /home/dgerard/R/x86_64-pc-linux-gnu-library/4.1</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="at">path =</span> <span class="fu">.libPaths</span>()[[<span class="dv">1</span>]])</span></code></pre></div>
+<pre><code>##   [1] &quot;abind&quot;                &quot;amen&quot;                 &quot;animation&quot;           
+##   [4] &quot;annotate&quot;             &quot;AnnotationDbi&quot;        &quot;ape&quot;                 
+##   [7] &quot;arm&quot;                  &quot;arrangements&quot;         &quot;ashr&quot;                
+##  [10] &quot;askpass&quot;              &quot;assertthat&quot;           &quot;backports&quot;           
+##  [13] &quot;base64enc&quot;            &quot;beeswarm&quot;             &quot;bfa&quot;                 
+##  [16] &quot;BGLR&quot;                 &quot;BH&quot;                   &quot;Biobase&quot;             
+##  [19] &quot;BiocFileCache&quot;        &quot;BiocGenerics&quot;         &quot;BiocIO&quot;              
+##  [22] &quot;BiocManager&quot;          &quot;BiocParallel&quot;         &quot;BiocVersion&quot;         
+##  [25] &quot;biomaRt&quot;              &quot;Biostrings&quot;           &quot;bit&quot;                 
+##  [28] &quot;bit64&quot;                &quot;bitops&quot;               &quot;blob&quot;                
+##  [31] &quot;brew&quot;                 &quot;brio&quot;                 &quot;broom&quot;               
+##  [34] &quot;BSgenome&quot;             &quot;bslib&quot;                &quot;cachem&quot;              
+##  [37] &quot;callr&quot;                &quot;car&quot;                  &quot;carData&quot;             
+##  [40] &quot;caret&quot;                &quot;cate&quot;                 &quot;cellranger&quot;          
+##  [43] &quot;cli&quot;                  &quot;clipr&quot;                &quot;clue&quot;                
+##  [46] &quot;coda&quot;                 &quot;colorspace&quot;           &quot;colourpicker&quot;        
+##  [49] &quot;commonmark&quot;           &quot;conflicted&quot;           &quot;conquer&quot;             
+##  [52] &quot;corpcor&quot;              &quot;corrplot&quot;             &quot;covr&quot;                
+##  [55] &quot;cowplot&quot;              &quot;cpp11&quot;                &quot;crayon&quot;              
+##  [58] &quot;credentials&quot;          &quot;crosstalk&quot;            &quot;curl&quot;                
+##  [61] &quot;data.table&quot;           &quot;datapasta&quot;            &quot;DBI&quot;                 
+##  [64] &quot;dbplyr&quot;               &quot;DelayedArray&quot;         &quot;desc&quot;                
+##  [67] &quot;DESeq2&quot;               &quot;devtools&quot;             &quot;DiagrammeR&quot;          
+##  [70] &quot;dials&quot;                &quot;diaQTL&quot;               &quot;DiceDesign&quot;          
+##  [73] &quot;diffobj&quot;              &quot;digest&quot;               &quot;doFuture&quot;            
+##  [76] &quot;doParallel&quot;           &quot;doRNG&quot;                &quot;downlit&quot;             
+##  [79] &quot;downloader&quot;           &quot;dplyr&quot;                &quot;DT&quot;                  
+##  [82] &quot;dtplyr&quot;               &quot;e1071&quot;                &quot;edgeR&quot;               
+##  [85] &quot;ellipsis&quot;             &quot;esaBcv&quot;               &quot;etrunct&quot;             
+##  [88] &quot;evaluate&quot;             &quot;fansi&quot;                &quot;farver&quot;              
+##  [91] &quot;fastmap&quot;              &quot;fastmatch&quot;            &quot;fBasics&quot;             
+##  [94] &quot;filelock&quot;             &quot;fitPoly&quot;              &quot;fontawesome&quot;         
+##  [97] &quot;forcats&quot;              &quot;foreach&quot;              &quot;formatR&quot;             
+## [100] &quot;fs&quot;                   &quot;furrr&quot;                &quot;futile.logger&quot;       
+## [103] &quot;futile.options&quot;       &quot;future&quot;               &quot;future.apply&quot;        
+## [106] &quot;gapminder&quot;            &quot;gargle&quot;               &quot;genefilter&quot;          
+## [109] &quot;geneplotter&quot;          &quot;generics&quot;             &quot;GenomeInfoDb&quot;        
+## [112] &quot;GenomeInfoDbData&quot;     &quot;GenomicAlignments&quot;    &quot;GenomicFeatures&quot;     
+## [115] &quot;GenomicRanges&quot;        &quot;gert&quot;                 &quot;GGally&quot;              
+## [118] &quot;gganimate&quot;            &quot;ggbeeswarm&quot;           &quot;ggdendro&quot;            
+## [121] &quot;ggExtra&quot;              &quot;ggfittext&quot;            &quot;ggplot2&quot;             
+## [124] &quot;ggthemes&quot;             &quot;gh&quot;                   &quot;gitcreds&quot;            
+## [127] &quot;glipld&quot;               &quot;globals&quot;              &quot;glue&quot;                
+## [130] &quot;gmp&quot;                  &quot;googledrive&quot;          &quot;googlesheets4&quot;       
+## [133] &quot;gower&quot;                &quot;GPfit&quot;                &quot;gridExtra&quot;           
+## [136] &quot;gss&quot;                  &quot;gtable&quot;               &quot;hardhat&quot;             
+## [139] &quot;hash&quot;                 &quot;haven&quot;                &quot;here&quot;                
+## [142] &quot;highr&quot;                &quot;hms&quot;                  &quot;htmltools&quot;           
+## [145] &quot;htmlwidgets&quot;          &quot;httpuv&quot;               &quot;httr&quot;                
+## [148] &quot;hunspell&quot;             &quot;hwep&quot;                 &quot;ids&quot;                 
+## [151] &quot;igraph&quot;               &quot;impute&quot;               &quot;infer&quot;               
+## [154] &quot;influenceR&quot;           &quot;ini&quot;                  &quot;interactionTest&quot;     
+## [157] &quot;interplot&quot;            &quot;investr&quot;              &quot;invgamma&quot;            
+## [160] &quot;ipred&quot;                &quot;IRanges&quot;              &quot;irlba&quot;               
+## [163] &quot;isoband&quot;              &quot;iterators&quot;            &quot;itertools&quot;           
+## [166] &quot;janitor&quot;              &quot;jquerylib&quot;            &quot;jsonlite&quot;            
+## [169] &quot;kableExtra&quot;           &quot;KEGGREST&quot;             &quot;klippy&quot;              
+## [172] &quot;knitr&quot;                &quot;labeling&quot;             &quot;lambda.r&quot;            
+## [175] &quot;later&quot;                &quot;latex2exp&quot;            &quot;lava&quot;                
+## [178] &quot;lazyeval&quot;             &quot;ldsep&quot;                &quot;leaflet&quot;             
+## [181] &quot;leaflet.providers&quot;    &quot;leapp&quot;                &quot;leaps&quot;               
+## [184] &quot;lhs&quot;                  &quot;lifecycle&quot;            &quot;limma&quot;               
+## [187] &quot;listenv&quot;              &quot;lm.br&quot;                &quot;lme4&quot;                
+## [190] &quot;lmtest&quot;               &quot;locfit&quot;               &quot;lpSolve&quot;             
+## [193] &quot;lubridate&quot;            &quot;magick&quot;               &quot;magrittr&quot;            
+## [196] &quot;maptools&quot;             &quot;markdown&quot;             &quot;matchingR&quot;           
+## [199] &quot;MatrixGenerics&quot;       &quot;MatrixModels&quot;         &quot;matrixStats&quot;         
+## [202] &quot;memoise&quot;              &quot;memuse&quot;               &quot;microbenchmark&quot;      
+## [205] &quot;mime&quot;                 &quot;miniUI&quot;               &quot;minqa&quot;               
+## [208] &quot;missForest&quot;           &quot;mixsqp&quot;               &quot;modeest&quot;             
+## [211] &quot;modeldata&quot;            &quot;ModelMetrics&quot;         &quot;modelr&quot;              
+## [214] &quot;munsell&quot;              &quot;nloptr&quot;               &quot;numDeriv&quot;            
+## [217] &quot;openssl&quot;              &quot;openxlsx&quot;             &quot;optimx&quot;              
+## [220] &quot;palmerpenguins&quot;       &quot;parallelly&quot;           &quot;parsedate&quot;           
+## [223] &quot;parsnip&quot;              &quot;patchwork&quot;            &quot;pbkrtest&quot;            
+## [226] &quot;pcaMethods&quot;           &quot;pdist&quot;                &quot;PedigreeSimR&quot;        
+## [229] &quot;permute&quot;              &quot;phwelike&quot;             &quot;pillar&quot;              
+## [232] &quot;pinfsc50&quot;             &quot;pkgbuild&quot;             &quot;pkgconfig&quot;           
+## [235] &quot;pkgdown&quot;              &quot;pkgload&quot;              &quot;plogr&quot;               
+## [238] &quot;plotly&quot;               &quot;plyr&quot;                 &quot;png&quot;                 
+## [241] &quot;polyRAD&quot;              &quot;pracma&quot;               &quot;praise&quot;              
+## [244] &quot;prettyunits&quot;          &quot;pROC&quot;                 &quot;processx&quot;            
+## [247] &quot;prodlim&quot;              &quot;progress&quot;             &quot;progressr&quot;           
+## [250] &quot;promises&quot;             &quot;proxy&quot;                &quot;ps&quot;                  
+## [253] &quot;purrr&quot;                &quot;quantreg&quot;             &quot;qvalue&quot;              
+## [256] &quot;R.methodsS3&quot;          &quot;R.oo&quot;                 &quot;R.utils&quot;             
+## [259] &quot;R6&quot;                   &quot;ragg&quot;                 &quot;randomForest&quot;        
+## [262] &quot;rankdist&quot;             &quot;rappdirs&quot;             &quot;raster&quot;              
+## [265] &quot;rcmdcheck&quot;            &quot;RColorBrewer&quot;         &quot;Rcpp&quot;                
+## [268] &quot;RcppArmadillo&quot;        &quot;RcppEigen&quot;            &quot;RcppProgress&quot;        
+## [271] &quot;RCurl&quot;                &quot;readr&quot;                &quot;readxl&quot;              
+## [274] &quot;recipes&quot;              &quot;rematch&quot;              &quot;rematch2&quot;            
+## [277] &quot;remotes&quot;              &quot;reprex&quot;               &quot;reshape&quot;             
+## [280] &quot;reshape2&quot;             &quot;restfulr&quot;             &quot;reticulate&quot;          
+## [283] &quot;rex&quot;                  &quot;Rhtslib&quot;              &quot;rhub&quot;                
+## [286] &quot;rio&quot;                  &quot;rjson&quot;                &quot;rlang&quot;               
+## [289] &quot;rmarkdown&quot;            &quot;rmutil&quot;               &quot;rngtools&quot;            
+## [292] &quot;roxygen2&quot;             &quot;rprojroot&quot;            &quot;rsample&quot;             
+## [295] &quot;Rsamtools&quot;            &quot;RSQLite&quot;              &quot;rstiefel&quot;            
+## [298] &quot;rstudioapi&quot;           &quot;rtracklayer&quot;          &quot;ruv&quot;                 
+## [301] &quot;rversions&quot;            &quot;rvest&quot;                &quot;S4Vectors&quot;           
+## [304] &quot;sandwich&quot;             &quot;sass&quot;                 &quot;scales&quot;              
+## [307] &quot;scam&quot;                 &quot;selectr&quot;              &quot;seqgendiff&quot;          
+## [310] &quot;servr&quot;                &quot;sessioninfo&quot;          &quot;shades&quot;              
+## [313] &quot;shiny&quot;                &quot;shinyjs&quot;              &quot;Sleuth3&quot;             
+## [316] &quot;slider&quot;               &quot;snakecase&quot;            &quot;snow&quot;                
+## [319] &quot;softImpute&quot;           &quot;sourcetools&quot;          &quot;sp&quot;                  
+## [322] &quot;SparseM&quot;              &quot;spelling&quot;             &quot;SQUAREM&quot;             
+## [325] &quot;stable&quot;               &quot;stabledist&quot;           &quot;statip&quot;              
+## [328] &quot;stringi&quot;              &quot;stringr&quot;              &quot;SummarizedExperiment&quot;
+## [331] &quot;SuppDists&quot;            &quot;sva&quot;                  &quot;svd&quot;                 
+## [334] &quot;svglite&quot;              &quot;sys&quot;                  &quot;systemfonts&quot;         
+## [337] &quot;tensr&quot;                &quot;terra&quot;                &quot;testthat&quot;            
+## [340] &quot;textshaping&quot;          &quot;tibble&quot;               &quot;tidymodels&quot;          
+## [343] &quot;tidyr&quot;                &quot;tidyselect&quot;           &quot;tidyverse&quot;           
+## [346] &quot;timeDate&quot;             &quot;timeSeries&quot;           &quot;tinytex&quot;             
+## [349] &quot;truncnorm&quot;            &quot;tune&quot;                 &quot;tweenr&quot;              
+## [352] &quot;tzdb&quot;                 &quot;updog&quot;                &quot;usethis&quot;             
+## [355] &quot;utf8&quot;                 &quot;uuid&quot;                 &quot;VariantAnnotation&quot;   
+## [358] &quot;vcfR&quot;                 &quot;vctrs&quot;                &quot;vegan&quot;               
+## [361] &quot;vicar&quot;                &quot;vipor&quot;                &quot;viridis&quot;             
+## [364] &quot;viridisLite&quot;          &quot;visNetwork&quot;           &quot;vroom&quot;               
+## [367] &quot;waldo&quot;                &quot;warp&quot;                 &quot;webshot&quot;             
+## [370] &quot;whisker&quot;              &quot;whoami&quot;               &quot;withr&quot;               
+## [373] &quot;workflows&quot;            &quot;workflowsets&quot;         &quot;xaringan&quot;            
+## [376] &quot;xfun&quot;                 &quot;xgboost&quot;              &quot;XML&quot;                 
+## [379] &quot;xml2&quot;                 &quot;xopen&quot;                &quot;xtable&quot;              
+## [382] &quot;XVector&quot;              &quot;yaml&quot;                 &quot;yardstick&quot;           
+## [385] &quot;zip&quot;                  &quot;zlibbioc&quot;             &quot;zoo&quot;</code></pre></li>
 </ul></li>
 <li><p>Ways to install a package:</p>
 <ul>
@@ -460,27 +591,27 @@ $(document).ready(function () {
 <h1>Package Structure</h1>
 <ul>
 <li><p>A typical package will have this directory/file structure</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> DESCRIPTION</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> .git</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> .gitignore</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> LICENSE</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> LICENSE.md</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> man</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── f1.Rd</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   └── f2.Rd</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> NAMESPACE</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> R</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   └── rcode.R</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> .Rbuildignore</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> README.md</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> README.Rmd</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> src</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   └── cppcode.cpp</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> tests</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">├──</span> testthat</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">│</span>   └── test-file.R</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="ex">└──</span> testthat.R</span></code></pre></div></li>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> DESCRIPTION</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> .git</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> .gitignore</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> LICENSE</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> LICENSE.md</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> man</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── f1.Rd</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   └── f2.Rd</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> NAMESPACE</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> R</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   └── rcode.R</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> .Rbuildignore</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> README.md</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> README.Rmd</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> src</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   └── cppcode.cpp</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> tests</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">├──</span> testthat</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">│</span>   └── test-file.R</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="ex">└──</span> testthat.R</span></code></pre></div></li>
 <li><p>Most of these files/folders will be generated by <code>{devtools}</code> and <code>{usethis}</code>, but you should still know what they are.</p></li>
 <li><p><code>.git</code> is a hidden directory that git uses to store your version control history. Don’t touch this.</p></li>
 <li><p><code>.gitignore</code> is a hidden file used to tell git what files/folders to not place under version control.</p></li>
@@ -512,9 +643,9 @@ $(document).ready(function () {
 <li><p>This is the “source” state of the package, so you can choose it to be almost anywhere on your computer.</p></li>
 <li><p>Choose a location that is not inside an RStudio project, another R package, another git repo, or inside an R library.</p></li>
 <li><p>Then just type</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_package</span>(<span class="at">path =</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_package</span>(<span class="at">path =</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div></li>
 <li><p>I don’t like RStudio projects, so I typically run</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_package</span>(<span class="at">path =</span> <span class="st">&quot;.&quot;</span>, <span class="at">rstudio =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_package</span>(<span class="at">path =</span> <span class="st">&quot;.&quot;</span>, <span class="at">rstudio =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>You can use RStudio Projects if you want. But I won’t help with any issues you have with RStudio projects.</p></li>
 <li><p><strong>Example</strong>: For this lecture, we will create an R package called together that</p></li>
 </ul>
@@ -523,12 +654,13 @@ $(document).ready(function () {
 <div id="the-r-folder" class="section level1">
 <h1>The R folder</h1>
 <ul>
-<li><p>Most R code in package should be a function definition.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fname <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">arg1 =</span> val1, <span class="at">arg2 =</span> val2, ...) {</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## code here</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(retval)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
-<li><p>Don’t have other R code in your package until you understand the benefits of exceptions to this rule.</p></li>
+<li><p>Here, we will discuss how programming is a little different compared to working in an R script or an R Markdown file in interactive mode.</p></li>
+<li><p>All R code in package should be a function definition (with <strong>very</strong> few exceptions).</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fname <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">arg1 =</span> val1, <span class="at">arg2 =</span> val2, ...) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## code here</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(retval)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>Don’t have R code outside of a function definition in your package until you <strong>really</strong> understand the benefits of exceptions to this rule.</p></li>
 <li><p>All R code should go in R scripts (ending in “.R”) <strong>not</strong> R markdowns (ending in “.Rmd”)</p></li>
 <li><p>Use informative file names. Put only related R functions into the same file (e.g. a main function and some helpers).</p></li>
 <li><p>As you add or modify function definitions, you should test interactively test them. That is, iteratively:</p>
@@ -538,25 +670,54 @@ $(document).ready(function () {
 <li>Repeat 1 and 2 until you are happy with the function.</li>
 </ol></li>
 <li><p>In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is build. So, for example, if you include the following line of code in your package.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
-<pre><code>## [1] &quot;2021-12-02 16:33:43 EST&quot;</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>## [1] &quot;2021-12-03 16:24:07 EST&quot;</code></pre>
 <p>Then <code>x</code> be the time of the package build. If you want the time that a user runs some code, include this statement in a function.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ftime <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">Sys.time</span>())</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ftime</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2021-12-02 16:33:43 EST&quot;</code></pre></li>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ftime <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">Sys.time</span>())</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ftime</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;2021-12-03 16:24:07 EST&quot;</code></pre></li>
+<li><p>When you alias a function from another package, don’t do</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> pkg<span class="sc">::</span>bar</span></code></pre></div>
+<p>instead, do</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> <span class="cf">function</span>(...) pkg<span class="sc">::</span><span class="fu">bar</span>(...)</span></code></pre></div>
+<p>This is since <code>foo</code> is defined as <code>pkg::bar</code> during build time of your package. So if the <code>{pkg}</code> maintainers fix an issue in <code>bar()</code>, your aliased function will still be the incorrect version of <code>bar()</code> until a user rebuilds your package.</p></li>
+<li><p>Don’t modify a user’s R landscape (the global settings and the behavior of functions/objects outside of your package). With rare exceptions, here are some things to not do:</p>
+<ul>
+<li>Never use <code>setwd()</code>.</li>
+<li>Never use <code>library()</code> or <code>require()</code>.
+<ul>
+<li>See below for using other packages in your package.</li>
+</ul></li>
+<li>Never use <code>source()</code>.
+<ul>
+<li>Use <code>devtools::load_all()</code> while developing a package (but <em>never</em> have <code>devtools::load_all()</code> in your package).</li>
+</ul></li>
+<li>Never change the options via <code>options()</code> or <code>par()</code>.</li>
+<li>Never use <code>set.seed()</code> to alter the random number generation for a user.
+<ul>
+<li>Except possibly in examples, vignettes, and unit tests. But never in anything in the /R folder.</li>
+</ul></li>
+<li>Never use <code>Sys.setenv()</code> or <code>Sys.setlocale()</code>.</li>
+</ul></li>
 </ul>
 </div>
 <div id="documentation" class="section level1">
 <h1>Documentation</h1>
+<ul>
+<li>You should be writing documentation while you are writing R code
+<ul>
+<li><strong>Not</strong> only after the code is “done”.</li>
+</ul></li>
+</ul>
 </div>
 <div id="namespace" class="section level1">
 <h1>Namespace</h1>
 <ul>
 <li><p>Include the following in any function that you want a user to have access to.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>export</span></code></pre></div></li>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>export</span></code></pre></div></li>
 </ul>
 </div>
 <div id="using-other-packages" class="section level1">
@@ -564,7 +725,7 @@ $(document).ready(function () {
 <ul>
 <li><p><strong>Never</strong> use <code>library()</code> or <code>require()</code> in an R package.</p></li>
 <li><p>Package dependencies go in the DESCRIPTION folder. You can tell R that your package depends on another package by running:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_package</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_package</span>()</span></code></pre></div></li>
 <li><p>Then, you call functions from other packages via <code>package::function()</code>, where <code>package</code> is the name of the package and <code>function()</code> is the function name from <code>package</code>.</p></li>
 <li><p>You should try to have as few dependencies as possible. When packages change, that can affect (or break) your package, which means more work on your part to maintain your package.</p></li>
 <li><p>Try to avoid dependencies on new packages or on packages from folks who do not have a history of maintaining their packages.</p></li>
@@ -581,12 +742,17 @@ $(document).ready(function () {
 <h1>Workflow</h1>
 <ul>
 <li><p>Keep working directory at all times at top level of your R package.</p></li>
-<li><p>Write all R code in a function.</p></li>
 <li><p>Iterate the following until done:</p>
 <ol style="list-style-type: decimal">
-<li>Tweak a function.</li>
-<li>Run <code>devtools::load_all()</code></li>
-<li>Try out the change by running a small example or some tests.</li>
+<li>Tweak a function</li>
+<li>Update documetnation (if necessary)</li>
+<li>Run <code>devtools::document()</code> (if you’ve made any changes that impact help files or NAMESPACE)
+<ul>
+<li>Or run <code>devtools::load_all()</code> if you haven’t made those changes.</li>
+</ul></li>
+<li>Run some examples interactively.</li>
+<li>Run <code>devtools::test()</code></li>
+<li>Run <code>devtools::check()</code></li>
 </ol></li>
 <li><p><code>load_all()</code> is how we can load a source package into memory. This will load all functions (both exported and non-exported).</p></li>
 </ul>
@@ -597,8 +763,8 @@ $(document).ready(function () {
 <h2>External data</h2>
 <ul>
 <li><p>External data is available to the user. For example, the <code>mpg</code> dataset from the <code>{ggplot2}</code> is available to us by running</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;mpg&quot;</span>, <span class="at">package =</span> <span class="st">&quot;ggplot2&quot;</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(mpg)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;mpg&quot;</span>, <span class="at">package =</span> <span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(mpg)</span></code></pre></div>
 <pre><code>## tibble [234 × 11] (S3: tbl_df/tbl/data.frame)
 ##  $ manufacturer: chr [1:234] &quot;audi&quot; &quot;audi&quot; &quot;audi&quot; &quot;audi&quot; ...
 ##  $ model       : chr [1:234] &quot;a4&quot; &quot;a4&quot; &quot;a4&quot; &quot;a4&quot; ...
@@ -615,29 +781,29 @@ $(document).ready(function () {
 <li><p>You can use <code>usethis::use_data()</code> to save a dataset in the “data” directory. The first argument is the data you want to save.</p></li>
 <li><p>You should document your dataset, using roxygen, in a separate R file in the “R” directory. Typically, folks document all of their data in “R/data.R”.</p></li>
 <li><p>Instead of a function declaration, you just type the name of the dataset. E.g., from my <code>{updog}</code> R package I have the following documentation for the <code>snpdat</code> tibble.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; GBS data from Shirasawa et al (2017)</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Contains counts of reference alleles and total read counts </span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; from the GBS data of Shirasawa et al (2017) for</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; the three SNPs used as examples in Gerard et. al. (2018).</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @format A \code{tibble} with 419 rows and 4 columns:</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \describe{</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{id}{The identification label of the individuals.}</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{snp}{The SNP label.}</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{counts}{The number of read-counts that support the reference allele.}</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{size}{The total number of read-counts at a given SNP.}</span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @source \doi{10.1038/srep44207}</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @references</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \itemize{</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Shirasawa, Kenta, Masaru Tanaka, Yasuhiro Takahata, Daifu Ma, Qinghe Cao, Qingchang Liu, Hong Zhai, Sang-Soo Kwak, Jae Cheol Jeong, Ung-Han Yoon, Hyeong-Un Lee, Hideki Hirakawa, and Sahiko Isobe &quot;A high-density SNP genetic map consisting of a complete set of homologous groups in autohexaploid sweetpotato (Ipomoea batatas).&quot; \emph{Scientific Reports 7} (2017). \doi{10.1038/srep44207}}</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Gerard, D., Ferrão, L. F. V., Garcia, A. A. F., &amp; Stephens, M. (2018). Genotyping Polyploids from Messy Sequencing Data. \emph{Genetics}, 210(3), 789-807. \doi{10.1534/genetics.118.301468}.}</span></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;snpdat&quot;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; GBS data from Shirasawa et al (2017)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Contains counts of reference alleles and total read counts </span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; from the GBS data of Shirasawa et al (2017) for</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; the three SNPs used as examples in Gerard et. al. (2018).</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @format A \code{tibble} with 419 rows and 4 columns:</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \describe{</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{id}{The identification label of the individuals.}</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{snp}{The SNP label.}</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{counts}{The number of read-counts that support the reference allele.}</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{size}{The total number of read-counts at a given SNP.}</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @source \doi{10.1038/srep44207}</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @references</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \itemize{</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Shirasawa, Kenta, Masaru Tanaka, Yasuhiro Takahata, Daifu Ma, Qinghe Cao, Qingchang Liu, Hong Zhai, Sang-Soo Kwak, Jae Cheol Jeong, Ung-Han Yoon, Hyeong-Un Lee, Hideki Hirakawa, and Sahiko Isobe &quot;A high-density SNP genetic map consisting of a complete set of homologous groups in autohexaploid sweetpotato (Ipomoea batatas).&quot; \emph{Scientific Reports 7} (2017). \doi{10.1038/srep44207}}</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Gerard, D., Ferrão, L. F. V., Garcia, A. A. F., &amp; Stephens, M. (2018). Genotyping Polyploids from Messy Sequencing Data. \emph{Genetics}, 210(3), 789-807. \doi{10.1534/genetics.118.301468}.}</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;snpdat&quot;</span></span></code></pre></div></li>
 <li><p>Never export a dataset (via the <code>@export</code> tag).</p></li>
 </ul>
 </div>
@@ -647,9 +813,9 @@ $(document).ready(function () {
 <li><p>To use pre-computed data, you place all internal data in the “R/sysdata.rda” file.</p></li>
 <li><p><code>usethis::use_data()</code> will do this automatically if you use the <code>internal = TRUE</code> argument.</p></li>
 <li><p>E.g. the following will put <code>x</code> and <code>y</code> in “R/sysdata.rda”</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">hello =</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>), <span class="at">goodbye =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(x, y, <span class="at">internal =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">hello =</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>), <span class="at">goodbye =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(x, y, <span class="at">internal =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
 <li><p>You can use internal data in a package as you normally would use an object that is loaded into memory.</p></li>
 </ul>
 </div>
