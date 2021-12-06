@@ -72,11 +72,10 @@ klippy::klippy()
         ```{r}
         .libPaths()
         ```
-    - For example, these are all of the packages in `r .libPaths()[[1]]`
+    - For example, these are some of the packages in `r .libPaths()[[1]]`
         ```{r}
-        list.files(path = .libPaths()[[1]])
+        head(list.files(path = .libPaths()[[1]]))
         ```
-
 
 - Ways to install a package:
     - From CRAN: `install.packages()`.
@@ -225,8 +224,141 @@ klippy::klippy()
 
 # Documentation
 
+- Documentation: Describing:
+    1. What a function does.
+    2. What are the inputs of the function.
+    3. What are the outputs of the function.
+    4. Example usage of the function.
+
+- Documentation is vital for
+    1. Maintaining packages (you will forget what your functions do)
+    2. Having other folks use your package (they need a way to learn the functions).
+
 - You should be writing documentation while you are writing R code
     - **Not** only after the code is "done".
+
+- Documentation in an R package is in ".rd" files in the "man" folder. This is rather esoteric, so we'll use `{roxygen2}` to generate them automatically.
+
+- `{roxygen2}` documentation is provided by comments above a function, where each line begins with `#'`.
+
+    ```{r, eval = FALSE}
+    #'
+    #' Documentation goes here
+    #'
+    fn <- function() {
+      ## Function code here.
+    }
+    ```
+
+- After you write some documentation, you can run
+    ```{r, eval = FALSE}
+    devtools::document()
+    ```
+    and `{roxygen2}` will automatically update your documentation.
+    
+- You can then look at your documentation by using `?` or `help()`.
+
+- `{roxygen2}` comments are formatted as tag-value pairs, where tags begin with an ampersand `@`.
+
+- Values of a tag extend from the tag to the next tag.
+
+- A typical `{roxygen2}` docoumentation looks like this
+
+    ```{r, eval = FALSE}
+    #' @title One line description of what the function does.
+    #' 
+    #' @description One paragraph description of what the function does
+    #'
+    #' @details
+    #' Long documentation, detailing exactly what the function does
+    #' 
+    #' @param arg1 What is arg1?
+    #' @param arg2 What is arg2?
+    #' 
+    #' @return What is returned?
+    #' 
+    #' @author Your name
+    #' 
+    #' @examples
+    #' ## Some example code goes here
+    fn <- function(arg1, arg2) {
+      ## Function code here
+    }
+    ```
+    
+- `@param`: Each argument should be documented. You should state
+    1. What is the format of the argument (character vector? data frame? numeric matrix?)
+    2. What affect the argument has on the function's behavior.
+    
+- `@examples`: Include a few lines of example R code. Do not use `@example` as this expects only one line.
+
+- `@return`: What does your function return (numeric vector, character matrix, etc). Describe not just its type but what it is (posterior probabilities, summation, geometric means, etc)
+
+- Use `@inheritParams` to use the parameter documentation from a function in a different function.
+
+- The following will use `fn1()`'s documentation for `a` in `fn2()`.
+    ```{r, eval = FALSE}
+    #' @param a An argument
+    #'
+    fn1 <- function(a) {
+    }
+    
+    #' @inheritParams fn1
+    #' @param b Another argument
+    #' 
+    fn2 <- function(a, b) {
+    }
+    ```
+
+
+## Formatting
+
+- Within `{roxygen2}` blocks, you can format your documentation with LaTeX-style code:
+
+
+- `\emph{italics}`: italics.
+
+- `\strong{bold}`: bold.
+
+- `\code{fn()}`: formatted in-line code
+
+- `\link{fn}: Link to the documentation of `fn()`. Do *not* include parentheses inside `\link{}`
+
+- I often do `\code{\link{fn}()}` when I link to a function so that it is both linked, code-formatted, and has a parentheses.
+
+- To link to functions in other packages, use `\link[pkg]{fn}`
+
+- `\url{}`: Include a URL.
+
+- `\href{www}{word}`: Provide a hyperlink.
+
+- `\email{}`: Provide an email.
+
+- `\doi{}`: Provide the DOI of a paper (with a link to that paper).
+
+- You can make an itemized list with
+    ```
+    \itemize{
+      \item Item 1
+      \item Item 2
+    }
+    ```
+
+- You can make an enumerated list with
+    ```
+    \enumerate{
+      \item Item 1
+      \item Item 2
+    }
+    ```
+
+- You can make a named list with
+    ```
+    \describe{
+      \item{Name 1}{Item 1}
+      \item{Name 2}{Item 2}
+    }
+    ```
 
 # Namespace
 
@@ -245,6 +377,16 @@ klippy::klippy()
     
 - Then, you call functions from other packages via `package::function()`, where `package` is the name of the package and `function()` is the function name from `package`.
 
+- You can suggest (but not require) a package to be installed. This is usually done if the functions from the suggested package are not vital, or the suggested package is hard to install (or has a lot of dependencies itself). To do so, also use `usethis::use_package()` with `type = "Suggests"`.
+
+- If you suggest a package, whenever you use a function from that package you should first check to see if it is installed with `requireNamespace("pkg", quietly = TRUE)`. E.g.
+    ```{r, eval = FALSE}
+    if (requireNamespace("pkg", quietly = TRUE)) {
+      pkg::fun()
+    }
+    ```
+
+
 - You should try to have as few dependencies as possible. When packages change, that can affect (or break) your package, which means more work on your part to maintain your package.
 
 - Try to avoid dependencies on new packages or on packages from folks who do not have a history of maintaining their packages.
@@ -253,6 +395,90 @@ klippy::klippy()
     - E.g., if you only use string manipulation in one spot in your package, try using `grepl()` instead of `stringr::str_detect()`.
 
 # DESCRIPTION file
+
+- The file called "DESCRIPTION" (with no filename extension) contains "meta" information about your package (like the authors, the dependencies, the license, etc)
+
+- `usethis::create_package()` gives you a template for DESCRIPTION which you can fill in. Most of the options are self-explanatory.
+
+    ```{yaml, eval=FALSE}
+    Package: mypackage
+    Title: What The Package Does (one line, title case required)
+    Version: 0.1
+    Authors@R: person("First", "Last", email = "first.last@example.com",
+                      role = c("aut", "cre"))
+    Description: What the package does (one paragraph)
+    Depends: R (>= 3.1.0)
+    License: What license is it under?
+    LazyData: true
+    ```
+    
+- Each line consists of a **field** and a **value**, separated by colon. For example, above the "Package" field has the value "mypackage".
+
+- "Package": Choose a package name that is 
+    1. Only letters,
+    2. All lower-case,
+    3. Relatively short,
+    4. Unique (e.g. don't choose "google" as your package name).
+    
+    
+- "Title": In less than 65 characters, in title case, describe what your package does.
+
+- "Description": A paragraph of what the package does. Each line should be less than 80 characters long and each newline should be indented by 4 white spaces.
+    - There are a lot of things CRAN wants formatted for a Description section of the DESCRIPTION file. See XYZ (submission checklist).
+    
+- "Authors@R:" This field contains executable R code. See the helpfile for `person()`.
+    - The `first` and `last` arguments are the first and last names of the person.
+    - The `email` should be the email of the individual.
+    - The `role` should be a vector containing possible values of `"aut"` for author, `"cre"` for creator/maintainer (one one person should be `"cre"`), `"ctb"` for contributor (only providing minor edits). There are other roles that are possible.
+    - The `comment` argument is a named character vector with additional notes. The most common value of `comment` is the ORCID [XYZ link here] with `comment = c(ORCID = "number here")`.
+    
+    - If you have more than one author, put the `person()` calls in a vector.
+        ```{yaml, eval = FALSE}
+        Authors@R:: c(person("Jane", "Doe", email = "janedoe@american.edu", role = c("aut", "cre")),
+                      person("John", "Doe", email = "johndoe@american.edu", role = c("aut")))
+        ```
+
+- "License": What license should you distribute this package under? Don't edit this by hand. You should use either (in decreasing order of restrictiveness)
+    - Proprietary license: No one can use your package (CRAN won't except this)
+        ```{r, eval = FALSE}
+        usethis::use_proprietary_license()
+        ```
+    - GPL-3 license: If other folks make derivatives of your package, they have to also place it as open-source under a GPL-3 license:
+        ```{r, eval = FALSE}
+        usethis::use_gpl3_license()
+        ```
+    - MIT license: Folks can use your stuff as long they distribute the license with your code.
+        ```{r, eval = FALSE}
+        usethis::use_mit_license()
+        ```
+    - CC0 license: You place your stuff in the public domain, and anyone can use it for any reason.
+        ```{r, eval = FALSE}
+        usethis::use_cc0_license()
+        ```
+
+- "Version": At least two integers separated by dots (.) or dashes (-) like `1.0.2` or `1.0-11`. You should usually only have three integers (at most).
+    - I would recommend just sticking to exactly three integers, separated by dots.
+    - The first integer is the "major release".
+    - The second integer is the "minor release".
+    - The third integer is the "bug fixes".
+    - You change a version number when you feel that you have a completed version of the package.
+    - Only increment version numbers up (that is, if you are on version `1.0.1`, don't change it to `0.9.0`.
+
+
+- "Imports": What packages does your package depend on? If you run `usethis::use_package()`, then `{usethis}` will edit the DESCRIPTION file for you. But typically the imports field looks something like this
+    ```{yaml, eval = FALSE}
+    Imports:
+      pkg1,
+      pkg2
+    ```
+
+- "Suggests": What packages do you suggest installing to use your package (but are not required)? Again, use `usethis::use_package()`, but this time with the `Type = "Suggests"` argument. It will look like this in the DESCRIPTION folder:
+
+    ```{yaml, eval = FALSE}
+    Suggests:
+      pkg1,
+      pkg2
+    ```
 
 # Workflow
 
@@ -288,9 +514,9 @@ klippy::klippy()
 - Instead of a function declaration, you just type the name of the dataset. E.g., from my `{updog}` R package I have the following documentation for the `snpdat` tibble.
 
     ```{r, eval = FALSE}
-    #' GBS data from Shirasawa et al (2017)
+    #' @title GBS data from Shirasawa et al (2017)
     #'
-    #' Contains counts of reference alleles and total read counts 
+    #' @description Contains counts of reference alleles and total read counts 
     #' from the GBS data of Shirasawa et al (2017) for
     #' the three SNPs used as examples in Gerard et. al. (2018).
     #'
@@ -314,6 +540,10 @@ klippy::klippy()
     ```
 
 - Never export a dataset (via the `@export` tag).
+
+- The `@format` tag is useful for describing how the data are structured.
+
+- The `@source` tag is useful to describe the URL/papers/collection process for the data.
 
 ## Internal Data
 
