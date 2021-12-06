@@ -512,7 +512,7 @@ $(document).ready(function () {
 <li>E.g. if you have a website in your package folder, then you can exclude it from the bundle by placing that folder’s name in <code>.Rbuildignore</code>.</li>
 <li>You typically just use <code>usethis::use_build_ignore()</code> to add files/folders to <code>.Rbuildignore</code>.</li>
 </ul></li>
-<li><p><code>README.md</code> is the file that other developers typically first look at, and it is the frontpage of your package’s GitHub website. <code>README.Rmd</code> is an R markdown file that generates <code>README.md</code>.</p></li>
+<li><p><code>README.md</code> is the file that other developers typically first look at, and it is the front page of your package’s GitHub website. <code>README.Rmd</code> is an R markdown file that generates <code>README.md</code>.</p></li>
 <li><p><code>src</code> is a folder that contains C++ files (ending in “.cpp”).</p></li>
 <li><p><code>tests</code> is a folder that contains R code for unit-tests, which are automatic checks that you write to determine if your R package works as you intend.</p></li>
 </ul>
@@ -528,7 +528,7 @@ $(document).ready(function () {
 <li><p>I don’t like RStudio projects, so I typically run</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_package</span>(<span class="at">path =</span> <span class="st">&quot;.&quot;</span>, <span class="at">rstudio =</span> <span class="cn">FALSE</span>, <span class="at">open =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>You can use RStudio Projects if you want. But I won’t help with any issues you have with RStudio projects.</p></li>
-<li><p><strong>Exercise</strong>: For this lecture, we will create a simple R package called <code>forloop</code> that reproduces a lot of Base R functions using for-loops. Create a folder called “forloop”, set the working directory to this forlder, and run</p>
+<li><p><strong>Exercise</strong>: For this lecture, we will create a simple R package called <code>forloop</code> that reproduces a lot of Base R functions using for-loops. Create a folder called “forloop”, set the working directory to this folder, and run</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_package</span>(<span class="at">path =</span> <span class="st">&quot;.&quot;</span>, <span class="at">rstudio =</span> <span class="cn">FALSE</span>, <span class="at">open =</span> <span class="cn">FALSE</span>)</span></code></pre></div></li>
 </ul>
 </div>
@@ -554,13 +554,13 @@ $(document).ready(function () {
 <li><p>In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is build. So, for example, if you include the following line of code in your package.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
-<pre><code>## [1] &quot;2021-12-06 15:34:12 EST&quot;</code></pre>
+<pre><code>## [1] &quot;2021-12-06 16:01:28 EST&quot;</code></pre>
 <p>Then <code>x</code> be the time of the package build. If you want the time that a user runs some code, include this statement in a function.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ftime <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">Sys.time</span>())</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ftime</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2021-12-06 15:34:12 EST&quot;</code></pre></li>
+<pre><code>## [1] &quot;2021-12-06 16:01:28 EST&quot;</code></pre></li>
 <li><p>When you alias a function from another package, don’t do</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> pkg<span class="sc">::</span>bar</span></code></pre></div>
 <p>instead, do</p>
@@ -628,7 +628,7 @@ $(document).ready(function () {
 <li><p>You can then look at your documentation by using <code>?</code> or <code>help()</code>.</p></li>
 <li><p><code>{roxygen2}</code> comments are formatted as tag-value pairs, where tags begin with an ampersand <code>@</code>.</p></li>
 <li><p>Values of a tag extend from the tag to the next tag.</p></li>
-<li><p>A typical <code>{roxygen2}</code> docoumentation looks like this</p>
+<li><p>A typical <code>{roxygen2}</code> documentation looks like this</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @title One line description of what the function does.</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; </span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @description One paragraph description of what the function does</span></span>
@@ -775,7 +775,7 @@ $(document).ready(function () {
 <li>E.g., if you only use string manipulation in one spot in your package, try using <code>grepl()</code> instead of <code>stringr::str_detect()</code>.</li>
 </ul></li>
 <li><p>If you do import functions from other packages, put all of those <code>{roxygen2}</code> tags in the same location in one file.</p></li>
-<li><p><strong>Exercise</strong>: Instead of using <code>count_na()</code>, you descide to use the <code>n_na()</code> function from the <code>{na.tools}</code> package. Make these edits to your package now.</p></li>
+<li><p><strong>Exercise</strong>: Instead of using <code>count_na()</code>, you decide to use the <code>n_na()</code> function from the <code>{na.tools}</code> package. Make these edits to your package now.</p></li>
 <li><p><strong>Exercise</strong>: Now import <code>n_na()</code> and remove your use of <code>::</code> from the previous exercise.</p></li>
 </ul>
 </div>
@@ -856,7 +856,7 @@ $(document).ready(function () {
 <li><p>Iterate the following until done:</p>
 <ol style="list-style-type: decimal">
 <li>Tweak a function</li>
-<li>Update documetnation (if necessary)</li>
+<li>Update documentation (if necessary)</li>
 <li>Run <code>devtools::document()</code> (if you’ve made any changes that impact help files or NAMESPACE)
 <ul>
 <li>Or run <code>devtools::load_all()</code> if you haven’t made those changes.</li>
@@ -930,10 +930,10 @@ $(document).ready(function () {
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">hello =</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>), <span class="at">goodbye =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(x, y, <span class="at">internal =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
 <li><p>You can use internal data in a package as you normally would use an object that is loaded into memory.</p></li>
-<li><p><strong>Exercise</strong>: Create a function called <code>fib()</code> that takes as input <code>n</code> and returns the <code>n</code>th <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci number</a>. Recall that the sequnce is <span class="math display">\[
+<li><p><strong>Exercise</strong>: Create a function called <code>fib()</code> that takes as input <code>n</code> and returns the <code>n</code>th <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci number</a>. Recall that the sequence is <span class="math display">\[
   0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, \ldots
   \]</span> where the next number is the sum of the previous two numbers. Put this function in a new R script file (called “fib.R”) and make sure your function is well documented.</p></li>
-<li><p><strong>Exericse</strong>: Save the first 1000 Fibonacci numbers as a vector for internal data. Then create a function called <code>fib1000()</code> that just looks up the <code>n</code>th Fibonacci number from this internal vector.</p></li>
+<li><p><strong>Exercise</strong>: Save the first 1000 Fibonacci numbers as a vector for internal data. Then create a function called <code>fib1000()</code> that just looks up the <code>n</code>th Fibonacci number from this internal vector.</p></li>
 </ul>
 </div>
 </div>

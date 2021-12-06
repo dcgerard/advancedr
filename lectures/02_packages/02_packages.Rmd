@@ -135,7 +135,7 @@ klippy::klippy()
     - E.g. if you have a website in your package folder, then you can exclude it from the bundle by placing that folder's name in `.Rbuildignore`. 
     - You typically just use `usethis::use_build_ignore()` to add files/folders to `.Rbuildignore`.
 
-- `README.md` is the file that other developers typically first look at, and it is the frontpage of your package's GitHub website. `README.Rmd` is an R markdown file that generates `README.md`.
+- `README.md` is the file that other developers typically first look at, and it is the front page of your package's GitHub website. `README.Rmd` is an R markdown file that generates `README.md`.
 
 - `src` is a folder that contains C++ files (ending in ".cpp").
 
@@ -162,7 +162,7 @@ klippy::klippy()
     ```
     You can use RStudio Projects if you want. But I won't help with any issues you have with RStudio projects.
 
-- **Exercise**: For this lecture, we will create a simple R package called `forloop` that reproduces a lot of Base R functions using for-loops. Create a folder called "forloop", set the working directory to this forlder, and run
+- **Exercise**: For this lecture, we will create a simple R package called `forloop` that reproduces a lot of Base R functions using for-loops. Create a folder called "forloop", set the working directory to this folder, and run
     ```{r, eval = FALSE}
     usethis::create_package(path = ".", rstudio = FALSE, open = FALSE)
     ```
@@ -340,7 +340,7 @@ klippy::klippy()
 
 - Values of a tag extend from the tag to the next tag.
 
-- A typical `{roxygen2}` docoumentation looks like this
+- A typical `{roxygen2}` documentation looks like this
 
     ```{r, eval = FALSE}
     #' @title One line description of what the function does.
@@ -618,7 +618,7 @@ klippy::klippy()
     
 - If you do import functions from other packages, put all of those `{roxygen2}` tags in the same location in one file.
     
-- **Exercise**: Instead of using `count_na()`, you descide to use the `n_na()` function from the `{na.tools}` package. Make these edits to your package now.
+- **Exercise**: Instead of using `count_na()`, you decide to use the `n_na()` function from the `{na.tools}` package. Make these edits to your package now.
     ```{r, eval = FALSE, echo = FALSE}
     usethis::use_package("na.tools")
     ```
@@ -793,7 +793,7 @@ klippy::klippy()
 
 - Iterate the following until done:
     1. Tweak a function
-    2. Update documetnation (if necessary)
+    2. Update documentation (if necessary)
     3. Run `devtools::document()` (if you’ve made any changes that impact help files or NAMESPACE)
         - Or run `devtools::load_all()` if you haven't made those changes.
     4. Run some examples interactively.
@@ -867,7 +867,7 @@ klippy::klippy()
 
 - You can use internal data in a package as you normally would use an object that is loaded into memory.
 
-- **Exercise**: Create a function called `fib()` that takes as input `n` and returns the `n`th [Fibonacci number](https://en.wikipedia.org/wiki/Fibonacci_number). Recall that the sequnce is
+- **Exercise**: Create a function called `fib()` that takes as input `n` and returns the `n`th [Fibonacci number](https://en.wikipedia.org/wiki/Fibonacci_number). Recall that the sequence is
     $$
     0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, \ldots
     $$
@@ -925,7 +925,7 @@ klippy::klippy()
     }
     ```
     
-- **Exericse**: Save the first 1000 Fibonacci numbers as a vector for internal data. Then create a function called `fib1000()` that just looks up the `n`th Fibonacci number from this internal vector.
+- **Exercise**: Save the first 1000 Fibonacci numbers as a vector for internal data. Then create a function called `fib1000()` that just looks up the `n`th Fibonacci number from this internal vector.
 
     ```{r, eval = FALSE, echo = FALSE}
     n <- 1000
