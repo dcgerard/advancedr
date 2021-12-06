@@ -53,7 +53,7 @@ klippy::klippy()
 
 # Package States
 
-- The same R package is in a different format/state depending at different points of development.
+- The same R package is in a different format/state at different points of development.
 
 - **Source package**: A directory of files (R scripts, documentation files, test scripts, etc) with a specific structure. This lecture is about developing source packages.
 
@@ -85,7 +85,7 @@ klippy::klippy()
 
 - **In-memory package**: makes functions in a package available for use.
     - Use `library()` to place an installed package in memory.
-    - Use `devtools::load_all()` to place a source package in memory. You typically do this
+    - Use `devtools::load_all()` to place a source package in memory. You typically do this during your workflow when you are building your package.
 
 # Package Structure
 
@@ -118,14 +118,14 @@ klippy::klippy()
     
 - `.git` is a hidden directory that git uses to store your version control history. Don't touch this.
 
-- `.gitignore` is a hidden file used to tell git what files/folders to not place under version control.
+- `.gitignore` is a hidden file used to tell git what files/folders to not place under version control. See the [Pro Git Book](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository#_ignoring).
 
 - `LICENSE` and `LICENSE.md` contain the license that your code is distributed under. Typical open-source licenses are [MIT](https://opensource.org/licenses/MIT) and [GPL-3](https://www.gnu.org/licenses/gpl-3.0).
 
 - The `man` (for "manual") folder contains files that hold your package's documentation. E.g. whenever you use `help()` it uses information from a file in the `man` folder.
 
 - `NAMESPACE` is a file that determines 
-    i. What functions you are available to the user of your package (versus what functions are for internal use only), and
+    i. What functions are available to the user of your package (versus what functions are for internal use only), and
     ii. What functions from other packages are you importing.
     
 - The `R` folder contains R script files (ending in ".R") that hold all of your R code.
@@ -147,7 +147,7 @@ klippy::klippy()
 
 - Before running this, change your working directory to where you want to create your R package with "Session > Set Working Directory > Choose Directory...".
 
-- This is the "source" state of the package, so you can choose it to be almost anywhere on your computer.
+- This will be the "source" state of the package, so you can choose it to be almost anywhere on your computer.
 
 - Choose a location that is not inside an RStudio project, another R package, another git repo, or inside an R library.
 
@@ -158,11 +158,14 @@ klippy::klippy()
 
 - I don't like RStudio projects, so I typically run
     ```{r, eval = FALSE}
-    usethis::create_package(path = ".", rstudio = FALSE)
+    usethis::create_package(path = ".", rstudio = FALSE, open = FALSE)
     ```
     You can use RStudio Projects if you want. But I won't help with any issues you have with RStudio projects.
 
-- **Example**: For this lecture, we will create an R package called together that
+- **Exercise**: For this lecture, we will create a simple R package called `forloop` that reproduces a lot of Base R functions using for-loops. Create a folder called "forloop", set the working directory to this forlder, and run
+    ```{r, eval = FALSE}
+    usethis::create_package(path = ".", rstudio = FALSE, open = FALSE)
+    ```
 
 # The R folder
 
@@ -221,6 +224,81 @@ klippy::klippy()
     - Never use `set.seed()` to alter the random number generation for a user.
         - Except possibly in examples, vignettes, and unit tests. But never in anything in the /R folder.
     - Never use `Sys.setenv()` or `Sys.setlocale()`.
+    
+- **Exercise**: Create an R script file in your package called "sum.R" via
+    ```{r, eval = FALSE}
+    usethis::use_r(name = "sum")
+    ```
+    In this file, create a function called `sum2()` that takes as input a numeric vector `x` and returns its sum. Use a for-loop to calculate the sum (not the `sum()` function).
+
+    ```{r, eval = FALSE, echo = FALSE}
+    sum2 <- function(x) {
+      if (length(x) == 0) {
+        return(NA_real_)
+      }
+      
+      sval <- 0
+      for (i in seq_along(x)) {
+        sval <- sval + x[[i]]
+      }
+      return(sval)
+    }
+    ```
+
+- **Exercise**: Include an `na.rm` argument that defaults to `FALSE`. It removes `NA`'s if `TRUE` and does not if `FALSE`.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    sum2 <- function(x, na.rm = FALSE) {
+      sval <- 0
+      for (i in seq_along(x)) {
+        if (!is.na(x[[i]]) | !na.rm) {
+          sval <- sval + x[[i]]
+        }
+      }
+      return(sval)
+    }
+    ```
+    
+- **Exercise**: Create a function called `count_na()` that will use a for-loop to count how many `NA`'s there are in a vector.
+
+    ```{r, eval=FALSE, echo=FALSE}
+    count_na <- function(x) {
+      sval <- 0
+      for (i in seq_along(x)) {
+        if (is.na(x[[i]])) {
+          sval <- sval + 1
+        }
+      }
+      return(sval)
+    }
+    ```
+
+
+- **Exercise**: There are a couple edge cases you should worry about. If the length of `x` is 0, then you should return `NA_real_`. If all values of `x` are `NA`, then you should return `NA_real_` (use `count_na()` to check for this). Edit your function to make these changes now. Test it out on
+    ```{r, eval = FALSE}
+    sum2(c(NA, NA, 1), na.rm = TRUE) ## should be 1
+    sum2(c(), na.rm = TRUE) ## should be NA
+    sum2(c(NA, NA, NA), na.rm = TRUE) ## should be NA
+    ```
+
+    ```{r, eval = FALSE, echo = FALSE}
+    sum2 <- function(x, na.rm = FALSE) {
+      stopifnot(is.logical(na.rm))
+      if (length(x) == 0) {
+        return(NA_real_)
+      }
+      if (count_na(x) == length(x)) {
+        return(NA_real_)
+      }
+      sval <- 0
+      for (i in seq_along(x)) {
+        if (!is.na(x[[i]]) | !na.rm) {
+          sval <- sval + x[[i]]
+        }
+      }
+      return(sval)
+    }
+    ```
 
 # Documentation
 
@@ -309,12 +387,14 @@ klippy::klippy()
     fn2 <- function(a, b) {
     }
     ```
+    
+- If you want to document your function, but do not want `{roxygen2}` to create a man file for it, then add the `@noRd` tag.
 
+- Documenting is very good, but having a manual page means that you need to maintain it for other users, so I usually document **all** of my functions but only have man pages for my exported functions.
 
 ## Formatting
 
 - Within `{roxygen2}` blocks, you can format your documentation with LaTeX-style code:
-
 
 - `\emph{italics}`: italics.
 
@@ -359,21 +439,121 @@ klippy::klippy()
       \item{Name 2}{Item 2}
     }
     ```
+    
+- **Exercise**: Document `sum2()` and `count_na()`. Make sure to include the following tags `@title`, `@description`, `@details`, `@param`, `@return`, `@author`, and `@examples`.
+
+- **Exercise**: In the `@seealso` tag, provide a link to each function. Also provide a link to `base::sum()`. Use an itemized list.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    #' @title Counts how many \code{NA}'s are in a vector.
+    #'
+    #' @description Counts how many \code{NA}'s are in a vector.
+    #'
+    #' @param x A vector.
+    #'
+    #' @return The number of \code{NA}'s in \code{x}
+    #'
+    #' @author David Gerard
+    #'
+    #' @seealso \code{\link{sum2}()} for summing \code{x}.
+    #'
+    #' @examples
+    #' count_na(c(NA, NA, 1, NA))
+    count_na <- function(x) {
+      sval <- 0
+      for (i in seq_along(x)) {
+        if (is.na(x[[i]])) {
+          sval <- sval + 1
+        }
+      }
+      return(sval)
+    }
+    
+    #' @title For-loop summation
+    #'
+    #' @description Returns sum of a vector.
+    #'
+    #' @details Same as \code{\link[base]{sum}()}, but with for-loops.
+    #'
+    #' Returns \code{NA_real_} if \code{x} has length 0 or are all \code{NA}'s.
+    #'
+    #' @param x A numeric vector, to be summed.
+    #' @param na.rm A logical. Should we remove NA's or not?
+    #'
+    #' @return The sum of the elements of \code{x}.
+    #'
+    #' @author David Gerard
+    #'
+    #' @seealso
+    #' \itemize{
+    #'   \item \code{\link{count_na}()} for counting how many \code{NA}'s there are
+    #'       in a vector.
+    #'   \item \code{\link[base]{sum}()} for base R summation.
+    #' }
+    #'
+    #' @examples
+    #' sum2(c(NA, NA, 1), na.rm = TRUE) ## should be 1
+    #' sum2(c(), na.rm = TRUE) ## should be NA
+    #' sum2(c(NA, NA, NA), na.rm = TRUE) ## should be NA
+    sum2 <- function(x, na.rm = FALSE) {
+      stopifnot(is.logical(na.rm))
+      if (length(x) == 0) {
+        return(NA_real_)
+      }
+      if (count_na(x) == length(x)) {
+        return(NA_real_)
+      }
+      sval <- 0
+      for (i in seq_along(x)) {
+        if (!is.na(x[[i]]) | !na.rm) {
+          sval <- sval + x[[i]]
+        }
+      }
+      return(sval)
+    }
+    ```
 
 # Namespace
 
-- Include the following in any function that you want a user to have access to.
+- A namespace tells R what functions come from what packages.
+
+- Each package has a namespace. You use `::` to tell R which package to use a function from. Otherwise, it wouldn't know to distinguish between, e.g.
+    ```{r, eval = FALSE}
+    dplyr::lag()
+    stats::lag()
+    ```
+
+- Your package namespace will determine
+    1. From what packages are you importing which functions?
+    2. What functions are you exporting to users?
+
+## Exporting
+
+- Include the following tag in the documentation of any function that you want a user to have access to.
     ```{r, eval = FALSE}
     @export
     ```
+    
+- This will add the function to the "NAMESPACE" file (which you should not edit by hand).
 
-# Using other packages
+- Note `devtools::load_all()` will attach all functions from your package so you can test them out. But if a user installs your package and uses `library()`, they will *only* have access to exported functions.
+    
+- You should **only** export functions you want others to use.
+
+- Exporting a function means that you have to be very wary about changing it in future versions since that might break other folks' code.
+
+- **Exercise**: Look at the "NAMESPACE" file in `{forloop}`. Now export all of your functions in `{forloop}`. Look at the "NAMESPACE" file again.
+    
+## Importing
+
 - **Never** use `library()` or `require()` in an R package.
 
 - Package dependencies go in the DESCRIPTION folder. You can tell R that your package depends on another package by running:
     ```{r, eval = FALSE}
     usethis::use_package()
     ```
+    
+- This will make it so that the package is available when your package is installed.
     
 - Then, you call functions from other packages via `package::function()`, where `package` is the name of the package and `function()` is the function name from `package`.
 
@@ -386,6 +566,48 @@ klippy::klippy()
     }
     ```
 
+## Technical notes on importing
+
+- Importing functions from a package is different than including a package in the "Imports" field of the DESCRIPTION file.
+    - Importing a function attaches it so that you do not need to use `::`.
+    - Including a package in the Imports field makes sure the package is installed.
+
+- The importing part of a namespace is important to avoid ambiguity.
+
+- E.g. many packages use `c()`. We can (rather foolishly) redefine it via
+    ```{r, eval = FALSE}
+    ## Don't run this
+    c <- function(x) {
+      return(NA)
+    }
+    ```
+    and no package will be affected because they all import `c()` from the `{base}` R package.
+
+- **Search Path**: The list of packages that R will automatically search for functions. See your search path by `search()`.
+    ```{r}
+    search()
+    ```
+
+- **Loading a package**: Put a package in memory, but do not put it in the search path. You can then use the function by using `::` as in `dplyr::mutate()`. If you call a function via `::` then it will load that package automatically.
+
+- **Attaching a package**: Both load a package and place it in the search path, so you don't need to use `::` to call a function from that package. This is what `library()` does.
+
+- If you import a package (via the DESCRIPTION file), then it loads it, it does not attach it, so you need to use `::`.
+
+- If you import a function (via the namespace), then it attaches it, so you do not need to use `::`.
+
+- Generally, I do not recommend importing functions. but you can do it by using `@importFrom` anywhere in your package.
+
+- E.g. adding this line anywhere in your package will attach `dplyr::mutate()` whenever your package is attached.
+
+    ```{r}
+    #' @importFrom dplyr mutate
+    ```
+
+- Why do I recommend rarely using `@importFrom`? Because that could make coding more complicated for your users 
+    - E.g. if you import `dplyr::lag()` then when a user attached your package, R will now think `lag()` comes from `{dplyr}` and not `{stats}`, which could break the user's code.
+
+## Practical suggestions
 
 - You should try to have as few dependencies as possible. When packages change, that can affect (or break) your package, which means more work on your part to maintain your package.
 
@@ -393,6 +615,64 @@ klippy::klippy()
 
 - Try to avoid dependencies on packages from the tidyverse (dplyr, tidyr, etc). These packages have changed frequently in the past. The maintainers are great about notifying folks about breaking changes, but it still means more work on your part.
     - E.g., if you only use string manipulation in one spot in your package, try using `grepl()` instead of `stringr::str_detect()`.
+    
+- If you do import functions from other packages, put all of those `{roxygen2}` tags in the same location in one file.
+    
+- **Exercise**: Instead of using `count_na()`, you descide to use the `n_na()` function from the `{na.tools}` package. Make these edits to your package now.
+    ```{r, eval = FALSE, echo = FALSE}
+    usethis::use_package("na.tools")
+    ```
+
+    ```{r, eval = FALSE, echo = FALSE}
+    #' @title For-loop summation
+    #'
+    #' @description Returns sum of a vector.
+    #'
+    #' @details Same as \code{\link[base]{sum}()}, but with for-loops.
+    #'
+    #' Returns \code{NA_real_} if \code{x} has length 0 or are all \code{NA}'s.
+    #'
+    #' @param x A numeric vector, to be summed.
+    #' @param na.rm A logical. Should we remove NA's or not?
+    #'
+    #' @return The sum of the elements of \code{x}.
+    #'
+    #' @author David Gerard
+    #'
+    #' @seealso
+    #' \itemize{
+    #'   \item \code{\link{count_na}()} for counting how many \code{NA}'s there are
+    #'       in a vector.
+    #'   \item \code{\link[base]{sum}()} for base R summation.
+    #' }
+    #'
+    #' @examples
+    #' sum2(c(NA, NA, 1), na.rm = TRUE) ## should be 1
+    #' sum2(c(), na.rm = TRUE) ## should be NA
+    #' sum2(c(NA, NA, NA), na.rm = TRUE) ## should be NA
+    sum2 <- function(x, na.rm = FALSE) {
+      stopifnot(is.logical(na.rm))
+      if (length(x) == 0) {
+        return(NA_real_)
+      }
+      if (na.tools::n_na(x) == length(x)) {
+        return(NA_real_)
+      }
+      sval <- 0
+      for (i in seq_along(x)) {
+        if (!is.na(x[[i]]) | !na.rm) {
+          sval <- sval + x[[i]]
+        }
+      }
+      return(sval)
+    }
+    ```
+
+- **Exercise**: Now import `n_na()` and remove your use of `::` from the previous exercise.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    #' @importFrom na.tools n_na
+    ```
 
 # DESCRIPTION file
 
@@ -424,13 +704,13 @@ klippy::klippy()
 - "Title": In less than 65 characters, in title case, describe what your package does.
 
 - "Description": A paragraph of what the package does. Each line should be less than 80 characters long and each newline should be indented by 4 white spaces.
-    - There are a lot of things CRAN wants formatted for a Description section of the DESCRIPTION file. See XYZ (submission checklist).
+    - There are a lot of things CRAN wants formatted for a Description section of the DESCRIPTION file. See [Checklist for CRAN Submissions](https://cran.r-project.org/web/packages/submission_checklist.html).
     
 - "Authors@R:" This field contains executable R code. See the helpfile for `person()`.
     - The `first` and `last` arguments are the first and last names of the person.
     - The `email` should be the email of the individual.
     - The `role` should be a vector containing possible values of `"aut"` for author, `"cre"` for creator/maintainer (one one person should be `"cre"`), `"ctb"` for contributor (only providing minor edits). There are other roles that are possible.
-    - The `comment` argument is a named character vector with additional notes. The most common value of `comment` is the ORCID [XYZ link here] with `comment = c(ORCID = "number here")`.
+    - The `comment` argument is a named character vector with additional notes. The most common value of `comment` is your [ORCID](https://orcid.org/) number with `comment = c(ORCID = "number here")`.
     
     - If you have more than one author, put the `person()` calls in a vector.
         ```{yaml, eval = FALSE}
@@ -464,7 +744,6 @@ klippy::klippy()
     - You change a version number when you feel that you have a completed version of the package.
     - Only increment version numbers up (that is, if you are on version `1.0.1`, don't change it to `0.9.0`.
 
-
 - "Imports": What packages does your package depend on? If you run `usethis::use_package()`, then `{usethis}` will edit the DESCRIPTION file for you. But typically the imports field looks something like this
     ```{yaml, eval = FALSE}
     Imports:
@@ -478,6 +757,34 @@ klippy::klippy()
     Suggests:
       pkg1,
       pkg2
+    ```
+    
+- **Exercise**: Edit the "Package", "Title", "Authors@R" and "Description" sections of your "DESCRIPTION" file
+
+    ```{yaml, eval = FALSE, echo = FALSE}
+    Package: forloop
+    Title: For-loop practice
+    Version: 0.0.0.9000
+    Authors@R: 
+        person(given = "David",
+               family = "Gerard",
+               role = c("aut", "cre"),
+               email = "gerard.1787@gmail.com",
+               comment = c(ORCID = "0000-0001-9450-5023"))
+    Description: Just some for-loop practice.
+    License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+        license
+    Encoding: UTF-8
+    Roxygen: list(markdown = TRUE)
+    RoxygenNote: 7.1.2
+    Imports: 
+        na.tools
+    ```
+    
+- **Exercise**: Use a GPL-3 license.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    usethis::use_gpl3_license()
     ```
 
 # Workflow
@@ -559,3 +866,86 @@ klippy::klippy()
     ```
 
 - You can use internal data in a package as you normally would use an object that is loaded into memory.
+
+- **Exercise**: Create a function called `fib()` that takes as input `n` and returns the `n`th [Fibonacci number](https://en.wikipedia.org/wiki/Fibonacci_number). Recall that the sequnce is
+    $$
+    0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, \ldots
+    $$
+    where the next number is the sum of the previous two numbers. Put this function in a new R script file (called "fib.R") and make sure your function is well documented.
+    
+    ```{r, eval=FALSE, echo=FALSE}
+    usethis::use_r("fib")
+    ```
+    
+    ```{r, eval = FALSE, echo = FALSE}
+    #' @title Fibonacci sequence
+    #'
+    #' @description Returns the nth Fibonacci number.
+    #'
+    #' @details The Fibonacci sequence is
+    #'     0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
+    #'     where the next number is the sum of the previous two numbers.
+    #'
+    #' @param n An integer. Which Fibonacci number?
+    #'
+    #' @return The nth Fibonacci number
+    #'
+    #' @author David
+    #'
+    #' @export
+    #'
+    #' @examples
+    #' fib(1)
+    #' fib(2)
+    #' fib(3)
+    #' fib(4)
+    #' fib(5)
+    #' fib(6)
+    #' fib(7)
+    #' fib(8)
+    #' fib(9)
+    #' fib(10)
+    #' fib(11)
+    fib <- function(n) {
+      if (n == 1) {
+        return(0)
+      } else if (n == 2) {
+        return(1)
+      }
+    
+      fval <- 1
+      one_b <- 1
+      two_b <- 0
+      for (i in 3:n) {
+        fval <- one_b + two_b
+        two_b <- one_b
+        one_b <- fval
+      }
+      return(fval)
+    }
+    ```
+    
+- **Exericse**: Save the first 1000 Fibonacci numbers as a vector for internal data. Then create a function called `fib1000()` that just looks up the `n`th Fibonacci number from this internal vector.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    n <- 1000
+    fibnum <- rep(NA_real_, length.out = n)
+    fibnum[[1]] <- 0
+    fibnum[[2]] <- 1
+    for (i in 3:n) {
+      fibnum[[i]] <- fibnum[[i-1]] + fibnum[[i-2]]
+    }
+    usethis::use_data(fibnum = fibnum, internal = TRUE)
+    ```
+    
+    ```{r, eval = FALSE, echo = FALSE}
+    #' @inherit fib
+    #'
+    #' @export
+    #'
+    #' @examples
+    #' fib1000(60)
+    fib1000 <- function(n) {
+      fibnum[[n]]
+    }
+    ```
