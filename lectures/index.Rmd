@@ -25,8 +25,10 @@ This repository contains material based upon work supported by the National Scie
 - 01 Git/GitHub
   - [Bash Basics](./01_basic_bash.html)
   - [Git and Github](./01_git_github.html)
+  - [Lab 01: Bash and Git](https://github.com/advanced-r-spring-2022/lab_01_git)
 - 02 R Packages
   - [R Packages](./02_packages.html)
+  - [Lab 02: R Packages](https://github.com/advanced-r-spring-2022/lab_02_packages/settings)
 - 03 Best Practices
   - [Best Practices](./03_practices.html)
 - 04 Foundations
