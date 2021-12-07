@@ -187,7 +187,7 @@ klippy::klippy()
 - Use informative file names. Put only related R functions into the same file (e.g. a main function and some helpers).
 
 - As you add or modify function definitions, you should test interactively test them. That is, iteratively:
-    1.  Use `devtools::load_all()` to load a source package into memory. 
+    1. Use `devtools::load_all()` to load a source package into memory. 
     2. Play the function you are working on, edit it.
     3. Repeat 1 and 2 until you are happy with the function.
     

@@ -25,7 +25,7 @@ ggplot2::theme_set(ggplot2::theme_bw())
 - **Instructor**: Dr. David Gerard
 - **Email**: <dgerard@american.edu>
 - **Office**: DMTI 106E
-- **Office Hours**: TBD
+- **Office Hours**: Tuesdays and Wednesdays 4:00 PM -- 5:00 PM
 
 # Overview of Topics and Course Objectives
 
@@ -122,7 +122,11 @@ This course provides an in depth study of the R ecosystem and software developme
     
 # Late Work Policy
 
-- Let me know if you need a couple days.
+- I expect the vast majority of your homeworks to be turned in on the day they are due.
+
+- But let me know a few days ahead of time if you need a couple days.
+
+- Don't abuse this policy, or I'll change it.
     
 # Sharing Course Content: 
 

@@ -27,7 +27,7 @@ klippy::klippy()
 - Structure of an R package.
 - Documenting R packages.
 - Workflow for building R packages.
-- Required: Chapters 1--10 and 14 from [R Packages](https://r-pkgs.org/index.html).
+- Required: Chapters 1--10 and 13--14 from [R Packages](https://r-pkgs.org/index.html).
 - Resource: [Writing R Extensions](https://cran.r-project.org/doc/manuals/R-exts.html)
 
 # Prereqs
@@ -54,6 +54,7 @@ klippy::klippy()
 # Package States
 
 - The same R package is in a different format/state at different points of development.
+    - Source -> bundled -> binary -> installed -> in-memory.
 
 - **Source package**: A directory of files (R scripts, documentation files, test scripts, etc) with a specific structure. This lecture is about developing source packages.
 
@@ -122,7 +123,7 @@ klippy::klippy()
 
 - `LICENSE` and `LICENSE.md` contain the license that your code is distributed under. Typical open-source licenses are [MIT](https://opensource.org/licenses/MIT) and [GPL-3](https://www.gnu.org/licenses/gpl-3.0).
 
-- The `man` (for "manual") folder contains files that hold your package's documentation. E.g. whenever you use `help()` it uses information from a file in the `man` folder.
+- The `man` (for "manual") folder contains files that hold your package's documentation. E.g. whenever you use `help()` it uses information from a file in the `man` folder. This package has two functions which are documented `f1()` and `f2()`.
 
 - `NAMESPACE` is a file that determines 
     i. What functions are available to the user of your package (versus what functions are for internal use only), and
@@ -187,11 +188,11 @@ klippy::klippy()
 - Use informative file names. Put only related R functions into the same file (e.g. a main function and some helpers).
 
 - As you add or modify function definitions, you should test interactively test them. That is, iteratively:
-    1.  Use `devtools::load_all()` to load a source package into memory. 
+    1. Use `devtools::load_all()` to load a source package into memory. 
     2. Play the function you are working on, edit it.
     3. Repeat 1 and 2 until you are happy with the function.
     
-- In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is build. So, for example, if you include the following line of code in your package.
+- In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is built. So, for example, if you include the following line of code in your package.
     ```{r}
     x <- Sys.time()
     x
@@ -417,27 +418,27 @@ klippy::klippy()
 - `\doi{}`: Provide the DOI of a paper (with a link to that paper).
 
 - You can make an itemized list with
-    ```
-    \itemize{
-      \item Item 1
-      \item Item 2
-    }
+    ```{r, eval = FALSE}
+    #' \itemize{
+    #'   \item Item 1
+    #'   \item Item 2
+    #' }
     ```
 
 - You can make an enumerated list with
-    ```
-    \enumerate{
-      \item Item 1
-      \item Item 2
-    }
+    ```{r, eval = FALSE}
+    #' \enumerate{
+    #'   \item Item 1
+    #'   \item Item 2
+    #' }
     ```
 
 - You can make a named list with
-    ```
-    \describe{
-      \item{Name 1}{Item 1}
-      \item{Name 2}{Item 2}
-    }
+    ```{r, eval = FALSE}
+    #' \describe{
+    #'   \item{Name 1}{Item 1}
+    #'   \item{Name 2}{Item 2}
+    #' }
     ```
     
 - **Exercise**: Document `sum2()` and `count_na()`. Make sure to include the following tags `@title`, `@description`, `@details`, `@param`, `@return`, `@author`, and `@examples`.
@@ -701,7 +702,7 @@ klippy::klippy()
     4. Unique (e.g. don't choose "google" as your package name).
     
     
-- "Title": In less than 65 characters, in title case, describe what your package does.
+- "Title": In less than 65 characters, in title case, describe what your package does. Must be in title case and cannot end in a period.
 
 - "Description": A paragraph of what the package does. Each line should be less than 80 characters long and each newline should be indented by 4 white spaces.
     - There are a lot of things CRAN wants formatted for a Description section of the DESCRIPTION file. See [Checklist for CRAN Submissions](https://cran.r-project.org/web/packages/submission_checklist.html).

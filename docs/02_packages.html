@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-06" />
+<meta name="date" content="2021-12-07" />
 
 <title>R Packages</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">R Packages</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-06</h4>
+<h4 class="date">2021-12-07</h4>
 
 </div>
 
@@ -404,7 +404,7 @@ $(document).ready(function () {
 <li>Structure of an R package.</li>
 <li>Documenting R packages.</li>
 <li>Workflow for building R packages.</li>
-<li>Required: Chapters 1–10 and 14 from <a href="https://r-pkgs.org/index.html">R Packages</a>.</li>
+<li>Required: Chapters 1–10 and 13–14 from <a href="https://r-pkgs.org/index.html">R Packages</a>.</li>
 <li>Resource: <a href="https://cran.r-project.org/doc/manuals/R-exts.html">Writing R Extensions</a></li>
 </ul>
 </div>
@@ -433,7 +433,10 @@ $(document).ready(function () {
 <div id="package-states" class="section level1">
 <h1>Package States</h1>
 <ul>
-<li><p>The same R package is in a different format/state at different points of development.</p></li>
+<li><p>The same R package is in a different format/state at different points of development.</p>
+<ul>
+<li>Source -&gt; bundled -&gt; binary -&gt; installed -&gt; in-memory.</li>
+</ul></li>
 <li><p><strong>Source package</strong>: A directory of files (R scripts, documentation files, test scripts, etc) with a specific structure. This lecture is about developing source packages.</p></li>
 <li><p><strong>Bundled package</strong>: A source package that has been compressed into a single file (along with a few other operations). These usually end in “.tar.gz”. We use the following to create a bundled package from a source package:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build</span>()</span></code></pre></div>
@@ -451,8 +454,8 @@ $(document).ready(function () {
 ## [4] &quot;/usr/lib/R/library&quot;</code></pre></li>
 <li><p>For example, these are some of the packages in /home/dgerard/R/x86_64-pc-linux-gnu-library/4.1</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">list.files</span>(<span class="at">path =</span> <span class="fu">.libPaths</span>()[[<span class="dv">1</span>]]))</span></code></pre></div>
-<pre><code>## [1] &quot;abind&quot;         &quot;amen&quot;          &quot;animation&quot;     &quot;annotate&quot;     
-## [5] &quot;AnnotationDbi&quot; &quot;ape&quot;</code></pre></li>
+<pre><code>## [1] &quot;abind&quot;         &quot;animation&quot;     &quot;annotate&quot;      &quot;AnnotationDbi&quot;
+## [5] &quot;ape&quot;           &quot;ashr&quot;</code></pre></li>
 </ul></li>
 <li><p>Ways to install a package:</p>
 <ul>
@@ -497,7 +500,7 @@ $(document).ready(function () {
 <li><p><code>.git</code> is a hidden directory that git uses to store your version control history. Don’t touch this.</p></li>
 <li><p><code>.gitignore</code> is a hidden file used to tell git what files/folders to not place under version control. See the <a href="https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository#_ignoring">Pro Git Book</a>.</p></li>
 <li><p><code>LICENSE</code> and <code>LICENSE.md</code> contain the license that your code is distributed under. Typical open-source licenses are <a href="https://opensource.org/licenses/MIT">MIT</a> and <a href="https://www.gnu.org/licenses/gpl-3.0">GPL-3</a>.</p></li>
-<li><p>The <code>man</code> (for “manual”) folder contains files that hold your package’s documentation. E.g. whenever you use <code>help()</code> it uses information from a file in the <code>man</code> folder.</p></li>
+<li><p>The <code>man</code> (for “manual”) folder contains files that hold your package’s documentation. E.g. whenever you use <code>help()</code> it uses information from a file in the <code>man</code> folder. This package has two functions which are documented <code>f1()</code> and <code>f2()</code>.</p></li>
 <li><p><code>NAMESPACE</code> is a file that determines</p>
 <ol style="list-style-type: lower-roman">
 <li>What functions are available to the user of your package (versus what functions are for internal use only), and</li>
@@ -551,16 +554,16 @@ $(document).ready(function () {
 <li>Play the function you are working on, edit it.</li>
 <li>Repeat 1 and 2 until you are happy with the function.</li>
 </ol></li>
-<li><p>In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is build. So, for example, if you include the following line of code in your package.</p>
+<li><p>In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is built. So, for example, if you include the following line of code in your package.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
-<pre><code>## [1] &quot;2021-12-06 16:01:28 EST&quot;</code></pre>
+<pre><code>## [1] &quot;2021-12-07 10:56:31 EST&quot;</code></pre>
 <p>Then <code>x</code> be the time of the package build. If you want the time that a user runs some code, include this statement in a function.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ftime <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">Sys.time</span>())</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ftime</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2021-12-06 16:01:28 EST&quot;</code></pre></li>
+<pre><code>## [1] &quot;2021-12-07 10:56:31 EST&quot;</code></pre></li>
 <li><p>When you alias a function from another package, don’t do</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> pkg<span class="sc">::</span>bar</span></code></pre></div>
 <p>instead, do</p>
@@ -684,9 +687,21 @@ $(document).ready(function () {
 <li><p><code>\href{www}{word}</code>: Provide a hyperlink.</p></li>
 <li><p><code>\email{}</code>: Provide an email.</p></li>
 <li><p><code>\doi{}</code>: Provide the DOI of a paper (with a link to that paper).</p></li>
-<li><p>You can make an itemized list with <code>\itemize{       \item Item 1       \item Item 2     }</code></p></li>
-<li><p>You can make an enumerated list with <code>\enumerate{       \item Item 1       \item Item 2     }</code></p></li>
-<li><p>You can make a named list with <code>\describe{       \item{Name 1}{Item 1}       \item{Name 2}{Item 2}     }</code></p></li>
+<li><p>You can make an itemized list with</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \itemize{</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item Item 1</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item Item 2</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span></code></pre></div></li>
+<li><p>You can make an enumerated list with</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \enumerate{</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item Item 1</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item Item 2</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span></code></pre></div></li>
+<li><p>You can make a named list with</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \describe{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Name 1}{Item 1}</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Name 2}{Item 2}</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span></code></pre></div></li>
 <li><p><strong>Exercise</strong>: Document <code>sum2()</code> and <code>count_na()</code>. Make sure to include the following tags <code>@title</code>, <code>@description</code>, <code>@details</code>, <code>@param</code>, <code>@return</code>, <code>@author</code>, and <code>@examples</code>.</p></li>
 <li><p><strong>Exercise</strong>: In the <code>@seealso</code> tag, provide a link to each function. Also provide a link to <code>base::sum()</code>. Use an itemized list.</p></li>
 </ul>
@@ -697,8 +712,8 @@ $(document).ready(function () {
 <ul>
 <li><p>A namespace tells R what functions come from what packages.</p></li>
 <li><p>Each package has a namespace. You use <code>::</code> to tell R which package to use a function from. Otherwise, it wouldn’t know to distinguish between, e.g.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">lag</span>()</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>stats<span class="sc">::</span><span class="fu">lag</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">lag</span>()</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>stats<span class="sc">::</span><span class="fu">lag</span>()</span></code></pre></div></li>
 <li><p>Your package namespace will determine</p>
 <ol style="list-style-type: decimal">
 <li>From what packages are you importing which functions?</li>
@@ -709,7 +724,7 @@ $(document).ready(function () {
 <h2>Exporting</h2>
 <ul>
 <li><p>Include the following tag in the documentation of any function that you want a user to have access to.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>export</span></code></pre></div></li>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>export</span></code></pre></div></li>
 <li><p>This will add the function to the “NAMESPACE” file (which you should not edit by hand).</p></li>
 <li><p>Note <code>devtools::load_all()</code> will attach all functions from your package so you can test them out. But if a user installs your package and uses <code>library()</code>, they will <em>only</em> have access to exported functions.</p></li>
 <li><p>You should <strong>only</strong> export functions you want others to use.</p></li>
@@ -722,14 +737,14 @@ $(document).ready(function () {
 <ul>
 <li><p><strong>Never</strong> use <code>library()</code> or <code>require()</code> in an R package.</p></li>
 <li><p>Package dependencies go in the DESCRIPTION folder. You can tell R that your package depends on another package by running:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_package</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_package</span>()</span></code></pre></div></li>
 <li><p>This will make it so that the package is available when your package is installed.</p></li>
 <li><p>Then, you call functions from other packages via <code>package::function()</code>, where <code>package</code> is the name of the package and <code>function()</code> is the function name from <code>package</code>.</p></li>
 <li><p>You can suggest (but not require) a package to be installed. This is usually done if the functions from the suggested package are not vital, or the suggested package is hard to install (or has a lot of dependencies itself). To do so, also use <code>usethis::use_package()</code> with <code>type = "Suggests"</code>.</p></li>
 <li><p>If you suggest a package, whenever you use a function from that package you should first check to see if it is installed with <code>requireNamespace("pkg", quietly = TRUE)</code>. E.g.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">&quot;pkg&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  pkg<span class="sc">::</span><span class="fu">fun</span>()</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">&quot;pkg&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  pkg<span class="sc">::</span><span class="fu">fun</span>()</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
 </ul>
 </div>
 <div id="technical-notes-on-importing" class="section level2">
@@ -742,13 +757,13 @@ $(document).ready(function () {
 </ul></li>
 <li><p>The importing part of a namespace is important to avoid ambiguity.</p></li>
 <li><p>E.g. many packages use <code>c()</code>. We can (rather foolishly) redefine it via</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Don&#39;t run this</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="cn">NA</span>)</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Don&#39;t run this</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="cn">NA</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>and no package will be affected because they all import <code>c()</code> from the <code>{base}</code> R package.</p></li>
 <li><p><strong>Search Path</strong>: The list of packages that R will automatically search for functions. See your search path by <code>search()</code>.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">search</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">search</span>()</span></code></pre></div>
 <pre><code>## [1] &quot;.GlobalEnv&quot;        &quot;package:stats&quot;     &quot;package:graphics&quot; 
 ## [4] &quot;package:grDevices&quot; &quot;package:utils&quot;     &quot;package:datasets&quot; 
 ## [7] &quot;package:methods&quot;   &quot;Autoloads&quot;         &quot;package:base&quot;</code></pre></li>
@@ -758,7 +773,7 @@ $(document).ready(function () {
 <li><p>If you import a function (via the namespace), then it attaches it, so you do not need to use <code>::</code>.</p></li>
 <li><p>Generally, I do not recommend importing functions. but you can do it by using <code>@importFrom</code> anywhere in your package.</p></li>
 <li><p>E.g. adding this line anywhere in your package will attach <code>dplyr::mutate()</code> whenever your package is attached.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom dplyr mutate</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom dplyr mutate</span></span></code></pre></div></li>
 <li><p>Why do I recommend rarely using <code>@importFrom</code>? Because that could make coding more complicated for your users</p>
 <ul>
 <li>E.g. if you import <code>dplyr::lag()</code> then when a user attached your package, R will now think <code>lag()</code> comes from <code>{dplyr}</code> and not <code>{stats}</code>, which could break the user’s code.</li>
@@ -785,15 +800,15 @@ $(document).ready(function () {
 <ul>
 <li><p>The file called “DESCRIPTION” (with no filename extension) contains “meta” information about your package (like the authors, the dependencies, the license, etc)</p></li>
 <li><p><code>usethis::create_package()</code> gives you a template for DESCRIPTION which you can fill in. Most of the options are self-explanatory.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Package</span><span class="kw">:</span><span class="at"> mypackage</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Title</span><span class="kw">:</span><span class="at"> What The Package Does (one line, title case required)</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Version</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Authors@R</span><span class="kw">:</span><span class="at"> person(&quot;First&quot;, &quot;Last&quot;, email = &quot;first.last@example.com&quot;,</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="at">                  role = c(&quot;aut&quot;, &quot;cre&quot;))</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="fu">Description</span><span class="kw">:</span><span class="at"> What the package does (one paragraph)</span></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="fu">Depends</span><span class="kw">:</span><span class="at"> R (&gt;= 3.1.0)</span></span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="fu">License</span><span class="kw">:</span><span class="at"> What license is it under?</span></span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="fu">LazyData</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb35"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Package</span><span class="kw">:</span><span class="at"> mypackage</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Title</span><span class="kw">:</span><span class="at"> What The Package Does (one line, title case required)</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Version</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Authors@R</span><span class="kw">:</span><span class="at"> person(&quot;First&quot;, &quot;Last&quot;, email = &quot;first.last@example.com&quot;,</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="at">                  role = c(&quot;aut&quot;, &quot;cre&quot;))</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">Description</span><span class="kw">:</span><span class="at"> What the package does (one paragraph)</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="fu">Depends</span><span class="kw">:</span><span class="at"> R (&gt;= 3.1.0)</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="fu">License</span><span class="kw">:</span><span class="at"> What license is it under?</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="fu">LazyData</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div></li>
 <li><p>Each line consists of a <strong>field</strong> and a <strong>value</strong>, separated by colon. For example, above the “Package” field has the value “mypackage”.</p></li>
 <li><p>“Package”: Choose a package name that is</p>
 <ol style="list-style-type: decimal">
@@ -802,7 +817,7 @@ $(document).ready(function () {
 <li>Relatively short,</li>
 <li>Unique (e.g. don’t choose “google” as your package name).</li>
 </ol></li>
-<li><p>“Title”: In less than 65 characters, in title case, describe what your package does.</p></li>
+<li><p>“Title”: In less than 65 characters, in title case, describe what your package does. Must be in title case and cannot end in a period.</p></li>
 <li><p>“Description”: A paragraph of what the package does. Each line should be less than 80 characters long and each newline should be indented by 4 white spaces.</p>
 <ul>
 <li>There are a lot of things CRAN wants formatted for a Description section of the DESCRIPTION file. See <a href="https://cran.r-project.org/web/packages/submission_checklist.html">Checklist for CRAN Submissions</a>.</li>
@@ -814,19 +829,19 @@ $(document).ready(function () {
 <li><p>The <code>role</code> should be a vector containing possible values of <code>"aut"</code> for author, <code>"cre"</code> for creator/maintainer (one one person should be <code>"cre"</code>), <code>"ctb"</code> for contributor (only providing minor edits). There are other roles that are possible.</p></li>
 <li><p>The <code>comment</code> argument is a named character vector with additional notes. The most common value of <code>comment</code> is your <a href="https://orcid.org/">ORCID</a> number with <code>comment = c(ORCID = "number here")</code>.</p></li>
 <li><p>If you have more than one author, put the <code>person()</code> calls in a vector.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="at">Authors@R</span><span class="fu">:</span><span class="kw">:</span><span class="at"> c(person(&quot;Jane&quot;, &quot;Doe&quot;, email = &quot;janedoe@american.edu&quot;, role = c(&quot;aut&quot;, &quot;cre&quot;)),</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="at">              person(&quot;John&quot;, &quot;Doe&quot;, email = &quot;johndoe@american.edu&quot;, role = c(&quot;aut&quot;)))</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb36"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="at">Authors@R</span><span class="fu">:</span><span class="kw">:</span><span class="at"> c(person(&quot;Jane&quot;, &quot;Doe&quot;, email = &quot;janedoe@american.edu&quot;, role = c(&quot;aut&quot;, &quot;cre&quot;)),</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="at">              person(&quot;John&quot;, &quot;Doe&quot;, email = &quot;johndoe@american.edu&quot;, role = c(&quot;aut&quot;)))</span></span></code></pre></div></li>
 </ul></li>
 <li><p>“License”: What license should you distribute this package under? Don’t edit this by hand. You should use either (in decreasing order of restrictiveness)</p>
 <ul>
 <li><p>Proprietary license: No one can use your package (CRAN won’t except this)</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_proprietary_license</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_proprietary_license</span>()</span></code></pre></div></li>
 <li><p>GPL-3 license: If other folks make derivatives of your package, they have to also place it as open-source under a GPL-3 license:</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_gpl3_license</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_gpl3_license</span>()</span></code></pre></div></li>
 <li><p>MIT license: Folks can use your stuff as long they distribute the license with your code.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_mit_license</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_mit_license</span>()</span></code></pre></div></li>
 <li><p>CC0 license: You place your stuff in the public domain, and anyone can use it for any reason.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_cc0_license</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_cc0_license</span>()</span></code></pre></div></li>
 </ul></li>
 <li><p>“Version”: At least two integers separated by dots (.) or dashes (-) like <code>1.0.2</code> or <code>1.0-11</code>. You should usually only have three integers (at most).</p>
 <ul>
@@ -838,13 +853,13 @@ $(document).ready(function () {
 <li>Only increment version numbers up (that is, if you are on version <code>1.0.1</code>, don’t change it to <code>0.9.0</code>.</li>
 </ul></li>
 <li><p>“Imports”: What packages does your package depend on? If you run <code>usethis::use_package()</code>, then <code>{usethis}</code> will edit the DESCRIPTION file for you. But typically the imports field looks something like this</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Imports</span><span class="kw">:</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="at">  pkg1,</span></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="at">  pkg2</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb41"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Imports</span><span class="kw">:</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="at">  pkg1,</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="at">  pkg2</span></span></code></pre></div></li>
 <li><p>“Suggests”: What packages do you suggest installing to use your package (but are not required)? Again, use <code>usethis::use_package()</code>, but this time with the <code>Type = "Suggests"</code> argument. It will look like this in the DESCRIPTION folder:</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Suggests</span><span class="kw">:</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="at">  pkg1,</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="at">  pkg2</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb42"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Suggests</span><span class="kw">:</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="at">  pkg1,</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="at">  pkg2</span></span></code></pre></div></li>
 <li><p><strong>Exercise</strong>: Edit the “Package”, “Title”, “<a href="mailto:Authors@R" class="email">Authors@R</a>” and “Description” sections of your “DESCRIPTION” file</p></li>
 <li><p><strong>Exercise</strong>: Use a GPL-3 license.</p></li>
 </ul>
@@ -874,8 +889,8 @@ $(document).ready(function () {
 <h2>External data</h2>
 <ul>
 <li><p>External data is available to the user. For example, the <code>mpg</code> dataset from the <code>{ggplot2}</code> is available to us by running</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;mpg&quot;</span>, <span class="at">package =</span> <span class="st">&quot;ggplot2&quot;</span>)</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(mpg)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;mpg&quot;</span>, <span class="at">package =</span> <span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(mpg)</span></code></pre></div>
 <pre><code>## tibble [234 × 11] (S3: tbl_df/tbl/data.frame)
 ##  $ manufacturer: chr [1:234] &quot;audi&quot; &quot;audi&quot; &quot;audi&quot; &quot;audi&quot; ...
 ##  $ model       : chr [1:234] &quot;a4&quot; &quot;a4&quot; &quot;a4&quot; &quot;a4&quot; ...
@@ -892,29 +907,29 @@ $(document).ready(function () {
 <li><p>You can use <code>usethis::use_data()</code> to save a dataset in the “data” directory. The first argument is the data you want to save.</p></li>
 <li><p>You should document your dataset, using roxygen, in a separate R file in the “R” directory. Typically, folks document all of their data in “R/data.R”.</p></li>
 <li><p>Instead of a function declaration, you just type the name of the dataset. E.g., from my <code>{updog}</code> R package I have the following documentation for the <code>snpdat</code> tibble.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @title GBS data from Shirasawa et al (2017)</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @description Contains counts of reference alleles and total read counts </span></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; from the GBS data of Shirasawa et al (2017) for</span></span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; the three SNPs used as examples in Gerard et. al. (2018).</span></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @format A \code{tibble} with 419 rows and 4 columns:</span></span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \describe{</span></span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{id}{The identification label of the individuals.}</span></span>
-<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{snp}{The SNP label.}</span></span>
-<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{counts}{The number of read-counts that support the reference allele.}</span></span>
-<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{size}{The total number of read-counts at a given SNP.}</span></span>
-<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
-<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @source \doi{10.1038/srep44207}</span></span>
-<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @references</span></span>
-<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \itemize{</span></span>
-<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Shirasawa, Kenta, Masaru Tanaka, Yasuhiro Takahata, Daifu Ma, Qinghe Cao, Qingchang Liu, Hong Zhai, Sang-Soo Kwak, Jae Cheol Jeong, Ung-Han Yoon, Hyeong-Un Lee, Hideki Hirakawa, and Sahiko Isobe &quot;A high-density SNP genetic map consisting of a complete set of homologous groups in autohexaploid sweetpotato (Ipomoea batatas).&quot; \emph{Scientific Reports 7} (2017). \doi{10.1038/srep44207}}</span></span>
-<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Gerard, D., Ferrão, L. F. V., Garcia, A. A. F., &amp; Stephens, M. (2018). Genotyping Polyploids from Messy Sequencing Data. \emph{Genetics}, 210(3), 789-807. \doi{10.1534/genetics.118.301468}.}</span></span>
-<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
-<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;snpdat&quot;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @title GBS data from Shirasawa et al (2017)</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @description Contains counts of reference alleles and total read counts </span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; from the GBS data of Shirasawa et al (2017) for</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; the three SNPs used as examples in Gerard et. al. (2018).</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @format A \code{tibble} with 419 rows and 4 columns:</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \describe{</span></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{id}{The identification label of the individuals.}</span></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{snp}{The SNP label.}</span></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{counts}{The number of read-counts that support the reference allele.}</span></span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;     \item{size}{The total number of read-counts at a given SNP.}</span></span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @source \doi{10.1038/srep44207}</span></span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @references</span></span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \itemize{</span></span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Shirasawa, Kenta, Masaru Tanaka, Yasuhiro Takahata, Daifu Ma, Qinghe Cao, Qingchang Liu, Hong Zhai, Sang-Soo Kwak, Jae Cheol Jeong, Ung-Han Yoon, Hyeong-Un Lee, Hideki Hirakawa, and Sahiko Isobe &quot;A high-density SNP genetic map consisting of a complete set of homologous groups in autohexaploid sweetpotato (Ipomoea batatas).&quot; \emph{Scientific Reports 7} (2017). \doi{10.1038/srep44207}}</span></span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Gerard, D., Ferrão, L. F. V., Garcia, A. A. F., &amp; Stephens, M. (2018). Genotyping Polyploids from Messy Sequencing Data. \emph{Genetics}, 210(3), 789-807. \doi{10.1534/genetics.118.301468}.}</span></span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;snpdat&quot;</span></span></code></pre></div></li>
 <li><p>Never export a dataset (via the <code>@export</code> tag).</p></li>
 <li><p>The <code>@format</code> tag is useful for describing how the data are structured.</p></li>
 <li><p>The <code>@source</code> tag is useful to describe the URL/papers/collection process for the data.</p></li>
@@ -926,9 +941,9 @@ $(document).ready(function () {
 <li><p>To use pre-computed data, you place all internal data in the “R/sysdata.rda” file.</p></li>
 <li><p><code>usethis::use_data()</code> will do this automatically if you use the <code>internal = TRUE</code> argument.</p></li>
 <li><p>E.g. the following will put <code>x</code> and <code>y</code> in “R/sysdata.rda”</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>)</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">hello =</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>), <span class="at">goodbye =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(x, y, <span class="at">internal =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">hello =</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>), <span class="at">goodbye =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(x, y, <span class="at">internal =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
 <li><p>You can use internal data in a package as you normally would use an object that is loaded into memory.</p></li>
 <li><p><strong>Exercise</strong>: Create a function called <code>fib()</code> that takes as input <code>n</code> and returns the <code>n</code>th <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci number</a>. Recall that the sequence is <span class="math display">\[
   0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, \ldots
