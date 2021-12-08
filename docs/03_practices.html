@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-03" />
+<meta name="date" content="2021-12-08" />
 
 <title>Software Development Best Practices</title>
 
@@ -358,20 +358,20 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Software Development Best Practices</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-03</h4>
+<h4 class="date">2021-12-08</h4>
 
 </div>
 
 <div id="TOC">
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
+<li><a href="#coding-style">Coding Style</a></li>
 <li><a href="#assertions">Assertions</a></li>
 <li><a href="#unit-tests">Unit Tests</a></li>
 <li><a href="#package-checking">Package Checking</a>
 <ul>
 <li><a href="#continuous-integration">Continuous Integration</a></li>
 </ul></li>
-<li><a href="#coding-style">Coding Style</a></li>
 <li><a href="#other-things">Other Things</a></li>
 </ul>
 </div>
@@ -391,25 +391,56 @@ $(document).ready(function () {
 <li><a href="https://style.tidyverse.org/">The tidyverse style guide</a></li>
 </ul>
 </div>
+<div id="coding-style" class="section level1">
+<h1>Coding Style</h1>
+<ul>
+<li><p>You should break up your functions into discrete tasks.</p>
+<ul>
+<li>Reduces duplicating code, so less prone to bugs.</li>
+<li>Allows you to think more modularly about tasks, which makes code easier to reason about.</li>
+<li>Makes it easier to combine code in new ways.</li>
+</ul></li>
+<li><p>One way to force you to do this is to make all functions be less than some length. E.g. Bioconductor recommends having <a href="https://bioconductor.org/packages/devel/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#function-length-checking">no functions longer than 50 lines</a>.</p></li>
+<li><p><strong>Example</strong>:</p></li>
+</ul>
+</div>
 <div id="assertions" class="section level1">
 <h1>Assertions</h1>
+<ul>
+<li><p><code>stopifnot()</code></p></li>
+<li><p><code>stop()</code></p></li>
+<li><p><code>warning()</code></p></li>
+</ul>
 </div>
 <div id="unit-tests" class="section level1">
 <h1>Unit Tests</h1>
+<ul>
+<li><p>So far your work flow has been to iteratively:</p>
+<ol style="list-style-type: decimal">
+<li>Write a function.</li>
+<li>Load the package into memory with <code>devtools::load_all()</code></li>
+<li>Play around with it, testing it on your own.</li>
+</ol></li>
+<li><p>This is great, but informal. If your code changes, those informal checks you ran might no longer work, and you wouldn’t know.</p></li>
+<li><p>A <strong>unit test</strong> is a stored test that you can rerun automatically.</p></li>
+<li><p>Writing unit tests is a fair amount of work but it is worth it because:</p>
+<ol style="list-style-type: decimal">
+<li>If your code changes in a breaking way, your unit tests will alert you. This makes you more confident to make robust changes to your code.</li>
+<li>I often find bugs while I create unit tests. Describing what I expect and testing out corner cases formally lowers the chance of a bug ending up in your final product.</li>
+</ol></li>
+<li><p><code>{testthat}</code> is one of the R package that implements unit tests in R. The second most popular one is probably <code>{RUnit}</code>.</p></li>
+</ul>
 </div>
 <div id="package-checking" class="section level1">
 <h1>Package Checking</h1>
 <ul>
 <li><p>Don’t include non-ASCII characters in your code. This will give you a CRAN note.</p></li>
-<li><p>If you accidently include such characters, you can find them with</p>
+<li><p>If you accidentally include such characters, you can find them with</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>tools<span class="sc">::</span><span class="fu">showNonASCIIfile</span>()</span></code></pre></div></li>
 </ul>
 <div id="continuous-integration" class="section level2">
 <h2>Continuous Integration</h2>
 </div>
-</div>
-<div id="coding-style" class="section level1">
-<h1>Coding Style</h1>
 </div>
 <div id="other-things" class="section level1">
 <h1>Other Things</h1>
