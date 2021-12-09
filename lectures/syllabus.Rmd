@@ -79,12 +79,7 @@ This course provides an in depth study of the R ecosystem and software developme
     devtools::has_devel()
     ```
 
-
-- Git: <https://git-scm.com/>
-    - See installation instructions [here](./01_git_github.html).
-
-- A GitHub Account: <https://github.com/>
-    - Choose a professional username.
+- Git and GitHub: Go through [Setting up Git and GitHub](./01_git_setup.html).
 
 # Assignments and Grading
 
