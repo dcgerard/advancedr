@@ -107,7 +107,7 @@ klippy::klippy()
     
 - Copy the entire text that shows up. This is your public key.
 
-- Go to [Add Public Key to GitHub](https://dcgerard.github.io/advancedr/01_git_github.html#add-public-key-to-github) to continue authentication setup.
+- Go to [Add Public Key to GitHub](./01_git_setup.html#add-public-key-to-github#add-public-key-to-github) to continue authentication setup.
 
 ## Generate Key Pair on the Terminal
 
