@@ -31,22 +31,52 @@ klippy::klippy()
 - Chapters 12 and 19 from [R Packages](https://r-pkgs.org/index.html)
 - [The tidyverse style guide](https://style.tidyverse.org/)
 
+# Coding Style
+
+- You should break up your functions into discrete tasks.
+    - Reduces duplicating code, so less prone to bugs.
+    - Allows you to think more modularly about tasks, which makes code easier to reason about.
+    - Makes it easier to combine code in new ways.
+
+- One way to force you to do this is to make all functions be less than some length. E.g. Bioconductor recommends having [no functions longer than 50 lines](https://bioconductor.org/packages/devel/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#function-length-checking).
+
+- **Example**:
+
 # Assertions
 
+- `stopifnot()`
+
+- `stop()`
+
+- `warning()`
+
 # Unit Tests
+
+- So far your work flow has been to iteratively:
+    1. Write a function.
+    2. Load the package into memory with `devtools::load_all()`
+    3. Play around with it, testing it on your own.
+    
+- This is great, but informal. If your code changes, those informal checks you ran might no longer work, and you wouldn't know.
+
+- A **unit test** is a stored test that you can rerun automatically.
+
+- Writing unit tests is a fair amount of work but it is worth it because:
+    1. If your code changes in a breaking way, your unit tests will alert you. This makes you more confident to make robust changes to your code.
+    2. I often find bugs while I create unit tests. Describing what I expect and testing out corner cases formally lowers the chance of a bug ending up in your final product.
+
+- `{testthat}` is one of the R package that implements unit tests in R. The second most popular one is probably `{RUnit}`.
 
 # Package Checking
 
 - Don't include non-ASCII characters in your code. This will give you a CRAN note.
 
-- If you accidently include such characters, you can find them with
+- If you accidentally include such characters, you can find them with
     ```{r, eval = FALSE}
     tools::showNonASCIIfile()
     ```
     
 ## Continuous Integration
-    
-# Coding Style
 
 # Other Things
 
