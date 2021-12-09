@@ -39,6 +39,7 @@ klippy::klippy()
     git --version
     ```
     if git is installed, you will see something like
+    
     ```
     git version 2.25.1
     ```
