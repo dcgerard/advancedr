@@ -107,7 +107,7 @@ klippy::klippy()
     
 - Copy the entire text that shows up. This is your public key.
 
-- Go to [Add Public Key to GitHub](./01_git_setup.html#add-public-key-to-github#add-public-key-to-github) to continue authentication setup.
+- Go to [Add Public Key to GitHub](./01_git_setup.html#add-public-key-to-github) to continue authentication setup.
 
 ## Generate Key Pair on the Terminal
 
@@ -167,7 +167,7 @@ klippy::klippy()
 
 ## Add Public Key to GitHub
 
-1. On [GitHub](https://github.com/), in the upper right corner, click on your profile photo and click on "Settings"
+1. On [GitHub](https://github.com/settings/keys), in the upper right corner, click on your profile photo and click on "Settings"
 
     <img src="./01_figs/userbar-account-settings.png" alt="GitHub Account Settings Menu" width="20%"/>
     
