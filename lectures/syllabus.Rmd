@@ -41,8 +41,7 @@ This course provides an in depth study of the R ecosystem and software developme
 
 # Textbooks
 
-- Advanced R (1st Edition): <http://adv-r.had.co.nz/>
-    - We are using the first edition, not the second, because it focuses more on Base R than the second.
+- Advanced R: <https://adv-r.hadley.nz/index.html>
     
 - R Packages: <https://r-pkgs.org/>
 

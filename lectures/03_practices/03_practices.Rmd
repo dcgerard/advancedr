@@ -44,6 +44,8 @@ klippy::klippy()
 
 # Assertions
 
+- One hallmark of good programming is to return an error as early as possible.
+
 - `stopifnot()`
 
 - `stop()`

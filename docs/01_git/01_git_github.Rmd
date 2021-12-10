@@ -39,6 +39,7 @@ klippy::klippy()
     git --version
     ```
     if git is installed, you will see something like
+    
     ```
     git version 2.25.1
     ```
@@ -115,8 +116,7 @@ klippy::klippy()
 
 ## Motivation 3: Great for job interviews
 
-- In a [Kaggle Survey](https://www.kaggle.com/surveys/2017), 58.5% of data
-  scientists say they primarily use git for sharing code.
+- In a [2021 Stack Overflow Survey](https://insights.stackoverflow.com/survey/2021#other-tools), 93.43% of developers say they use git.
   
 - You can make your final-project repo public so prospective employers can
   view your work.

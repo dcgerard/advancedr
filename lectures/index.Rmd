@@ -47,4 +47,4 @@ This repository contains material based upon work supported by the National Scie
 
 # Final Project
 
-- Final project description
+- [Final project description](./ff_project_description.html)

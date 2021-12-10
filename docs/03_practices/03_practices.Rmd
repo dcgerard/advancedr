@@ -44,6 +44,8 @@ klippy::klippy()
 
 # Assertions
 
+- One hallmark of good programming is to return an error as early as possible.
+
 - `stopifnot()`
 
 - `stop()`
@@ -61,11 +63,107 @@ klippy::klippy()
 
 - A **unit test** is a stored test that you can rerun automatically.
 
+- Your workflow when coding using unit tests is to:
+    1. Modify code or tests.
+    2. Test package with `devtools::test()`. This will run all unit tests.
+    3. Repeat until all tests pass.
+
 - Writing unit tests is a fair amount of work but it is worth it because:
     1. If your code changes in a breaking way, your unit tests will alert you. This makes you more confident to make robust changes to your code.
     2. I often find bugs while I create unit tests. Describing what I expect and testing out corner cases formally lowers the chance of a bug ending up in your final product.
 
 - `{testthat}` is one of the R package that implements unit tests in R. The second most popular one is probably `{RUnit}`.
+
+    ```{r}
+    library(testthat)
+    local_edition(3)
+    ```
+
+- To use `{testthat}`, run
+    ```{r, eval=FALSE}
+    usethis::use_testthat()
+    ```
+
+- This will have created a new folder "tests". Inside this folder is an R script "testthat.R" and another folder "testthat".
+
+    ```
+    .
+    ├── DESCRIPTION
+    ├── NAMESPACE
+    ├── R
+    └── tests
+        ├── testthat
+        └── testthat.R
+    ```
+    
+- "testthat.R" contains a few lines of code telling R to run all of your unit tests during package checking.
+
+- Unit tests will be in R scripts inside the "testthat" folder.
+    
+- **Expectation**: Describes expected result of a computation. 
+    - Correct value? 
+    - Correct type (character/numeric/factor/logical)? 
+    - Correctly produces an error when expected?
+    - All expectations are functions like `expect_*()`
+    
+- **Test**: A group of related expectations. Usually, a test tests only one function, or a couple tightly related functions. A test is created with `test_that()`.
+
+- **Testthat File**: A collection of related tests.
+
+## Testthat File
+
+- A testthat file is just an R script that holds a few related tests.
+
+- You can create an R script for unit testing by typing
+    ```{r, eval=FALSE}
+    usethis::use_test()
+    ```
+    specifying the `name` of the R script.
+    
+## Test
+
+- All `{testthat}` tests are of the form
+
+    ```{r, eval=FALSE}
+    test_that("Human Readable Description", {
+      ## Code running test
+    })
+    ```
+
+## Expectation
+
+- An expectation returns an error if a function or result is not what you expect.
+
+- In `{testthat}` all expectations begin with `expect_`.
+
+- The most common expectation is to test for equality with `expect_equal()`.
+    ```{r}
+    x <- 10
+    y <- 10
+    expect_equal(x, y)
+    ```
+    You can specify the tolerance level so for items that are only approximately equal
+    ```{r, error=TRUE}
+    expect_equal(10, 10 + 10^-8)
+    expect_equal(10, 10 + 10^-5)
+    expect_equal(10, 10 + 10^-5, tolerance = 10^-4)
+    ```
+- Use `ignore_attr = TRUE` if your objects have different attributes and you just care about the numeric values (default `expect_equal()` will throw an error):
+    ```{r, error=TRUE}
+    
+    names(x) <- "hello"
+    expect_equal(x, y, ignore_attr = TRUE)
+    expect_equal(x, y)
+    ```
+    
+
+- A more strict version of testing is `expect_identical()`
+    
+- `expect_match()`
+
+
+
+
 
 # Package Checking
 
