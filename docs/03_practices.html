@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-08" />
+<meta name="date" content="2021-12-09" />
 
 <title>Software Development Best Practices</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Software Development Best Practices</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-08</h4>
+<h4 class="date">2021-12-09</h4>
 
 </div>
 
@@ -367,7 +367,12 @@ $(document).ready(function () {
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#coding-style">Coding Style</a></li>
 <li><a href="#assertions">Assertions</a></li>
-<li><a href="#unit-tests">Unit Tests</a></li>
+<li><a href="#unit-tests">Unit Tests</a>
+<ul>
+<li><a href="#testthat-file">Testthat File</a></li>
+<li><a href="#test">Test</a></li>
+<li><a href="#expectation">Expectation</a></li>
+</ul></li>
 <li><a href="#package-checking">Package Checking</a>
 <ul>
 <li><a href="#continuous-integration">Continuous Integration</a></li>
@@ -423,20 +428,101 @@ $(document).ready(function () {
 </ol></li>
 <li><p>This is great, but informal. If your code changes, those informal checks you ran might no longer work, and you wouldn’t know.</p></li>
 <li><p>A <strong>unit test</strong> is a stored test that you can rerun automatically.</p></li>
+<li><p>Your workflow when coding using unit tests is to:</p>
+<ol style="list-style-type: decimal">
+<li>Modify code or tests.</li>
+<li>Test package with <code>devtools::test()</code>. This will run all unit tests.</li>
+<li>Repeat until all tests pass.</li>
+</ol></li>
 <li><p>Writing unit tests is a fair amount of work but it is worth it because:</p>
 <ol style="list-style-type: decimal">
 <li>If your code changes in a breaking way, your unit tests will alert you. This makes you more confident to make robust changes to your code.</li>
 <li>I often find bugs while I create unit tests. Describing what I expect and testing out corner cases formally lowers the chance of a bug ending up in your final product.</li>
 </ol></li>
-<li><p><code>{testthat}</code> is one of the R package that implements unit tests in R. The second most popular one is probably <code>{RUnit}</code>.</p></li>
+<li><p><code>{testthat}</code> is one of the R package that implements unit tests in R. The second most popular one is probably <code>{RUnit}</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(testthat)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">local_edition</span>(<span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## Setting deferred event(s) on global environment.
+##   * Will be run automatically when session ends
+##   * Execute (and clear) with `withr::deferred_run()`.
+##   * Clear (without executing) with `withr::deferred_clear()`.</code></pre></li>
+<li><p>To use <code>{testthat}</code>, run</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_testthat</span>()</span></code></pre></div></li>
+<li><p>This will have created a new folder “tests”. Inside this folder is an R script “testthat.R” and another folder “testthat”.</p>
+<pre><code>.
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+└── tests
+    ├── testthat
+    └── testthat.R</code></pre></li>
+<li><p>“testthat.R” contains a few lines of code telling R to run all of your unit tests during package checking.</p></li>
+<li><p>Unit tests will be in R scripts inside the “testthat” folder.</p></li>
+<li><p><strong>Expectation</strong>: Describes expected result of a computation.</p>
+<ul>
+<li>Correct value?</li>
+<li>Correct type (character/numeric/factor/logical)?</li>
+<li>Correctly produces an error when expected?</li>
+<li>All expectations are functions like <code>expect_*()</code></li>
+</ul></li>
+<li><p><strong>Test</strong>: A group of related expectations. Usually, a test tests only one function, or a couple tightly related functions. A test is created with <code>test_that()</code>.</p></li>
+<li><p><strong>Testthat File</strong>: A collection of related tests.</p></li>
 </ul>
+<div id="testthat-file" class="section level2">
+<h2>Testthat File</h2>
+<ul>
+<li><p>A testthat file is just an R script that holds a few related tests.</p></li>
+<li><p>You can create an R script for unit testing by typing</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_test</span>()</span></code></pre></div>
+<p>specifying the <code>name</code> of the R script.</p></li>
+</ul>
+</div>
+<div id="test" class="section level2">
+<h2>Test</h2>
+<ul>
+<li><p>All <code>{testthat}</code> tests are of the form</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">&quot;Human Readable Description&quot;</span>, {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Code running test</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div></li>
+</ul>
+</div>
+<div id="expectation" class="section level2">
+<h2>Expectation</h2>
+<ul>
+<li><p>An expectation returns an error if a function or result is not what you expect.</p></li>
+<li><p>In <code>{testthat}</code> all expectations begin with <code>expect_</code>.</p></li>
+<li><p>The most common expectation is to test for equality with <code>expect_equal()</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y)</span></code></pre></div>
+<p>You can specify the tolerance level so for items that are only approximately equal</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">8</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">5</span>)</span></code></pre></div>
+<pre><code>## Error: 10 not equal to 10 + 10^-5.
+## 1/1 mismatches
+## [1] 10 - 10 == -1e-05</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">5</span>, <span class="at">tolerance =</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">4</span>)</span></code></pre></div></li>
+<li><p>Use <code>ignore_attr = TRUE</code> if your objects have different attributes and you just care about the numeric values (default <code>expect_equal()</code> will throw an error):</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edition_get</span>()</span></code></pre></div>
+<pre><code>## [1] 2</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">&lt;-</span> <span class="st">&quot;hello&quot;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y, <span class="at">ignore_attr =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## Error: `x` not equal to `y`.
+## names for target but not for current</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y)</span></code></pre></div>
+<pre><code>## Error: `x` not equal to `y`.
+## names for target but not for current</code></pre></li>
+<li><p>A more strict version of testing is <code>expect_identical()</code></p></li>
+<li><p><code>expect_match()</code></p></li>
+</ul>
+</div>
 </div>
 <div id="package-checking" class="section level1">
 <h1>Package Checking</h1>
 <ul>
 <li><p>Don’t include non-ASCII characters in your code. This will give you a CRAN note.</p></li>
 <li><p>If you accidentally include such characters, you can find them with</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>tools<span class="sc">::</span><span class="fu">showNonASCIIfile</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>tools<span class="sc">::</span><span class="fu">showNonASCIIfile</span>()</span></code></pre></div></li>
 </ul>
 <div id="continuous-integration" class="section level2">
 <h2>Continuous Integration</h2>
