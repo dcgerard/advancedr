@@ -365,7 +365,7 @@ $(document).ready(function () {
 <div id="TOC">
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
-<li><a href="#coding-style">Coding Style</a></li>
+<li><a href="#an-example-from-genetics">An example from genetics</a></li>
 <li><a href="#assertions">Assertions</a></li>
 <li><a href="#unit-tests">Unit Tests</a>
 <ul>
@@ -377,7 +377,7 @@ $(document).ready(function () {
 <ul>
 <li><a href="#continuous-integration">Continuous Integration</a></li>
 </ul></li>
-<li><a href="#other-things">Other Things</a></li>
+<li><a href="#coding-style">Coding Style</a></li>
 </ul>
 </div>
 
@@ -396,25 +396,51 @@ $(document).ready(function () {
 <li><a href="https://style.tidyverse.org/">The tidyverse style guide</a></li>
 </ul>
 </div>
-<div id="coding-style" class="section level1">
-<h1>Coding Style</h1>
+<div id="an-example-from-genetics" class="section level1">
+<h1>An example from genetics</h1>
 <ul>
-<li><p>You should break up your functions into discrete tasks.</p>
-<ul>
-<li>Reduces duplicating code, so less prone to bugs.</li>
-<li>Allows you to think more modularly about tasks, which makes code easier to reason about.</li>
-<li>Makes it easier to combine code in new ways.</li>
-</ul></li>
-<li><p>One way to force you to do this is to make all functions be less than some length. E.g. Bioconductor recommends having <a href="https://bioconductor.org/packages/devel/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#function-length-checking">no functions longer than 50 lines</a>.</p></li>
-<li><p><strong>Example</strong>:</p></li>
+<li><p>Most of the interesting applications of R computing come from Statistics.</p></li>
+<li><p>For this lecture, I will use an example from statistical genetics (because that is my field).</p></li>
+<li><p>Suppose I am making a method to test for <a href="https://en.wikipedia.org/wiki/Hardy%E2%80%93Weinberg_principle">Hardy-Weinberg equilibrium</a> (HWE).</p></li>
+<li><p>In genetics there are often two “alleles” A and a. Recall that humans have two copies of their genome, so some individuals have AA, some have Aa, and some have aa. If <span class="math inline">\(Pr(A) = p\)</span>, then HWE states that <span class="math display">\[\begin{align}
+  Pr(AA) &amp;= p^2\\
+  Pr(Aa) &amp;= 2p(1-p)\\
+  Pr(aa) &amp;= (1-p)^2
+  \end{align}\]</span> If HWE is not fulfilled, then <span class="math inline">\(Pr(AA) \neq p^2\)</span> or <span class="math inline">\(Pr(Aa) \neq 2p(1-p)\)</span> or <span class="math inline">\(Pr(aa) \neq (1-p)^2\)</span>.</p></li>
+<li><p>Let <span class="math inline">\(n_{AA}, n_{Aa}, n_{aa}\)</span> be the number of individuals observed to have AA, Aa, and aa, respectively. Let <span class="math inline">\(n = n_{AA} + n_{Aa} + n_{aa}\)</span>.</p></li>
+<li><p>A goal is often to test if HWE is satisfied. That is, do <span class="math inline">\(n_{AA}/n, n_{Aa}/n, n_{aa}/n\)</span> follow the frequencies expected under HWE?</p></li>
+<li><p>We can estimate <span class="math inline">\(p\)</span> by <span class="math display">\[
+  \hat{p} = \frac{2n_{AA} + n_{Aa}}{2n}
+  \]</span></p></li>
+<li><p>We then compare <span class="math inline">\(n_{AA}/n\)</span> to <span class="math inline">\(\hat{p}^2\)</span>, we compare <span class="math inline">\(n_{Aa}/n\)</span> to <span class="math inline">\(2\hat{p}(1-\hat{p})\)</span>, and we compare <span class="math inline">\(n_{aa}/n\)</span> to <span class="math inline">\((1-\hat{p})^2\)</span>.</p></li>
+<li><p>The two canonical ways to do this are via a <span class="math inline">\(\chi^2\)</span> test or a likelihood ratio test.</p></li>
+<li><p>For the <span class="math inline">\(chi^2\)</span> test we calculate <span class="math display">\[
+  X = \frac{(n_{AA} - n\hat{p}^2)^2}{n\hat{p}^2} + \frac{(n_{Aa} - n\hat{p}(1-\hat{p}))^2}{n\hat{p}(1-\hat{p})} + \frac{(n_{aa} - n(1-\hat{p})^2)^2}{n(1-\hat{p})^2}
+  \]</span></p></li>
+<li><p>If the null were true, then <span class="math inline">\(X \sim \chi^2_1\)</span>, so the <span class="math inline">\(p\)</span>-value is</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pchisq</span>(X, <span class="dv">1</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span></code></pre></div></li>
+<li><p>For the likelihood</p></li>
 </ul>
 </div>
 <div id="assertions" class="section level1">
 <h1>Assertions</h1>
 <ul>
-<li><p><code>stopifnot()</code></p></li>
-<li><p><code>stop()</code></p></li>
-<li><p><code>warning()</code></p></li>
+<li><p>One hallmark of good programming is to return an error as early as possible.</p></li>
+<li><p>An <strong>assertion</strong> is a statement during your code that should always evaluation to <code>TRUE</code>. If an assertion evaluates to <code>FALSE</code> then this throws an error.</p></li>
+<li><p>In R, the base assertion is <code>stopifnot()</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(x <span class="sc">==</span> <span class="dv">10</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(x <span class="sc">&gt;</span> <span class="dv">20</span>)</span></code></pre></div>
+<pre><code>## Error: x &gt; 20 is not TRUE</code></pre></li>
+<li><p>If you want to be more explicit about your errors, you can put <code>stop()</code> inside an if-then statement.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (x <span class="sc">!=</span> <span class="dv">10</span>) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stop</span>(<span class="st">&quot;x is not 10&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>For user-facing functions, I like to check user arguments for validity in R.</p>
+<ul>
+<li>Other languages force argument validity, but R, e.g., allows users to insert characters for numeric arguments!</li>
+</ul></li>
+<li><p>If you just don’t like the bahavior, but don’t want to kill the program, use <code>warning()</code>.</p></li>
 </ul>
 </div>
 <div id="unit-tests" class="section level1">
@@ -440,14 +466,14 @@ $(document).ready(function () {
 <li>I often find bugs while I create unit tests. Describing what I expect and testing out corner cases formally lowers the chance of a bug ending up in your final product.</li>
 </ol></li>
 <li><p><code>{testthat}</code> is one of the R package that implements unit tests in R. The second most popular one is probably <code>{RUnit}</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(testthat)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">local_edition</span>(<span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(testthat)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">local_edition</span>(<span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## Setting deferred event(s) on global environment.
 ##   * Will be run automatically when session ends
 ##   * Execute (and clear) with `withr::deferred_run()`.
 ##   * Clear (without executing) with `withr::deferred_clear()`.</code></pre></li>
 <li><p>To use <code>{testthat}</code>, run</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_testthat</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_testthat</span>()</span></code></pre></div></li>
 <li><p>This will have created a new folder “tests”. Inside this folder is an R script “testthat.R” and another folder “testthat”.</p>
 <pre><code>.
 ├── DESCRIPTION
@@ -473,7 +499,7 @@ $(document).ready(function () {
 <ul>
 <li><p>A testthat file is just an R script that holds a few related tests.</p></li>
 <li><p>You can create an R script for unit testing by typing</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_test</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_test</span>()</span></code></pre></div>
 <p>specifying the <code>name</code> of the R script.</p></li>
 </ul>
 </div>
@@ -481,9 +507,9 @@ $(document).ready(function () {
 <h2>Test</h2>
 <ul>
 <li><p>All <code>{testthat}</code> tests are of the form</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">&quot;Human Readable Description&quot;</span>, {</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Code running test</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div></li>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">&quot;Human Readable Description&quot;</span>, {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Code running test</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div></li>
 </ul>
 </div>
 <div id="expectation" class="section level2">
@@ -492,22 +518,22 @@ $(document).ready(function () {
 <li><p>An expectation returns an error if a function or result is not what you expect.</p></li>
 <li><p>In <code>{testthat}</code> all expectations begin with <code>expect_</code>.</p></li>
 <li><p>The most common expectation is to test for equality with <code>expect_equal()</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y)</span></code></pre></div>
 <p>You can specify the tolerance level so for items that are only approximately equal</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">8</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">8</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">5</span>)</span></code></pre></div>
 <pre><code>## Error: 10 not equal to 10 + 10^-5.
 ## 1/1 mismatches
 ## [1] 10 - 10 == -1e-05</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">5</span>, <span class="at">tolerance =</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">4</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">5</span>, <span class="at">tolerance =</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">4</span>)</span></code></pre></div></li>
 <li><p>Use <code>ignore_attr = TRUE</code> if your objects have different attributes and you just care about the numeric values (default <code>expect_equal()</code> will throw an error):</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">&lt;-</span> <span class="st">&quot;hello&quot;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y, <span class="at">ignore_attr =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">&lt;-</span> <span class="st">&quot;hello&quot;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y, <span class="at">ignore_attr =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## Error: `x` not equal to `y`.
 ## names for target but not for current</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y)</span></code></pre></div>
 <pre><code>## Error: `x` not equal to `y`.
 ## names for target but not for current</code></pre></li>
 <li><p>A more strict version of testing is <code>expect_identical()</code></p></li>
@@ -520,18 +546,22 @@ $(document).ready(function () {
 <ul>
 <li><p>Don’t include non-ASCII characters in your code. This will give you a CRAN note.</p></li>
 <li><p>If you accidentally include such characters, you can find them with</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>tools<span class="sc">::</span><span class="fu">showNonASCIIfile</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>tools<span class="sc">::</span><span class="fu">showNonASCIIfile</span>()</span></code></pre></div></li>
 </ul>
 <div id="continuous-integration" class="section level2">
 <h2>Continuous Integration</h2>
 </div>
 </div>
-<div id="other-things" class="section level1">
-<h1>Other Things</h1>
+<div id="coding-style" class="section level1">
+<h1>Coding Style</h1>
 <ul>
-<li>Comment code, but not excessively.</li>
-<li>Break up large functions into smaller functions.</li>
-<li>Restart R often.</li>
+<li>You should break up your functions into discrete tasks.
+<ul>
+<li>Reduces duplicating code, so less prone to bugs.</li>
+<li>Allows you to think more modularly about tasks, which makes code easier to reason about.</li>
+<li>Makes it easier to combine code in new ways.</li>
+</ul></li>
+<li>One way to force you to do this is to make all functions be less than some length. E.g. Bioconductor recommends having <a href="https://bioconductor.org/packages/devel/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#function-length-checking">no functions longer than 50 lines</a>.</li>
 </ul>
 </div>
 

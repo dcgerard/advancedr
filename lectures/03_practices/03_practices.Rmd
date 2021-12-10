@@ -31,26 +31,73 @@ klippy::klippy()
 - Chapters 12 and 19 from [R Packages](https://r-pkgs.org/index.html)
 - [The tidyverse style guide](https://style.tidyverse.org/)
 
-# Coding Style
+# An example from genetics
 
-- You should break up your functions into discrete tasks.
-    - Reduces duplicating code, so less prone to bugs.
-    - Allows you to think more modularly about tasks, which makes code easier to reason about.
-    - Makes it easier to combine code in new ways.
+- Most of the interesting applications of R computing come from Statistics. 
 
-- One way to force you to do this is to make all functions be less than some length. E.g. Bioconductor recommends having [no functions longer than 50 lines](https://bioconductor.org/packages/devel/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#function-length-checking).
+- For this lecture, I will use an example from statistical genetics (because that is my field).
 
-- **Example**:
+- Suppose I am making a method to test for [Hardy-Weinberg equilibrium](https://en.wikipedia.org/wiki/Hardy%E2%80%93Weinberg_principle) (HWE). 
+
+- In genetics there are often two "alleles" A and a. Recall that humans have two copies of their genome, so some individuals have AA, some have Aa, and some have aa. If $Pr(A) = p$, then HWE states that
+    \begin{align}
+    Pr(AA) &= p^2\\
+    Pr(Aa) &= 2p(1-p)\\
+    Pr(aa) &= (1-p)^2
+    \end{align}
+    If HWE is not fulfilled, then $Pr(AA) \neq p^2$ or $Pr(Aa) \neq 2p(1-p)$ or $Pr(aa) \neq (1-p)^2$.
+  
+- Let $n_{AA}, n_{Aa}, n_{aa}$ be the number of individuals observed to have AA, Aa, and aa, respectively. Let $n = n_{AA} + n_{Aa} + n_{aa}$.
+
+- A goal is often to test if HWE is satisfied. That is, do $n_{AA}/n, n_{Aa}/n, n_{aa}/n$ follow the frequencies expected under HWE?
+
+- We can estimate $p$ by
+    $$
+    \hat{p} = \frac{2n_{AA} + n_{Aa}}{2n}
+    $$
+    
+- We then compare $n_{AA}/n$ to $\hat{p}^2$, we compare $n_{Aa}/n$ to $2\hat{p}(1-\hat{p})$, and we compare $n_{aa}/n$ to $(1-\hat{p})^2$.
+
+- The two canonical ways to do this are via a $\chi^2$ test or a likelihood ratio test.
+
+- For the $chi^2$ test we calculate
+    $$
+    X = \frac{(n_{AA} - n\hat{p}^2)^2}{n\hat{p}^2} + \frac{(n_{Aa} - n\hat{p}(1-\hat{p}))^2}{n\hat{p}(1-\hat{p})} + \frac{(n_{aa} - n(1-\hat{p})^2)^2}{n(1-\hat{p})^2}
+    $$
+
+- If the null were true, then $X \sim \chi^2_1$, so the $p$-value is
+    ```{r, eval = FALSE}
+    pchisq(X, 1, lower.tail = FALSE)
+    ```
+
+- For the likelihood
 
 # Assertions
 
 - One hallmark of good programming is to return an error as early as possible.
 
-- `stopifnot()`
+- An **assertion** is a statement during your code that should always evaluation to `TRUE`. If an assertion evaluates to `FALSE` then this throws an error.
 
-- `stop()`
+- In R, the base assertion is `stopifnot()`.
 
-- `warning()`
+    ```{r, error=TRUE}
+    x <- 10
+    stopifnot(x == 10)
+    stopifnot(x > 20)
+    ```
+
+- If you want to be more explicit about your errors, you can put `stop()` inside an if-then statement.
+
+    ```{r, error=TRUE}
+    if (x != 10) {
+      stop("x is not 10")
+    }
+    ```
+
+- For user-facing functions, I like to check user arguments for validity in R.
+    - Other languages force argument validity, but R, e.g., allows users to insert characters for numeric arguments!
+
+- If you just don't like the bahavior, but don't want to kill the program, use `warning()`.
 
 # Unit Tests
 
@@ -161,10 +208,6 @@ klippy::klippy()
     
 - `expect_match()`
 
-
-
-
-
 # Package Checking
 
 - Don't include non-ASCII characters in your code. This will give you a CRAN note.
@@ -176,8 +219,12 @@ klippy::klippy()
     
 ## Continuous Integration
 
-# Other Things
+# Coding Style
 
-- Comment code, but not excessively.
-- Break up large functions into smaller functions.
-- Restart R often.
+- You should break up your functions into discrete tasks.
+    - Reduces duplicating code, so less prone to bugs.
+    - Allows you to think more modularly about tasks, which makes code easier to reason about.
+    - Makes it easier to combine code in new ways.
+
+- One way to force you to do this is to make all functions be less than some length. E.g. Bioconductor recommends having [no functions longer than 50 lines](https://bioconductor.org/packages/devel/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#function-length-checking).
+
