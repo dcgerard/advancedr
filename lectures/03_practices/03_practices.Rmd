@@ -12,14 +12,21 @@ urlcolor: "blue"
 ---
 
 ```{r setup, include=FALSE}
+set.seed(1)
 knitr::opts_chunk$set(echo       = TRUE, 
                       fig.align  = "center",
-                      fig.height = 3, fig.width = 4)
+                      fig.height = 3, 
+                      fig.width  = 4)
+knitr::opts_knit$set(global.par = TRUE)
 ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
 ```
 
 ```{r klippy, echo=FALSE, include=TRUE}
 klippy::klippy()
+par(mar = c(3, 3, 2, 1),
+mgp = c(1.8, 0.4, 0), 
+las = 1,
+tcl = -.25)
 ```
 
 # Learning Objectives
@@ -31,50 +38,98 @@ klippy::klippy()
 - Chapters 12 and 19 from [R Packages](https://r-pkgs.org/index.html)
 - [The tidyverse style guide](https://style.tidyverse.org/)
 
-# An example from genetics
+# A Working Example
 
-- Most of the interesting applications of R computing come from Statistics. 
+- For this lecture, let's suppose that we want to create a package to simulate data from the normal simple linear regression model.
 
-- For this lecture, I will use an example from statistical genetics (because that is my field).
-
-- Suppose I am making a method to test for [Hardy-Weinberg equilibrium](https://en.wikipedia.org/wiki/Hardy%E2%80%93Weinberg_principle) (HWE). 
-
-- In genetics there are often two "alleles" A and a. Recall that humans have two copies of their genome, so some individuals have AA, some have Aa, and some have aa. If $Pr(A) = p$, then HWE states that
+- Recall that the normal simple linear regression model is of the form
     \begin{align}
-    Pr(AA) &= p^2\\
-    Pr(Aa) &= 2p(1-p)\\
-    Pr(aa) &= (1-p)^2
+    Y_i &= \beta_0 + \beta_1X_i + \epsilon_i\\
+    \epsilon_i &\sim N(0,\sigma^2)
     \end{align}
-    If HWE is not fulfilled, then $Pr(AA) \neq p^2$ or $Pr(Aa) \neq 2p(1-p)$ or $Pr(aa) \neq (1-p)^2$.
-  
-- Let $n_{AA}, n_{Aa}, n_{aa}$ be the number of individuals observed to have AA, Aa, and aa, respectively. Let $n = n_{AA} + n_{Aa} + n_{aa}$.
 
-- A goal is often to test if HWE is satisfied. That is, do $n_{AA}/n, n_{Aa}/n, n_{aa}/n$ follow the frequencies expected under HWE?
-
-- We can estimate $p$ by
-    $$
-    \hat{p} = \frac{2n_{AA} + n_{Aa}}{2n}
-    $$
+- Here, 
+    - $Y_i$ is the value of the response variable for obsrvation $i$.
+    - $X_i$ is the value of the predigor variable for obsrevation $i$.
+    - $\beta_0$ is the $y$-intercept, 
+    - $\beta_1$ is the slope (values that are 1 $x$ larger tend to be $\beta_1$ $y$ larger, on average).
+    - $\epsilon_i$ is the error for observation $i$. Assumed to be a random variable with a normal distribution with mean 0 and variance $\sigma^2$.
     
-- We then compare $n_{AA}/n$ to $\hat{p}^2$, we compare $n_{Aa}/n$ to $2\hat{p}(1-\hat{p})$, and we compare $n_{aa}/n$ to $(1-\hat{p})^2$.
-
-- The two canonical ways to do this are via a $\chi^2$ test or a likelihood ratio test.
-
-- For the $chi^2$ test we calculate
-    $$
-    X = \frac{(n_{AA} - n\hat{p}^2)^2}{n\hat{p}^2} + \frac{(n_{Aa} - n\hat{p}(1-\hat{p}))^2}{n\hat{p}(1-\hat{p})} + \frac{(n_{aa} - n(1-\hat{p})^2)^2}{n(1-\hat{p})^2}
-    $$
-
-- If the null were true, then $X \sim \chi^2_1$, so the $p$-value is
-    ```{r, eval = FALSE}
-    pchisq(X, 1, lower.tail = FALSE)
+- If we had the $X_i$'s, $\beta_0$, $\beta_1$, $\sigma^2$, and the sample size $n$, then it would be easy to simulate under this model.
+    ```{r}
+    n <- 100
+    sigma2 <- 0.1
+    beta0 <- 0
+    beta1 <- 2
+    x <- runif(n)
+    eps <- rnorm(n, mean = 0, sd = sqrt(sigma2))
+    y <- beta0 + beta1 * x + eps
+    
+    plot(x, y)
+    abline(a = beta0, b = beta1, col = 2)
+    grid()
     ```
 
-- For the likelihood
+    
+- There are many design considerations for simulating under this model:
+    1. Do we simulate the $X$'s or do we obtain these values from the user? If we simulate them, how do we do this? Should we allow the user to do both?
+    2. Do we simulate $\beta_0$ and $\beta_1$? Do we allow the user to input a distribution for these effect sizes?
+    3. Do we simulate $\sigma^2$? This is often difficult for the user to choose, so maybe there is a more intuitive specification for it?
+    
+- Let's start with a basic function where we assume the user has provided everything. We'll expand on this later.
+
+    ```{r}
+    #' @title Simulate SLR
+    #' 
+    #' @description Simulate response values from the normal simple
+    #'     linear regression model.
+    #' 
+    #' @param n The sample size
+    #' @param x The values of the predictor variable for the \code{n}
+    #'    individuals. 
+    #' @param beta0 The y-intercept.
+    #' @param beta1 The slope.
+    #' @param sigma2 The error variance.
+    #' 
+    #' @return A vector of length n. The values of the response variable.
+    #' 
+    #' @author David Gerard
+    #' 
+    #' @examples
+    #' n <- 100
+    #' x <- runif(n)
+    #' beta0 <- 0
+    #' beta1 <- 2
+    #' sigma2 <- 0.5
+    #' y <- simreg(n = n, x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2)
+    #' plot(x, y)
+    #' abline(a = beta0, b = beta1)
+    simreg <- function(n, x, beta0, beta1, sigma2) {
+      eps <- stats::rnorm(n = n, mean = 0, sd = sqrt(sigma2))
+      y <- beta0 + beta1 * x + eps
+      return(y)
+    }
+    ```
+
 
 # Assertions
 
 - One hallmark of good programming is to return an error as early as possible.
+
+- For example, what if the user provided an incorrect input
+    ```{r}
+    n <- 100
+    sigma2 <- 0.1
+    beta0 <- 0
+    beta1 <- 2
+    x <- runif(n)
+    y <- simreg(n = 1, x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2)
+    ```
+    It ran OK, but there was no error even though `n = 100`. What gives? Let's look at a plot.
+    ```{r}
+    plot(x, y)
+    ```
+    So R is recycling the one error term that it simulated. It would be nice to catch this so that it doesn't hurt a user down the road.
 
 - An **assertion** is a statement during your code that should always evaluation to `TRUE`. If an assertion evaluates to `FALSE` then this throws an error.
 
@@ -96,8 +151,74 @@ klippy::klippy()
 
 - For user-facing functions, I like to check user arguments for validity in R.
     - Other languages force argument validity, but R, e.g., allows users to insert characters for numeric arguments!
+    
+- Let's try this out for `simreg()`.
 
-- If you just don't like the bahavior, but don't want to kill the program, use `warning()`.
+    ```{r}
+    simreg <- function(n, x, beta0, beta1, sigma2) {
+      ## Check input
+      stopifnot(length(x) == n)
+      
+      ## Simulate y
+      eps <- stats::rnorm(n = n, mean = 0, sd = sqrt(sigma2))
+      y <- beta0 + beta1 * x + eps
+      return(y)
+    }
+    ```
+    
+- Then we get an error that tells us we made a mistake. This could save a user a huge amount of debugging time down the road.
+    ```{r, error=TRUE}
+    y <- simreg(n = 1, x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2)
+    ```
+
+- If you just don't like the behavior, but don't want to kill the program, use `warning()`.
+
+    ```{r, warning=TRUE}
+    simreg <- function(n, x, beta0, beta1, sigma2) {
+      ## Check input
+      if (length(x) != n) {
+        warning("n not equal to length(x). Recycling error terms.")
+      }
+      
+      ## Simulate y
+      eps <- stats::rnorm(n = n, mean = 0, sd = sqrt(sigma2))
+      y <- beta0 + beta1 * x + eps
+      return(y)
+    }
+    y <- simreg(n = 1, x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2)
+    ```
+
+- **Exercise**: Add assertions to check:
+    1. That `n`, `beta0`, `beta1`, and `sigma2` are all length 1.
+    2. That all of the variables are numerics.
+    3. That `sigma2` is non-negative.
+    
+    ```{r, eval = FALSE, echo = FALSE}
+    simreg <- function(n, x, beta0, beta1, sigma2) {
+      ## Check input
+      stopifnot(length(x) == n)
+      stopifnot(length(n) == 1, 
+                length(beta0) == 1, 
+                length(beta1) == 1, 
+                length(sigma2) == 1)
+      stopifnot(sigma2 >= 0)
+      stopifnot(is.numeric(n),
+                is.numeric(x),
+                is.numeric(beta0),
+                is.numeric(beta1),
+                is.numeric(sigma2))
+      
+      ## Simulate y
+      eps <- stats::rnorm(n = n, mean = 0, sd = sqrt(sigma2))
+      y <- beta0 + beta1 * x + eps
+      return(y)
+    }
+    y <- simreg(n = 100, x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2)
+    ```
+    
+- You should also place assertions in the middle of code (not just checking user inputs) in cases where you want to be doubly sure that your code is working.
+
+- E.g. I often place an assertion during optimization scripts to make sure that the objective function is not decreasing each iteration.
 
 # Unit Tests
 
