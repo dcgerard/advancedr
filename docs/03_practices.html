@@ -601,6 +601,7 @@ $(document).ready(function () {
 <ul>
 <li><p>An expectation returns an error if a function or result is not what you expect.</p></li>
 <li><p>In <code>{testthat}</code> all expectations begin with <code>expect_</code>.</p></li>
+<li><p>The first argument is the actual result of a function in your package. The second argument is the expected result.</p></li>
 <li><p>The most common expectation is to test for equality with <code>expect_equal()</code>.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">10</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">10</span></span>
@@ -613,15 +614,60 @@ $(document).ready(function () {
 ## [1] 10 - 10 == -1e-05</code></pre>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">5</span>, <span class="at">tolerance =</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">4</span>)</span></code></pre></div></li>
 <li><p>Use <code>ignore_attr = TRUE</code> if your objects have different attributes and you just care about the numeric values (default <code>expect_equal()</code> will throw an error):</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">&lt;-</span> <span class="st">&quot;hello&quot;</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y, <span class="at">ignore_attr =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<pre><code>## Error: `x` not equal to `y`.
-## names for target but not for current</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y)</span></code></pre></div>
-<pre><code>## Error: `x` not equal to `y`.
-## names for target but not for current</code></pre></li>
-<li><p>A more strict version of testing is <code>expect_identical()</code></p></li>
-<li><p><code>expect_match()</code></p></li>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">local_edition</span>(<span class="dv">3</span>) <span class="do">## not necessary for package</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">&lt;-</span> <span class="st">&quot;hello&quot;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y)</span></code></pre></div>
+<pre><code>## Error: `x` (`actual`) not equal to `y` (`expected`).
+## 
+## `names(actual)` is a character vector (&#39;hello&#39;)
+## `names(expected)` is absent</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y, <span class="at">ignore_attr =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
+<li><p>The <code>local_edition(3)</code> code makes it so my code chunks use the most recent <code>{testthat}</code> functions. You don’t need to worry about that in your package. <code>{usethis}</code> will automatically assume the third edition. You can explicitely use the third edition by adding the following to your DESCRIPTION file:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Config/testthat/edition</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span></code></pre></div></li>
+<li><p><code>expect_match()</code> checks for a regular expression match.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_match</span>(<span class="st">&quot;hello&quot;</span>, <span class="st">&quot;ll&quot;</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_match</span>(<span class="st">&quot;helo&quot;</span>, <span class="st">&quot;ll&quot;</span>)</span></code></pre></div>
+<pre><code>## Error: &quot;helo&quot; does not match &quot;ll&quot;.
+## Actual value: &quot;helo&quot;</code></pre></li>
+<li><p>You can use <code>expect_warning()</code> and <code>expect_error()</code> to check that your functions error correctly.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>simreg <span class="ot">&lt;-</span> <span class="cf">function</span>(n, x, beta0, beta1, sigma2) {</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Check input</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">length</span>(x) <span class="sc">==</span> n)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Simulate y</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  eps <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">rnorm</span>(<span class="at">n =</span> n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fu">sqrt</span>(sigma2))</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> beta0 <span class="sc">+</span> beta1 <span class="sc">*</span> x <span class="sc">+</span> eps</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">100</span>)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>beta0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>beta1 <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_error</span>(<span class="fu">simreg</span>(<span class="at">n =</span> <span class="dv">1</span>, </span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>                    <span class="at">x =</span> x, </span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta0 =</span> beta0, </span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta1 =</span> beta1, </span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sigma2 =</span> sigma2))</span></code></pre></div></li>
+<li><p>It is recommended that you think harder about your unit tests, but you can just test for a non-error by using <code>expect_error()</code> and setting <code>regexp = NA</code></p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_error</span>(<span class="fu">simreg</span>(<span class="at">n =</span> <span class="fu">length</span>(x), </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">x =</span> x, </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta0 =</span> beta0, </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta1 =</span> beta1, </span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sigma2 =</span> sigma2), </span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">regexp =</span> <span class="cn">NA</span>)</span></code></pre></div></li>
+<li><p><code>expect_type()</code> is tests for the type of the output (<code>"double"</code>, <code>"integer"</code>, <code>"character"</code>, or <code>"logical"</code>).</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">local_edition</span>(<span class="dv">3</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(<span class="dv">1</span>, <span class="st">&quot;double&quot;</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(1L, <span class="st">&quot;integer&quot;</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;character&quot;</span>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(<span class="cn">TRUE</span>, <span class="st">&quot;logical&quot;</span>)</span></code></pre></div></li>
+<li><p><code>expect_s3_class()</code> is used to test for the class of the object (e.g. <code>"data.frame"</code>, <code>"matrix"</code>, <code>"tibble"</code>, <code>"lm"</code>, etc..)</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">simreg</span>(<span class="at">n =</span> <span class="fu">length</span>(x), <span class="at">x =</span> x, <span class="at">beta0 =</span> beta0, <span class="at">beta1 =</span> beta1, <span class="at">sigma2 =</span> sigma2)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>lmout <span class="ot">&lt;-</span> lout <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_s3_class</span>(<span class="at">object =</span> lmout, <span class="at">class =</span> <span class="st">&quot;lm&quot;</span>)</span></code></pre></div></li>
+<li><p><code>expect_true()</code> acts like <code>stopifnot()</code> except for unit tests instead of assertions.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_true</span>(<span class="dv">3</span> <span class="sc">==</span> <span class="dv">3</span>)</span></code></pre></div></li>
 </ul>
 </div>
 </div>
@@ -630,7 +676,7 @@ $(document).ready(function () {
 <ul>
 <li><p>Don’t include non-ASCII characters in your code. This will give you a CRAN note.</p></li>
 <li><p>If you accidentally include such characters, you can find them with</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>tools<span class="sc">::</span><span class="fu">showNonASCIIfile</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tools<span class="sc">::</span><span class="fu">showNonASCIIfile</span>()</span></code></pre></div></li>
 </ul>
 <div id="continuous-integration" class="section level2">
 <h2>Continuous Integration</h2>

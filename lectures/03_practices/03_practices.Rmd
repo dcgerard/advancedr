@@ -304,6 +304,8 @@ tcl = -.25)
 
 - In `{testthat}` all expectations begin with `expect_`.
 
+- The first argument is the actual result of a function in your package. The second argument is the expected result.
+
 - The most common expectation is to test for equality with `expect_equal()`.
     ```{r}
     x <- 10
@@ -318,16 +320,79 @@ tcl = -.25)
     ```
 - Use `ignore_attr = TRUE` if your objects have different attributes and you just care about the numeric values (default `expect_equal()` will throw an error):
     ```{r, error=TRUE}
-    
+    local_edition(3) ## not necessary for package
     names(x) <- "hello"
-    expect_equal(x, y, ignore_attr = TRUE)
     expect_equal(x, y)
+    expect_equal(x, y, ignore_attr = TRUE)
     ```
     
+- The `local_edition(3)` code makes it so my code chunks use the most recent `{testthat}` functions. You don't need to worry about that in your package. `{usethis}` will automatically assume the third edition. You can explicitely use the third edition by adding the following to your DESCRIPTION file:
+    ```{yaml, eval = FALSE}
+    Config/testthat/edition: 3
+    ```
 
-- A more strict version of testing is `expect_identical()`
+- `expect_match()` checks for a regular expression match.
+
+    ```{r, error = TRUE}
+    expect_match("hello", "ll")
+    expect_match("helo", "ll")
+    ```
+
+- You can use `expect_warning()` and `expect_error()` to check that your functions error correctly.
+
+    ```{r}
+    simreg <- function(n, x, beta0, beta1, sigma2) {
+      ## Check input
+      stopifnot(length(x) == n)
+      
+      ## Simulate y
+      eps <- stats::rnorm(n = n, mean = 0, sd = sqrt(sigma2))
+      y <- beta0 + beta1 * x + eps
+      return(y)
+    }
     
-- `expect_match()`
+    x <- runif(100)
+    beta0 <- 0
+    beta1 <- 2
+    sigma2 <- 0.5
+    expect_error(simreg(n = 1, 
+                        x = x, 
+                        beta0 = beta0, 
+                        beta1 = beta1, 
+                        sigma2 = sigma2))
+    ```
+    
+- It is recommended that you think harder about your unit tests, but you can just test for a non-error by using `expect_error()` and setting `regexp = NA`
+    ```{r}
+    expect_error(simreg(n = length(x), 
+                        x = x, 
+                        beta0 = beta0, 
+                        beta1 = beta1, 
+                        sigma2 = sigma2), 
+                 regexp = NA)
+    ```
+
+- `expect_type()` is tests for the type of the output (`"double"`, `"integer"`, `"character"`, or `"logical"`).
+    ```{r}
+    local_edition(3)
+    expect_type(1, "double")
+    expect_type(1L, "integer")
+    expect_type("1", "character")
+    expect_type(TRUE, "logical")
+    ```
+
+- `expect_s3_class()` is used to test for the class of the object (e.g. `"data.frame"`, `"matrix"`, `"tibble"`, `"lm"`, etc..)
+    ```{r}
+    y <- simreg(n = length(x), x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2)
+    lmout <- lout <- lm(y ~ x)
+    expect_s3_class(object = lmout, class = "lm")
+    ```
+
+- `expect_true()` acts like `stopifnot()` except for unit tests instead of assertions.
+    ```{r}
+    expect_true(3 == 3)
+    ```
+
 
 # Package Checking
 
