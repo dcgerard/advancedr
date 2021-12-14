@@ -13,7 +13,7 @@
 
 <meta name="date" content="2021-12-14" />
 
-<title>Software Development Best Practices</title>
+<title>Assertions and Unit Tests</title>
 
 <script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -356,7 +356,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Software Development Best Practices</h1>
+<h1 class="title toc-ignore">Assertions and Unit Tests</h1>
 <h4 class="author">David Gerard</h4>
 <h4 class="date">2021-12-14</h4>
 
@@ -373,11 +373,6 @@ $(document).ready(function () {
 <li><a href="#test">Test</a></li>
 <li><a href="#testthat-file">Testthat File</a></li>
 </ul></li>
-<li><a href="#package-checking">Package Checking</a>
-<ul>
-<li><a href="#continuous-integration">Continuous Integration</a></li>
-</ul></li>
-<li><a href="#coding-style">Coding Style</a></li>
 </ul>
 </div>
 
@@ -390,10 +385,7 @@ $(document).ready(function () {
 <ul>
 <li>Assertions</li>
 <li>Unit Tests</li>
-<li>Package Checking</li>
-<li>Coding Style</li>
-<li>Chapters 12 and 19 from <a href="https://r-pkgs.org/index.html">R Packages</a></li>
-<li><a href="https://style.tidyverse.org/">The tidyverse style guide</a></li>
+<li>Chapter 12 from <a href="https://r-pkgs.org/index.html">R Packages</a></li>
 </ul>
 </div>
 <div id="a-working-example" class="section level1">
@@ -406,8 +398,8 @@ $(document).ready(function () {
   \end{align}\]</span></p></li>
 <li><p>Here,</p>
 <ul>
-<li><span class="math inline">\(Y_i\)</span> is the value of the response variable for obsrvation <span class="math inline">\(i\)</span>.</li>
-<li><span class="math inline">\(X_i\)</span> is the value of the predigor variable for obsrevation <span class="math inline">\(i\)</span>.</li>
+<li><span class="math inline">\(Y_i\)</span> is the value of the response variable for observation <span class="math inline">\(i\)</span>.</li>
+<li><span class="math inline">\(X_i\)</span> is the value of the predictor variable for observation <span class="math inline">\(i\)</span>.</li>
 <li><span class="math inline">\(\beta_0\)</span> is the <span class="math inline">\(y\)</span>-intercept,</li>
 <li><span class="math inline">\(\beta_1\)</span> is the slope (values that are 1 <span class="math inline">\(x\)</span> larger tend to be <span class="math inline">\(\beta_1\)</span> <span class="math inline">\(y\)</span> larger, on average).</li>
 <li><span class="math inline">\(\epsilon_i\)</span> is the error for observation <span class="math inline">\(i\)</span>. Assumed to be a random variable with a normal distribution with mean 0 and variance <span class="math inline">\(\sigma^2\)</span>.</li>
@@ -424,7 +416,7 @@ $(document).ready(function () {
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, y)</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">a =</span> beta0, <span class="at">b =</span> beta1, <span class="at">col =</span> <span class="dv">2</span>)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">grid</span>()</span></code></pre></div>
-<p><img src="03_practices_files/figure-html/unnamed-chunk-1-1.png" width="384" style="display: block; margin: auto;" /></p></li>
+<p><img src="03_testing_files/figure-html/unnamed-chunk-1-1.png" width="384" style="display: block; margin: auto;" /></p></li>
 <li><p>There are many design considerations for simulating under this model:</p>
 <ol style="list-style-type: decimal">
 <li>Do we simulate the <span class="math inline">\(X\)</span>’s or do we obtain these values from the user? If we simulate them, how do we do this? Should we allow the user to do both?</li>
@@ -477,7 +469,7 @@ $(document).ready(function () {
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">simreg</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">x =</span> x, <span class="at">beta0 =</span> beta0, <span class="at">beta1 =</span> beta1, <span class="at">sigma2 =</span> sigma2)</span></code></pre></div>
 <p>It ran OK, but there was no error even though <code>n = 100</code>. What gives? Let’s look at a plot.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, y)</span></code></pre></div>
-<p><img src="03_practices_files/figure-html/unnamed-chunk-4-1.png" width="384" style="display: block; margin: auto;" /> So R is recycling the one error term that it simulated. It would be nice to catch this so that it doesn’t hurt a user down the road.</p></li>
+<p><img src="03_testing_files/figure-html/unnamed-chunk-4-1.png" width="384" style="display: block; margin: auto;" /> So R is recycling the one error term that it simulated. It would be nice to catch this so that it doesn’t hurt a user down the road.</p></li>
 <li><p>An <strong>assertion</strong> is a statement during your code that should always evaluation to <code>TRUE</code>. If an assertion evaluates to <code>FALSE</code> then this throws an error.</p></li>
 <li><p>In R, the base assertion is <code>stopifnot()</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">10</span></span>
@@ -604,7 +596,7 @@ $(document).ready(function () {
 ## `names(actual)` is a character vector (&#39;hello&#39;)
 ## `names(expected)` is absent</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y, <span class="at">ignore_attr =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
-<li><p>The <code>local_edition(3)</code> code makes it so my code chunks use the most recent <code>{testthat}</code> functions. You don’t need to worry about that in your package. <code>{usethis}</code> will automatically assume the third edition. You can explicitely use the third edition by adding the following to your DESCRIPTION file:</p>
+<li><p>The <code>local_edition(3)</code> code makes it so my code chunks use the most recent <code>{testthat}</code> functions. You don’t need to worry about that in your package. <code>{usethis}</code> will automatically assume the third edition. You can explicitly use the third edition by adding the following to your DESCRIPTION file:</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Config/testthat/edition</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span></code></pre></div></li>
 <li><p><code>expect_match()</code> checks for a regular expression match.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_match</span>(<span class="st">&quot;hello&quot;</span>, <span class="st">&quot;ll&quot;</span>)</span>
@@ -694,7 +686,7 @@ $(document).ready(function () {
 <li><p>Notice that I put two expectations in the same test. This is all connected to the output of <code>simreg()</code>, so it makes sense to put them in the same test.</p></li>
 <li><p>Whenever a test generates something randomly, I like to set a seed for reproducibility.</p>
 <ul>
-<li>A <a href="https://en.wikipedia.org/wiki/Random_seed">random seed</a> initalizes the pseudorandom process. So any “random draws” in R will be the same if you set the same seed via <code>set.seed()</code>.</li>
+<li>A <a href="https://en.wikipedia.org/wiki/Random_seed">random seed</a> initializes the pseudorandom process. So any “random draws” in R will be the same if you set the same seed via <code>set.seed()</code>.</li>
 </ul></li>
 <li><p>If you find yourself printing stuff in the console when writing code, try writing a test instead.</p></li>
 <li><p>I usually have a unit test open at the same time that I am coding a function.</p></li>
@@ -713,29 +705,6 @@ $(document).ready(function () {
 <li><p><strong>Exercise</strong>: Edit <code>regsim()</code> so that <code>x</code> is either a vector or <code>NULL</code>. If <code>NULL</code>, then your function should simulate <code>x</code> from a standard normal distribution. You can check if a value is <code>NULL</code> via <code>is.null()</code>. The function should then return a list of length two with the simulated <code>x</code> and <code>y</code> values. Create a new unit test for this new behavior.</p></li>
 </ul>
 </div>
-</div>
-<div id="package-checking" class="section level1">
-<h1>Package Checking</h1>
-<ul>
-<li><p>Don’t include non-ASCII characters in your code. This will give you a CRAN note.</p></li>
-<li><p>If you accidentally include such characters, you can find them with</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>tools<span class="sc">::</span><span class="fu">showNonASCIIfile</span>()</span></code></pre></div></li>
-</ul>
-<div id="continuous-integration" class="section level2">
-<h2>Continuous Integration</h2>
-</div>
-</div>
-<div id="coding-style" class="section level1">
-<h1>Coding Style</h1>
-<ul>
-<li>You should break up your functions into discrete tasks.
-<ul>
-<li>Reduces duplicating code, so less prone to bugs.</li>
-<li>Allows you to think more modularly about tasks, which makes code easier to reason about.</li>
-<li>Makes it easier to combine code in new ways.</li>
-</ul></li>
-<li>One way to force you to do this is to make all functions be less than some length. E.g. Bioconductor recommends having <a href="https://bioconductor.org/packages/devel/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#function-length-checking">no functions longer than 50 lines</a>.</li>
-</ul>
 </div>
 
 <!DOCTYPE html>

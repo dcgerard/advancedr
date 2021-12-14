@@ -1,5 +1,5 @@
 ---
-title: "Software Development Best Practices"
+title: "Assertions and Unit Tests"
 author: "David Gerard"
 date: "`r Sys.Date()`"
 output:  
@@ -33,10 +33,7 @@ tcl = -.25)
 
 - Assertions
 - Unit Tests
-- Package Checking
-- Coding Style
-- Chapters 12 and 19 from [R Packages](https://r-pkgs.org/index.html)
-- [The tidyverse style guide](https://style.tidyverse.org/)
+- Chapter 12 from [R Packages](https://r-pkgs.org/index.html)
 
 # A Working Example
 
@@ -49,8 +46,8 @@ tcl = -.25)
     \end{align}
 
 - Here, 
-    - $Y_i$ is the value of the response variable for obsrvation $i$.
-    - $X_i$ is the value of the predigor variable for obsrevation $i$.
+    - $Y_i$ is the value of the response variable for observation $i$.
+    - $X_i$ is the value of the predictor variable for observation $i$.
     - $\beta_0$ is the $y$-intercept, 
     - $\beta_1$ is the slope (values that are 1 $x$ larger tend to be $\beta_1$ $y$ larger, on average).
     - $\epsilon_i$ is the error for observation $i$. Assumed to be a random variable with a normal distribution with mean 0 and variance $\sigma^2$.
@@ -306,7 +303,7 @@ tcl = -.25)
     expect_equal(x, y, ignore_attr = TRUE)
     ```
     
-- The `local_edition(3)` code makes it so my code chunks use the most recent `{testthat}` functions. You don't need to worry about that in your package. `{usethis}` will automatically assume the third edition. You can explicitely use the third edition by adding the following to your DESCRIPTION file:
+- The `local_edition(3)` code makes it so my code chunks use the most recent `{testthat}` functions. You don't need to worry about that in your package. `{usethis}` will automatically assume the third edition. You can explicitly use the third edition by adding the following to your DESCRIPTION file:
     ```{yaml, eval = FALSE}
     Config/testthat/edition: 3
     ```
@@ -382,7 +379,7 @@ tcl = -.25)
     sigma2 <- 0.5
     y <- simreg(n = length(x), x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2)
     lmout <- lm(y ~ x)
-    expect_equal(coef(lmout)[[2]], beta1, tolerance = 0.001)
+    expect_equal(coef(lmout)[[2]], beta1, tolerance = 0.01)
     ```
 
 - **Exercise**: Write an expectation that the output is a numeric vector.
@@ -428,7 +425,7 @@ test_that("simreg() output is consistent", {
 - Notice that I put two expectations in the same test. This is all connected to the output of `simreg()`, so it makes sense to put them in the same test.
 
 - Whenever a test generates something randomly, I like to set a seed for reproducibility.
-    - A [random seed](https://en.wikipedia.org/wiki/Random_seed) initalizes the pseudorandom process. So any "random draws" in R will be the same if you set the same seed via `set.seed()`.
+    - A [random seed](https://en.wikipedia.org/wiki/Random_seed) initializes the pseudorandom process. So any "random draws" in R will be the same if you set the same seed via `set.seed()`.
     
 - If you find yourself printing stuff in the console when writing code, try writing a test instead.
 
@@ -454,62 +451,40 @@ test_that("simreg() output is consistent", {
 
 - **Exercise**: Edit `regsim()` so that `x` is either a vector or `NULL`. If `NULL`, then your function should simulate `x` from a standard normal distribution. You can check if a value is `NULL` via `is.null()`. The function should then return a list of length two with the simulated `x` and `y` values. Create a new unit test for this new behavior.
 
-```{r, eval = FALSE, echo = FALSE}
-simreg <- function(n, x, beta0, beta1, sigma2) {
-  if (is.null(x)) {
-    x <- stats::rnorm(n)
-  }
-  ## Check input
-  stopifnot(length(x) == n)
-  stopifnot(length(n) == 1, 
-            length(beta0) == 1, 
-            length(beta1) == 1, 
-            length(sigma2) == 1)
-  stopifnot(sigma2 >= 0)
-  stopifnot(is.numeric(n),
-            is.numeric(x),
-            is.numeric(beta0),
-            is.numeric(beta1),
-            is.numeric(sigma2))
-  
-  ## Simulate y
-  eps <- stats::rnorm(n = n, mean = 0, sd = sqrt(sigma2))
-  y <- beta0 + beta1 * x + eps
-  return(list(x = x, y = y))
-}
-
-test_that("regsim() works", {
-  n <- 10000
-  beta0 <- 0
-  beta1 <- 2
-  sigma2 <- 0.5
-  sout <- simreg(n = n, 
-                 x = NULL, 
-                 beta0 = beta0, 
-                 beta1 = beta1, 
-                 sigma2 = sigma2)
-  expect_type(sout, "list")
-})
-```
-
-
-# Package Checking
-
-- Don't include non-ASCII characters in your code. This will give you a CRAN note.
-
-- If you accidentally include such characters, you can find them with
-    ```{r, eval = FALSE}
-    tools::showNonASCIIfile()
-    ```
+    ```{r, eval = FALSE, echo = FALSE}
+    simreg <- function(n, x, beta0, beta1, sigma2) {
+      if (is.null(x)) {
+        x <- stats::rnorm(n)
+      }
+      ## Check input
+      stopifnot(length(x) == n)
+      stopifnot(length(n) == 1, 
+                length(beta0) == 1, 
+                length(beta1) == 1, 
+                length(sigma2) == 1)
+      stopifnot(sigma2 >= 0)
+      stopifnot(is.numeric(n),
+                is.numeric(x),
+                is.numeric(beta0),
+                is.numeric(beta1),
+                is.numeric(sigma2))
+      
+      ## Simulate y
+      eps <- stats::rnorm(n = n, mean = 0, sd = sqrt(sigma2))
+      y <- beta0 + beta1 * x + eps
+      return(list(x = x, y = y))
+    }
     
-## Continuous Integration
-
-# Coding Style
-
-- You should break up your functions into discrete tasks.
-    - Reduces duplicating code, so less prone to bugs.
-    - Allows you to think more modularly about tasks, which makes code easier to reason about.
-    - Makes it easier to combine code in new ways.
-
-- One way to force you to do this is to make all functions be less than some length. E.g. Bioconductor recommends having [no functions longer than 50 lines](https://bioconductor.org/packages/devel/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#function-length-checking).
-
+    test_that("regsim() works", {
+      n <- 10000
+      beta0 <- 0
+      beta1 <- 2
+      sigma2 <- 0.5
+      sout <- simreg(n = n, 
+                     x = NULL, 
+                     beta0 = beta0, 
+                     beta1 = beta1, 
+                     sigma2 = sigma2)
+      expect_type(sout, "list")
+    })
+    ```

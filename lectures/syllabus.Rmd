@@ -1,5 +1,5 @@
 ---
-title: "STAT 415/615 Regression"
+title: "DATA 496/696 Advanced R"
 author: "David Gerard"
 date: "Updated: `r Sys.Date()`"
 output:  

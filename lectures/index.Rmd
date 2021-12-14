@@ -31,7 +31,9 @@ This repository contains material based upon work supported by the National Scie
   - [R Packages](./02_packages.html)
   - [Lab 02: R Packages](https://github.com/advanced-r-spring-2022/lab_02_packages)
 - 03 Best Practices
-  - [Best Practices](./03_practices.html)
+  - [Assertions and Testing](./03_testing.html)
+  - [Package Checking and Continuous Integration](./03_checking.html)
+  - [Coding Style](./03_style.html)
 - 04 Foundations
   - Data Structures
   - Subsetting
