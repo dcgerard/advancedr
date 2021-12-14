@@ -163,7 +163,7 @@ tcl = -.25)
         }
         ```
         
-# Curley Braces
+## Curley Braces
 
 - Whenever you use curly braces `{}`, the opening brace should be the last character on a line, and the closing brace should be the first character on a line.
     - Good:
@@ -252,6 +252,22 @@ tcl = -.25)
 - Always use `TRUE` or `FALSE`, not `T` or `F`
     - `T` and `F` are aliases for `TRUE` and `FALSE`, and so may be overwritten by the user, which is scary.
     
+- Don't include [non-ASCII](https://en.wikipedia.org/wiki/ASCII#Character_set) characters in your code. 
+    - ASCII characters are lower case letters (`a` through `z`), upper case letters (`A` through `Z`), digits (`0` through `9`), and common punctuation.
+    - Including non-ASCII characters will give you a CRAN note.
+    - Non-ASCII characters usually show up when you copy and paste from the web. E.g. the following look normal but are non-ASCII (and are all different): 
+        - En Dash: "–"
+        - Em Dash: "—"
+        - Horizontal Bar: "―"
+        - En Quad: " "
+        - Em Quad: " "
+        - En Space: " "
+        - Em Space: " "
+    - If you accidentally include such characters, you can find them with
+        ```{r, eval = FALSE}
+        tools::showNonASCIIfile()
+        ```
+    
 # Functions
 
 ## Function Argument Length
@@ -315,6 +331,22 @@ tcl = -.25)
         #' @importFrom foreach %dopar%
         ```
     - There is a small performance penalty for using `::` (about 5 µs). So import a function if you are iterating it $\sim$ million times, and each iteration takes on the order of 1 ns.
+    
+## Order of Arguments
+
+- Always place arguments with defaults after arguments without defaults.
+- Good:
+    ```{r, eval = FALSE}
+    function(arg1, arg2, arg3 = NULL) {
+      
+    }
+    ```
+- Bad:
+    ```{r, eval = FALSE}
+    function(arg1, arg3 = NULL, arg2) {
+      
+    }
+    ```
 
 # `lintr`
 

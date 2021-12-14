@@ -372,9 +372,7 @@ $(document).ready(function () {
 <li><a href="#names">Names</a></li>
 <li><a href="#commas">Commas</a></li>
 <li><a href="#parenthese">Parenthese</a></li>
-</ul></li>
-<li><a href="#curley-braces">Curley Braces</a>
-<ul>
+<li><a href="#curley-braces">Curley Braces</a></li>
 <li><a href="#if-else"><code>if-else</code></a></li>
 <li><a href="#infix-characters">Infix Characters</a></li>
 <li><a href="#code-length">Code Length</a></li>
@@ -386,6 +384,7 @@ $(document).ready(function () {
 <li><a href="#function-length">Function Length</a></li>
 <li><a href="#explicit-returns">Explicit returns</a></li>
 <li><a href="#importing">Importing</a></li>
+<li><a href="#order-of-arguments">Order of Arguments</a></li>
 </ul></li>
 <li><a href="#lintr"><code>lintr</code></a></li>
 </ul>
@@ -514,9 +513,8 @@ $(document).ready(function () {
 </ul></li>
 </ul>
 </div>
-</div>
-<div id="curley-braces" class="section level1">
-<h1>Curley Braces</h1>
+<div id="curley-braces" class="section level2">
+<h2>Curley Braces</h2>
 <ul>
 <li>Whenever you use curly braces <code>{}</code>, the opening brace should be the last character on a line, and the closing brace should be the first character on a line.
 <ul>
@@ -534,6 +532,7 @@ $(document).ready(function () {
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dostuff</span>() }</span></code></pre></div></li>
 </ul></li>
 </ul>
+</div>
 <div id="if-else" class="section level2">
 <h2><code>if-else</code></h2>
 <ul>
@@ -601,6 +600,23 @@ $(document).ready(function () {
 <ul>
 <li><code>T</code> and <code>F</code> are aliases for <code>TRUE</code> and <code>FALSE</code>, and so may be overwritten by the user, which is scary.</li>
 </ul></li>
+<li><p>Don’t include <a href="https://en.wikipedia.org/wiki/ASCII#Character_set">non-ASCII</a> characters in your code.</p>
+<ul>
+<li><p>ASCII characters are lower case letters (<code>a</code> through <code>z</code>), upper case letters (<code>A</code> through <code>Z</code>), digits (<code>0</code> through <code>9</code>), and common punctuation.</p></li>
+<li><p>Including non-ASCII characters will give you a CRAN note.</p></li>
+<li><p>Non-ASCII characters usually show up when you copy and paste from the web. E.g. the following look normal but are non-ASCII (and are all different):</p>
+<ul>
+<li>En Dash: “–”</li>
+<li>Em Dash: “—”</li>
+<li>Horizontal Bar: “―”</li>
+<li>En Quad: “ ”</li>
+<li>Em Quad: “ ”</li>
+<li>En Space: “ ”</li>
+<li>Em Space: “ ”</li>
+</ul></li>
+<li><p>If you accidentally include such characters, you can find them with</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>tools<span class="sc">::</span><span class="fu">showNonASCIIfile</span>()</span></code></pre></div></li>
+</ul></li>
 </ul>
 </div>
 </div>
@@ -610,12 +626,12 @@ $(document).ready(function () {
 <h2>Function Argument Length</h2>
 <ul>
 <li><p>If you have a lot of arguments, indent the arguments on new lines.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>run_me <span class="ot">&lt;-</span> <span class="cf">function</span>(this,</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                   is,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">a =</span> <span class="st">&quot;lot&quot;</span>,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">of =</span> <span class="st">&quot;arguments&quot;</span>,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">that =</span> <span class="st">&quot;are longer than 80 characters&quot;</span>) {</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>run_me <span class="ot">&lt;-</span> <span class="cf">function</span>(this,</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                   is,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">a =</span> <span class="st">&quot;lot&quot;</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">of =</span> <span class="st">&quot;arguments&quot;</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">that =</span> <span class="st">&quot;are longer than 80 characters&quot;</span>) {</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
 </ul>
 </div>
 <div id="function-length" class="section level2">
@@ -634,13 +650,13 @@ $(document).ready(function () {
 <h2>Explicit returns</h2>
 <ul>
 <li><p>In R, the last value evaluated in a function will be implicitly returned. I think this is bad practice since it makes it harder to reason about what R is returning. So always include a <code>return()</code> statement. <strong>Never</strong> do</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>add_two <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  x <span class="sc">+</span> y</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p><strong>Always</strong> do</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>add_two <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x <span class="sc">+</span> y)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  x <span class="sc">+</span> y</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><strong>Always</strong> do</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>add_two <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x <span class="sc">+</span> y)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
 </ul>
 </div>
 <div id="importing" class="section level2">
@@ -648,21 +664,35 @@ $(document).ready(function () {
 <ul>
 <li><p><strong>Never</strong> use the <code>@import</code> tag in a package to bring all of a package’s exported functions into the <code>NAMESPACE</code>. This creates too much risk for name collision.</p></li>
 <li><p>In a package, never import functions, always type the package where the function came from. This makes it easier to reason about namespaces. <strong>Never</strong> do</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom ggplot2 qplot</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>plot_red <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">qplot</span>(x, y, <span class="at">color =</span> <span class="fu">I</span>(<span class="st">&quot;red&quot;</span>))</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom ggplot2 qplot</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>plot_red <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">qplot</span>(x, y, <span class="at">color =</span> <span class="fu">I</span>(<span class="st">&quot;red&quot;</span>))</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p><strong>Always</strong> do</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>plot_red <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">qplot</span>(x, y, <span class="at">color =</span> <span class="fu">I</span>(<span class="st">&quot;red&quot;</span>))</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>plot_red <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">qplot</span>(x, y, <span class="at">color =</span> <span class="fu">I</span>(<span class="st">&quot;red&quot;</span>))</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
 <li><p><strong>Exceptions</strong>:</p>
 <ul>
 <li><p>You will have to import infix functions (surrounded by percent signs). Such as</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom magrittr %&gt;%</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom foreach %dopar%</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom magrittr %&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom foreach %dopar%</span></span></code></pre></div></li>
 <li><p>There is a small performance penalty for using <code>::</code> (about 5 µs). So import a function if you are iterating it <span class="math inline">\(\sim\)</span> million times, and each iteration takes on the order of 1 ns.</p></li>
 </ul></li>
+</ul>
+</div>
+<div id="order-of-arguments" class="section level2">
+<h2>Order of Arguments</h2>
+<ul>
+<li><p>Always place arguments with defaults after arguments without defaults.</p></li>
+<li><p>Good:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="cf">function</span>(arg1, arg2, <span class="at">arg3 =</span> <span class="cn">NULL</span>) {</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>Bad:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="cf">function</span>(arg1, <span class="at">arg3 =</span> <span class="cn">NULL</span>, arg2) {</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
 </ul>
 </div>
 </div>
@@ -670,7 +700,7 @@ $(document).ready(function () {
 <h1><code>lintr</code></h1>
 <ul>
 <li><p>The <code>lintr</code> package will check many coding issues. Try running the following in the top directory of your package.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>lintr<span class="sc">::</span><span class="fu">lint_package</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>lintr<span class="sc">::</span><span class="fu">lint_package</span>()</span></code></pre></div></li>
 </ul>
 </div>
 

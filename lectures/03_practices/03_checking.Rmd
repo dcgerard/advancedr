@@ -37,21 +37,76 @@ tcl = -.25)
 
 # Package Checking
 
-- Don't include non-ASCII characters in your code. This will give you a CRAN note.
+- `R CMD check` is a command-line tool for automatic package checking that can automatically detect common problems that are hard to check.
 
-- If you accidentally include such characters, you can find them with
+- When you run `R CMD check` can be run from R via
     ```{r, eval = FALSE}
-    tools::showNonASCIIfile()
+    devtools::check()
     ```
+
+- The check will return errors, warnings, and notes.
+
+- **Errors**: Serious problems you should fix right away.
+
+- **Warnings**: Likely problems that you should fix eventually.
+
+- **Notes**: Minor problems that may or may not be real problems. I would fix them anyway.
+
+- Workflow for package checking:
+    1. Run `devtools::check()`
+    2. Fix problem.
+    3. Repeat until no more problems.
+    
+# Common issues
+
+- If you run into an error/warning/note that you do not understand, go to the R packages page to understand it: <https://r-pkgs.org/r-cmd-check.html>
+
+- I won't cover all of the checks, but I'll list the ones that I most often need to fix.
+
+- In the "DESCRIPTION" file, your title should be in title case ("This is a Title", not "This is a title"), and not end in a period. 
+
+- Every argument of a documented function needs to be documented, and there cannot be excess documentation.
+    - If you have a typo in your `{roxygen2}` documentation, you will get this warning:
+    
+        ```
+        > checking Rd \usage sections ... WARNING
+          Undocumented arguments in documentation object 'pkg'
+            ‘arg’
+          Documented arguments not in \usage in documentation object 'pkg':
+            ‘agr’
+        ```
+        
+    - An undocumented function (where you don't have `{roxygen2}` comments or where you added the `@noRd` tag) does not throw such a warning.
+    
+- Your package should not be too large.
+    - R will tell you which folders have large files. 
+    - If you are including too much data, that will be an issue.
+    - If R tells you that only `libs` is too large then this is usually OK:
+    
+        ```
+        > checking installed package size ... NOTE
+            installed size is 5.2Mb
+            sub-directories of 1Mb or more:
+              libs 4.4Mb
+        ```
+    
+    - The above often occurs when you are using Rcpp.
+    
+- Failure to specify a package:
+    - R will tell you if you have not imported a function, but try to use it. 
+    - The error will look like this:
+    
+        ```
+        > checking R code for possible problems ... NOTE
+          simreg: no visible global function definition for ‘rnorm’
+          Undefined global functions or variables:
+            rnorm
+          Consider adding
+            importFrom("stats", "rnorm")
+          to your NAMESPACE file.
+        ``` 
+        
+    - Note that R comes with 
     
 ## Continuous Integration
-
-# Coding Style
-
-- You should break up your functions into discrete tasks.
-    - Reduces duplicating code, so less prone to bugs.
-    - Allows you to think more modularly about tasks, which makes code easier to reason about.
-    - Makes it easier to combine code in new ways.
-
-- One way to force you to do this is to make all functions be less than some length. E.g. Bioconductor recommends having [no functions longer than 50 lines](https://bioconductor.org/packages/devel/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#function-length-checking).
 
