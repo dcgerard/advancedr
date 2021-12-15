@@ -65,7 +65,7 @@ $$
 $$
 for some $\xi > 0$. This work extends the approaches from @blachman1987confidence. 
 
-- For this project, I would like you to create an R package for computing confidence intervals for means when the sample size is 1. The details I have in mind are below.
+- For this project, I would like you to create an R package called `{noner}` (N is One in R) for computing confidence intervals for means when the sample size is 1. The details I have in mind are below.
 
 1. @wall2001effective list a couple ways to derive $\xi$ (through either numerically solving an equation, or through closed-form approximations). Implement all of these methods.
 2. You can arbitrarily shift and scale $x$ by some constant $a$ and obtain $x-a \sim N(\mu - a, \sigma^2)$. So another confidence interval would be
@@ -81,7 +81,7 @@ for some $\xi > 0$. This work extends the approaches from @blachman1987confidenc
 
 ## Graphical Project: Empirical Distribution Function Plots
 
-- Create a package called `{ggedf}` that creates geoms for visualizing the [empirical distribution function](https://en.wikipedia.org/wiki/Empirical_distribution_function). Namely.
+- Create a package called `{ggedf}` ('ggplot2' for Empirical Distribution Functions) that creates geoms for visualizing the [empirical distribution function](https://en.wikipedia.org/wiki/Empirical_distribution_function). Namely.
 
 - Let $X_1,X_2,\ldots,X_n$ be a set of numerical observations. Assume that these values are ordered. The empirical distribution function $F(x)$ is defined to be the proportion of $X_i$ values less than or equal to $x$. You can obtain this in R via the `stats::ecdf()` function.
 
@@ -136,7 +136,7 @@ for some $\xi > 0$. This work extends the approaches from @blachman1987confidenc
 
 - Wikipedia provides a list of small groups: <https://en.wikipedia.org/wiki/List_of_small_groups>
 
-- **Project**: Create an S4 object oriented system for some of the small groups from the Wikipedia page on small groups.
+- **Project**: Create an S4 object oriented system for some of the small groups from the Wikipedia page on small groups. This should be implemented in a package called `{sgroupr}` (Small Groups in R).
 
 - E.g. Suppose that `as.g_4_2()` converts a numeric vector into a vector encoding the [Klein 4-group](https://en.wikipedia.org/wiki/Klein_four-group), and we define `+` to be the binary operator (which you would need to overload). Then I am envisioning code of the form
 
@@ -190,7 +190,7 @@ for some $\xi > 0$. This work extends the approaches from @blachman1987confidenc
 
 ## Data Download Project: Marvel API
 
-- **Description**: Use the `{httr}` package to build an R package interface to the Marvel Comic's API: <https://developer.marvel.com/>
+- **Description**: Use the `{httr}` package to build an R package called `{marvalr}` to interface to the Marvel Comic's API: <https://developer.marvel.com/>
 
 - I would only recommend this project if you are familiar with the `{httr}` package: <https://data-science-master.github.io/lectures/08_web_scraping/08_apis.html>
 

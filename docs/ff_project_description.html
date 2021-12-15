@@ -449,7 +449,7 @@ $(document).ready(function () {
 <li><p><span class="citation">Wall, Boen, and Tweedie (2001)</span> provide an approach to calculate a finite confidence interval for the mean of a normal distribution when <span class="math inline">\(n=1\)</span>. Specifically, if <span class="math inline">\(x \sim N(\mu, \sigma^2)\)</span>, then the confidence interval is of the form: <span class="math display">\[
 \mu \in x \pm \xi|x|,
 \]</span> for some <span class="math inline">\(\xi &gt; 0\)</span>. This work extends the approaches from <span class="citation">Blachman and Machol (1987)</span>.</p></li>
-<li><p>For this project, I would like you to create an R package for computing confidence intervals for means when the sample size is 1. The details I have in mind are below.</p></li>
+<li><p>For this project, I would like you to create an R package called <code>{noner}</code> (N is One in R) for computing confidence intervals for means when the sample size is 1. The details I have in mind are below.</p></li>
 </ul>
 <ol style="list-style-type: decimal">
 <li><span class="citation">Wall, Boen, and Tweedie (2001)</span> list a couple ways to derive <span class="math inline">\(\xi\)</span> (through either numerically solving an equation, or through closed-form approximations). Implement all of these methods.</li>
@@ -466,7 +466,7 @@ $(document).ready(function () {
 <div id="graphical-project-empirical-distribution-function-plots" class="section level2">
 <h2>Graphical Project: Empirical Distribution Function Plots</h2>
 <ul>
-<li><p>Create a package called <code>{ggedf}</code> that creates geoms for visualizing the <a href="https://en.wikipedia.org/wiki/Empirical_distribution_function">empirical distribution function</a>. Namely.</p></li>
+<li><p>Create a package called <code>{ggedf}</code> (‘ggplot2’ for Empirical Distribution Functions) that creates geoms for visualizing the <a href="https://en.wikipedia.org/wiki/Empirical_distribution_function">empirical distribution function</a>. Namely.</p></li>
 <li><p>Let <span class="math inline">\(X_1,X_2,\ldots,X_n\)</span> be a set of numerical observations. Assume that these values are ordered. The empirical distribution function <span class="math inline">\(F(x)\)</span> is defined to be the proportion of <span class="math inline">\(X_i\)</span> values less than or equal to <span class="math inline">\(x\)</span>. You can obtain this in R via the <code>stats::ecdf()</code> function.</p></li>
 <li><p>The typical plot for the EDF is a step-function plot, via <code>stats::plot.stepfun()</code></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">11</span>)</span>
@@ -510,7 +510,7 @@ $(document).ready(function () {
 </ul></li>
 <li><p>Groups are fundamental to the building blocks of much of theoretical mathematics.</p></li>
 <li><p>Wikipedia provides a list of small groups: <a href="https://en.wikipedia.org/wiki/List_of_small_groups" class="uri">https://en.wikipedia.org/wiki/List_of_small_groups</a></p></li>
-<li><p><strong>Project</strong>: Create an S4 object oriented system for some of the small groups from the Wikipedia page on small groups.</p></li>
+<li><p><strong>Project</strong>: Create an S4 object oriented system for some of the small groups from the Wikipedia page on small groups. This should be implemented in a package called <code>{sgroupr}</code> (Small Groups in R).</p></li>
 <li><p>E.g. Suppose that <code>as.g_4_2()</code> converts a numeric vector into a vector encoding the <a href="https://en.wikipedia.org/wiki/Klein_four-group">Klein 4-group</a>, and we define <code>+</code> to be the binary operator (which you would need to overload). Then I am envisioning code of the form</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.g_4_2</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
@@ -542,7 +542,7 @@ $(document).ready(function () {
 <div id="data-download-project-marvel-api" class="section level2">
 <h2>Data Download Project: Marvel API</h2>
 <ul>
-<li><p><strong>Description</strong>: Use the <code>{httr}</code> package to build an R package interface to the Marvel Comic’s API: <a href="https://developer.marvel.com/" class="uri">https://developer.marvel.com/</a></p></li>
+<li><p><strong>Description</strong>: Use the <code>{httr}</code> package to build an R package called <code>{marvalr}</code> to interface to the Marvel Comic’s API: <a href="https://developer.marvel.com/" class="uri">https://developer.marvel.com/</a></p></li>
 <li><p>I would only recommend this project if you are familiar with the <code>{httr}</code> package: <a href="https://data-science-master.github.io/lectures/08_web_scraping/08_apis.html" class="uri">https://data-science-master.github.io/lectures/08_web_scraping/08_apis.html</a></p></li>
 <li><p>You should create R functions that translate into HTTP queries through <code>{httr}</code>.</p></li>
 <li><p>You should follow best practices for API packages as detailed by the <code>{httr}</code> vignette: <a href="https://httr.r-lib.org/articles/api-packages.html" class="uri">https://httr.r-lib.org/articles/api-packages.html</a></p></li>
