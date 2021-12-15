@@ -39,7 +39,7 @@ tcl = -.25)
 
 - `R CMD check` is a command-line tool for automatic package checking that can automatically detect common problems that are hard to check.
 
-- When you run `R CMD check` can be run from R via
+- `R CMD check` can be run from R via
     ```{r, eval = FALSE}
     devtools::check()
     ```
@@ -56,6 +56,8 @@ tcl = -.25)
     1. Run `devtools::check()`
     2. Fix problem.
     3. Repeat until no more problems.
+    
+- I wouldn't run `devtools::check()` everytime you make a change. I would do it only a couple times a day. But the earlier you do it, the easier it is to fix all issues.
     
 # Common issues
 
@@ -186,3 +188,4 @@ tcl = -.25)
       shell: Rscript {0}
     ```
 
+- You can see a variety of other YAML files at <https://github.com/r-lib/actions/tree/v1/examples>

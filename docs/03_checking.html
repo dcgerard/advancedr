@@ -389,7 +389,7 @@ $(document).ready(function () {
 <h1>Package Checking</h1>
 <ul>
 <li><p><code>R CMD check</code> is a command-line tool for automatic package checking that can automatically detect common problems that are hard to check.</p></li>
-<li><p>When you run <code>R CMD check</code> can be run from R via</p>
+<li><p><code>R CMD check</code> can be run from R via</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">check</span>()</span></code></pre></div></li>
 <li><p>The check will return errors, warnings, and notes.</p></li>
 <li><p><strong>Errors</strong>: Serious problems you should fix right away.</p></li>
@@ -401,6 +401,7 @@ $(document).ready(function () {
 <li>Fix problem.</li>
 <li>Repeat until no more problems.</li>
 </ol></li>
+<li><p>I wouldn’t run <code>devtools::check()</code> everytime you make a change. I would do it only a couple times a day. But the earlier you do it, the easier it is to fix all issues.</p></li>
 </ul>
 </div>
 <div id="common-issues" class="section level1">
@@ -533,6 +534,7 @@ $(document).ready(function () {
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    install.packages(&quot;BiocManager&quot;) # new line</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    BiocManager::install(&quot;VariantAnnotation&quot;) # new line</span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> Rscript {0}</span></span></code></pre></div></li>
+<li><p>You can see a variety of other YAML files at <a href="https://github.com/r-lib/actions/tree/v1/examples" class="uri">https://github.com/r-lib/actions/tree/v1/examples</a></p></li>
 </ul>
 </div>
 </div>

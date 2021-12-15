@@ -537,3 +537,21 @@ test_that("simreg() output is consistent", {
     })
     ```
 
+# Test Coverage
+
+- There are various ways to estimate what proportion of lines of your code are covered by unit tests.
+
+- The `{covr}` package will do this for you with
+    ```{r, eval = FALSE}
+    covr::package_coverage()
+    ```
+
+- Running this is as far as we'll go in this class.
+
+- If you have an open-source repo on GitHub, then you can use different some websites to automatically check your test coverage each time you push.
+    ```{r, eval=FALSE}
+    usethis::use_coverage(type = "codecov")
+    ```
+    - You would then set up your repo on <https://codecov.io/>.
+    - But using codecov for private repos costs money, so we won't do this in our class.
+

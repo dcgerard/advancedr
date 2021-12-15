@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-14" />
+<meta name="date" content="2021-12-15" />
 
 <title>Assertions and Unit Tests</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Assertions and Unit Tests</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-14</h4>
+<h4 class="date">2021-12-15</h4>
 
 </div>
 
@@ -373,6 +373,7 @@ $(document).ready(function () {
 <li><a href="#test">Test</a></li>
 <li><a href="#testthat-file">Testthat File</a></li>
 </ul></li>
+<li><a href="#test-coverage">Test Coverage</a></li>
 </ul>
 </div>
 
@@ -706,6 +707,21 @@ $(document).ready(function () {
 <li><p><strong>Exercise</strong>: In <code>simreg()</code>, if <code>x</code> is provided, then <code>n</code> is not really needed since it can be inferred from <code>x</code>. Set the default of <code>n</code> to be <code>NULL</code> and only require it if <code>x</code> is not provided. Give a warning if both <code>x</code> and <code>n</code> are provided, and throw an error if both <code>x</code> and <code>n</code> are <code>NULL</code>. Write a unit test to check all of these new behaviors. <em>Note</em>: It is typical (and good practice) to put all arguments with defaults after all arguments without defaults.</p></li>
 </ul>
 </div>
+</div>
+<div id="test-coverage" class="section level1">
+<h1>Test Coverage</h1>
+<ul>
+<li><p>There are various ways to estimate what proportion of lines of your code are covered by unit tests.</p></li>
+<li><p>The <code>{covr}</code> package will do this for you with</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>covr<span class="sc">::</span><span class="fu">package_coverage</span>()</span></code></pre></div></li>
+<li><p>Running this is as far as we’ll go in this class.</p></li>
+<li><p>If you have an open-source repo on GitHub, then you can use different some websites to automatically check your test coverage each time you push.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_coverage</span>(<span class="at">type =</span> <span class="st">&quot;codecov&quot;</span>)</span></code></pre></div>
+<ul>
+<li>You would then set up your repo on <a href="https://codecov.io/" class="uri">https://codecov.io/</a>.</li>
+<li>But using codecov for private repos costs money, so we won’t do this in our class.</li>
+</ul></li>
+</ul>
 </div>
 
 <!DOCTYPE html>
