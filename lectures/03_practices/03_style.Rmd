@@ -121,7 +121,7 @@ tcl = -.25)
         mat[1,]
         ```
 
-## Parenthese
+## Parentheses
 
 - Don't put a space in or around parentheses for functions.
     - Good:

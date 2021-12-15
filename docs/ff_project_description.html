@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-10" />
+<meta name="date" content="2021-12-15" />
 
 <title>Final Project Description</title>
 
@@ -148,6 +148,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 
 
@@ -358,7 +380,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Final Project Description</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-10</h4>
+<h4 class="date">2021-12-15</h4>
 
 </div>
 
@@ -369,9 +391,12 @@ $(document).ready(function () {
 <li><a href="#grade-breakdown">Grade breakdown</a></li>
 <li><a href="#project-topics">Project Topics</a>
 <ul>
-<li><a href="#small-groups">Small Groups</a></li>
-<li><a href="#marvel-api">Marvel API</a></li>
+<li><a href="#statistics-project-confidence-intervals-when-n-1">Statistics Project: Confidence Intervals when <span class="math inline">\(n = 1\)</span></a></li>
+<li><a href="#graphical-project-empirical-distribution-function-plots">Graphical Project: Empirical Distribution Function Plots</a></li>
+<li><a href="#object-oriented-programming-project-small-groups">Object Oriented Programming Project: Small Groups</a></li>
+<li><a href="#data-download-project-marvel-api">Data Download Project: Marvel API</a></li>
 </ul></li>
+<li><a href="#references">References</a></li>
 </ul>
 </div>
 
@@ -399,7 +424,7 @@ $(document).ready(function () {
 </ul></li>
 <li>Assertions
 <ul>
-<li>Your functions throw errors at impoper inputs.</li>
+<li>Your functions throw errors at improper inputs.</li>
 </ul></li>
 </ul>
 </div>
@@ -415,11 +440,60 @@ $(document).ready(function () {
 <div id="project-topics" class="section level1">
 <h1>Project Topics</h1>
 <ul>
-<li><p>You are responsible for choosing a project of sufficient complexity. But here are some possible topics that you may consider.</p></li>
+<li><p>Choose one of the below topics (each one can only be implemented by one group).</p></li>
 <li><p>I’ll update this page as I gain more ideas.</p></li>
 </ul>
-<div id="small-groups" class="section level2">
-<h2>Small Groups</h2>
+<div id="statistics-project-confidence-intervals-when-n-1" class="section level2">
+<h2>Statistics Project: Confidence Intervals when <span class="math inline">\(n = 1\)</span></h2>
+<ul>
+<li><p><span class="citation">Wall, Boen, and Tweedie (2001)</span> provide an approach to calculate a finite confidence interval for the mean of a normal distribution when <span class="math inline">\(n=1\)</span>. Specifically, if <span class="math inline">\(x \sim N(\mu, \sigma^2)\)</span>, then the confidence interval is of the form: <span class="math display">\[
+\mu \in x \pm \xi|x|,
+\]</span> for some <span class="math inline">\(\xi &gt; 0\)</span>. This work extends the approaches from <span class="citation">Blachman and Machol (1987)</span>.</p></li>
+<li><p>For this project, I would like you to create an R package for computing confidence intervals for means when the sample size is 1. The details I have in mind are below.</p></li>
+</ul>
+<ol style="list-style-type: decimal">
+<li><span class="citation">Wall, Boen, and Tweedie (2001)</span> list a couple ways to derive <span class="math inline">\(\xi\)</span> (through either numerically solving an equation, or through closed-form approximations). Implement all of these methods.</li>
+<li>You can arbitrarily shift and scale <span class="math inline">\(x\)</span> by some constant <span class="math inline">\(a\)</span> and obtain <span class="math inline">\(x-a \sim N(\mu - a, \sigma^2)\)</span>. So another confidence interval would be <span class="math display">\[
+ \mu \in x-a \pm \xi|x-a|
+ \]</span> So allow the user to choose <span class="math inline">\(a\)</span>.</li>
+<li>Bayesian credible intervals for <span class="math inline">\(n=1\)</span> are pretty easy to obtain using <a href="https://en.wikipedia.org/wiki/Conjugate_prior#Table_of_conjugate_distributions">conjugate priors</a>. Implement Bayesian credible intervals for <span class="math inline">\(n=1\)</span> (you’ll have to learn a little bit about Bayesian inference for this).</li>
+<li>Possibly allow the user to place a distribution over <span class="math inline">\(a\)</span>. This is not quite the same as a full Bayesian approach, so I would be interested in exploring the results of this hybrid approach.</li>
+<li>Implement simulation scripts in a vignette comparing various approaches to calculate a confidence interval when <span class="math inline">\(n=1\)</span>.</li>
+<li><span class="citation">Wall, Boen, and Tweedie (2001)</span> also describe confidence intervals of a similar form when <span class="math inline">\(n &gt; 1\)</span>, but are sub-optimal when <span class="math inline">\(n &gt; 2\)</span>. Implement these approaches and have a vignette comparing it to the standard <span class="math inline">\(t\)</span>-intervals.</li>
+<li>Also calculate confidence interval for success probability of a binomial distribution when <span class="math inline">\(n=1\)</span>. There are tons of ways to do this, so you will have to explore the literature to implement the various approaches.</li>
+</ol>
+</div>
+<div id="graphical-project-empirical-distribution-function-plots" class="section level2">
+<h2>Graphical Project: Empirical Distribution Function Plots</h2>
+<ul>
+<li><p>Create a package called <code>{ggedf}</code> that creates geoms for visualizing the <a href="https://en.wikipedia.org/wiki/Empirical_distribution_function">empirical distribution function</a>. Namely.</p></li>
+<li><p>Let <span class="math inline">\(X_1,X_2,\ldots,X_n\)</span> be a set of numerical observations. Assume that these values are ordered. The empirical distribution function <span class="math inline">\(F(x)\)</span> is defined to be the proportion of <span class="math inline">\(X_i\)</span> values less than or equal to <span class="math inline">\(x\)</span>. You can obtain this in R via the <code>stats::ecdf()</code> function.</p></li>
+<li><p>The typical plot for the EDF is a step-function plot, via <code>stats::plot.stepfun()</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">11</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>eout <span class="ot">&lt;-</span> <span class="fu">ecdf</span>(x)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(eout, <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">1</span>), <span class="at">mgp =</span> <span class="fu">c</span>(<span class="fl">1.8</span>, <span class="fl">0.4</span>, <span class="dv">0</span>), <span class="at">las =</span> <span class="dv">1</span>, <span class="at">tcl =</span> <span class="sc">-</span>.<span class="dv">25</span>)</span></code></pre></div>
+<p><img src="ff_project_description_files/figure-html/unnamed-chunk-1-1.png" width="384" style="display: block; margin: auto;" /> There are many alternatives to this plot.</p></li>
+<li><p>Cumulative Percentage Polygons <span class="citation">(Dixon and Massey 1983)</span>: These just connect the the points of <span class="math inline">\((X_i, \frac{i}{n})\)</span></p></li>
+<li><p>Mountain Plots <span class="citation">(Monti 1995)</span>: Same as cumulative percentage polygons, but they decrease from 0.5 to 1 and have a separate scale on the right-hand-side.</p></li>
+<li><p><span class="math inline">\(p\)</span>-Mountain Plots <span class="citation">(Xue and Titterington 2011)</span>: to fold along any quantile (not just the median).</p>
+<ul>
+<li>It was also shown in <span class="citation">Xue and Titterington (2011)</span> that the area under the curve in a mountain plot is the mean absolute deviation, so you could show this on the mountain plots.</li>
+</ul></li>
+<li><p>Percentile Summary Graphs <span class="citation">(Cleveland 1994)</span>: This is a scatterplot of <span class="math inline">\((\frac{i}{n}, X_i)\)</span> with horizontal lines indicating the quantiles (like in a boxplot).</p></li>
+<li><p>Quantile Graphs <span class="citation">(Chambers et al. 2018)</span>: This is a line plot using the one of the continuous definitions of quantiles when between two points. E.g. see the 9 different types of quantiles in the help file of <code>stats::quantile()</code>.</p>
+<ul>
+<li>I can imagine interpolating via splines, see <code>stats::splinefun()</code></li>
+</ul></li>
+<li><p>You could also come up with other plots and summary statistics describing the EDF (either from the literature or on your own).</p></li>
+<li><p>Your geoms should also be able to plot point-wise and simultaneous confidence intervals for the cumulative distribution function from the EDF. See <a href="https://en.wikipedia.org/wiki/CDF-based_nonparametric_confidence_interval" class="uri">https://en.wikipedia.org/wiki/CDF-based_nonparametric_confidence_interval</a></p></li>
+<li><p>You might want to look at this reference for building new geoms:</p>
+<ul>
+<li><a href="https://bookdown.org/rdpeng/RProgDA/building-new-graphical-elements.html" class="uri">https://bookdown.org/rdpeng/RProgDA/building-new-graphical-elements.html</a></li>
+</ul></li>
+</ul>
+</div>
+<div id="object-oriented-programming-project-small-groups" class="section level2">
+<h2>Object Oriented Programming Project: Small Groups</h2>
 <ul>
 <li><p>A <strong>binary operator</strong> is an operation that combines two elements to create a third element. E.g. <span class="math inline">\(+\)</span> is a binary operator for numbers, we can “combine” 1 and 2 to make 3 via <span class="math inline">\(1 + 2 = 3\)</span></p></li>
 <li><p>A <strong>group</strong> is a space (denoted <span class="math inline">\(G\)</span>) of elements along with a binary operator (denoted “<span class="math inline">\(\cdot\)</span>”) such that</p>
@@ -438,23 +512,23 @@ $(document).ready(function () {
 <li><p>Wikipedia provides a list of small groups: <a href="https://en.wikipedia.org/wiki/List_of_small_groups" class="uri">https://en.wikipedia.org/wiki/List_of_small_groups</a></p></li>
 <li><p><strong>Project</strong>: Create an S4 object oriented system for some of the small groups from the Wikipedia page on small groups.</p></li>
 <li><p>E.g. Suppose that <code>as.g_4_2()</code> converts a numeric vector into a vector encoding the <a href="https://en.wikipedia.org/wiki/Klein_four-group">Klein 4-group</a>, and we define <code>+</code> to be the binary operator (which you would need to overload). Then I am envisioning code of the form</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.g_4_2</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.g_4_2</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
 <pre><code># 1
 # 2
 # 3
 # 4</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">2</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">2</span></span></code></pre></div>
 <pre><code># 2
 # 1
 # 4
 # 3</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">3</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">3</span></span></code></pre></div>
 <pre><code># 3
 # 4
 # 1
 # 2</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">4</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">4</span></span></code></pre></div>
 <pre><code># 4
 # 3
 # 2
@@ -465,8 +539,8 @@ $(document).ready(function () {
 </ul></li>
 </ul>
 </div>
-<div id="marvel-api" class="section level2">
-<h2>Marvel API</h2>
+<div id="data-download-project-marvel-api" class="section level2">
+<h2>Data Download Project: Marvel API</h2>
 <ul>
 <li><p><strong>Description</strong>: Use the <code>{httr}</code> package to build an R package interface to the Marvel Comic’s API: <a href="https://developer.marvel.com/" class="uri">https://developer.marvel.com/</a></p></li>
 <li><p>I would only recommend this project if you are familiar with the <code>{httr}</code> package: <a href="https://data-science-master.github.io/lectures/08_web_scraping/08_apis.html" class="uri">https://data-science-master.github.io/lectures/08_web_scraping/08_apis.html</a></p></li>
@@ -477,6 +551,32 @@ $(document).ready(function () {
 <li><p>The API has endpoints for comics, comic series, comic stories, comic events and crossovers, creators, and characters. I would recommend creating a function for each of these endpoints.</p></li>
 <li><p>For this project, you can try other API’s (<a href="https://github.com/public-apis/public-apis" class="uri">https://github.com/public-apis/public-apis</a>). I just thought this one looked well-documented and fun.</p></li>
 </ul>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-blachman1987confidence" class="csl-entry">
+Blachman, N., and R. Machol. 1987. <span>“Confidence Intervals Based on One or More Observations.”</span> <em>IEEE Transactions on Information Theory</em> 33 (3): 373–82. <a href="https://doi.org/10.1109/TIT.1987.1057306">https://doi.org/10.1109/TIT.1987.1057306</a>.
+</div>
+<div id="ref-chambers2018graphical" class="csl-entry">
+Chambers, John M, William S Cleveland, Beat Kleiner, and Paul A Tukey. 2018. <em>Graphical Methods for Data Analysis</em>. Chapman; Hall/CRC. <a href="https://doi.org/10.1201/9781351072304">https://doi.org/10.1201/9781351072304</a>.
+</div>
+<div id="ref-cleveland1994elements" class="csl-entry">
+Cleveland, W. S. 1994. <em>The Elements of Graphing Data</em>. AT&amp;T Bell Laboratories. <a href="https://books.google.com/books?id=KMsZAQAAIAAJ">https://books.google.com/books?id=KMsZAQAAIAAJ</a>.
+</div>
+<div id="ref-dixon1983introduction" class="csl-entry">
+Dixon, W. J., and F. J. Massey. 1983. <em>Introduction to Statistical Analysis</em>. McGraw-Hill. <a href="https://books.google.com/books?id=BdjtAAAAMAAJ">https://books.google.com/books?id=BdjtAAAAMAAJ</a>.
+</div>
+<div id="ref-monti1995folded" class="csl-entry">
+Monti, Katherine L. 1995. <span>“Folded Empirical Distribution Function Curves-Mountain Plots.”</span> <em>The American Statistician</em> 49 (4): 342–45. <a href="https://doi.org/10.2307/2684570">https://doi.org/10.2307/2684570</a>.
+</div>
+<div id="ref-wall2001effective" class="csl-entry">
+Wall, Melanie M., James Boen, and Richard Tweedie. 2001. <span>“An Effective Confidence Interval for the Mean with Samples of Size One and Two.”</span> <em>The American Statistician</em> 55 (2): 102–5. <a href="https://doi.org/10.2307/2685995">https://doi.org/10.2307/2685995</a>.
+</div>
+<div id="ref-xue2011pfolded" class="csl-entry">
+Xue, Jing-Hao, and D. Michael Titterington. 2011. <span>“The <span class="math inline">\(p\)</span>-Folded Cumulative Distribution Function and the Mean Absolute Deviation from the <span class="math inline">\(p\)</span>-Quantile.”</span> <em>Statistics &amp; Probability Letters</em> 81 (8): 1179–82. <a href="https://doi.org/10.1016/j.spl.2011.03.014">https://doi.org/10.1016/j.spl.2011.03.014</a>.
+</div>
 </div>
 </div>
 
