@@ -57,7 +57,7 @@ tcl = -.25)
     2. Fix problem.
     3. Repeat until no more problems.
     
-- I wouldn't run `devtools::check()` everytime you make a change. I would do it only a couple times a day. But the earlier you do it, the easier it is to fix all issues.
+- I wouldn't run `devtools::check()` every time you make a change. I would do it only a couple times a day. But the earlier you do it, the easier it is to fix all issues.
     
 # Common issues
 
@@ -94,7 +94,7 @@ tcl = -.25)
     
     - The above often occurs when you are using Rcpp.
     
-- Failure to have a package installed: This hapens sometimes when you work on multiple computers (or collaborate with others). You can install all dependencies of a package with
+- Failure to have a package installed: This happens sometimes when you work on multiple computers (or collaborate with others). You can install all dependencies of a package with
     ```{r, eval = FALSE}
     devtools::install_deps(dependencies = TRUE)
     ```
@@ -189,3 +189,26 @@ tcl = -.25)
     ```
 
 - You can see a variety of other YAML files at <https://github.com/r-lib/actions/tree/v1/examples>
+
+# Exercise
+
+Recall the `simreg()` example from the [Testing](./03_testing.html) lecture. Use the edit-check workflow to further develop your package with the following capabilities:
+
+1. In `simreg()`, instead of simulating $x$ from a standard normal, give the user the ability to choose the variance of $x$, which we will call $\tau^2$.
+
+2. It is probably difficult for the user to specify both $\sigma^2$ (the residual variance) and $\tau^2$ (the variance of the predictors). A better API would allow the user to provide more intuitive inputs. One possible input would be the proportion of variance explained (PVE), which we will define as
+    $$
+    PVE = \frac{\beta_1^2\tau^2}{\beta_1^2\tau^2 + \sigma^2}.
+    $$
+    This follows from
+    $$
+    var(y_i) = var(\beta_0 + \beta_1x_i + \epsilon_i) = \beta_1^2\tau^2 + \sigma^2,
+    $$
+    and so $\beta_1^2\tau^2$ is how much of the variance in $y$ is explained by the predictors.
+    
+    Allow the user to set the PVE, the residual variance ($\sigma^2$), and the regression coefficient ($\beta_1$). To do this, you should create a new function called `tau_from_pve()` which will calculate the proper $\tau^2$ given the PVE, the residual variance, and the regression coefficient. Then you can just use that $\tau^2$ to simulate $x$.
+    
+3. It would probably be better to include many options to choose $x$. Create a new function called `simx()` that will generate $x$ values under different conditions:
+    1. From $N(0,\tau^2)$ after specifying $\tau$
+    2. From `sample(x = c(a, b), size = n, replace = TRUE)` for different numeric values of `a` and `b`.
+
