@@ -30,7 +30,7 @@ par(mar = c(3, 3, 2, 1),
 
 # Summary
 
-You will work in teams of two or three to build an R package using some of the tools we have learned during this course.
+You will work in teams of three or four to build an R package using some of the tools we have learned during this course.
 
 # Grading Criteria
 
@@ -53,7 +53,9 @@ You will work in teams of two or three to build an R package using some of the t
 
 # Project Topics
 
-- Choose one of the below topics (each one can only be implemented by one group).
+- Below are some possible topics (each one can only be implemented by one group).
+
+- I think each of these could potentially be submitted to CRAN, if enough work has been put into them. This would look great on your resume.
 
 - I'll update this page as I gain more ideas.
 
@@ -68,16 +70,19 @@ for some $\xi > 0$. This work extends the approaches from @blachman1987confidenc
 - For this project, I would like you to create an R package called `{noner}` (N is One in R) for computing confidence intervals for means when the sample size is 1. The details I have in mind are below.
 
 1. @wall2001effective list a couple ways to derive $\xi$ (through either numerically solving an equation, or through closed-form approximations). Implement all of these methods.
-2. You can arbitrarily shift and scale $x$ by some constant $a$ and obtain $x-a \sim N(\mu - a, \sigma^2)$. So another confidence interval would be
+2. Your function should allow the user to choose the coverage probability.
+3. You can arbitrarily shift $x$ by some constant $a$ and obtain $x-a \sim N(\mu - a, \sigma^2)$. So another confidence interval would be
     $$
     \mu \in x-a \pm \xi|x-a|
     $$
     So allow the user to choose $a$.
-3. Bayesian credible intervals for $n=1$ are pretty easy to obtain using [conjugate priors](https://en.wikipedia.org/wiki/Conjugate_prior#Table_of_conjugate_distributions). Implement Bayesian credible intervals for $n=1$ (you'll have to learn a little bit about Bayesian inference for this).
-4. Possibly allow the user to place a distribution over $a$. This is not quite the same as a full Bayesian approach, so I would be interested in exploring the results of this hybrid approach.
-5. Implement simulation scripts in a vignette comparing various approaches to calculate a confidence interval when $n=1$.
-6. @wall2001effective also describe confidence intervals of a similar form when $n > 1$, but are sub-optimal when $n > 2$. Implement these approaches and have a vignette comparing it to the standard $t$-intervals.
-7. Also calculate confidence interval for success probability of a binomial distribution when $n=1$. There are tons of ways to do this, so you will have to explore the literature to implement the various approaches.
+4. Use the confidence interval to obtain a $p$-value against some null.
+5. Create a function to calculate the power of your test under various alternatives.
+6. Bayesian credible intervals for $n=1$ are pretty easy to obtain using [conjugate priors](https://en.wikipedia.org/wiki/Conjugate_prior#Table_of_conjugate_distributions). Implement Bayesian credible intervals for $n=1$ (you'll have to learn a little bit about Bayesian inference for this).
+7. Possibly allow the user to place a distribution over $a$. This is not quite the same as a full Bayesian approach, so I would be interested in exploring the results of this hybrid approach.
+8. Implement simulation scripts in a vignette comparing various approaches to calculate a confidence interval when $n=1$.
+9. @wall2001effective also describe confidence intervals of a similar form when $n > 1$, but are sub-optimal when $n > 2$. Implement these approaches and have a vignette comparing it to the standard $t$-intervals.
+10. Also calculate confidence interval for success probability of a binomial distribution when $n=1$. There are tons of ways to do this, so you will have to explore the literature to implement the various approaches.
 
 ## Graphical Project: Empirical Distribution Function Plots
 

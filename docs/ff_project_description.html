@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-15" />
+<meta name="date" content="2021-12-17" />
 
 <title>Final Project Description</title>
 
@@ -380,7 +380,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Final Project Description</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-15</h4>
+<h4 class="date">2021-12-17</h4>
 
 </div>
 
@@ -406,7 +406,7 @@ $(document).ready(function () {
 </script>
 <div id="summary" class="section level1">
 <h1>Summary</h1>
-<p>You will work in teams of two or three to build an R package using some of the tools we have learned during this course.</p>
+<p>You will work in teams of three or four to build an R package using some of the tools we have learned during this course.</p>
 </div>
 <div id="grading-criteria" class="section level1">
 <h1>Grading Criteria</h1>
@@ -440,7 +440,8 @@ $(document).ready(function () {
 <div id="project-topics" class="section level1">
 <h1>Project Topics</h1>
 <ul>
-<li><p>Choose one of the below topics (each one can only be implemented by one group).</p></li>
+<li><p>Below are some possible topics (each one can only be implemented by one group).</p></li>
+<li><p>I think each of these could potentially be submitted to CRAN, if enough work has been put into them. This would look great on your resume.</p></li>
 <li><p>I’ll update this page as I gain more ideas.</p></li>
 </ul>
 <div id="statistics-project-confidence-intervals-when-n-1" class="section level2">
@@ -453,9 +454,12 @@ $(document).ready(function () {
 </ul>
 <ol style="list-style-type: decimal">
 <li><span class="citation">Wall, Boen, and Tweedie (2001)</span> list a couple ways to derive <span class="math inline">\(\xi\)</span> (through either numerically solving an equation, or through closed-form approximations). Implement all of these methods.</li>
-<li>You can arbitrarily shift and scale <span class="math inline">\(x\)</span> by some constant <span class="math inline">\(a\)</span> and obtain <span class="math inline">\(x-a \sim N(\mu - a, \sigma^2)\)</span>. So another confidence interval would be <span class="math display">\[
+<li>Your function should allow the user to choose the coverage probability.</li>
+<li>You can arbitrarily shift <span class="math inline">\(x\)</span> by some constant <span class="math inline">\(a\)</span> and obtain <span class="math inline">\(x-a \sim N(\mu - a, \sigma^2)\)</span>. So another confidence interval would be <span class="math display">\[
  \mu \in x-a \pm \xi|x-a|
  \]</span> So allow the user to choose <span class="math inline">\(a\)</span>.</li>
+<li>Use the confidence interval to obtain a <span class="math inline">\(p\)</span>-value against some null.</li>
+<li>Create a function to calculate the power of your test under various alternatives.</li>
 <li>Bayesian credible intervals for <span class="math inline">\(n=1\)</span> are pretty easy to obtain using <a href="https://en.wikipedia.org/wiki/Conjugate_prior#Table_of_conjugate_distributions">conjugate priors</a>. Implement Bayesian credible intervals for <span class="math inline">\(n=1\)</span> (you’ll have to learn a little bit about Bayesian inference for this).</li>
 <li>Possibly allow the user to place a distribution over <span class="math inline">\(a\)</span>. This is not quite the same as a full Bayesian approach, so I would be interested in exploring the results of this hybrid approach.</li>
 <li>Implement simulation scripts in a vignette comparing various approaches to calculate a confidence interval when <span class="math inline">\(n=1\)</span>.</li>
