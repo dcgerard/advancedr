@@ -9,22 +9,28 @@ output:
     toc_float: false
     highlight: pygments
 urlcolor: "blue"
+bibliography: "ff_bib.bib"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo       = TRUE, 
                       fig.align  = "center",
                       fig.height = 3, fig.width = 4)
+knitr::opts_knit$set(global.par = TRUE)
 ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
 ```
 
 ```{r klippy, echo=FALSE, include=TRUE}
 klippy::klippy()
+par(mar = c(3, 3, 2, 1),
+    mgp = c(1.8, 0.4, 0), 
+    las = 1,
+    tcl = -.25)
 ```
 
 # Summary
 
-You will work in teams of two or three to build an R package using some of the tools we have learned during this course.
+You will work in teams of three or four to build an R package using some of the tools we have learned during this course.
 
 # Grading Criteria
 
@@ -36,7 +42,7 @@ You will work in teams of two or three to build an R package using some of the t
 - Continuous integration
     - No notes/warnings/errors
 - Assertions
-    - Your functions throw errors at impoper inputs.
+    - Your functions throw errors at improper inputs.
 
 # Grade breakdown
 
@@ -47,11 +53,71 @@ You will work in teams of two or three to build an R package using some of the t
 
 # Project Topics
 
-- You are responsible for choosing a project of sufficient complexity. But here are some possible topics that you may consider.
+- Below are some possible topics (each one can only be implemented by one group).
+
+- I think each of these could potentially be submitted to CRAN, if enough work has been put into them. This would look great on your resume.
 
 - I'll update this page as I gain more ideas.
 
-## Small Groups
+## Statistics Project: Confidence Intervals when $n = 1$
+
+- @wall2001effective provide an approach to calculate a finite confidence interval for the mean of a normal distribution when $n=1$. Specifically, if $x \sim N(\mu, \sigma^2)$, then the confidence interval is of the form:
+$$
+\mu \in x \pm \xi|x|,
+$$
+for some $\xi > 0$. This work extends the approaches from @blachman1987confidence. 
+
+- For this project, I would like you to create an R package called `{noner}` (N is One in R) for computing confidence intervals for means when the sample size is 1. The details I have in mind are below.
+
+1. @wall2001effective list a couple ways to derive $\xi$ (through either numerically solving an equation, or through closed-form approximations). Implement all of these methods.
+2. Your function should allow the user to choose the coverage probability.
+3. You can arbitrarily shift $x$ by some constant $a$ and obtain $x-a \sim N(\mu - a, \sigma^2)$. So another confidence interval would be
+    $$
+    \mu \in x-a \pm \xi|x-a|
+    $$
+    So allow the user to choose $a$.
+4. Use the confidence interval to obtain a $p$-value against some null.
+5. Create a function to calculate the power of your test under various alternatives.
+6. Bayesian credible intervals for $n=1$ are pretty easy to obtain using [conjugate priors](https://en.wikipedia.org/wiki/Conjugate_prior#Table_of_conjugate_distributions). Implement Bayesian credible intervals for $n=1$ (you'll have to learn a little bit about Bayesian inference for this).
+7. Possibly allow the user to place a distribution over $a$. This is not quite the same as a full Bayesian approach, so I would be interested in exploring the results of this hybrid approach.
+8. Implement simulation scripts in a vignette comparing various approaches to calculate a confidence interval when $n=1$.
+9. @wall2001effective also describe confidence intervals of a similar form when $n > 1$, but are sub-optimal when $n > 2$. Implement these approaches and have a vignette comparing it to the standard $t$-intervals.
+10. Also calculate confidence interval for success probability of a binomial distribution when $n=1$. There are tons of ways to do this, so you will have to explore the literature to implement the various approaches.
+
+## Graphical Project: Empirical Distribution Function Plots
+
+- Create a package called `{ggedf}` ('ggplot2' for Empirical Distribution Functions) that creates geoms for visualizing the [empirical distribution function](https://en.wikipedia.org/wiki/Empirical_distribution_function). Namely.
+
+- Let $X_1,X_2,\ldots,X_n$ be a set of numerical observations. Assume that these values are ordered. The empirical distribution function $F(x)$ is defined to be the proportion of $X_i$ values less than or equal to $x$. You can obtain this in R via the `stats::ecdf()` function.
+
+- The typical plot for the EDF is a step-function plot, via `stats::plot.stepfun()`
+    ```{r}
+    x <- c(1, 10, 11)
+    eout <- ecdf(x)
+    plot(eout, mar = c(3, 3, 2, 1), mgp = c(1.8, 0.4, 0), las = 1, tcl = -.25)
+    ```
+    There are many alternatives to this plot.
+
+- Cumulative Percentage Polygons [@dixon1983introduction]: These just connect the the points of $(X_i, \frac{i}{n})$
+
+- Mountain Plots [@monti1995folded]: Same as cumulative percentage polygons, but they decrease from 0.5 to 1 and have a separate scale on the right-hand-side.
+
+- $p$-Mountain Plots [@xue2011pfolded]: to fold along any quantile (not just the median). 
+    - It was also shown in @xue2011pfolded that the area under the curve in a mountain plot is the mean absolute deviation, so you could show this on the mountain plots.
+
+- Percentile Summary Graphs [@cleveland1994elements]: This is a scatterplot of $(\frac{i}{n}, X_i)$ with horizontal lines indicating the quantiles (like in a boxplot).
+
+- Quantile Graphs [@chambers2018graphical]: This is a line plot using the one of the continuous definitions of quantiles when between two points. E.g. see the 9 different types of quantiles in the help file of `stats::quantile()`.
+    - I can imagine interpolating via splines, see `stats::splinefun()`
+
+- You could also come up with other plots and summary statistics describing the EDF (either from the literature or on your own).
+
+- Your geoms should also be able to plot point-wise and simultaneous confidence intervals for the cumulative distribution function from the EDF. See <https://en.wikipedia.org/wiki/CDF-based_nonparametric_confidence_interval>
+
+- You might want to look at this reference for building new geoms:
+    - <https://bookdown.org/rdpeng/RProgDA/building-new-graphical-elements.html>
+    
+## Object Oriented Programming Project: Small Groups
 
 - A **binary operator** is an operation that combines two elements to create a third element. E.g. $+$ is a binary operator for numbers, we can "combine" 1 and 2 to make 3 via  $1 + 2 = 3$
 
@@ -75,7 +141,7 @@ You will work in teams of two or three to build an R package using some of the t
 
 - Wikipedia provides a list of small groups: <https://en.wikipedia.org/wiki/List_of_small_groups>
 
-- **Project**: Create an S4 object oriented system for some of the small groups from the Wikipedia page on small groups.
+- **Project**: Create an S4 object oriented system for some of the small groups from the Wikipedia page on small groups. This should be implemented in a package called `{sgroupr}` (Small Groups in R).
 
 - E.g. Suppose that `as.g_4_2()` converts a numeric vector into a vector encoding the [Klein 4-group](https://en.wikipedia.org/wiki/Klein_four-group), and we define `+` to be the binary operator (which you would need to overload). Then I am envisioning code of the form
 
@@ -127,9 +193,9 @@ You will work in teams of two or three to build an R package using some of the t
 - A good S4 object system that implements binary operations that you can explore is [`{lubridate}`](https://github.com/tidyverse/lubridate). 
     - E.g. they add `duration`s together in a special way.
 
-## Marvel API
+## Data Download Project: Marvel API
 
-- **Description**: Use the `{httr}` package to build an R package interface to the Marvel Comic's API: <https://developer.marvel.com/>
+- **Description**: Use the `{httr}` package to build an R package called `{marvalr}` to interface to the Marvel Comic's API: <https://developer.marvel.com/>
 
 - I would only recommend this project if you are familiar with the `{httr}` package: <https://data-science-master.github.io/lectures/08_web_scraping/08_apis.html>
 
@@ -144,3 +210,5 @@ You will work in teams of two or three to build an R package using some of the t
 - The API has endpoints for comics, comic series, comic stories, comic events and crossovers, creators, and characters. I would recommend creating a function for each of these endpoints.
 
 - For this project, you can try other API's (<https://github.com/public-apis/public-apis>). I just thought this one looked well-documented and fun.
+
+# References

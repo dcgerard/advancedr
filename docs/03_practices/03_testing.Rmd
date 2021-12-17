@@ -46,8 +46,8 @@ tcl = -.25)
     \end{align}
 
 - Here, 
-    - $Y_i$ is the value of the response variable for obsrvation $i$.
-    - $X_i$ is the value of the predigor variable for obsrevation $i$.
+    - $Y_i$ is the value of the response variable for observation $i$.
+    - $X_i$ is the value of the predictor variable for observation $i$.
     - $\beta_0$ is the $y$-intercept, 
     - $\beta_1$ is the slope (values that are 1 $x$ larger tend to be $\beta_1$ $y$ larger, on average).
     - $\epsilon_i$ is the error for observation $i$. Assumed to be a random variable with a normal distribution with mean 0 and variance $\sigma^2$.
@@ -303,7 +303,7 @@ tcl = -.25)
     expect_equal(x, y, ignore_attr = TRUE)
     ```
     
-- The `local_edition(3)` code makes it so my code chunks use the most recent `{testthat}` functions. You don't need to worry about that in your package. `{usethis}` will automatically assume the third edition. You can explicitely use the third edition by adding the following to your DESCRIPTION file:
+- The `local_edition(3)` code makes it so my code chunks use the most recent `{testthat}` functions. You don't need to worry about that in your package. `{usethis}` will automatically assume the third edition. You can explicitly use the third edition by adding the following to your DESCRIPTION file:
     ```{yaml, eval = FALSE}
     Config/testthat/edition: 3
     ```
@@ -425,7 +425,7 @@ test_that("simreg() output is consistent", {
 - Notice that I put two expectations in the same test. This is all connected to the output of `simreg()`, so it makes sense to put them in the same test.
 
 - Whenever a test generates something randomly, I like to set a seed for reproducibility.
-    - A [random seed](https://en.wikipedia.org/wiki/Random_seed) initalizes the pseudorandom process. So any "random draws" in R will be the same if you set the same seed via `set.seed()`.
+    - A [random seed](https://en.wikipedia.org/wiki/Random_seed) initializes the pseudorandom process. So any "random draws" in R will be the same if you set the same seed via `set.seed()`.
     
 - If you find yourself printing stuff in the console when writing code, try writing a test instead.
 
@@ -488,3 +488,70 @@ test_that("simreg() output is consistent", {
       expect_type(sout, "list")
     })
     ```
+
+- **Exercise**: In `simreg()`, if `x` is provided, then `n` is not really needed since it can be inferred from `x`. Set the default of `n` to be `NULL` and only require it if `x` is not provided. Give a warning if both `x` and `n` are provided, and throw an error if both `x` and `n` are `NULL`. Write a unit test to check all of these new behaviors. *Note*: It is typical (and good practice) to put all arguments with defaults after all arguments without defaults.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    simreg <- function(x, beta0, beta1, sigma2, n = NULL) {
+      if (is.null(x) && is.null(n)) {
+        stop("both x and n are NULL")
+      } else if (is.null(x)) {
+        x <- stats::rnorm(n)
+      } else if (is.null(n)) {
+        n <- length(x)
+      } else {
+        warning("both x and n are specified. Ignoring n")
+        n <- length(x)
+      }
+      
+      ## Check input
+      stopifnot(length(x) == n)
+      stopifnot(length(n) == 1, 
+                length(beta0) == 1, 
+                length(beta1) == 1, 
+                length(sigma2) == 1)
+      stopifnot(sigma2 >= 0)
+      stopifnot(is.numeric(n),
+                is.numeric(x),
+                is.numeric(beta0),
+                is.numeric(beta1),
+                is.numeric(sigma2))
+      
+      ## Simulate y
+      eps <- stats::rnorm(n = n, mean = 0, sd = sqrt(sigma2))
+      y <- beta0 + beta1 * x + eps
+      return(list(x = x, y = y))
+    }
+    
+    test_that("null arguments work for simreg()", {
+      set.seed(1)
+      n <- 10
+      x <- runif(n)
+      beta0 <- 10
+      beta1 <- 20
+      sigma2 <- 5
+      expect_error(simreg(x = NULL, beta0 = beta0, beta1 = beta1, sigma2 = sigma2, n = NULL))
+      expect_warning(simreg(x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2, n = n))
+      expect_error(simreg(x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2, n = NULL), NA)
+      expect_error(simreg(x = NULL, beta0 = beta0, beta1 = beta1, sigma2 = sigma2, n = n), NA)
+    })
+    ```
+
+# Test Coverage
+
+- There are various ways to estimate what proportion of lines of your code are covered by unit tests.
+
+- The `{covr}` package will do this for you with
+    ```{r, eval = FALSE}
+    covr::package_coverage()
+    ```
+
+- Running this is as far as we'll go in this class.
+
+- If you have an open-source repo on GitHub, then you can use different some websites to automatically check your test coverage each time you push.
+    ```{r, eval=FALSE}
+    usethis::use_coverage(type = "codecov")
+    ```
+    - You would then set up your repo on <https://codecov.io/>.
+    - But using codecov for private repos costs money, so we won't do this in our class.
+

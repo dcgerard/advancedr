@@ -1,0 +1,41 @@
+---
+title: "S4 Objects"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output:  
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    highlight: pygments
+urlcolor: "blue"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo       = TRUE, 
+                      fig.align  = "center",
+                      fig.height = 3, fig.width = 4)
+ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
+
+# Learning Objectives
+
+- Chapter 15 of [Advanced R](https://adv-r.hadley.nz/)
+- [Common Bioconductor Methods and Classes](https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/)
+- [BiocGenerics](https://bioconductor.org/packages/3.14/bioc/html/BiocGenerics.html)
+- [S4Vectors](https://bioconductor.org/packages/3.14/bioc/html/S4Vectors.html)
+- [IRanges](https://bioconductor.org/packages/3.14/bioc/html/IRanges.html)
+
+# Motivation
+
+- The most common application of S4 objects is in the [Bioconductor](https://bioconductor.org/) project, so we will use some of those base classes as an example.
+
+# File Structure
+
+- All class definitions in "R/AllClasses.R"
+- All generic function definitions in "R/AllGenerics.R"
+- Methods are defined in a file named by the generic function. For example, all `show` methods would go in "R/show-methods.R".

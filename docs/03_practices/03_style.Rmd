@@ -38,13 +38,13 @@ tcl = -.25)
 
 # Style Guides
 
-- Each organization has a style guide that you should adhere to.
+- Each organization has a style guide on how code should be formatted that you should adhere to.
 
 - When everyone on a project uses a consistent style, it makes code easier to read and understand, and it makes collaboration easier and faster.
 
 - There are lots of style guides (see links in the Learning Objectives). This document contains the style guide for our class.
 
-# Style Guide
+- This style guide is obviously opinionated, and others have their own thoughts (which is perfectly fine!). The important thing is consistency among collaborators.
 
 - We will mostly follow the [tidyverse style guide](https://style.tidyverse.org/). Below I place some points of emphasis and note differences.
 
@@ -121,7 +121,7 @@ tcl = -.25)
         mat[1,]
         ```
 
-## Parenthese
+## Parentheses
 
 - Don't put a space in or around parentheses for functions.
     - Good:
@@ -163,7 +163,7 @@ tcl = -.25)
         }
         ```
         
-# Curley Braces
+## Curley Braces
 
 - Whenever you use curly braces `{}`, the opening brace should be the last character on a line, and the closing brace should be the first character on a line.
     - Good:
@@ -203,7 +203,7 @@ tcl = -.25)
         
 ## Infix Characters
 
-- An [**infix**](https://en.wikipedia.org/wiki/Infix_notation) is one where arguments on both sides of it are used in a function. The alternative is [**prefix**](https://en.wikipedia.org/wiki/Polish_notation) notation. Compare
+- An [**infix**](https://en.wikipedia.org/wiki/Infix_notation) operator is one where arguments on both sides of it are used in a function. The alternative is [**prefix**](https://en.wikipedia.org/wiki/Polish_notation) notation. Compare
     ```{r}
     5 + 10 ## infix notation
     `+`(5, 10) ## prefix notation
@@ -252,6 +252,22 @@ tcl = -.25)
 - Always use `TRUE` or `FALSE`, not `T` or `F`
     - `T` and `F` are aliases for `TRUE` and `FALSE`, and so may be overwritten by the user, which is scary.
     
+- Don't include [non-ASCII](https://en.wikipedia.org/wiki/ASCII#Character_set) characters in your code. 
+    - ASCII characters are lower case letters (`a` through `z`), upper case letters (`A` through `Z`), digits (`0` through `9`), and common punctuation.
+    - Including non-ASCII characters will give you a CRAN note.
+    - Non-ASCII characters usually show up when you copy and paste from the web. E.g. the following look normal but are non-ASCII (and are all different): 
+        - En Dash: "–"
+        - Em Dash: "—"
+        - Horizontal Bar: "―"
+        - En Quad: " "
+        - Em Quad: " "
+        - En Space: " "
+        - Em Space: " "
+    - If you accidentally include such characters, you can find them with
+        ```{r, eval = FALSE}
+        tools::showNonASCIIfile()
+        ```
+    
 # Functions
 
 ## Function Argument Length
@@ -277,7 +293,7 @@ tcl = -.25)
 
 ## Explicit returns
 
-- In R, the last value evaluated in a function will be implicitely returned. I think this is bad practice since it makes it harder to reason about what R is returning. So always include a `return()` statement. **Never** do
+- In R, the last value evaluated in a function will be implicitly returned. I think this is bad practice since it makes it harder to reason about what R is returning. So always include a `return()` statement. **Never** do
     ```{r, eval = FALSE}
     add_two <- function(x, y) {
       x + y
@@ -315,6 +331,22 @@ tcl = -.25)
         #' @importFrom foreach %dopar%
         ```
     - There is a small performance penalty for using `::` (about 5 µs). So import a function if you are iterating it $\sim$ million times, and each iteration takes on the order of 1 ns.
+    
+## Order of Arguments
+
+- Always place arguments with defaults after arguments without defaults.
+- Good:
+    ```{r, eval = FALSE}
+    function(arg1, arg2, arg3 = NULL) {
+      
+    }
+    ```
+- Bad:
+    ```{r, eval = FALSE}
+    function(arg1, arg3 = NULL, arg2) {
+      
+    }
+    ```
 
 # `lintr`
 

@@ -1,0 +1,38 @@
+---
+title: "Memory"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output:  
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    highlight: pygments
+urlcolor: "blue"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo       = TRUE, 
+                      fig.align  = "center",
+                      fig.height = 3, fig.width = 4)
+ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
+
+# Learning Objectives
+
+- Names/Values
+- Copy-on-modify
+- Modify-by-reference
+- Chapter 2 from [Advanced R](https://adv-r.hadley.nz/)
+
+# Names and Values
+
+# List of new functions
+
+- `tracemem()`: Tracks an object so that a message is printed whenever it is copied.
+- `lobstr::obj_addr()`: Gives the address (in memory) of an object that a name points to.
+- `lobstr::obj_size()`: Gives the size (in memory) of an object.

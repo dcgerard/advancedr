@@ -35,9 +35,7 @@ This repository contains material based upon work supported by the National Scie
   - [Package Checking and Continuous Integration](./03_checking.html)
   - [Coding Style](./03_style.html)
 - 04 Foundations
-  - Data Structures
-  - Subsetting
-  - Functions
+  - [Memory](./04_memory.html)
 - 05 Object-oriented Programming
   - S3 Objects
   - S4 Objects
