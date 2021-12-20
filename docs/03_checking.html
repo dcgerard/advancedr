@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-17" />
+<meta name="date" content="2021-12-20" />
 
 <title>Automatic Checks</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Automatic Checks</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-17</h4>
+<h4 class="date">2021-12-20</h4>
 
 </div>
 
@@ -544,7 +544,7 @@ $(document).ready(function () {
 <p>Recall the <code>simreg()</code> example from the <a href="./03_testing.html">Testing</a> lecture. Use the edit-check workflow to further develop your package with the following capabilities:</p>
 <ol style="list-style-type: decimal">
 <li><p>In <code>simreg()</code>, instead of simulating <span class="math inline">\(x\)</span> from a standard normal, give the user the ability to choose the variance of <span class="math inline">\(x\)</span>, which we will call <span class="math inline">\(\tau^2\)</span>.</p></li>
-<li><p>It is probably difficult for the user to specify both <span class="math inline">\(\sigma^2\)</span> (the residual variance) and <span class="math inline">\(\tau^2\)</span> (the variance of the predictors). A better API would allow the user to provide more intuitive inputs. One possible input would be the proportion of variance explained (PVE), which we will define as <span class="math display">\[
+<li><p>It is probably difficult for the user to specify both <span class="math inline">\(\sigma^2\)</span> (the residual variance) and <span class="math inline">\(\tau^2\)</span> (the variance of the predictors). A better option would allow the user to provide more intuitive inputs. One possible input would be the proportion of variance explained (PVE), which we will define as <span class="math display">\[
  PVE = \frac{\beta_1^2\tau^2}{\beta_1^2\tau^2 + \sigma^2}.
  \]</span> This follows from <span class="math display">\[
  var(y_i) = var(\beta_0 + \beta_1x_i + \epsilon_i) = \beta_1^2\tau^2 + \sigma^2,
