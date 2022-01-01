@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-11-12" />
+<meta name="date" content="2021-12-20" />
 
 <title>Basic Bash</title>
 
@@ -271,7 +271,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Basic Bash</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-11-12</h4>
+<h4 class="date">2021-12-20</h4>
 
 </div>
 
@@ -321,18 +321,18 @@ $(document).ready(function () {
 <li><p>Open up the terminal</p>
 <ul>
 <li><p>Windows: Open up the <code>Git Bash</code> app. It should look like this:</p>
-<p><img src="figs/git_bash.png" alt="Git Bash for Windows" width="50%"/></p></li>
+<p><img src="01_figs/git_bash.png" alt="Git Bash for Windows" width="50%"/></p></li>
 <li><p>Mac: On your Mac, do one of the following:</p>
 <ul>
-<li>Click the Launchpad icon <img src="figs/launchpad.png" alt="Mac Launchpad icon" width="20" height="20"> in the Dock, type Terminal in the search field, then click Terminal.</li>
-<li>In the Finder <img src="figs/finder.png" alt="Mac Finder Icon" width="20" height="20">, open the /Applications/Utilities folder, then double-click Terminal.</li>
+<li>Click the Launchpad icon <img src="01_figs/launchpad.png" alt="Mac Launchpad icon" width="20" height="20"> in the Dock, type Terminal in the search field, then click Terminal.</li>
+<li>In the Finder <img src="01_figs/finder.png" alt="Mac Finder Icon" width="20" height="20">, open the /Applications/Utilities folder, then double-click Terminal.</li>
 </ul></li>
 <li><p>Ubuntu: Do one of the following</p>
 <ul>
 <li><p>Open the dash and search for “terminal”. Open up the terminal.</p></li>
 <li><p>Use keyboard shortcut: Ctrl+Alt+T</p></li>
 <li><p>It should look like this:</p>
-<p><img src="figs/terminal_ubuntu.png" alt="Git Bash for Windows" width="50%"/></p></li>
+<p><img src="01_figs/terminal_ubuntu.png" alt="Git Bash for Windows" width="50%"/></p></li>
 </ul></li>
 </ul></li>
 <li><p>All commands get placed after the dollar sign.</p></li>
@@ -349,8 +349,9 @@ $(document).ready(function () {
 <li><p><code>ls</code>: List the current files and folders in a directory.</p>
 <pre class="bash"><code>ls</code></pre>
 <pre><code>01_basic_bash.Rmd
+01_figs
 01_git_github.Rmd
-figs
+01_git_setup.Rmd
 _site.yml</code></pre></li>
 <li><p><code>cd</code>: Change directories. This is like <code>setwd()</code> in R. As when we specified paths in R, using two periods mean “move back a folder”.</p>
 <pre class="bash"><code>cd ../
@@ -386,39 +387,44 @@ pwd</code></pre>
 <pre class="bash"><code>cp 01_basic_bash.Rmd hellobash.Rmd
 ls</code></pre>
 <pre><code>01_basic_bash.Rmd
+01_figs
 01_git_github.Rmd
-figs
+01_git_setup.Rmd
 hellobash.Rmd
 _site.yml</code></pre></li>
 <li><p><code>mv</code>: Move/rename a file.</p>
 <pre class="bash"><code>mv hellobash.Rmd goodbyebash.Rmd
 ls</code></pre>
 <pre><code>01_basic_bash.Rmd
+01_figs
 01_git_github.Rmd
-figs
+01_git_setup.Rmd
 goodbyebash.Rmd
 _site.yml</code></pre></li>
 <li><p><code>rm</code>: Remove a file.</p>
 <pre class="bash"><code>rm goodbyebash.Rmd
 ls</code></pre>
 <pre><code>01_basic_bash.Rmd
+01_figs
 01_git_github.Rmd
-figs
+01_git_setup.Rmd
 _site.yml</code></pre></li>
 <li><p><code>mkdir</code>: Make a directory/folder.</p>
 <pre class="bash"><code>mkdir tempdir
 ls</code></pre>
 <pre><code>01_basic_bash.Rmd
+01_figs
 01_git_github.Rmd
-figs
+01_git_setup.Rmd
 _site.yml
 tempdir</code></pre></li>
 <li><p><code>rmdir</code>: Remove a directory/folder.</p>
 <pre class="bash"><code>rmdir tempdir
 ls</code></pre>
 <pre><code>01_basic_bash.Rmd
+01_figs
 01_git_github.Rmd
-figs
+01_git_setup.Rmd
 _site.yml</code></pre></li>
 </ul>
 </div>
@@ -434,7 +440,8 @@ _site.yml</code></pre></li>
 </ul>
 <pre class="bash"><code>grep -rnw -e &quot;move&quot;</code></pre>
 <pre><code>.Rhistory:2:grep -rnwe &quot;move&quot;
-01_git_github.Rmd:173:- You can go back to previous versions of your code/text, then move forward to 
+01_git_github.Rmd:69:- You can go back to previous versions of your code/text, then move forward to 
+01_git_github.Rmd:226:- Then move into your new repo
 01_basic_bash.Rmd:93:  paths in R, using two periods mean &quot;move back a folder&quot;. 
 01_basic_bash.Rmd:100:    - If you use `cd` without specifying a folder to move to, it will move the 
 01_basic_bash.Rmd:108:    - OK, I&#39;m going to move us back to the 01_git directory.  
@@ -446,7 +453,9 @@ _site.yml</code></pre></li>
 <pre><code>.Rhistory:2:grep -rnwe &quot;move&quot;
 .Rhistory:9:conda_remove(envname = &quot;r-reticulate&quot;)
 .Rhistory:11:conda_remove(&quot;bs4&quot;)
-01_git_github.Rmd:173:- You can go back to previous versions of your code/text, then move forward to 
+01_git_github.Rmd:69:- You can go back to previous versions of your code/text, then move forward to 
+01_git_github.Rmd:226:- Then move into your new repo
+01_git_github.Rmd:398:- Lines after a &quot;`+`&quot; are being added. Lines after a &quot;`-`&quot; are being removed.
 01_basic_bash.Rmd:93:  paths in R, using two periods mean &quot;move back a folder&quot;. 
 01_basic_bash.Rmd:100:    - If you use `cd` without specifying a folder to move to, it will move the 
 01_basic_bash.Rmd:108:    - OK, I&#39;m going to move us back to the 01_git directory.  
@@ -470,21 +479,22 @@ _site.yml</code></pre></li>
 </ul>
 <p>E.g. to download the HTML file that contains the Wikipedia list of <a href="https://en.wikipedia.org/wiki/List_of_theological_demons">theological demons</a>, we can go</p>
 <pre class="bash"><code>wget -nc -nd https://en.wikipedia.org/wiki/List_of_theological_demons</code></pre>
-<pre><code>--2021-11-12 15:24:54--  https://en.wikipedia.org/wiki/List_of_theological_demons
+<pre><code>--2021-12-20 10:25:06--  https://en.wikipedia.org/wiki/List_of_theological_demons
 Resolving en.wikipedia.org (en.wikipedia.org)... 208.80.154.224, 2620:0:861:ed1a::1
 Connecting to en.wikipedia.org (en.wikipedia.org)|208.80.154.224|:443... connected.
 HTTP request sent, awaiting response... 200 OK
-Length: 75077 (73K) [text/html]
+Length: 76629 (75K) [text/html]
 Saving to: ‘List_of_theological_demons’
 
-     0K .......... .......... .......... .......... .......... 68% 3.15M 0s
-    50K .......... .......... ...                             100% 3.00M=0.02s
+     0K .......... .......... .......... .......... .......... 66% 2.22M 0s
+    50K .......... .......... ....                            100% 6.26M=0.03s
 
-2021-11-12 15:24:54 (3.10 MB/s) - ‘List_of_theological_demons’ saved [75077/75077]</code></pre>
+2021-12-20 10:25:06 (2.83 MB/s) - ‘List_of_theological_demons’ saved [76629/76629]</code></pre>
 <pre class="bash"><code>ls</code></pre>
 <pre><code>01_basic_bash.Rmd
+01_figs
 01_git_github.Rmd
-figs
+01_git_setup.Rmd
 List_of_theological_demons
 _site.yml</code></pre>
 <p>I’ll remove that file now</p>

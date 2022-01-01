@@ -54,17 +54,17 @@ knitr::opts_chunk$set(echo = TRUE, comment = "")
 - Open up the terminal
     - Windows: Open up the `Git Bash` app. It should look like this:
     
-        <img src="./figs/git_bash.png" alt="Git Bash for Windows" width="50%"/>
+        <img src="./01_figs/git_bash.png" alt="Git Bash for Windows" width="50%"/>
         
     - Mac: On your Mac, do one of the following:
-        - Click the Launchpad icon <img src="./figs/launchpad.png" alt="Mac Launchpad icon" width="20" height="20"> in the Dock, type Terminal in the search field, then click Terminal.
-        - In the Finder <img src="./figs/finder.png" alt="Mac Finder Icon" width="20" height="20">, open the /Applications/Utilities folder, then double-click Terminal.
+        - Click the Launchpad icon <img src="./01_figs/launchpad.png" alt="Mac Launchpad icon" width="20" height="20"> in the Dock, type Terminal in the search field, then click Terminal.
+        - In the Finder <img src="./01_figs/finder.png" alt="Mac Finder Icon" width="20" height="20">, open the /Applications/Utilities folder, then double-click Terminal.
     - Ubuntu: Do one of the following
         - Open the dash and search for "terminal". Open up the terminal.
         - Use keyboard shortcut: Ctrl+Alt+T
         - It should look like this:
         
-            <img src="./figs/terminal_ubuntu.png" alt="Git Bash for Windows" width="50%"/>
+            <img src="./01_figs/terminal_ubuntu.png" alt="Git Bash for Windows" width="50%"/>
     
 - All commands get placed after the dollar sign.
 

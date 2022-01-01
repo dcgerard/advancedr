@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-17" />
+<meta name="date" content="2021-12-20" />
 
 <title>Memory</title>
 
@@ -50,6 +50,101 @@
     </style>
 
 
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -263,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Memory</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-17</h4>
+<h4 class="date">2021-12-20</h4>
 
 </div>
 
@@ -271,7 +366,11 @@ $(document).ready(function () {
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#names-and-values">Names and Values</a></li>
-<li><a href="#list-of-new-functions">List of new functions</a></li>
+<li><a href="#lists-and-data-frames">Lists and Data Frames</a>
+<ul>
+<li><a href="#character-vectors">Character Vectors</a></li>
+</ul></li>
+<li><a href="#new-functions">New Functions</a></li>
 </ul>
 </div>
 
@@ -285,16 +384,166 @@ $(document).ready(function () {
 <li>Names/Values</li>
 <li>Copy-on-modify</li>
 <li>Modify-by-reference</li>
-<li>Chapter 2 from <a href="https://adv-r.hadley.nz/">Advanced R</a></li>
+<li>Chapter 2 from <a href="https://adv-r.hadley.nz/">Advanced R</a>
+<ul>
+<li>These lecture notes are mostly taken straight out of Hadley’s book. Many thanks for making my life easier.</li>
+<li>His images, which I use here, are licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" height="15" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png"/></a></li>
+</ul></li>
 </ul>
 </div>
 <div id="names-and-values" class="section level1">
 <h1>Names and Values</h1>
+<ul>
+<li><p><a href="https://en.wikipedia.org/wiki/Computer_memory">Computer Memory</a> is information (like numbers or strings) that is for immediate use. When you put information there, it is located at some “address” on your computer, and you can retrieve it from that address.</p></li>
+<li><p>The following puts the vector <code>c(1,2,3)</code> in memory, and binds the name <code>x</code> to it</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span></code></pre></div>
+<p><img src="04_figs/binding-1.png" alt="x binds to object" width="20%"/></p></li>
+<li><p>The function <code>lobstr::obj_addr()</code> let’s us see the address of this object.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(x)</span></code></pre></div>
+<pre><code>## [1] &quot;0x55b11bfab9a8&quot;</code></pre></li>
+<li><p>When you assign <code>x</code> to a new variable name <code>y</code>, it makes a new name that points to the same object as <code>x</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> x</span></code></pre></div>
+<p><img src="04_figs/binding-2.png" alt="y binds to same object as x" width="20%"/></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(y)</span></code></pre></div>
+<pre><code>## [1] &quot;0x55b11bfab9a8&quot;</code></pre></li>
+<li><p>If you modify <code>y</code>, then it will make a copy of object 0x55b11bfab9a8 and point <code>y</code> to that new object. This is called <strong>copy-on-modify</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>y[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="dv">4</span></span></code></pre></div>
+<p><img src="04_figs/binding-3.png" alt="y binds to new object" width="20%"/></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(y)</span></code></pre></div>
+<pre><code>## [1] &quot;0x55b11c27e048&quot;</code></pre></li>
+<li><p>Copy-on-modify exists so that <code>x</code> does not change when you change <code>y</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>## [1] 1 2 3</code></pre></li>
+<li><p>You can use <code>tracemem()</code> to track whenever an object is copied.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tracemem</span>(x)</span></code></pre></div>
+<pre><code>## [1] &quot;&lt;0x55b11acf1a48&gt;&quot;</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> x</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>y[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="dv">4</span> <span class="do">## copy made</span></span></code></pre></div>
+<pre><code>## tracemem[0x55b11acf1a48 -&gt; 0x55b11be324e8]: eval eval withVisible withCallingHandlers handle timing_fn evaluate_call &lt;Anonymous&gt; evaluate in_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt; withCallingHandlers suppressMessages render_one FUN lapply sapply &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>y[[<span class="dv">5</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="do">## no copy made, y modified</span></span></code></pre></div></li>
+<li><p><strong>Note</strong>: <code>tracemem()</code> is connected to the object (here 0x55b11acf1a48), <strong>not</strong> the name <code>x</code>. So the following will not show a copy-on-modify because we changed the binding of the name <code>x</code>.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tracemem</span>(x)</span></code></pre></div>
+<pre><code>## [1] &quot;&lt;0x55b11bed8a28&gt;&quot;</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">5</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> x</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>y[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> <span class="dv">6</span></span></code></pre></div></li>
+<li><p><strong>Note</strong>: <code>tracemem()</code> will give you weird results if you use it inside of RStudio. That’s because the Environment pane makes references to objects.</p></li>
+<li><p>Name <code>a</code> inside function points to same object</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tracemem</span>(x)</span></code></pre></div>
+<pre><code>## [1] &quot;&lt;0x55b11c2b6a58&gt;&quot;</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(a) {</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(a)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">f</span>(x) <span class="do">## no copy made</span></span></code></pre></div>
+<p><img src="04_figs/binding-f1.png" alt="a in function binds to same object" width="30%"/></p>
+<p>and <code>x</code> and <code>z</code> now point to same object</p>
+<p><img src="04_figs/binding-f2.png" alt="x and z point to same object" width="20%"/></p></li>
+<li><p><strong>Exercise</strong>: When does the address of <code>x</code> change? Use <code>cat()</code> and <code>lobstr::obj_addr()</code> to verify your answer. Does <code>tracemem()</code> help you here? Why are why not?</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) {</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  x[[i]] <span class="ot">&lt;-</span> i</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p><strong>Exercise</strong>: When does the address of <code>x</code> change? Use <code>cat()</code> and <code>lobstr::obj_addr()</code> to verify your answer.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="at">x =</span> <span class="cn">NA_real_</span>, <span class="at">length.out =</span> <span class="dv">10</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) {</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  x[[i]] <span class="ot">&lt;-</span> i</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p><strong>Exercise</strong>: When does the address of <code>x</code> change? Use <code>cat()</code> and <code>lobstr::obj_addr()</code> to verify your answer.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="at">mode =</span> <span class="st">&quot;numeric&quot;</span>, <span class="at">length =</span> <span class="dv">10</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) {</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  x[[i]] <span class="ot">&lt;-</span> i</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>Understanding when an object is copied is important for performance. Making copies can be expensive if you are doing it a lot (like in a for-loop), making your code run much slower.</p></li>
+</ul>
 </div>
-<div id="list-of-new-functions" class="section level1">
-<h1>List of new functions</h1>
+<div id="lists-and-data-frames" class="section level1">
+<h1>Lists and Data Frames</h1>
+<ul>
+<li><p>Recall that a list is a vector that can have elements of any type.</p></li>
+<li><p>To do this, list’s name points to a vector of references, and these point to the objects.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>l1 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span></code></pre></div>
+<p><img src="04_figs/list.png" alt="l1 points to references which point to objects" width="20%"/></p></li>
+<li><p>Copy on modify for a list only copies the references, so is much more memory efficient. This is called a <strong>shallow copy</strong>.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>l2 <span class="ot">&lt;-</span> l1</span></code></pre></div>
+<p><img src="04_figs/l-modify-1.png" alt="l1 and l2 point to references" width="20%"/></p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>l2[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="dv">4</span></span></code></pre></div>
+<p><img src="04_figs/l-modify-2.png" alt="l2 points to new vector of references" width="20%"/></p></li>
+<li><p><code>lobstr::ref()</code> allows you to see the location of each component of a list.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">ref</span>(l1, l2)</span></code></pre></div>
+<pre><code>## █ [1:0x55b11924d9e8] &lt;list&gt; 
+## ├─[2:0x55b11be506e8] &lt;dbl&gt; 
+## ├─[3:0x55b11be506b0] &lt;dbl&gt; 
+## └─[4:0x55b11be50678] &lt;dbl&gt; 
+##  
+## █ [5:0x55b11ab11eb8] &lt;list&gt; 
+## ├─[2:0x55b11be506e8] 
+## ├─[3:0x55b11be506b0] 
+## └─[6:0x55b11c2d0600] &lt;dbl&gt;</code></pre>
+<ul>
+<li>Notice that the lists are at different addresses, the first two objects of each list are at the same address, but the third object of each list are at different addresses.</li>
+</ul></li>
+<li><p>Data frames are lists of vectors (the columns)</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>d1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">3</span>))</span></code></pre></div>
+<p><img src="04_figs/dataframe.png" alt="data frame d1" width="20%"/></p></li>
+<li><p>Modify a column, then only that column is copied and modified</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>d2 <span class="ot">&lt;-</span> d1</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>d2[, <span class="dv">2</span>] <span class="ot">&lt;-</span> d2[, <span class="dv">2</span>] <span class="sc">*</span> <span class="dv">2</span></span></code></pre></div>
+<p><img src="04_figs/d-modify-c.png" alt="column 2 of d2 points to a different object" width="25%"/></p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">ref</span>(d1, d2)</span></code></pre></div>
+<pre><code>## █ [1:0x55b1196c6548] &lt;df[,2]&gt; 
+## ├─x = [2:0x55b1195e5d28] &lt;dbl&gt; 
+## └─y = [3:0x55b1195e5d78] &lt;dbl&gt; 
+##  
+## █ [4:0x55b11981bdd8] &lt;df[,2]&gt; 
+## ├─x = [2:0x55b1195e5d28] 
+## └─y = [5:0x55b11ab5ef58] &lt;dbl&gt;</code></pre></li>
+<li><p>Modify a row, then the entire data frame is copied (much less efficient).</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>d3 <span class="ot">&lt;-</span> d1</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>d3[<span class="dv">1</span>, ] <span class="ot">&lt;-</span> d3[<span class="dv">1</span>, ] <span class="sc">*</span> <span class="dv">3</span></span></code></pre></div>
+<p><img src="04_figs/d-modify-r.png" alt="d3 copied because modified row" width="40%"/></p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">ref</span>(d1, d3)</span></code></pre></div>
+<pre><code>## █ [1:0x55b1196c6548] &lt;df[,2]&gt; 
+## ├─x = [2:0x55b1195e5d28] &lt;dbl&gt; 
+## └─y = [3:0x55b1195e5d78] &lt;dbl&gt; 
+##  
+## █ [4:0x55b11a76a468] &lt;df[,2]&gt; 
+## ├─x = [5:0x55b11bed6388] &lt;dbl&gt; 
+## └─y = [6:0x55b11bed6338] &lt;dbl&gt;</code></pre></li>
+</ul>
+<div id="character-vectors" class="section level2">
+<h2>Character Vectors</h2>
+<ul>
+<li><p>A character vector is a vector of references to a global string pool.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;a&quot;</span>, <span class="st">&quot;abc&quot;</span>, <span class="st">&quot;d&quot;</span>)</span></code></pre></div>
+<p><img src="04_figs/character-2.png" alt="d3 copied because modified row" width="30%"/></p></li>
+<li><p>But Hadley usually writes this as</p>
+<p><img src="04_figs/character.png" alt="d3 copied because modified row" width="30%"/></p></li>
+<li><p>Use <code>lobstr::ref()</code> to show these references.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">ref</span>(x, <span class="at">character =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## █ [1:0x55b11c2d3898] &lt;chr&gt; 
+## ├─[2:0x55b11611c0e8] &lt;string: &quot;a&quot;&gt; 
+## ├─[2:0x55b11611c0e8] 
+## ├─[3:0x55b11b0e4c90] &lt;string: &quot;abc&quot;&gt; 
+## └─[4:0x55b1162d16f0] &lt;string: &quot;d&quot;&gt;</code></pre></li>
+<li><p><strong>Exercise</strong>: Why is <code>x</code> copied here? (it is only copied twice if you use R studio)</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(1L, 2L, 3L)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tracemem</span>(x)</span></code></pre></div>
+<pre><code>## [1] &quot;&lt;0x55b11aa95eb8&gt;&quot;</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>x[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="dv">4</span></span></code></pre></div>
+<pre><code>## tracemem[0x55b11aa95eb8 -&gt; 0x55b11aadee08]: eval eval withVisible withCallingHandlers handle timing_fn evaluate_call &lt;Anonymous&gt; evaluate in_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt; withCallingHandlers suppressMessages render_one FUN lapply sapply &lt;Anonymous&gt; &lt;Anonymous&gt; 
+## tracemem[0x55b11aadee08 -&gt; 0x55b11ab2edd8]: eval eval withVisible withCallingHandlers handle timing_fn evaluate_call &lt;Anonymous&gt; evaluate in_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt; withCallingHandlers suppressMessages render_one FUN lapply sapply &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre></li>
+</ul>
+</div>
+</div>
+<div id="new-functions" class="section level1">
+<h1>New Functions</h1>
 <ul>
 <li><code>tracemem()</code>: Tracks an object so that a message is printed whenever it is copied.</li>
+<li><code>untracemem()</code>: Untracks an object.</li>
+<li><code>lobstr::ref()</code>: Display a tree of object addresses.</li>
 <li><code>lobstr::obj_addr()</code>: Gives the address (in memory) of an object that a name points to.</li>
 <li><code>lobstr::obj_size()</code>: Gives the size (in memory) of an object.</li>
 </ul>
