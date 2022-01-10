@@ -36,6 +36,7 @@ This repository contains material based upon work supported by the National Scie
   - [Coding Style](./03_style.html)
 - 04 Foundations
   - [Memory](./04_memory.html)
+  - [Vectors](./04_vectors.html)
 - 05 Object-oriented Programming
   - S3 Objects
   - S4 Objects

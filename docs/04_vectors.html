@@ -13,7 +13,7 @@
 
 <meta name="date" content="2022-01-10" />
 
-<title>Advanced R</title>
+<title>Vectors</title>
 
 <script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -32,8 +32,10 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/clipboard-1.7.1/clipboard.min.js"></script>
+<link href="site_libs/primer-tooltips-1.4.0/build.css" rel="stylesheet" />
+<link href="site_libs/klippy-0.0.0.9500/css/klippy.min.css" rel="stylesheet" />
+<script src="site_libs/klippy-0.0.0.9500/js/klippy.min.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 <link rel="shortcut icon" href="https://dcgerard.github.io/advancedr/au_logo_small.png" />
@@ -47,16 +49,6 @@
   ul.task-list{list-style: none;}
     </style>
 
-<style type="text/css">code{white-space: pre;}</style>
-<script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
-  }
-}
-</script>
 
 
 
@@ -269,66 +261,50 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Advanced R</h1>
+<h1 class="title toc-ignore">Vectors</h1>
 <h4 class="author">David Gerard</h4>
 <h4 class="date">2022-01-10</h4>
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#learning-objectives">Learning Objectives</a></li>
+<li><a href="#vector-types">Vector Types</a></li>
+<li><a href="#new-functions">New Functions</a></li>
+</ul>
+</div>
 
-<div id="synopsis" class="section level1">
-<h1>Synopsis</h1>
-<p>This website contains the teaching materials for STAT 496/696 Advanced R, taught at American University by <a href="https://dcgerard.github.io/">David Gerard</a>.</p>
-<p>This repository contains material based upon work supported by the National Science Foundation under Grant No. <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=2132247">2132247</a>. The opinions, findings, and conclusions or recommendations expressed are those of the author and do not necessarily reflect the views of the National Science Foundation.</p>
-</div>
-<div id="administrative" class="section level1">
-<h1>Administrative</h1>
+<script>
+  addClassKlippyTo("pre.r, pre.markdown");
+  addKlippy('left', 'top', 'auto', '1', 'Copy code', 'Copied!');
+</script>
+<div id="learning-objectives" class="section level1">
+<h1>Learning Objectives</h1>
 <ul>
-<li><a href="./syllabus.html">Syllabus</a></li>
+<li>Vector Types</li>
+<li>Vector Attributes</li>
+<li>Vectors with attributes: Lists/data frames/matrices/arrays</li>
+<li>Chapter 3 from <a href="https://adv-r.hadley.nz/">Advanced R</a>
+<ul>
+<li>These lecture notes are mostly taken straight out of Hadley’s book. Many thanks for making my life easier.</li>
+<li>His images, which I use here, are licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" height="15" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png"/></a></li>
+</ul></li>
+<li>The topic should be mostly review, but we will go a little deeper.</li>
 </ul>
 </div>
-<div id="lectures" class="section level1">
-<h1>Lectures</h1>
-<ul>
-<li>01 Git/GitHub
-<ul>
-<li><a href="./01_basic_bash.html">Bash Basics</a></li>
-<li><a href="./01_git_setup.html">Setting up Git and GitHub</a></li>
-<li><a href="./01_git_github.html">Git and GitHub</a></li>
-<li><a href="https://github.com/advanced-r-spring-2022/lab_01_git">Lab 01: Bash and Git</a></li>
-</ul></li>
-<li>02 R Packages
-<ul>
-<li><a href="./02_packages.html">R Packages</a></li>
-<li><a href="https://github.com/advanced-r-spring-2022/lab_02_packages">Lab 02: R Packages</a></li>
-</ul></li>
-<li>03 Best Practices
-<ul>
-<li><a href="./03_testing.html">Assertions and Testing</a></li>
-<li><a href="./03_checking.html">Package Checking and Continuous Integration</a></li>
-<li><a href="./03_style.html">Coding Style</a></li>
-</ul></li>
-<li>04 Foundations
-<ul>
-<li><a href="./04_memory.html">Memory</a></li>
-<li><a href="./04_vectors.html">Vectors</a></li>
-</ul></li>
-<li>05 Object-oriented Programming
-<ul>
-<li>S3 Objects</li>
-<li>S4 Objects</li>
-</ul></li>
-<li>06 Environments</li>
-<li>07 Functional Programming</li>
-<li>08 Metaprogramming</li>
-<li>09 Performance/Profiling/Memory</li>
-<li>10 C++ and Rcpp</li>
-</ul>
+<div id="vector-types" class="section level1">
+<h1>Vector Types</h1>
 </div>
-<div id="final-project" class="section level1">
-<h1>Final Project</h1>
+<div id="new-functions" class="section level1">
+<h1>New Functions</h1>
 <ul>
-<li><a href="./ff_project_description.html">Final project description</a></li>
+<li><code>typeof()</code></li>
+<li><code>attr()</code></li>
+<li><code>attributes()</code></li>
+<li><code>structure()</code></li>
+<li><code>names()</code></li>
+<li><code>dim()</code></li>
 </ul>
 </div>
 

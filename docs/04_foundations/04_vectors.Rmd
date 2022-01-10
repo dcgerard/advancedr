@@ -1,0 +1,44 @@
+---
+title: "Vectors"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output:  
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    highlight: pygments
+urlcolor: "blue"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo       = TRUE, 
+                      fig.align  = "center",
+                      fig.height = 3, fig.width = 4)
+ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
+
+# Learning Objectives
+
+- Vector Types
+- Vector Attributes
+- Chapter 3 from [Advanced R](https://adv-r.hadley.nz/)
+    - These lecture notes are mostly taken straight out of Hadley's book. Many thanks for making my life easier.
+    - His images, which I use here, are licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" height="15" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png"/></a>
+- The topic should be mostly review, but we will go a little deeper.
+
+# Vector Types
+
+# New Functions
+
+- `typeof()`
+- `attr()`
+- `attributes()`
+- `structure()`
+- `names()`
+- `dim()`
+- 

@@ -196,7 +196,7 @@ Recall the `simreg()` example from the [Testing](./03_testing.html) lecture. Use
 
 1. In `simreg()`, instead of simulating $x$ from a standard normal, give the user the ability to choose the variance of $x$, which we will call $\tau^2$.
 
-2. It is probably difficult for the user to specify both $\sigma^2$ (the residual variance) and $\tau^2$ (the variance of the predictors). A better API would allow the user to provide more intuitive inputs. One possible input would be the proportion of variance explained (PVE), which we will define as
+2. It is probably difficult for the user to specify both $\sigma^2$ (the residual variance) and $\tau^2$ (the variance of the predictors). A better option would allow the user to provide more intuitive inputs. One possible input would be the proportion of variance explained (PVE), which we will define as
     $$
     PVE = \frac{\beta_1^2\tau^2}{\beta_1^2\tau^2 + \sigma^2}.
     $$
