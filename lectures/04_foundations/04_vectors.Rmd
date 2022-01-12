@@ -257,15 +257,28 @@ klippy::klippy()
     x <- matrix(1:6, nrow = 2, ncol = 3)
     dim(x)
     
-    x <- 1:12
-    dim(x) <- c(2, 2, 3)
-    dim(x)
+    y <- 1:12
+    dim(y) <- c(2, 2, 3)
+    dim(y)
     
-    x <- array(1:12, dim = c(2, 2, 3))
-    dim(x)
+    y <- array(1:12, dim = c(2, 2, 3))
+    dim(y)
     ```
     
-- `length()` still works on 
+- `length()` still works on matrices and arrays, but is less useful
+    ```{r}
+    length(x)
+    length(y)
+    ```
+
+- Instead, use `nrow()` and `ncol()` (for matrices), or `dim()` (for arrays).
+
+    ```{r}
+    nrow(x)
+    ncol(x)
+    dim(y)
+    ```
+
 
 
 # New Functions

@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-17" />
+<meta name="date" content="2022-01-12" />
 
 <title>Final Project Description</title>
 
@@ -380,7 +380,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Final Project Description</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-17</h4>
+<h4 class="date">2022-01-12</h4>
 
 </div>
 
@@ -392,6 +392,7 @@ $(document).ready(function () {
 <li><a href="#project-topics">Project Topics</a>
 <ul>
 <li><a href="#statistics-project-confidence-intervals-when-n-1">Statistics Project: Confidence Intervals when <span class="math inline">\(n = 1\)</span></a></li>
+<li><a href="#statistics-project-piecewise-linear-density-functions">Statistics Project: Piecewise Linear Density Functions</a></li>
 <li><a href="#graphical-project-empirical-distribution-function-plots">Graphical Project: Empirical Distribution Function Plots</a></li>
 <li><a href="#object-oriented-programming-project-small-groups">Object Oriented Programming Project: Small Groups</a></li>
 <li><a href="#data-download-project-marvel-api">Data Download Project: Marvel API</a></li>
@@ -466,6 +467,29 @@ $(document).ready(function () {
 <li><span class="citation">Wall, Boen, and Tweedie (2001)</span> also describe confidence intervals of a similar form when <span class="math inline">\(n &gt; 1\)</span>, but are sub-optimal when <span class="math inline">\(n &gt; 2\)</span>. Implement these approaches and have a vignette comparing it to the standard <span class="math inline">\(t\)</span>-intervals.</li>
 <li>Also calculate confidence interval for success probability of a binomial distribution when <span class="math inline">\(n=1\)</span>. There are tons of ways to do this, so you will have to explore the literature to implement the various approaches.</li>
 </ol>
+</div>
+<div id="statistics-project-piecewise-linear-density-functions" class="section level2">
+<h2>Statistics Project: Piecewise Linear Density Functions</h2>
+<ul>
+<li><p>A <a href="https://en.wikipedia.org/wiki/Probability_density_function">density function</a> characterizes the distribution of a continuous variable. You are most familiar with the normal density.</p></li>
+<li><p>The goal of this project is to create a package, called <code>{pldenr}</code>, that will return the density, distribution function, quantile function, and random generation for any density that is <a href="https://en.wikipedia.org/wiki/Piecewise_linear_function">piecewise linear</a>.</p></li>
+<li><p>The arguments for these functions can be</p>
+<ol style="list-style-type: decimal">
+<li>The endpoints of the lines and</li>
+<li>The relative height of the lines.</li>
+</ol></li>
+<li><p>E.g. the user could input <code>endpoints = c(0, 0.5)</code> and <code>relheight = c(1, 2)</code> to indicate that the height of the line at 0.5 should be twice as high as the height of the line at 0.</p></li>
+<li><p>Some user inputs will be incompatable with any density, and your function should throw an error in such a case.</p></li>
+<li><p>The function then scales the heights so that the area under the curve sums to 1. This shouldn’t be too hard since the area under a line is the <a href="https://en.wikipedia.org/wiki/Trapezoid#Area">area of a trapezoid</a>.</p></li>
+<li><p>You can include some default probability distributions (uniform, linear, triangular, etc).</p></li>
+<li><p>To simulate, simulate from the [0, 1] uniform distribution then apply the quantile function to the resulting simulated values.</p></li>
+<li><p><strong>Advanced Work</strong>:</p>
+<ul>
+<li>Allow for discontinuities.</li>
+<li>Given endpoints for the lines, estimate the density given a sample of points (very hard unless you are familiar with stat theory).</li>
+<li>Piecewise quadratic/cubic densities.</li>
+</ul></li>
+</ul>
 </div>
 <div id="graphical-project-empirical-distribution-function-plots" class="section level2">
 <h2>Graphical Project: Empirical Distribution Function Plots</h2>
