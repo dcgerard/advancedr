@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-20" />
+<meta name="date" content="2022-01-12" />
 
 <title>Basic Bash</title>
 
@@ -271,7 +271,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Basic Bash</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-20</h4>
+<h4 class="date">2022-01-12</h4>
 
 </div>
 
@@ -383,6 +383,10 @@ pwd</code></pre>
 <div id="other-commands." class="section level1">
 <h1>Other commands.</h1>
 <ul>
+<li><p><code>touch</code>: Create an empty file.</p>
+<pre class="bash"><code>touch empty_file.txt</code></pre></li>
+<li><p><code>more</code>: Open up a preview of a document. You can exit the preview by typeing <code>q</code>.</p>
+<pre class="bash"><code>more 01_basic_bash.Rmd </code></pre></li>
 <li><p><code>cp</code>: Copy a file.</p>
 <pre class="bash"><code>cp 01_basic_bash.Rmd hellobash.Rmd
 ls</code></pre>
@@ -445,10 +449,10 @@ _site.yml</code></pre></li>
 01_basic_bash.Rmd:93:  paths in R, using two periods mean &quot;move back a folder&quot;. 
 01_basic_bash.Rmd:100:    - If you use `cd` without specifying a folder to move to, it will move the 
 01_basic_bash.Rmd:108:    - OK, I&#39;m going to move us back to the 01_git directory.  
-01_basic_bash.Rmd:188:grep -rnw -e &quot;move&quot;</code></pre>
+01_basic_bash.Rmd:200:grep -rnw -e &quot;move&quot;</code></pre>
 <pre class="bash"><code>grep -rnw -e &quot;mov&quot;</code></pre>
-<pre><code>01_basic_bash.Rmd:192:grep -rnw -e &quot;mov&quot;
-01_basic_bash.Rmd:196:grep -rn -e &quot;mov&quot;</code></pre>
+<pre><code>01_basic_bash.Rmd:204:grep -rnw -e &quot;mov&quot;
+01_basic_bash.Rmd:208:grep -rn -e &quot;mov&quot;</code></pre>
 <pre class="bash"><code>grep -rn -e &quot;mov&quot;</code></pre>
 <pre><code>.Rhistory:2:grep -rnwe &quot;move&quot;
 .Rhistory:9:conda_remove(envname = &quot;r-reticulate&quot;)
@@ -459,12 +463,12 @@ _site.yml</code></pre></li>
 01_basic_bash.Rmd:93:  paths in R, using two periods mean &quot;move back a folder&quot;. 
 01_basic_bash.Rmd:100:    - If you use `cd` without specifying a folder to move to, it will move the 
 01_basic_bash.Rmd:108:    - OK, I&#39;m going to move us back to the 01_git directory.  
-01_basic_bash.Rmd:156:- `rm`: Remove a file.
-01_basic_bash.Rmd:170:- `rmdir`: Remove a directory/folder.
-01_basic_bash.Rmd:188:grep -rnw -e &quot;move&quot;
-01_basic_bash.Rmd:192:grep -rnw -e &quot;mov&quot;
-01_basic_bash.Rmd:196:grep -rn -e &quot;mov&quot;
-01_basic_bash.Rmd:221:I&#39;ll remove that file now</code></pre>
+01_basic_bash.Rmd:168:- `rm`: Remove a file.
+01_basic_bash.Rmd:182:- `rmdir`: Remove a directory/folder.
+01_basic_bash.Rmd:200:grep -rnw -e &quot;move&quot;
+01_basic_bash.Rmd:204:grep -rnw -e &quot;mov&quot;
+01_basic_bash.Rmd:208:grep -rn -e &quot;mov&quot;
+01_basic_bash.Rmd:233:I&#39;ll remove that file now</code></pre>
 </div>
 <div id="download-data-with-wget" class="section level1">
 <h1>Download data with <code>wget</code></h1>
@@ -479,17 +483,17 @@ _site.yml</code></pre></li>
 </ul>
 <p>E.g. to download the HTML file that contains the Wikipedia list of <a href="https://en.wikipedia.org/wiki/List_of_theological_demons">theological demons</a>, we can go</p>
 <pre class="bash"><code>wget -nc -nd https://en.wikipedia.org/wiki/List_of_theological_demons</code></pre>
-<pre><code>--2021-12-20 10:25:06--  https://en.wikipedia.org/wiki/List_of_theological_demons
+<pre><code>--2022-01-12 11:42:49--  https://en.wikipedia.org/wiki/List_of_theological_demons
 Resolving en.wikipedia.org (en.wikipedia.org)... 208.80.154.224, 2620:0:861:ed1a::1
 Connecting to en.wikipedia.org (en.wikipedia.org)|208.80.154.224|:443... connected.
 HTTP request sent, awaiting response... 200 OK
-Length: 76629 (75K) [text/html]
+Length: 77239 (75K) [text/html]
 Saving to: ‘List_of_theological_demons’
 
-     0K .......... .......... .......... .......... .......... 66% 2.22M 0s
-    50K .......... .......... ....                            100% 6.26M=0.03s
+     0K .......... .......... .......... .......... .......... 66% 1.84M 0s
+    50K .......... .......... .....                           100% 9.56M=0.03s
 
-2021-12-20 10:25:06 (2.83 MB/s) - ‘List_of_theological_demons’ saved [76629/76629]</code></pre>
+2022-01-12 11:42:49 (2.53 MB/s) - ‘List_of_theological_demons’ saved [77239/77239]</code></pre>
 <pre class="bash"><code>ls</code></pre>
 <pre><code>01_basic_bash.Rmd
 01_figs

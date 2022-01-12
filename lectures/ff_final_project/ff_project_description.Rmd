@@ -160,7 +160,7 @@ for some $\xi > 0$. This work extends the approaches from @blachman1987confidenc
 
 - A function to download the OEIS webpage, parse it using `{rvest}`, and obtain the references, various links, etc...
 
-- A function to create a musical representation of the sequence (using the [`{audio}`](https://cran.r-project.org/web/packages/audio/index.html) package).
+- A function to create a musical representation of the sequence (using the [`{audio}`](https://cran.r-project.org/package=audio) package).
 
 - Other ideas you have.
 

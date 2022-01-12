@@ -279,6 +279,23 @@ klippy::klippy()
     dim(y)
     ```
 
+- A vector is not a matrix with 1 dimension. It has `NULL` dimensions.
+
+    ```{r}
+    z <- c(1, 2, 3)
+    dim(z)
+    ```
+    
+- **Exercise**: What's the differences between `ncol()` and `NCOL()`. Read the help file and demonstrate some code where they provide different results.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    # NCOL() returns 1 for vectors
+    z <- c(1, 2, 3)
+    ncol(z)
+    NCOL(z)
+    ```
+
+- **Exercise**: 
 
 
 # New Functions
