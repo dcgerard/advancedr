@@ -24,7 +24,8 @@ klippy::klippy()
 
 # Learning Objectives
 
-- Understanding the fundamental objects in R
+- Understanding vectors, the fundamental objects in R.
+- This is mostly a long list of facts about vectors that you should be aware of.
 - Chapter 3 from [Advanced R](https://adv-r.hadley.nz/)
     - These lecture notes are mostly taken straight out of Hadley's book. Many thanks for making my life easier.
     - His images, which I use here, are licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" height="15" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png"/></a>
@@ -53,6 +54,20 @@ klippy::klippy()
     - Character: 
         - Anything in quotes:
         - `"1"`, `"one"`, `"1 won one"`, etc...
+        
+- You create vectors with `c()` for "combine"
+    ```{r}
+    x <- c(TRUE, TRUE, FALSE, TRUE) ## logical
+    x <- c(1L, 1L, 0L, 1L) ## integer
+    x <- c(1, 1, 0, 1) ## double
+    x <- c("1", "1", "0", "1") ## character
+    ```
+    
+- There are no scalars in R. A "scalar" is just a vector length 1.
+
+    ```{r}
+    is.vector(TRUE)
+    ```
 
 - Integers and doubles are together called "numerics"
 
@@ -69,9 +84,11 @@ klippy::klippy()
     typeof(x)
     x <- c("0", "1")
     typeof(x)
+    ```
     
-    typeof(Inf)
-    typeof(NaN)
+- The special values, `Inf`, `-Inf`, and `NaN` are doubles
+    ```{r}
+    typeof(c(Inf, -Inf, NaN))
     ```
     
 - Determine the length of a vector using `length()`
@@ -103,13 +120,22 @@ klippy::klippy()
         NA_real_ ## double NA
         NA_character_ ## character NA
         ```
+        
+    - This typically shows up in `dplyr::if_else()` where the return values need to be all of the same type.
+    
+        ```{r, error = TRUE}
+        dplyr::if_else(c(TRUE, FALSE), 1, NA) ## errors
+        
+        dplyr::if_else(c(TRUE, FALSE), 1, NA_real_) ## works fine
+        ```
     
     - Never use `==` when testing for missingness. It will return `NA` since it is always unknown if two unknowns are equal. Use `is.na()`.
-    ```{r}
-    x <- c(NA, 1)
-    x == NA
-    is.na(x)
-    ```
+    
+        ```{r}
+        x <- c(NA, 1)
+        x == NA
+        is.na(x)
+        ```
     
 - You can check the type with `is.logical()`, `is.integer()`, `is.double()`, and `is.character()`.
 
@@ -120,7 +146,7 @@ klippy::klippy()
     is.character("1")
     ```
 
-- Attempting to combine vectors of different types coerces them to one time. The order of preference  is character > integer > double > logical.
+- Attempting to combine vectors of different types coerces them to the same type. The order of preference  is character > integer > double > logical.
 
     ```{r}
     typeof(c(1L, TRUE))
@@ -173,7 +199,16 @@ klippy::klippy()
     attributes(a)
     ```
 
-- Attributes are name-value pairs, and all of these attributes are associated with an object:
+- You can set many attributes at the same time with `structure()`.
+
+    ```{r}
+    b <- structure(1:3,
+                   x = "abcdef",
+                   y = 4:6)
+    attributes(b)
+    ```
+
+- Attributes are name-value pairs, and all of these attributes are associated with an object. Below, the vector `c(1, 2, 3)` points to attributes `x` and `y` that each have their own values.
     
     <img src="./04_figs_vec/attr.png" alt="attributes diagram" width="25%"/>
     
@@ -184,11 +219,11 @@ klippy::klippy()
     attributes(sum(a))
     ```
 
-- Two attributes are not log, **names** and **dim**.
+- **Exception**: Two attributes are not lost typically: **names** and **dim**.
 
 ## Names
 
-- Names are are a character vector the same length as the atomic vector. Each name corresponds to a single element.
+- Names are a character vector the same length as the atomic vector. Each name corresponds to a single element.
 
 - You could set names using `attr()`, but you should not.
 
@@ -369,6 +404,8 @@ klippy::klippy()
     
 - Factors are R's way of storing categorical variables, and are useful when a variable only has a certain number of possible values.
 
+- Learn more about factors [here](https://dcgerard.github.io/stat_412_612/lectures/09_factors/09_factors.pdf).
+
 - A **Date** is a double vector with class attribute `Date`.
 
     ```{r}
@@ -405,9 +442,11 @@ klippy::klippy()
 
 - You mostly interact with these date-time objects through the `{lubridate}` package, but base R has their own interfaces (which I think are more difficult to use).
 
+- Learn more about dates and date-times [here](https://data-science-master.github.io/lectures/02_dates/02_dates.html).
+
 - **Exercise** (From Advanced R): `table()` will take as input a vector or vectors and count how many observations have each value. What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
 
-    ```{r}
+    ```{r, eval = FALSE, echo = FALSE}
     tab1 <- table(c("A", "A", "B"))
     tab1
     typeof(tab1) ## integer
@@ -417,23 +456,6 @@ klippy::klippy()
     tab2
     typeof(tab2) ## integer
     attributes(tab2) ## dimnames is a list of length 2 now
-    ```
-
-# Lists
-
-- Lists are like vectors except each element can be of any type.
-
-- You create lists with `list()`.
-    ```{r}
-    lobj <- list(a = 1:3,
-                 log_val = TRUE,
-                 list(c = 10))
-    ```
-
-- You can view a list with `str()`.
-
-    ```{r}
-    str(lobj)
     ```
 
 # Creating Empty Vectors
@@ -451,9 +473,20 @@ klippy::klippy()
 
 - Empty vectors often show up in defaults that are returned when folks ask for something of length 0. 
 
-- E.g., in simulate
+- E.g., in if you are simulating something, you might return a vector of length 0 if they ask for 0 elements.
 
-- You often want to create an empty vector that you then fill in with values. I like to create this vector to be missing values, so that I know I made a mistake if they are not all filled in.
+    ```{r, eval = FALSE}
+    f <- function(n) {
+      sout <- vector(mode = "double", length = n)
+      for (i in seq_len(n)) {
+        sout[[i]] <- simcode(...) ## put simulation code here
+      }
+      return(sout)
+    }
+    ```
+
+
+- You often want to create an empty vector that you then fill in with values. I like to create this vector to be with missing values, so that I know I made a mistake if they are not all filled in.
 
     ```{r}
     n <- 100
@@ -487,17 +520,34 @@ klippy::klippy()
     matval <- matrix(NA, nrow = p, ncol = n)
     ```
 
+# Lists
+
+- Lists are like vectors except each element can be of any type.
+
+- You create lists with `list()`.
+    ```{r}
+    lobj <- list(a = 1:3,
+                 log_val = TRUE,
+                 list(c = 10))
+    ```
+
+- You can view a list with `str()`.
+
+    ```{r}
+    str(lobj)
+    ```
+    
 - `c()` will combine a lists into a single list. If you use `c()` with a list and a vector, then it will first coerce the vector into a list where each element is a list.
 
-```{r}
-l1 <- list(1:2,
-           c("a", "b"))
-l2 <- list(c(TRUE, FALSE))
-c(l1, l2)
-c(l1, c("c", "d"))
-
-as.list(c("c", "d")) ## this is what it does before combining
-```
+    ```{r}
+    l1 <- list(1:2,
+               c("a", "b"))
+    l2 <- list(c(TRUE, FALSE))
+    c(l1, l2)
+    c(l1, c("c", "d"))
+    
+    as.list(c("c", "d")) ## this is what it does before combining
+    ```
 
 - `typeof()` will return `"list"` and `is.list()` tests for a list.
     ```{r}
@@ -514,15 +564,15 @@ as.list(c("c", "d")) ## this is what it does before combining
 
 - The `dim` attribute can be applied to lists
 
-```{r}
-lmat <- list(1:2,
-             3:10,
-             runif(4),
-             c("Hello", "world"))
-dim(lmat) <- c(2, 2)
-lmat
-lmat[[1, 2]]
-```
+    ```{r}
+    lmat <- list(1:2,
+                 3:10,
+                 runif(4),
+                 c("Hello", "world"))
+    dim(lmat) <- c(2, 2)
+    lmat
+    lmat[[1, 2]]
+    ```
 
 # Data Frames
 
@@ -556,10 +606,10 @@ lmat[[1, 2]]
 
 - Those row names are automatically generated, but you can set them with `rownames()`.
 
-```{r}
-rownames(df) <- c("h", "i", "j")
-df
-```
+    ```{r}
+    rownames(df) <- c("h", "i", "j")
+    df
+    ```
 
 - `tibbles`, from the package `{tibble}` are tidyverse data frames. The main differences are:
     1. Tibbles do not automatically coerce data (such as from strings to factors). Data frames used to do this in older versions of R.
@@ -650,6 +700,8 @@ df
 - `typeof()`: Determine the type of an object (character, double, integer, or logical).
 - `attr()`: Get or set an attribute.
 - `attributes()`: View all attributes.
+- `structure()`: Create an object with many attributes.
 - `names()`: Get or set names attributes.
 - `dim()`: Get or set dim attributes.
 - `class()`: Get or set class attributes.
+- `unclass()`: Remove the class attribute.
