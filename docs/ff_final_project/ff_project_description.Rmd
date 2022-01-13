@@ -84,6 +84,31 @@ for some $\xi > 0$. This work extends the approaches from @blachman1987confidenc
 9. @wall2001effective also describe confidence intervals of a similar form when $n > 1$, but are sub-optimal when $n > 2$. Implement these approaches and have a vignette comparing it to the standard $t$-intervals.
 10. Also calculate confidence interval for success probability of a binomial distribution when $n=1$. There are tons of ways to do this, so you will have to explore the literature to implement the various approaches.
 
+## Statistics Project: Piecewise Linear Density Functions
+
+- A [density function](https://en.wikipedia.org/wiki/Probability_density_function) characterizes the distribution of a continuous variable. You are most familiar with the normal density.
+
+- The goal of this project is to create a package, called `{pldenr}`, that will return the density, distribution function, quantile function, and random generation for any density that is [piecewise linear](https://en.wikipedia.org/wiki/Piecewise_linear_function).
+
+- The arguments for these functions can be
+    1. The endpoints of the lines and
+    2. The relative height of the lines.
+    
+- E.g. the user could input `endpoints = c(0, 0.5)` and `relheight = c(1, 2)` to indicate that the height of the line at 0.5 should be twice as high as the height of the line at 0.
+
+- Some user inputs will be incompatable with any density, and your function should throw an error in such a case.
+
+- The function then scales the heights so that the area under the curve sums to 1. This shouldn't be too hard since the area under a line is the [area of a trapezoid](https://en.wikipedia.org/wiki/Trapezoid#Area).
+
+- You can include some default probability distributions (uniform, linear, triangular, etc).
+
+- To simulate, simulate from the [0, 1] uniform distribution then apply the quantile function to the resulting simulated values.
+
+- **Advanced Work**:
+    - Allow for discontinuities.
+    - Given endpoints for the lines, estimate the density given a sample of points (very hard unless you are familiar with stat theory).
+    - Piecewise quadratic/cubic densities.
+
 ## Graphical Project: Empirical Distribution Function Plots
 
 - Create a package called `{ggedf}` ('ggplot2' for Empirical Distribution Functions) that creates geoms for visualizing the [empirical distribution function](https://en.wikipedia.org/wiki/Empirical_distribution_function). Namely.
@@ -116,6 +141,30 @@ for some $\xi > 0$. This work extends the approaches from @blachman1987confidenc
 
 - You might want to look at this reference for building new geoms:
     - <https://bookdown.org/rdpeng/RProgDA/building-new-graphical-elements.html>
+    
+## Data Project: The On-Line Encyclopedia of Integer Sequences
+
+- Create a data package for the [OEIS](https://oeis.org/).
+
+- Your R package can include the whole OEIS, downloaded from here: <https://oeis.org/stripped.gz>
+
+- But adding a large dataset to a package is easy. The hard part will be to develop helper-functions for this project.
+
+- A function to search for sequences that match the first few numbers in a sequence.
+
+- A function to plot the sequence.
+
+- A function to plot pairs of sequences.
+
+- A function to open the OEIS webpage on the sequence.
+
+- A function to download the OEIS webpage, parse it using `{rvest}`, and obtain the references, various links, etc...
+
+- A function to create a musical representation of the sequence (using the [`{audio}`](https://cran.r-project.org/package=audio) package).
+
+- Other ideas you have.
+
+- The OEIS does not seem to have a well-documented API, so I imagine it would be much harder to create a direct interface with the OEIS than to just download the data and create a package yourself.
     
 ## Object Oriented Programming Project: Small Groups
 

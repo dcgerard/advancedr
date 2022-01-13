@@ -139,6 +139,18 @@ knitr::opts_chunk$set(echo = TRUE, comment = "")
   
 # Other commands.
 
+- `touch`: Create an empty file.
+
+    ```{bash, eval = FALSE}
+    touch empty_file.txt
+    ```
+    
+- `more`: Open up a preview of a document. You can exit the preview by typeing `q`.
+
+    ```{bash, eval = FALSE}
+    more 01_basic_bash.Rmd 
+    ```
+
 - `cp`: Copy a file.
 
     ```{bash}

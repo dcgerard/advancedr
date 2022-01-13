@@ -1,0 +1,66 @@
+---
+title: "Subsetting"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output:  
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    highlight: pygments
+urlcolor: "blue"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo       = TRUE, 
+                      fig.align  = "center",
+                      fig.height = 3, fig.width = 4)
+ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
+
+# Learning Objectives
+
+- How to subset vectors, lists, matrices, arrays, ...
+- Chapter 4 from [Advanced R](https://adv-r.hadley.nz/)
+    - These lecture notes are mostly taken straight out of Hadley's book. Many thanks for making my life easier.
+    - His images, which I use here, are licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" height="15" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png"/></a>
+
+# Subsetting an Atomic Vector
+
+- **Subsetting** is extracting elements from an object.
+    - Subset because you only want some elements of a vector.
+    - Subset so you can assign new elements to that subset.
+    
+- Six ways to subset atomic vector.
+
+```{r}
+x <- c(8, 1.2, 33, 14)
+```
+
+
+- **Integer Subsetting**:
+    - Put integers in brackets and it will extract those elements. R starts counting at 1.
+        ```{r}
+        x[1]
+        x[c(1, 3)]
+        iset <- c(1, 3)
+        x[iset]
+        ```
+    - This can be used for sorting
+        ```{r}
+        order(x)
+        x[order(x)]
+        ```
+    - You can use duplicate integers to extract elements more than once.
+        ```{r}
+        x[c(2, 2, 2)]
+        ```
+- **Negative Integer Subsetting**:
+
+
+# New Functions
+
