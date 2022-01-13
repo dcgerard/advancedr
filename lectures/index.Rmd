@@ -38,6 +38,7 @@ This repository contains material based upon work supported by the National Scie
   - [Memory](./04_memory.html)
   - [Vectors](./04_vectors.html)
   - [Subsetting](./04_subsetting.html)
+  - [Control Flow](./04_controlflow.html)
 - 05 Object-oriented Programming
   - S3 Objects
   - S4 Objects
