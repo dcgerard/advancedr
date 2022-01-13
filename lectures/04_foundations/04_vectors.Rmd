@@ -265,6 +265,13 @@ klippy::klippy()
     x[["a"]]
     ```
 
+- You can remove names with `unname()`.
+
+    ```{r}
+    unname(x)
+    ```
+
+
 ## Dimensions
 
 - The dim attribute makes a vector into a **matrix** (a rectangle of numbers) or an **array** (a block of numbers).
@@ -702,6 +709,7 @@ klippy::klippy()
 - `attributes()`: View all attributes.
 - `structure()`: Create an object with many attributes.
 - `names()`: Get or set names attributes.
+- `unname()`: Remove the names attribute.
 - `dim()`: Get or set dim attributes.
 - `class()`: Get or set class attributes.
 - `unclass()`: Remove the class attribute.
