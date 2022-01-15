@@ -48,7 +48,7 @@ environment(square)
 
 - Below: Black dot is environment, squares are arguments. Body is not graphed.
 
-    <img src="./04_figs_fun/components.png" alt="some S3 objects" width="25%"/>
+    <img src="./04_figs_fun/components.png" alt="some S3 objects" width="15%"/>
 
 - **Exception**: Many base functions are written directly in C and don't have these three components.
 
@@ -65,29 +65,282 @@ environment(square)
 
 - Functions are objects, just like any other variable.
 
-- Sometimes, functions are called **closures** because they "enclose" their environments. That's why you sometimes see the error
+- Sometimes, functions are called **closures** because they "enclose" their environments (see Chapter 7). That's why you sometimes see the error
     ```{r, error = TRUE}
     lm[1]
     ```
+    I.e., you cannot subset a function.
 
 - So you can pass functions as arguments in a function (like in `optim()`).
 
-```{r}
-f <- function(par, dat) {
-  sum((par - dat)^2)
-}
-dat <- rnorm(100)
-oout <- optim(par = 0, fn = f, dat = dat, method = "L-BFGS-B")
-oout$par
-mean(dat)
-```
-
+    ```{r}
+    f <- function(par, dat) {
+      sum((par - dat)^2)
+    }
+    dat <- rnorm(100)
+    oout <- optim(par = 0, fn = f, dat = dat, method = "L-BFGS-B")
+    oout$par
+    mean(dat)
+    ```
 
 - Functions can return other functions (like in `ecdf()`).
 
-- So, functions can also have attributes.
+    ```{r}
+    x <- c(1, 99, 2, 11)
+    efun <- ecdf(x)
+    efun(10)
+    ```
+    
+- Functions can be elements of a list.
+
+    ```{r}
+    funs <- list(
+      half = function(x) x / 2,
+      double = function(x) x * 2
+    )
+    
+    funs$double(10)
+    ```
+
+- Because functions are objects, Hadley graphically represents name bindings in a similar way to variables:
+
+    <img src="./04_figs_fun/first-class.png" alt="some S3 objects" width="15%"/>
+
+- Functions can also be **anonymous** in R
+
+    ```{r}
+    (function(x) x^2)(2)
+    (function(x) x^2)(3)
+    ```
+
+    - This is most often used when you don't want to be bothered with thinking up a name.
+    
+    ```{r}
+    ## Integrate anonymous function from -infinity to infinity
+    integrate(function(x) exp(-x^2), -Inf, Inf)
+    
+    ## apply anonymous function to each column of mtcars
+    sapply(mtcars, function(x) length(unique(x))) 
+    ```
+    
+# Lexical Scoping
+
+- **Scoping** is the act of finding a value associated with a name. That is, you have `x` as a variable name in different parts of a program. When does it point to some objects versus others?
+
+- E.g., when is `x` pointing to 20 versus 10 in the code below?
+
+    ```{r}
+    x <- 10
+    g01 <- function() {
+      x <- 20
+      x
+    }
+    ```
+
+    - `x` points to 10 outside of the function, and points to 20 inside of the function.
+    
+- R uses [lexical scoping](https://en.wikipedia.org/wiki/Scope_(computer_science)#Lexical_scope), meaning that a name refers to an object based on when the function is defined.
+
+- In a lexically scoped language, a *block* defines a new scope. Variables are defined/declared in that scope and are not visible outside of that scope. Blocks can be nested, and when a variable is defined in an outer block, then it is visible in the inner block. But variables defined in the inner block are not defined in the outer block. E.g.
+
+    ```{r, error = TRUE}
+    outer_var <- 10
+    f <- function() {
+      print(outer_var)
+      inner_var <- 1
+    }
+    f() ## outer_var is available in inner block though it is defined in outer block.
+    inner_var ## inner_var not available in outer block because defined in inner block.
+    ```
+
+- Other types of scoping exist, such as [dynamic scoping](https://en.wikipedia.org/wiki/Scope_(computer_science)#Dynamic_scope), meaning that a name refers to an object based on when the function is called. Most languages don't use dynamic scope. One language that does use dynamic scope is bash.
+
+- Let's formalize this mechanism.
+
+## Name Masking
+
+- Names inside a function mask names defined outside a function.
+
+- If a name is not defined in a function, R looks up one level.
+
+    ```{r}
+    x <- 2
+    y <- 20
+    g03 <- function() {
+      y <- 1
+      return(c(x, y))
+    }
+    g03()
+    
+    # This doesn't change the previous value of y
+    y
+    ```
+
+- If a function is defined inside a function, then it keeps looking up levels until it finds a variable.
+
+- Below, the inner function finds `z` inside the inner function, finds `y` in the outer function, and finds `x` outside both functions. 
+    ```{r}
+    x <- 1
+    f1 <- function() {
+      y <- 2
+      f2 <- function() {
+        z <- 3
+        return(c(x, y, z))
+      }
+      return(f2())
+    }
+    f1()
+    ```
+
+## A fresh start
+
+- Each time a function is called, it creates a new environment to execute in.
+
+- This means it does not remember what happened last time.
+
+    ```{r}
+    a <- 2
+    g11 <- function() {
+      a <- a + 1
+      return(a)
+    }
+    
+    g11()
+    g11()
+    ```
+
+## Functions versus variables
+
+- Functions and variables can share names (though, this is not a good idea).
+
+```{r}
+sum <- c(10, 11)
+sum(sum)
+```
+
+- This is allowed since the function and the variable are in different environments. XYZ Explain this more.
+
+## Dynamic lookup
+
+- R determines *where* to look at function creation time (e.g. one level up), but it determines *what* is there at evaluation time.
+
+```{r}
+a <- 1
+g11()
+
+a <- 12
+g11()
+```
+
+## Advanced R Exercises
+
+1. What does the following code return? Why? Describe how each of the three c’s is interpreted.
+
+    ```{r}
+    c <- 10
+    c(c = c)
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    The first `c` is the function name for combine, the second `c` is a name attribute, the third `c` is a name pointing to `10`.
+    ```
+    
+
+2. What does the following function return? Make a prediction before running the code yourself.
+
+    ```{r, eval = FALSE}
+    f <- function(x) {
+      f <- function(x) {
+        f <- function() {
+          x ^ 2
+        }
+        f() + 1
+      }
+      f(x) * 2
+    }
+    f(10)
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    202. 10 gets passed to f(10)^2 * 2, where f(10) is 10^2 + 1
+    ```
+
+# Lazy Evaluation
+
+- **lazy evaluation** is where a variable is only evaluated if used.
+
+- R arguments are lazily evaluated. So the following does not show an error.
+
+    ```{r}
+    f <- function(x) {
+      return(10)
+    }
+    
+    f()
+    ```
+
+- In R, lazy evaluation is done via a *promise* data object, which is described in Chapter 20.
 
 
+- But a key component of lazy evaluation is that default arguments can be defined in terms of other arguments.
 
+    ```{r}
+    h04 <- function(x = 1, y = x * 2, z = a + b) {
+      a <- 10
+      b <- 100
+      
+      c(x, y, z)
+    }
+    
+    h04()
+    ```
 
+- I've used this property before, e.g., for choosing initial values of an optimization approach based on the input data.
+
+- Note that default arguments are evaluated inside the function, while user supplied arguments are evaluated outside the function.
+
+- This example from Advanced R blew my mind:
+    ```{r}
+    h05 <- function(x = ls()) {
+      a <- 1
+      x
+    }
+    
+    # ls() evaluated inside h05:
+    h05()
+    
+    # ls() evaluated in global environment:
+    h05(ls())
+    ```
+
+- **Exercise** (Advanced R): What does this function return? Why?
+
+    ```{r, eval = FALSE}
+    f2 <- function(x = z) {
+      z <- 100
+      x
+    }
+    f2()
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    It returns 100. It does so because `x` is only lazily evaluated when it is used, after which `z` is defined.
+    ```
+
+- **Exercise** (Advanced R): What does this function return? Why?
+
+    ```{r, eval = FALSE}
+    y <- 10
+    f1 <- function(x = {y <- 1; 2}, y = 0) {
+      c(x, y)
+    }
+    f1()
+    y
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    `f1()` returns `c(2, 1)` because when `x` is evaluated that is one `y <- 1` is evaluated. Note that `x` has a default argument of `2` because it is the last thing returned in that expression.
+    
+    Note that `y` is only assigned inside the function, so `y <- 10` is not overwritten.
+    ```
 

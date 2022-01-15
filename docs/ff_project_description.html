@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-12" />
+<meta name="date" content="2022-01-14" />
 
 <title>Final Project Description</title>
 
@@ -380,7 +380,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Final Project Description</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-12</h4>
+<h4 class="date">2022-01-14</h4>
 
 </div>
 
@@ -519,6 +519,7 @@ $(document).ready(function () {
 <ul>
 <li><a href="https://bookdown.org/rdpeng/RProgDA/building-new-graphical-elements.html" class="uri">https://bookdown.org/rdpeng/RProgDA/building-new-graphical-elements.html</a></li>
 </ul></li>
+<li><p>You should read the official documentation on extending <code>{ggplot2}</code>: <a href="https://ggplot2.tidyverse.org/articles/extending-ggplot2.html" class="uri">https://ggplot2.tidyverse.org/articles/extending-ggplot2.html</a>.</p></li>
 </ul>
 </div>
 <div id="data-project-the-on-line-encyclopedia-of-integer-sequences" class="section level2">
@@ -555,7 +556,7 @@ $(document).ready(function () {
 </ul></li>
 <li><p>Groups are fundamental to the building blocks of much of theoretical mathematics.</p></li>
 <li><p>Wikipedia provides a list of small groups: <a href="https://en.wikipedia.org/wiki/List_of_small_groups" class="uri">https://en.wikipedia.org/wiki/List_of_small_groups</a></p></li>
-<li><p><strong>Project</strong>: Create an S4 object oriented system for some of the small groups from the Wikipedia page on small groups. This should be implemented in a package called <code>{sgroupr}</code> (Small Groups in R).</p></li>
+<li><p><strong>Project</strong>: Create an S3 or S4 object oriented system for some of the small groups from the Wikipedia page on small groups. This should be implemented in a package called <code>{sgroupr}</code> (Small Groups in R).</p></li>
 <li><p>E.g. Suppose that <code>as.g_4_2()</code> converts a numeric vector into a vector encoding the <a href="https://en.wikipedia.org/wiki/Klein_four-group">Klein 4-group</a>, and we define <code>+</code> to be the binary operator (which you would need to overload). Then I am envisioning code of the form</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.g_4_2</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
@@ -582,6 +583,7 @@ $(document).ready(function () {
 <ul>
 <li>E.g. they add <code>duration</code>s together in a special way.</li>
 </ul></li>
+<li><p>You could try to do an S3 system implemented with the <a href="https://vctrs.r-lib.org/"><code>{vctrs}</code></a> package. This might be the easiest way to go.</p></li>
 </ul>
 </div>
 <div id="data-download-project-marvel-api" class="section level2">
