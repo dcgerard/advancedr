@@ -40,14 +40,14 @@ This repository contains material based upon work supported by the National Scie
   - [Subsetting](./04_subsetting.html)
   - [Control Flow](./04_controlflow.html)
   - [Functions](./04_functions.html)
+  - [Environments](./04_environments.html)
 - 05 Object-oriented Programming
-  - S3 Objects
-  - S4 Objects
-- 06 Environments
-- 07 Functional Programming
-- 08 Metaprogramming
-- 09 Performance/Profiling/Memory
-- 10 C++ and Rcpp
+  - [S3 Objects](./05_s3.html)
+  - [S4 Objects](./05_s4.html)
+- 06 Functional Programming
+- 07 Metaprogramming
+- 08 Performance/Profiling/Memory
+- 09 C++ and Rcpp
 
 # Final Project
 

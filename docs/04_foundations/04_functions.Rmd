@@ -48,7 +48,7 @@ environment(square)
 
 - Below: Black dot is environment, squares are arguments. Body is not graphed.
 
-    <img src="./04_figs_fun/components.png" alt="some S3 objects" width="25%"/>
+    <img src="./04_figs_fun/components.png" alt="some S3 objects" width="15%"/>
 
 - **Exception**: Many base functions are written directly in C and don't have these three components.
 
@@ -65,29 +65,620 @@ environment(square)
 
 - Functions are objects, just like any other variable.
 
-- Sometimes, functions are called **closures** because they "enclose" their environments. That's why you sometimes see the error
+- Sometimes, functions are called **closures** because they "enclose" their environments (see Chapter 7). That's why you sometimes see the error
     ```{r, error = TRUE}
     lm[1]
     ```
+    I.e., you cannot subset a function.
 
 - So you can pass functions as arguments in a function (like in `optim()`).
 
-```{r}
-f <- function(par, dat) {
-  sum((par - dat)^2)
-}
-dat <- rnorm(100)
-oout <- optim(par = 0, fn = f, dat = dat, method = "L-BFGS-B")
-oout$par
-mean(dat)
-```
-
+    ```{r}
+    f <- function(par, dat) {
+      sum((par - dat)^2)
+    }
+    dat <- rnorm(100)
+    oout <- optim(par = 0, fn = f, dat = dat, method = "L-BFGS-B")
+    oout$par
+    mean(dat)
+    ```
 
 - Functions can return other functions (like in `ecdf()`).
 
-- So, functions can also have attributes.
+    ```{r}
+    x <- c(1, 99, 2, 11)
+    efun <- ecdf(x)
+    efun(10)
+    ```
+    
+- Functions can be elements of a list.
+
+    ```{r}
+    funs <- list(
+      half = function(x) x / 2,
+      double = function(x) x * 2
+    )
+    
+    funs$double(10)
+    ```
+
+- Because functions are objects, Hadley graphically represents name bindings in a similar way to variables:
+
+    <img src="./04_figs_fun/first-class.png" alt="some S3 objects" width="15%"/>
+
+- Functions can also be **anonymous** in R
+
+    ```{r}
+    (function(x) x^2)(2)
+    (function(x) x^2)(3)
+    ```
+
+    - This is most often used when you don't want to be bothered with thinking up a name.
+    
+    ```{r}
+    ## Integrate anonymous function from -infinity to infinity
+    integrate(function(x) exp(-x^2), -Inf, Inf)
+    
+    ## apply anonymous function to each column of mtcars
+    sapply(mtcars, function(x) length(unique(x))) 
+    ```
+    
+# Lexical Scoping
+
+- **Scoping** is the act of finding a value associated with a name. That is, you have `x` as a variable name in different parts of a program. When does it point to some objects versus others?
+
+- E.g., when is `x` pointing to 20 versus 10 in the code below?
+
+    ```{r}
+    x <- 10
+    g01 <- function() {
+      x <- 20
+      x
+    }
+    ```
+
+    - `x` points to 10 outside of the function, and points to 20 inside of the function.
+    
+- R uses [lexical scoping](https://en.wikipedia.org/wiki/Scope_(computer_science)#Lexical_scope), meaning that a name refers to an object based on when the function is defined.
+
+- In a lexically scoped language, a *block* defines a new scope. Variables are defined/declared in that scope and are not visible outside of that scope. Blocks can be nested, and when a variable is defined in an outer block, then it is visible in the inner block. But variables defined in the inner block are not defined in the outer block. E.g.
+
+    ```{r, error = TRUE}
+    outer_var <- 10
+    f <- function() {
+      print(outer_var)
+      inner_var <- 1
+    }
+    f() ## outer_var is available in inner block though it is defined in outer block.
+    inner_var ## inner_var not available in outer block because defined in inner block.
+    ```
+
+- Other types of scoping exist, such as [dynamic scoping](https://en.wikipedia.org/wiki/Scope_(computer_science)#Dynamic_scope), meaning that a name refers to an object based on when the function is called. Most languages don't use dynamic scope. One language that does use dynamic scope is bash.
+
+- Let's formalize this mechanism.
+
+## Name Masking
+
+- Names inside a function mask names defined outside a function.
+
+- If a name is not defined in a function, R looks up one level.
+
+    ```{r}
+    x <- 2
+    y <- 20
+    g03 <- function() {
+      y <- 1
+      return(c(x, y))
+    }
+    g03()
+    
+    # This doesn't change the previous value of y
+    y
+    ```
+
+- If a function is defined inside a function, then it keeps looking up levels until it finds a variable.
+
+- Below, the inner function finds `z` inside the inner function, finds `y` in the outer function, and finds `x` outside both functions. 
+    ```{r}
+    x <- 1
+    f1 <- function() {
+      y <- 2
+      f2 <- function() {
+        z <- 3
+        return(c(x, y, z))
+      }
+      return(f2())
+    }
+    f1()
+    ```
+
+## A fresh start
+
+- Each time a function is called, it creates a new environment to execute in.
+
+- This means it does not remember what happened last time.
+
+    ```{r}
+    a <- 2
+    g11 <- function() {
+      a <- a + 1
+      return(a)
+    }
+    
+    g11()
+    g11()
+    ```
+
+## Functions versus variables
+
+- Functions and variables can share names (though, this is not a good idea).
+
+```{r}
+sum <- c(10, 11)
+sum(sum)
+```
+
+- This is allowed since the function and the variable are in different environments. XYZ Explain this more.
+
+## Dynamic lookup
+
+- R determines *where* to look at function creation time (e.g. one level up), but it determines *what* is there at evaluation time.
+
+```{r}
+a <- 1
+g11()
+
+a <- 12
+g11()
+```
+
+## Advanced R Exercises
+
+1. What does the following code return? Why? Describe how each of the three c’s is interpreted.
+
+    ```{r}
+    c <- 10
+    c(c = c)
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    The first `c` is the function name for combine, the second `c` is a name attribute, the third `c` is a name pointing to `10`.
+    ```
+    
+
+2. What does the following function return? Make a prediction before running the code yourself.
+
+    ```{r, eval = FALSE}
+    f <- function(x) {
+      f <- function(x) {
+        f <- function() {
+          x ^ 2
+        }
+        f() + 1
+      }
+      f(x) * 2
+    }
+    f(10)
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    202. 10 gets passed to f(10)^2 * 2, where f(10) is 10^2 + 1
+    ```
+
+# Lazy Evaluation
+
+- **lazy evaluation** is where a variable is only evaluated if used.
+
+- R arguments are lazily evaluated. So the following does not show an error, even though `x` is not defined.
+
+    ```{r}
+    f <- function(x) {
+      return(10)
+    }
+    
+    f()
+    ```
+
+- In R, lazy evaluation is done via a *promise* data object, which is described in Chapter 20.
+
+- But an important consequence of lazy evaluation is that default arguments can be defined in terms of other arguments.
+
+    ```{r}
+    h04 <- function(x = NULL, y = x * 2, z = a + b) {
+      a <- 10
+      b <- 100
+      
+      if (is.null(x)) {
+        x <- 4
+      }
+      
+      c(x, y, z)
+    }
+    
+    h04()
+    ```
+
+- I've used this property before, e.g., for choosing initial values of an optimization approach based on the input data.
+
+- Note that default arguments are evaluated inside the function, while user supplied arguments are evaluated outside the function.
+
+- This example from Advanced R blew my mind:
+    ```{r}
+    h05 <- function(x = ls()) { ## ls() is default argument
+      a <- 1
+      x
+    }
+    
+    # ls() evaluated inside h05:
+    h05()
+    
+    # ls() evaluated in global environment:
+    h05(ls()) ## ls() is user supplied
+    ```
+
+- **Exercise** (Advanced R): What does this function return? Why?
+
+    ```{r, eval = FALSE}
+    f2 <- function(x = z) {
+      z <- 100
+      x
+    }
+    f2()
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    It returns 100. It does so because `x` is only lazily evaluated when it is used, after which `z` is defined.
+    ```
+
+- **Exercise** (Advanced R): What does this function return? Why?
+
+    ```{r, eval = FALSE}
+    y <- 10
+    f1 <- function(x = {y <- 1; 2}, y = 0) {
+      c(x, y)
+    }
+    f1()
+    y
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    `f1()` returns `c(2, 1)` because when `x` is evaluated that is one `y <- 1` is evaluated. Note that `x` has a default argument of `2` because it is the last thing returned in that expression.
+    
+    Note that `y` is only assigned inside the function, so `y <- 10` is not overwritten.
+    ```
+
+# `...` (dot-dot-dot)
+
+- In R, the dot-dot-dot argument is a special argument which allows a function to take any number of additional arguments beyond those defined by the user.
+
+- This is used all over the place in R. See `seq()`, `optim()`, `plot()`, `print()`, etc...
+
+- In computer science, this type of argument is called a "varargs"
+
+- Typically, you either do one of two things with `...` in a function:
+    1. Assign arguments to a list.
+        ```{r, eval = FALSE}
+        args <- list(...)
+        ```
+    2. Pass arguments to another function.
+        ```{r, eval = FALSE}
+        fn(...)
+        ```
+    
+- E.g. I pass the extra arguments to a list so that I can check if they are `NULL` in the list, then I pass the extra arguments to `plot()`.
+
+    ```{r}
+    plotd <- function(x, y, ...) {
+      args <- list(...)
+      args$x <- x
+      args$y <- y
+      if (is.null(args$pch)) {
+        args$pch <- 16
+      }
+      if (is.null(args$mar)) {
+        args$mar <- c(3, 3, 2, 1)
+      }
+      if (is.null(args$mgp)) {
+        args$mgp <- c(1.8, 0.4, 0)
+      }
+      if (is.null(args$las)) {
+        args$las <- 1
+      }
+      if (is.null(args$tcl)) {
+        args$tcl <- -0.25
+      }
+      do.call(what = plot, args = args)
+    }
+    ```
+
+- I can pass more arguments to this function, or overwrite defaults
+    ```{r}
+    plotd(x = mtcars$wt, 
+          y = mtcars$mpg, 
+          main = "Motor Trends Cars",
+          xlab = "Weight", 
+          ylab = "MPG",
+          pch = 19)
+    ```
+   
+- `do.call()` is one way to call a function. You write the name of the function and provide a list of its arguments.
+
+- **Exercise**: Why do you think we get an error here?
+
+    ```{r, error = TRUE, eval = FALSE}
+    plot2 <- function(x, y, ...) {
+      if (!hasArg(pch)) {
+        pch <- 16
+        cat("pch assigned")
+      }
+      plot(x = x, y = y, pch = pch)
+    }
+    plot2(mtcars$wt, mtcars$mpg)
+    plot2(mtcars$wt, mtcars$mpg, pch = 19)
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    Arguments are not evaluated unless (i) passed to another function or (ii) stored as a list.
+    ```
+
+- If you want to just change one default, it is perhaps better to just include it as an additional argument.
+    ```{r}
+    plot3 <- function(x, y, pch = 16, ...) {
+      plot(x = x, y = y, pch = pch, ...)
+    }
+    plot3(mtcars$wt, mtcars$mpg)
+    plot3(mtcars$wt, mtcars$mpg, pch = 19)
+    ```
+
+# Function exits
+
+## Implicit versus explicit returns
+
+- R will return the last evaluated expression by default:
+    ```{r}
+    f <- function(x, y) {
+      y
+      x
+    }
+    f(1, 2)
+    ```
+    
+- I prefer to explicitly include a `return()` call:
+    ```{r}
+    f <- function(x, y) {
+      y
+      return(x)
+    }
+    f(1, 2)
+    ```
+
+## Visible versus invisible returns
+
+- A visible return prints the result:
+    ```{r}
+    f <- function(x) {
+      return(x)
+    }
+    f(1)
+    ```
+
+- You can prevent automatic printing by applying `invisible()`.
+    ```{r}
+    f <- function(x) {
+      return(invisible(x))
+    }
+    f(1)
+    ```
+    
+- We can print the value with `print()`.
+    ```{r}
+    f(1) |>
+      print()
+    ```
+    or by enclosing in parentheses:
+    ```{r}
+    (f(1))
+    ```
+    
+- Assignment is a function with returns invisibly:
+    ```{r}
+    x <- 1
+    (x <- 1)
+    ```
+
+- You might be surprised that assignment is a function, but remember in R almost everything is a function. Prefix notation might make it more clear:
+    ```{r}
+    `<-`(x, 10)
+    x
+    ```
+
+- `invisible()` returns are often used for arguments whose main purpose are side effects (like `print()` or `plot()` functions), so that you can chain arguments.
+
+    ```{r}
+    a <- b <- c <- d <- 2
+    a
+    b
+    c
+    d
+    ```
+
+## Exit handlers
+
+- If you change the global state (e.g. the `options()` arguments), then it is polite to revert back on exit.
+
+- Use `on.exit()` to do so, setting `add = TRUE` to not overwrite previous exit handlers.
+
+    ```{r}
+    cleanup <- function(dir, code) {
+      old_dir <- setwd(dir)
+      on.exit(setwd(old_dir), add = TRUE)
+      
+      # I can now change the working directory with impunity
+      
+      old_opt <- options(stringsAsFactors = FALSE)
+      on.exit(options(old_opt), add = TRUE)
+      
+      # I can now change the options with impunity
+    }
+    ```
+
+- I have used this in real life when manipulating the parallelization backend using the `{foreach}` package
+
+    ```{r, eval = FALSE}
+    oldDoPar <- doFuture::registerDoFuture()
+    on.exit(with(oldDoPar, foreach::setDoPar(fun=fun, data=data, info=info)), add = TRUE)
+    ```
+
+# Function Forms
+
+- Hadley's Function Forms:
+    - **prefix**: the function name comes before its arguments, like `foofy(a, b, c)`. These constitute of the majority of function calls in R.
+    - **infix**: the function name comes in between its arguments, like `x + y`. Infix forms are used for many mathematical operators, and for user-defined functions that begin and end with `%`.
+    - **replacement**: functions that replace values by assignment, like `names(df) <- c("a", "b", "c")`. They actually look like prefix functions.
+    - **special**: functions like `[[`, `if`, and `for`. While they don’t have a consistent structure, they play important roles in R’s syntax.
+
+- You can rewrite all forms in prefix form
+
+    ```{r}
+    x + y ## infix 
+    `+`(x, y) ## prefix
+    
+    df <- data.frame(1:2, c("a", "b"), c(TRUE, FALSE))
+    names(df) <- c("x", "y", "z") ## replacement
+    `names<-`(df, c("x", "y", "z")) ## prefix
+    
+    for(i in 1:10) print(i) ## special
+    `for`(i, 1:10, print(i)) ## prefix
+    ```
+
+- You can create your own infix functions by starting and ending them with `%`
+
+    ```{r}
+    `%+%` <- function(a, b) paste0(a, b)
+    
+    "hello" %+% "world"
+    ```
+
+- You can create your own replacement functions. 
+    - They must end in `<-`
+    - They must have arguments `x` and `value` and
+    - They must return the modified argument.
+
+- The following will replace the second 
+```{r}
+`second<-` <- function(x, value) {
+  x[2] <- value
+  x
+}
+
+x <- 1:10
+second(x) <- 12
+x
+```
+
+- You can include additional arguments by placing them between `x` and `value` and including them on the left-hand size.
+
+    ```{r}
+    `modify<-` <- function(x, position, value) {
+      x[position] <- value
+      x
+    }
+    modify(x, 1) <- 10
+    x
+    ```
+
+# Advanced R Exercises:
+
+1. Rewrite the following code snippets into prefix form:
+
+    ```{r}
+    1 + 2 + 3
+    
+    1 + (2 + 3)
+    
+    if (length(x) <= 5) x[[length(x)]] else x[[5]]
+    ```
+
+    ```{r, echo = FALSE, eval = FALSE}
+    `+`(`+`(1, 2), 3)
+    `+`(1, `+`(2, 3))
+    
+    n <- length(x)
+    `if`(`<=`(length(x), 5), `[[`(x, length(x)), `[[`(x, 5))
+    ```
+
+    - For the last one, make sure to convert `if`, `else`, `[[`, and `<=` all into prefix form.
+
+2. Create a replacement function called `rmod()` that modifies a random location in a vector. E.g.
+
+    ```{r, echo = FALSE, eval = TRUE}
+    `rmod<-` <- function(x, value) {
+      x[sample(seq_along(x), size = 1)] <- value
+      return(x)
+    }
+    ```
+    
+    ```{r}
+    set.seed(1)
+    x <- 1:10
+    rmod(x) <- NA
+    x
+    rmod(x) <- NA
+    x
+    ```
+
+3. Write your own version of `+` that pastes its inputs together if they are character vectors but behaves as usual otherwise. In other words, make this code work:
+
+    ```{r, eval = TRUE, echo = FALSE}
+    `+` <- function(x, y) {
+      if (is.character(x) || is.character(y)) {
+        return(paste0(x, y))
+      } else {
+        return(.Primitive("+")(x, y))
+      }
+    }
+    ```
 
 
+    ```{r}
+    1 + 2
+    "a" + "b"
+    ```
+
+    - *Hint*: Look at the source code of `+`.
+
+4. Create an infix `xor()` operator. Call it `%x|%`. E.g.
+
+    ```{r, eval = TRUE, echo = FALSE}
+    `%x|%` <- function(x, y) {
+      return(xor(x, y))
+    }
+    ```
+
+    ```{r}
+    c(TRUE, TRUE, FALSE, FALSE) %x|% c(TRUE, FALSE, TRUE, FALSE)
+    ```
+
+5. Create infix versions of the set functions `intersect()`, `union()`, and `setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match conventions from mathematics.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    `%n%` <- function(x, y) {
+      return(intersect(x, y))
+    }
+    
+    `%u%` <- function(x, y) {
+      return(union(x, y))
+    }
+    
+    `%/%` <- function(x, y) {
+      return(setdiff(x, y))
+    }
+    ```
 
 
+# New functions:
+
+- `do.call()`: Run a function with a list of arguments.
+- `invisible()`: Return without automatic printing.
+- `on.exit()`: Runs an expression when the function exits, whether naturally or by an error.
 

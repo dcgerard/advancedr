@@ -1,0 +1,64 @@
+---
+title: "Environments"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output:  
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    highlight: pygments
+urlcolor: "blue"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo       = TRUE, 
+                      fig.align  = "center",
+                      fig.height = 3, fig.width = 4)
+ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
+
+# Learning Objectives
+
+- R Environments
+- Chapter 7 from [Advanced R](https://adv-r.hadley.nz/)
+    - These lecture notes are mostly taken straight out of Hadley's book. Many thanks for making my life easier.
+    - His images, which I use here, are licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" height="15" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png"/></a>
+
+# Environment Basics
+
+- Hadley made a really great package for handling environments called `{rlang}`. It's way better than the base R functionality.
+
+    ```{r}
+    library(rlang)
+    ```
+
+- An **environment** is a fundamental data object in R that determines lexical scoping --- i.e. they determine when a name is bound to an object.
+
+- An environment is like a list, except:
+    - Everyname must be unique (lists can have multiple elements of the same name).
+    - Names are not ordered (lists are ordered)
+    - All environments (except the empty environment) have "parent" environments that they live in, and
+    - Environments use modify-in-place semantics (not copy-on-modify).
+    
+- Create a new environment with `rlang::env()`, which behaves a lot list `list()`.
+
+    ```{r}
+    e1 <- rlang::env(a = FALSE,
+                     b = "a",
+                     c = 2.3,
+                     d = 1:3)
+    ```
+
+- Environments associate names to values without any particular order. Hadley draws them like this:
+
+    <img src="./04_figs_env/bindings.png" alt="Environment Bindings" width="40%"/>
+    
+- Environments
+
+
+# New Functions

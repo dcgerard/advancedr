@@ -13,7 +13,7 @@
 
 <meta name="date" content="2022-01-17" />
 
-<title>Advanced R</title>
+<title>S3 Objects</title>
 
 <script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -32,8 +32,10 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/clipboard-1.7.1/clipboard.min.js"></script>
+<link href="site_libs/primer-tooltips-1.4.0/build.css" rel="stylesheet" />
+<link href="site_libs/klippy-0.0.0.9500/css/klippy.min.css" rel="stylesheet" />
+<script src="site_libs/klippy-0.0.0.9500/js/klippy.min.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 <link rel="shortcut icon" href="https://dcgerard.github.io/advancedr/au_logo_small.png" />
@@ -47,16 +49,6 @@
   ul.task-list{list-style: none;}
     </style>
 
-<style type="text/css">code{white-space: pre;}</style>
-<script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
-  }
-}
-</script>
 
 
 
@@ -269,70 +261,32 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Advanced R</h1>
+<h1 class="title toc-ignore">S3 Objects</h1>
 <h4 class="author">David Gerard</h4>
 <h4 class="date">2022-01-17</h4>
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#learning-objectives">Learning Objectives</a></li>
+<li><a href="#motivation">Motivation</a></li>
+</ul>
+</div>
 
-<div id="synopsis" class="section level1">
-<h1>Synopsis</h1>
-<p>This website contains the teaching materials for STAT 496/696 Advanced R, taught at American University by <a href="https://dcgerard.github.io/">David Gerard</a>.</p>
-<p>This repository contains material based upon work supported by the National Science Foundation under Grant No. <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=2132247">2132247</a>. The opinions, findings, and conclusions or recommendations expressed are those of the author and do not necessarily reflect the views of the National Science Foundation.</p>
-</div>
-<div id="administrative" class="section level1">
-<h1>Administrative</h1>
+<script>
+  addClassKlippyTo("pre.r, pre.markdown");
+  addKlippy('left', 'top', 'auto', '1', 'Copy code', 'Copied!');
+</script>
+<div id="learning-objectives" class="section level1">
+<h1>Learning Objectives</h1>
 <ul>
-<li><a href="./syllabus.html">Syllabus</a></li>
+<li>Chapter 13 of <a href="https://adv-r.hadley.nz/">Advanced R</a></li>
+<li><a href="https://vctrs.r-lib.org/articles/s3-vector.html"><code>{vctrs}</code></a> package</li>
 </ul>
 </div>
-<div id="lectures" class="section level1">
-<h1>Lectures</h1>
-<ul>
-<li>01 Git/GitHub
-<ul>
-<li><a href="./01_basic_bash.html">Bash Basics</a></li>
-<li><a href="./01_git_setup.html">Setting up Git and GitHub</a></li>
-<li><a href="./01_git_github.html">Git and GitHub</a></li>
-<li><a href="https://github.com/advanced-r-spring-2022/lab_01_git">Lab 01: Bash and Git</a></li>
-</ul></li>
-<li>02 R Packages
-<ul>
-<li><a href="./02_packages.html">R Packages</a></li>
-<li><a href="https://github.com/advanced-r-spring-2022/lab_02_packages">Lab 02: R Packages</a></li>
-</ul></li>
-<li>03 Best Practices
-<ul>
-<li><a href="./03_testing.html">Assertions and Testing</a></li>
-<li><a href="./03_checking.html">Package Checking and Continuous Integration</a></li>
-<li><a href="./03_style.html">Coding Style</a></li>
-</ul></li>
-<li>04 Foundations
-<ul>
-<li><a href="./04_memory.html">Memory</a></li>
-<li><a href="./04_vectors.html">Vectors</a></li>
-<li><a href="./04_subsetting.html">Subsetting</a></li>
-<li><a href="./04_controlflow.html">Control Flow</a></li>
-<li><a href="./04_functions.html">Functions</a></li>
-<li><a href="./04_environments.html">Environments</a></li>
-</ul></li>
-<li>05 Object-oriented Programming
-<ul>
-<li><a href="./05_s3.html">S3 Objects</a></li>
-<li><a href="./05_s4.html">S4 Objects</a></li>
-</ul></li>
-<li>06 Functional Programming</li>
-<li>07 Metaprogramming</li>
-<li>08 Performance/Profiling/Memory</li>
-<li>09 C++ and Rcpp</li>
-</ul>
-</div>
-<div id="final-project" class="section level1">
-<h1>Final Project</h1>
-<ul>
-<li><a href="./ff_project_description.html">Final project description</a></li>
-</ul>
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
 </div>
 
 <!DOCTYPE html>

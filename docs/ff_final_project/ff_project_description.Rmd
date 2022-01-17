@@ -142,6 +142,8 @@ for some $\xi > 0$. This work extends the approaches from @blachman1987confidenc
 - You might want to look at this reference for building new geoms:
     - <https://bookdown.org/rdpeng/RProgDA/building-new-graphical-elements.html>
     
+- You should read the official documentation on extending `{ggplot2}`: <https://ggplot2.tidyverse.org/articles/extending-ggplot2.html>.
+    
 ## Data Project: The On-Line Encyclopedia of Integer Sequences
 
 - Create a data package for the [OEIS](https://oeis.org/).
@@ -190,7 +192,7 @@ for some $\xi > 0$. This work extends the approaches from @blachman1987confidenc
 
 - Wikipedia provides a list of small groups: <https://en.wikipedia.org/wiki/List_of_small_groups>
 
-- **Project**: Create an S4 object oriented system for some of the small groups from the Wikipedia page on small groups. This should be implemented in a package called `{sgroupr}` (Small Groups in R).
+- **Project**: Create an S3 or S4 object oriented system for some of the small groups from the Wikipedia page on small groups. This should be implemented in a package called `{sgroupr}` (Small Groups in R).
 
 - E.g. Suppose that `as.g_4_2()` converts a numeric vector into a vector encoding the [Klein 4-group](https://en.wikipedia.org/wiki/Klein_four-group), and we define `+` to be the binary operator (which you would need to overload). Then I am envisioning code of the form
 
@@ -241,6 +243,8 @@ for some $\xi > 0$. This work extends the approaches from @blachman1987confidenc
 
 - A good S4 object system that implements binary operations that you can explore is [`{lubridate}`](https://github.com/tidyverse/lubridate). 
     - E.g. they add `duration`s together in a special way.
+    
+- You could try to do an S3 system implemented with the [`{vctrs}`](https://vctrs.r-lib.org/) package. This might be the easiest way to go.
 
 ## Data Download Project: Marvel API
 
