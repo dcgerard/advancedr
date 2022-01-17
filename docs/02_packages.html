@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-07" />
+<meta name="date" content="2022-01-17" />
 
 <title>R Packages</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">R Packages</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-07</h4>
+<h4 class="date">2022-01-17</h4>
 
 </div>
 
@@ -454,8 +454,8 @@ $(document).ready(function () {
 ## [4] &quot;/usr/lib/R/library&quot;</code></pre></li>
 <li><p>For example, these are some of the packages in /home/dgerard/R/x86_64-pc-linux-gnu-library/4.1</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">list.files</span>(<span class="at">path =</span> <span class="fu">.libPaths</span>()[[<span class="dv">1</span>]]))</span></code></pre></div>
-<pre><code>## [1] &quot;abind&quot;         &quot;animation&quot;     &quot;annotate&quot;      &quot;AnnotationDbi&quot;
-## [5] &quot;ape&quot;           &quot;ashr&quot;</code></pre></li>
+<pre><code>## [1] &quot;abind&quot;         &quot;amen&quot;          &quot;animation&quot;     &quot;annotate&quot;     
+## [5] &quot;AnnotationDbi&quot; &quot;ape&quot;</code></pre></li>
 </ul></li>
 <li><p>Ways to install a package:</p>
 <ul>
@@ -557,13 +557,13 @@ $(document).ready(function () {
 <li><p>In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is built. So, for example, if you include the following line of code in your package.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
-<pre><code>## [1] &quot;2021-12-07 10:56:31 EST&quot;</code></pre>
+<pre><code>## [1] &quot;2022-01-17 09:18:12 EST&quot;</code></pre>
 <p>Then <code>x</code> be the time of the package build. If you want the time that a user runs some code, include this statement in a function.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ftime <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">Sys.time</span>())</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ftime</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2021-12-07 10:56:31 EST&quot;</code></pre></li>
+<pre><code>## [1] &quot;2022-01-17 09:18:12 EST&quot;</code></pre></li>
 <li><p>When you alias a function from another package, don’t do</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> pkg<span class="sc">::</span>bar</span></code></pre></div>
 <p>instead, do</p>
@@ -789,6 +789,7 @@ $(document).ready(function () {
 <ul>
 <li>E.g., if you only use string manipulation in one spot in your package, try using <code>grepl()</code> instead of <code>stringr::str_detect()</code>.</li>
 </ul></li>
+<li><p>Here is a list of nice essays on limiting dependencies: <a href="https://www.tinyverse.org/" class="uri">https://www.tinyverse.org/</a></p></li>
 <li><p>If you do import functions from other packages, put all of those <code>{roxygen2}</code> tags in the same location in one file.</p></li>
 <li><p><strong>Exercise</strong>: Instead of using <code>count_na()</code>, you decide to use the <code>n_na()</code> function from the <code>{na.tools}</code> package. Make these edits to your package now.</p></li>
 <li><p><strong>Exercise</strong>: Now import <code>n_na()</code> and remove your use of <code>::</code> from the previous exercise.</p></li>

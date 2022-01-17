@@ -269,7 +269,7 @@ g11()
 
 - **lazy evaluation** is where a variable is only evaluated if used.
 
-- R arguments are lazily evaluated. So the following does not show an error.
+- R arguments are lazily evaluated. So the following does not show an error, even though `x` is not defined.
 
     ```{r}
     f <- function(x) {
@@ -281,13 +281,16 @@ g11()
 
 - In R, lazy evaluation is done via a *promise* data object, which is described in Chapter 20.
 
-
-- But a key component of lazy evaluation is that default arguments can be defined in terms of other arguments.
+- But an important consequence of lazy evaluation is that default arguments can be defined in terms of other arguments.
 
     ```{r}
-    h04 <- function(x = 1, y = x * 2, z = a + b) {
+    h04 <- function(x = NULL, y = x * 2, z = a + b) {
       a <- 10
       b <- 100
+      
+      if (is.null(x)) {
+        x <- 4
+      }
       
       c(x, y, z)
     }
@@ -301,7 +304,7 @@ g11()
 
 - This example from Advanced R blew my mind:
     ```{r}
-    h05 <- function(x = ls()) {
+    h05 <- function(x = ls()) { ## ls() is default argument
       a <- 1
       x
     }
@@ -310,7 +313,7 @@ g11()
     h05()
     
     # ls() evaluated in global environment:
-    h05(ls())
+    h05(ls()) ## ls() is user supplied
     ```
 
 - **Exercise** (Advanced R): What does this function return? Why?
@@ -343,4 +346,339 @@ g11()
     
     Note that `y` is only assigned inside the function, so `y <- 10` is not overwritten.
     ```
+
+# `...` (dot-dot-dot)
+
+- In R, the dot-dot-dot argument is a special argument which allows a function to take any number of additional arguments beyond those defined by the user.
+
+- This is used all over the place in R. See `seq()`, `optim()`, `plot()`, `print()`, etc...
+
+- In computer science, this type of argument is called a "varargs"
+
+- Typically, you either do one of two things with `...` in a function:
+    1. Assign arguments to a list.
+        ```{r, eval = FALSE}
+        args <- list(...)
+        ```
+    2. Pass arguments to another function.
+        ```{r, eval = FALSE}
+        fn(...)
+        ```
+    
+- E.g. I pass the extra arguments to a list so that I can check if they are `NULL` in the list, then I pass the extra arguments to `plot()`.
+
+    ```{r}
+    plotd <- function(x, y, ...) {
+      args <- list(...)
+      args$x <- x
+      args$y <- y
+      if (is.null(args$pch)) {
+        args$pch <- 16
+      }
+      if (is.null(args$mar)) {
+        args$mar <- c(3, 3, 2, 1)
+      }
+      if (is.null(args$mgp)) {
+        args$mgp <- c(1.8, 0.4, 0)
+      }
+      if (is.null(args$las)) {
+        args$las <- 1
+      }
+      if (is.null(args$tcl)) {
+        args$tcl <- -0.25
+      }
+      do.call(what = plot, args = args)
+    }
+    ```
+
+- I can pass more arguments to this function, or overwrite defaults
+    ```{r}
+    plotd(x = mtcars$wt, 
+          y = mtcars$mpg, 
+          main = "Motor Trends Cars",
+          xlab = "Weight", 
+          ylab = "MPG",
+          pch = 19)
+    ```
+   
+- `do.call()` is one way to call a function. You write the name of the function and provide a list of its arguments.
+
+- **Exercise**: Why do you think we get an error here?
+
+    ```{r, error = TRUE, eval = FALSE}
+    plot2 <- function(x, y, ...) {
+      if (!hasArg(pch)) {
+        pch <- 16
+        cat("pch assigned")
+      }
+      plot(x = x, y = y, pch = pch)
+    }
+    plot2(mtcars$wt, mtcars$mpg)
+    plot2(mtcars$wt, mtcars$mpg, pch = 19)
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    Arguments are not evaluated unless (i) passed to another function or (ii) stored as a list.
+    ```
+
+- If you want to just change one default, it is perhaps better to just include it as an additional argument.
+    ```{r}
+    plot3 <- function(x, y, pch = 16, ...) {
+      plot(x = x, y = y, pch = pch, ...)
+    }
+    plot3(mtcars$wt, mtcars$mpg)
+    plot3(mtcars$wt, mtcars$mpg, pch = 19)
+    ```
+
+# Function exits
+
+## Implicit versus explicit returns
+
+- R will return the last evaluated expression by default:
+    ```{r}
+    f <- function(x, y) {
+      y
+      x
+    }
+    f(1, 2)
+    ```
+    
+- I prefer to explicitly include a `return()` call:
+    ```{r}
+    f <- function(x, y) {
+      y
+      return(x)
+    }
+    f(1, 2)
+    ```
+
+## Visible versus invisible returns
+
+- A visible return prints the result:
+    ```{r}
+    f <- function(x) {
+      return(x)
+    }
+    f(1)
+    ```
+
+- You can prevent automatic printing by applying `invisible()`.
+    ```{r}
+    f <- function(x) {
+      return(invisible(x))
+    }
+    f(1)
+    ```
+    
+- We can print the value with `print()`.
+    ```{r}
+    f(1) |>
+      print()
+    ```
+    or by enclosing in parentheses:
+    ```{r}
+    (f(1))
+    ```
+    
+- Assignment is a function with returns invisibly:
+    ```{r}
+    x <- 1
+    (x <- 1)
+    ```
+
+- You might be surprised that assignment is a function, but remember in R almost everything is a function. Prefix notation might make it more clear:
+    ```{r}
+    `<-`(x, 10)
+    x
+    ```
+
+- `invisible()` returns are often used for arguments whose main purpose are side effects (like `print()` or `plot()` functions), so that you can chain arguments.
+
+    ```{r}
+    a <- b <- c <- d <- 2
+    a
+    b
+    c
+    d
+    ```
+
+## Exit handlers
+
+- If you change the global state (e.g. the `options()` arguments), then it is polite to revert back on exit.
+
+- Use `on.exit()` to do so, setting `add = TRUE` to not overwrite previous exit handlers.
+
+    ```{r}
+    cleanup <- function(dir, code) {
+      old_dir <- setwd(dir)
+      on.exit(setwd(old_dir), add = TRUE)
+      
+      # I can now change the working directory with impunity
+      
+      old_opt <- options(stringsAsFactors = FALSE)
+      on.exit(options(old_opt), add = TRUE)
+      
+      # I can now change the options with impunity
+    }
+    ```
+
+- I have used this in real life when manipulating the parallelization backend using the `{foreach}` package
+
+    ```{r, eval = FALSE}
+    oldDoPar <- doFuture::registerDoFuture()
+    on.exit(with(oldDoPar, foreach::setDoPar(fun=fun, data=data, info=info)), add = TRUE)
+    ```
+
+# Function Forms
+
+- Hadley's Function Forms:
+    - **prefix**: the function name comes before its arguments, like `foofy(a, b, c)`. These constitute of the majority of function calls in R.
+    - **infix**: the function name comes in between its arguments, like `x + y`. Infix forms are used for many mathematical operators, and for user-defined functions that begin and end with `%`.
+    - **replacement**: functions that replace values by assignment, like `names(df) <- c("a", "b", "c")`. They actually look like prefix functions.
+    - **special**: functions like `[[`, `if`, and `for`. While they don’t have a consistent structure, they play important roles in R’s syntax.
+
+- You can rewrite all forms in prefix form
+
+    ```{r}
+    x + y ## infix 
+    `+`(x, y) ## prefix
+    
+    df <- data.frame(1:2, c("a", "b"), c(TRUE, FALSE))
+    names(df) <- c("x", "y", "z") ## replacement
+    `names<-`(df, c("x", "y", "z")) ## prefix
+    
+    for(i in 1:10) print(i) ## special
+    `for`(i, 1:10, print(i)) ## prefix
+    ```
+
+- You can create your own infix functions by starting and ending them with `%`
+
+    ```{r}
+    `%+%` <- function(a, b) paste0(a, b)
+    
+    "hello" %+% "world"
+    ```
+
+- You can create your own replacement functions. 
+    - They must end in `<-`
+    - They must have arguments `x` and `value` and
+    - They must return the modified argument.
+
+- The following will replace the second 
+```{r}
+`second<-` <- function(x, value) {
+  x[2] <- value
+  x
+}
+
+x <- 1:10
+second(x) <- 12
+x
+```
+
+- You can include additional arguments by placing them between `x` and `value` and including them on the left-hand size.
+
+    ```{r}
+    `modify<-` <- function(x, position, value) {
+      x[position] <- value
+      x
+    }
+    modify(x, 1) <- 10
+    x
+    ```
+
+# Advanced R Exercises:
+
+1. Rewrite the following code snippets into prefix form:
+
+    ```{r}
+    1 + 2 + 3
+    
+    1 + (2 + 3)
+    
+    if (length(x) <= 5) x[[length(x)]] else x[[5]]
+    ```
+
+    ```{r, echo = FALSE, eval = FALSE}
+    `+`(`+`(1, 2), 3)
+    `+`(1, `+`(2, 3))
+    
+    n <- length(x)
+    `if`(`<=`(length(x), 5), `[[`(x, length(x)), `[[`(x, 5))
+    ```
+
+    - For the last one, make sure to convert `if`, `else`, `[[`, and `<=` all into prefix form.
+
+2. Create a replacement function called `rmod()` that modifies a random location in a vector. E.g.
+
+    ```{r, echo = FALSE, eval = TRUE}
+    `rmod<-` <- function(x, value) {
+      x[sample(seq_along(x), size = 1)] <- value
+      return(x)
+    }
+    ```
+    
+    ```{r}
+    set.seed(1)
+    x <- 1:10
+    rmod(x) <- NA
+    x
+    rmod(x) <- NA
+    x
+    ```
+
+3. Write your own version of `+` that pastes its inputs together if they are character vectors but behaves as usual otherwise. In other words, make this code work:
+
+    ```{r, eval = TRUE, echo = FALSE}
+    `+` <- function(x, y) {
+      if (is.character(x) || is.character(y)) {
+        return(paste0(x, y))
+      } else {
+        return(.Primitive("+")(x, y))
+      }
+    }
+    ```
+
+
+    ```{r}
+    1 + 2
+    "a" + "b"
+    ```
+
+    - *Hint*: Look at the source code of `+`.
+
+4. Create an infix `xor()` operator. Call it `%x|%`. E.g.
+
+    ```{r, eval = TRUE, echo = FALSE}
+    `%x|%` <- function(x, y) {
+      return(xor(x, y))
+    }
+    ```
+
+    ```{r}
+    c(TRUE, TRUE, FALSE, FALSE) %x|% c(TRUE, FALSE, TRUE, FALSE)
+    ```
+
+5. Create infix versions of the set functions `intersect()`, `union()`, and `setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match conventions from mathematics.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    `%n%` <- function(x, y) {
+      return(intersect(x, y))
+    }
+    
+    `%u%` <- function(x, y) {
+      return(union(x, y))
+    }
+    
+    `%/%` <- function(x, y) {
+      return(setdiff(x, y))
+    }
+    ```
+
+
+# New functions:
+
+- `do.call()`: Run a function with a list of arguments.
+- `invisible()`: Return without automatic printing.
+- `on.exit()`: Runs an expression when the function exits, whether naturally or by an error.
 

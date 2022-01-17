@@ -616,7 +616,9 @@ klippy::klippy()
 
 - Try to avoid dependencies on packages from the tidyverse (dplyr, tidyr, etc). These packages have changed frequently in the past. The maintainers are great about notifying folks about breaking changes, but it still means more work on your part.
     - E.g., if you only use string manipulation in one spot in your package, try using `grepl()` instead of `stringr::str_detect()`.
-    
+
+- Here is a list of nice essays on limiting dependencies: <https://www.tinyverse.org/>
+
 - If you do import functions from other packages, put all of those `{roxygen2}` tags in the same location in one file.
     
 - **Exercise**: Instead of using `count_na()`, you decide to use the `n_na()` function from the `{na.tools}` package. Make these edits to your package now.
