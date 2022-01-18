@@ -1041,7 +1041,7 @@ klippy::klippy()
     
 # Documenting a Package
 
-- It is pretty standard to have a help page for your package called "<package>-package". E.g., for our `{forloop}` package we would call it `forloop-package`. Then, if a user wanted to see more about the package, they could look at that help file via `` ?`forloop-package` ``.
+- It is pretty standard to have a help page for your package called "\<package\>-package". E.g., for our `{forloop}` package we would call it `forloop-package`. Then, if a user wanted to see more about the package, they could look at that help file via `` ?`forloop-package` ``.
 
 - This help file is also where I typically put function imports.
 

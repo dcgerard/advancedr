@@ -558,13 +558,13 @@ $(document).ready(function () {
 <li><p>In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is built. So, for example, if you include the following line of code in your package.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
-<pre><code>## [1] &quot;2022-01-18 11:44:52 EST&quot;</code></pre>
+<pre><code>## [1] &quot;2022-01-18 12:10:35 EST&quot;</code></pre>
 <p>Then <code>x</code> be the time of the package build. If you want the time that a user runs some code, include this statement in a function.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ftime <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">Sys.time</span>())</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ftime</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2022-01-18 11:44:52 EST&quot;</code></pre></li>
+<pre><code>## [1] &quot;2022-01-18 12:10:35 EST&quot;</code></pre></li>
 <li><p>When you alias a function from another package, don’t do</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> pkg<span class="sc">::</span>bar</span></code></pre></div>
 <p>instead, do</p>
@@ -960,7 +960,7 @@ $(document).ready(function () {
 <div id="documenting-a-package" class="section level1">
 <h1>Documenting a Package</h1>
 <ul>
-<li><p>It is pretty standard to have a help page for your package called “<package>-package”. E.g., for our <code>{forloop}</code> package we would call it <code>forloop-package</code>. Then, if a user wanted to see more about the package, they could look at that help file via <code>?`forloop-package`</code>.</p></li>
+<li><p>It is pretty standard to have a help page for your package called “&lt;package&gt;-package”. E.g., for our <code>{forloop}</code> package we would call it <code>forloop-package</code>. Then, if a user wanted to see more about the package, they could look at that help file via <code>?`forloop-package`</code>.</p></li>
 <li><p>This help file is also where I typically put function imports.</p></li>
 <li><p>Here is my documentation for my <code>{ldsep}</code> package</p>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Linkage Disequilibrium Shrinkage Estimation for Polyploids</span></span>
