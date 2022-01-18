@@ -163,7 +163,7 @@ klippy::klippy()
     ```
     You can use RStudio Projects if you want. But I won't help with any issues you have with RStudio projects.
 
-- **Exercise**: For this lecture, we will create a simple R package called `forloop` that reproduces a lot of Base R functions using for-loops. Create a folder called "forloop", set the working directory to this folder, and run
+- **Example**: For this lecture, we will create a simple R package called `forloop` that reproduces some Base R functions using for-loops. Create a folder called "forloop", set the working directory to this folder, and run
     ```{r, eval = FALSE}
     usethis::create_package(path = ".", rstudio = FALSE, open = FALSE)
     ```
@@ -225,6 +225,19 @@ klippy::klippy()
     - Never use `set.seed()` to alter the random number generation for a user.
         - Except possibly in examples, vignettes, and unit tests. But never in anything in the /R folder.
     - Never use `Sys.setenv()` or `Sys.setlocale()`.
+    
+- **Example**: Let's work together to build a function called `col_means()` that will take as input a data frame and return a vector of column means. We will not use the `colMeans()` function.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    col_means <- function(df, na_rm = TRUE) {
+      mean_vec <- rep(NA_real_, length.out = length(df))
+      for (i in seq_along(mtcars)) {
+        mean_vec[[i]] <- mean(mtcars[[i]], na.rm = na_rm)
+      }
+      return(mean_vec)
+    }
+    ```
+
     
 - **Exercise**: Create an R script file in your package called "sum.R" via
     ```{r, eval = FALSE}
@@ -441,6 +454,38 @@ klippy::klippy()
     #' }
     ```
     
+- **Example**: Let's work together to document our `col_means()` function.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    #' @title Calculate column means of a data frame.
+    #' 
+    #' @description Iterates through the columns of a data frame and
+    #'    returns a vector of column means.
+    #' 
+    #' @details
+    #' This function will allow the user to choose if they should first
+    #' remove missing values.
+    #' 
+    #' @param df The data frame.
+    #' @param na_rm A logical. Should we ignore missing values (\code{TRUE})
+    #' or not (\code{FALSE})?
+    #' 
+    #' @author David Gerard
+    #' 
+    #' @examples
+    #' data("mtcars")
+    #' col_means(mtcars)
+    #' 
+    #' @export
+    col_means <- function(df, na_rm = TRUE) {
+      mean_vec <- rep(NA_real_, length.out = length(df))
+      for (i in seq_along(mtcars)) {
+        mean_vec[[i]] <- mean(mtcars[[i]], na.rm = na_rm)
+      }
+      return(mean_vec)
+    }
+    ```
+    
 - **Exercise**: Document `sum2()` and `count_na()`. Make sure to include the following tags `@title`, `@description`, `@details`, `@param`, `@return`, `@author`, and `@examples`.
 
 - **Exercise**: In the `@seealso` tag, provide a link to each function. Also provide a link to `base::sum()`. Use an itemized list.
@@ -620,6 +665,46 @@ klippy::klippy()
 - Here is a list of nice essays on limiting dependencies: <https://www.tinyverse.org/>
 
 - If you do import functions from other packages, put all of those `{roxygen2}` tags in the same location in one file.
+
+- **Example**: Together, let's modify our `col_means()` function to one called `col_stats()` that also allows for calculating the standard deviation. However, `sd()` comes from the `{stats}` package, and so we need to make sure to tell R which package it is from.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    #' @title Calculate column means of a data frame.
+    #' 
+    #' @description Iterates through the columns of a data frame and
+    #'    returns a vector of column means.
+    #' 
+    #' @details
+    #' This function will allow the user to choose if they should first
+    #' remove missing values.
+    #' 
+    #' @param df The data frame.
+    #' @param na_rm A logical. Should we ignore missing values (\code{TRUE})
+    #' or not (\code{FALSE})?
+    #' 
+    #' @author David Gerard
+    #' 
+    #' @examples
+    #' data("mtcars")
+    #' col_stats(mtcars)
+    #' col_stats(mtcars, "mean")
+    #' col_stats(mtcars, "sd")
+    #' 
+    #' @export
+    col_stats <- function(df, type = c("mean", "sd"), na_rm = TRUE) {
+      type <- match.arg(type)
+      if (type == "mean") {
+        fun <- mean
+      } else if (type == "sd") {
+        fun <- stats::sd
+      }
+      mean_vec <- rep(NA_real_, length.out = length(df))
+      for (i in seq_along(mtcars)) {
+        mean_vec[[i]] <- fun(mtcars[[i]], na.rm = na_rm)
+      }
+      return(mean_vec)
+    }
+    ```
     
 - **Exercise**: Instead of using `count_na()`, you decide to use the `n_na()` function from the `{na.tools}` package. Make these edits to your package now.
     ```{r, eval = FALSE, echo = FALSE}
@@ -952,3 +1037,71 @@ klippy::klippy()
       fibnum[[n]]
     }
     ```
+    
+    
+# Documenting a Package
+
+- It is pretty standard to have a help page for your package called "<package>-package". E.g., for our `{forloop}` package we would call it `forloop-package`. Then, if a user wanted to see more about the package, they could look at that help file via `` ?`forloop-package` ``.
+
+- This help file is also where I typically put function imports.
+
+
+- Here is my documentation for my `{ldsep}` package
+    ```{r}
+    #' Linkage Disequilibrium Shrinkage Estimation for Polyploids
+    #'
+    #' Estimate haplotypic or composite pairwise linkage disequilibrium
+    #' (LD) in polyploids, using either genotypes or genotype likelihoods. Support is
+    #' provided to estimate the popular measures of LD: the LD coefficient D,
+    #' the standardized LD coefficient D', and the Pearson correlation
+    #' coefficient r. All estimates are returned with corresponding
+    #' standard errors. These estimates and standard errors can then be used
+    #' for shrinkage estimation.
+    #'
+    #' @section Functions:
+    #'
+    #' The main functions are:
+    #' \describe{
+    #'   \item{\code{\link{ldfast}()}}{Fast, moment-based, bias-corrected LD
+    #'       LD estimates from marginal posterior distributions.}
+    #'   \item{\code{\link{ldest}()}}{Estimates pairwise LD.}
+    #'   \item{\code{\link{mldest}()}}{Iteratively apply \code{\link{ldest}()}
+    #'       across many pairs of SNPs.}
+    #'   \item{\code{\link{sldest}()}}{Iteratively apply \code{\link{ldest}()}
+    #'       along a sliding window of fixed length.}
+    #'   \item{\code{\link{plot.lddf}()}}{Plot method for the output of
+    #'       \code{\link{mldest}()} and \code{\link{sldest}()}.}
+    #'   \item{\code{\link{format_lddf}()}}{Format the output of
+    #'       \code{\link{mldest}()} and \code{\link{sldest}()} into a matrix.}
+    #'   \item{\code{\link{ldshrink}()}}{Shrink correlation estimates
+    #'       using adaptive shrinkage (Stephens, 2017; Dey and Stephens, 2018).}
+    #' }
+    #'
+    #' @section Citation:
+    #' If you find the methods in this package useful, please run the following
+    #' in R for citation information: \code{citation("ldsep")}
+    #'
+    #'
+    #' @importFrom stats var
+    #' @importFrom foreach %dopar%
+    #' @useDynLib ldsep, .registration = TRUE
+    #' @importFrom Rcpp sourceCpp
+    #'
+    #' @docType package
+    #' @name ldsep-package
+    #' @aliases ldsep
+    #'
+    #' @author David Gerard
+    NULL
+    ```
+
+- I use the `@section` tag to make custom sections for (i) the important functions and (ii) how to cite the package. This is not required, but it is a good standard.
+    - The format for this tag is `@section Name:`. Make sure you end the name of the section with a colon.
+
+- `@docType package`: Should be included to show that this is not a function.
+
+- `@name ldsep-package`: Makes it so that if a user types `` ?`ldsep-package` ``, then they will reach this help file.
+
+- `@aliases ldsep`: This makes it so that a user type `?ldsep`, then they will reach this help file as well.
+
+- Just include `NULL` or `"ldsep-package"` below the documentation so that `{roxygen2}` knows to make a help file for it.

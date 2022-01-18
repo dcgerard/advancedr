@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-17" />
+<meta name="date" content="2022-01-18" />
 
 <title>R Packages</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">R Packages</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-17</h4>
+<h4 class="date">2022-01-18</h4>
 
 </div>
 
@@ -391,6 +391,7 @@ $(document).ready(function () {
 <li><a href="#external-data">External data</a></li>
 <li><a href="#internal-data">Internal Data</a></li>
 </ul></li>
+<li><a href="#documenting-a-package">Documenting a Package</a></li>
 </ul>
 </div>
 
@@ -531,7 +532,7 @@ $(document).ready(function () {
 <li><p>I don’t like RStudio projects, so I typically run</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_package</span>(<span class="at">path =</span> <span class="st">&quot;.&quot;</span>, <span class="at">rstudio =</span> <span class="cn">FALSE</span>, <span class="at">open =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>You can use RStudio Projects if you want. But I won’t help with any issues you have with RStudio projects.</p></li>
-<li><p><strong>Exercise</strong>: For this lecture, we will create a simple R package called <code>forloop</code> that reproduces a lot of Base R functions using for-loops. Create a folder called “forloop”, set the working directory to this folder, and run</p>
+<li><p><strong>Example</strong>: For this lecture, we will create a simple R package called <code>forloop</code> that reproduces some Base R functions using for-loops. Create a folder called “forloop”, set the working directory to this folder, and run</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_package</span>(<span class="at">path =</span> <span class="st">&quot;.&quot;</span>, <span class="at">rstudio =</span> <span class="cn">FALSE</span>, <span class="at">open =</span> <span class="cn">FALSE</span>)</span></code></pre></div></li>
 </ul>
 </div>
@@ -557,13 +558,13 @@ $(document).ready(function () {
 <li><p>In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is built. So, for example, if you include the following line of code in your package.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
-<pre><code>## [1] &quot;2022-01-17 09:18:12 EST&quot;</code></pre>
+<pre><code>## [1] &quot;2022-01-18 11:44:52 EST&quot;</code></pre>
 <p>Then <code>x</code> be the time of the package build. If you want the time that a user runs some code, include this statement in a function.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ftime <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">Sys.time</span>())</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ftime</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2022-01-17 09:18:12 EST&quot;</code></pre></li>
+<pre><code>## [1] &quot;2022-01-18 11:44:52 EST&quot;</code></pre></li>
 <li><p>When you alias a function from another package, don’t do</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> pkg<span class="sc">::</span>bar</span></code></pre></div>
 <p>instead, do</p>
@@ -587,6 +588,7 @@ $(document).ready(function () {
 </ul></li>
 <li>Never use <code>Sys.setenv()</code> or <code>Sys.setlocale()</code>.</li>
 </ul></li>
+<li><p><strong>Example</strong>: Let’s work together to build a function called <code>col_means()</code> that will take as input a data frame and return a vector of column means. We will not use the <code>colMeans()</code> function.</p></li>
 <li><p><strong>Exercise</strong>: Create an R script file in your package called “sum.R” via</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_r</span>(<span class="at">name =</span> <span class="st">&quot;sum&quot;</span>)</span></code></pre></div>
 <p>In this file, create a function called <code>sum2()</code> that takes as input a numeric vector <code>x</code> and returns its sum. Use a for-loop to calculate the sum (not the <code>sum()</code> function).</p></li>
@@ -702,6 +704,7 @@ $(document).ready(function () {
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Name 1}{Item 1}</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{Name 2}{Item 2}</span></span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span></code></pre></div></li>
+<li><p><strong>Example</strong>: Let’s work together to document our <code>col_means()</code> function.</p></li>
 <li><p><strong>Exercise</strong>: Document <code>sum2()</code> and <code>count_na()</code>. Make sure to include the following tags <code>@title</code>, <code>@description</code>, <code>@details</code>, <code>@param</code>, <code>@return</code>, <code>@author</code>, and <code>@examples</code>.</p></li>
 <li><p><strong>Exercise</strong>: In the <code>@seealso</code> tag, provide a link to each function. Also provide a link to <code>base::sum()</code>. Use an itemized list.</p></li>
 </ul>
@@ -791,6 +794,7 @@ $(document).ready(function () {
 </ul></li>
 <li><p>Here is a list of nice essays on limiting dependencies: <a href="https://www.tinyverse.org/" class="uri">https://www.tinyverse.org/</a></p></li>
 <li><p>If you do import functions from other packages, put all of those <code>{roxygen2}</code> tags in the same location in one file.</p></li>
+<li><p><strong>Example</strong>: Together, let’s modify our <code>col_means()</code> function to one called <code>col_stats()</code> that also allows for calculating the standard deviation. However, <code>sd()</code> comes from the <code>{stats}</code> package, and so we need to make sure to tell R which package it is from.</p></li>
 <li><p><strong>Exercise</strong>: Instead of using <code>count_na()</code>, you decide to use the <code>n_na()</code> function from the <code>{na.tools}</code> package. Make these edits to your package now.</p></li>
 <li><p><strong>Exercise</strong>: Now import <code>n_na()</code> and remove your use of <code>::</code> from the previous exercise.</p></li>
 </ul>
@@ -952,6 +956,68 @@ $(document).ready(function () {
 <li><p><strong>Exercise</strong>: Save the first 1000 Fibonacci numbers as a vector for internal data. Then create a function called <code>fib1000()</code> that just looks up the <code>n</code>th Fibonacci number from this internal vector.</p></li>
 </ul>
 </div>
+</div>
+<div id="documenting-a-package" class="section level1">
+<h1>Documenting a Package</h1>
+<ul>
+<li><p>It is pretty standard to have a help page for your package called “<package>-package”. E.g., for our <code>{forloop}</code> package we would call it <code>forloop-package</code>. Then, if a user wanted to see more about the package, they could look at that help file via <code>?`forloop-package`</code>.</p></li>
+<li><p>This help file is also where I typically put function imports.</p></li>
+<li><p>Here is my documentation for my <code>{ldsep}</code> package</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Linkage Disequilibrium Shrinkage Estimation for Polyploids</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Estimate haplotypic or composite pairwise linkage disequilibrium</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; (LD) in polyploids, using either genotypes or genotype likelihoods. Support is</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; provided to estimate the popular measures of LD: the LD coefficient D,</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; the standardized LD coefficient D&#39;, and the Pearson correlation</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; coefficient r. All estimates are returned with corresponding</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; standard errors. These estimates and standard errors can then be used</span></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; for shrinkage estimation.</span></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @section Functions:</span></span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; The main functions are:</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; \describe{</span></span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{\code{\link{ldfast}()}}{Fast, moment-based, bias-corrected LD</span></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;       LD estimates from marginal posterior distributions.}</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{\code{\link{ldest}()}}{Estimates pairwise LD.}</span></span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{\code{\link{mldest}()}}{Iteratively apply \code{\link{ldest}()}</span></span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;       across many pairs of SNPs.}</span></span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{\code{\link{sldest}()}}{Iteratively apply \code{\link{ldest}()}</span></span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;       along a sliding window of fixed length.}</span></span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{\code{\link{plot.lddf}()}}{Plot method for the output of</span></span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;       \code{\link{mldest}()} and \code{\link{sldest}()}.}</span></span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{\code{\link{format_lddf}()}}{Format the output of</span></span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;       \code{\link{mldest}()} and \code{\link{sldest}()} into a matrix.}</span></span>
+<span id="cb47-26"><a href="#cb47-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;   \item{\code{\link{ldshrink}()}}{Shrink correlation estimates</span></span>
+<span id="cb47-27"><a href="#cb47-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;       using adaptive shrinkage (Stephens, 2017; Dey and Stephens, 2018).}</span></span>
+<span id="cb47-28"><a href="#cb47-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; }</span></span>
+<span id="cb47-29"><a href="#cb47-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb47-30"><a href="#cb47-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @section Citation:</span></span>
+<span id="cb47-31"><a href="#cb47-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; If you find the methods in this package useful, please run the following</span></span>
+<span id="cb47-32"><a href="#cb47-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; in R for citation information: \code{citation(&quot;ldsep&quot;)}</span></span>
+<span id="cb47-33"><a href="#cb47-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb47-34"><a href="#cb47-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb47-35"><a href="#cb47-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom stats var</span></span>
+<span id="cb47-36"><a href="#cb47-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom foreach %dopar%</span></span>
+<span id="cb47-37"><a href="#cb47-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @useDynLib ldsep, .registration = TRUE</span></span>
+<span id="cb47-38"><a href="#cb47-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom Rcpp sourceCpp</span></span>
+<span id="cb47-39"><a href="#cb47-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb47-40"><a href="#cb47-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @docType package</span></span>
+<span id="cb47-41"><a href="#cb47-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @name ldsep-package</span></span>
+<span id="cb47-42"><a href="#cb47-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @aliases ldsep</span></span>
+<span id="cb47-43"><a href="#cb47-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb47-44"><a href="#cb47-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @author David Gerard</span></span>
+<span id="cb47-45"><a href="#cb47-45" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div>
+<pre><code>## NULL</code></pre></li>
+<li><p>I use the <code>@section</code> tag to make custom sections for (i) the important functions and (ii) how to cite the package. This is not required, but it is a good standard.</p>
+<ul>
+<li>The format for this tag is <code>@section Name:</code>. Make sure you end the name of the section with a colon.</li>
+</ul></li>
+<li><p><code>@docType package</code>: Should be included to show that this is not a function.</p></li>
+<li><p><code>@name ldsep-package</code>: Makes it so that if a user types <code>?`ldsep-package`</code>, then they will reach this help file.</p></li>
+<li><p><code>@aliases ldsep</code>: This makes it so that a user type <code>?ldsep</code>, then they will reach this help file as well.</p></li>
+<li><p>Just include <code>NULL</code> or <code>"ldsep-package"</code> below the documentation so that <code>{roxygen2}</code> knows to make a help file for it.</p></li>
+</ul>
 </div>
 
 <!DOCTYPE html>
