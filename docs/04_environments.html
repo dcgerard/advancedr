@@ -366,6 +366,7 @@ $(document).ready(function () {
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#environment-basics">Environment Basics</a></li>
+<li><a href="#parents">Parents</a></li>
 <li><a href="#new-functions">New Functions</a></li>
 </ul>
 </div>
@@ -405,11 +406,105 @@ $(document).ready(function () {
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">d =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span></code></pre></div></li>
 <li><p>Environments associate names to values without any particular order. Hadley draws them like this:</p>
 <p><img src="04_figs_env/bindings.png" alt="Environment Bindings" width="40%"/></p></li>
-<li><p>Environments</p></li>
+<li><p>Environments have “reference semantics”, which means that they modify-in-place.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>e2 <span class="ot">&lt;-</span> e1</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>e2<span class="sc">$</span>d <span class="ot">&lt;-</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">6</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>e1<span class="sc">$</span>d</span></code></pre></div>
+<pre><code>## [1] 4 5 6</code></pre></li>
+<li><p>One by-product is that an environemnt can contain itself.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>e1<span class="sc">$</span>d <span class="ot">&lt;-</span> e1</span></code></pre></div>
+<p><img src="04_figs_env/loop.png" alt="Environment containing itself" width="40%"/></p></li>
+<li><p>Printing an environment just shows its address</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>e1</span></code></pre></div>
+<pre><code>## &lt;environment: 0x5589a9280df8&gt;</code></pre></li>
+<li><p>To print the objects of an environment, use <code>rlang::env_print()</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_print</span>(e1)</span></code></pre></div>
+<pre><code>## &lt;environment: 0x5589a9280df8&gt;
+## parent: &lt;environment: global&gt;
+## bindings:
+##  * a: &lt;lgl&gt;
+##  * b: &lt;chr&gt;
+##  * c: &lt;dbl&gt;
+##  * d: &lt;env&gt;</code></pre></li>
+<li><p>Use <code>rlang::env_names()</code> to get a character vector with names.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_names</span>(e1)</span></code></pre></div>
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot;</code></pre></li>
+<li><p>The current environment is the environment in which the code is currently being executed (where R looks for names). Use <code>rlang::current_env()</code> to get the current environment.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ce <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">current_env</span>()</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(ce)</span></code></pre></div>
+<pre><code>## [1] &quot;environment&quot;</code></pre></li>
+<li><p>The global environment is the environment where you interactively use R. You can access it with <code>rlang::global_env()</code></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>gl <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">global_env</span>()</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(gl)</span></code></pre></div>
+<pre><code>## [1] &quot;environment&quot;</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env_print</span>(gl)</span></code></pre></div>
+<pre><code>## &lt;environment: global&gt;
+## parent: &lt;environment: package:rlang&gt;
+## bindings:
+##  * ce: &lt;env&gt;
+##  * e1: &lt;env&gt;
+##  * e2: &lt;env&gt;
+##  * gl: &lt;env&gt;
+##  * q: &lt;fn&gt;</code></pre></li>
+<li><p>We can see that the current environment is the global environment with <code>identical()</code></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(gl, ce)</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre></li>
+<li><p>You should not use <code>==</code>. This is since <code>==</code> is expecting to be used on a vector, and an environment is not a vector.</p></li>
+</ul>
+</div>
+<div id="parents" class="section level1">
+<h1>Parents</h1>
+<ul>
+<li><p>Every environment has a <strong>parent</strong>. If a name is not found in the current environment then it is searched for in the parent. This is how lexical scoping operates in R.</p></li>
+<li><p><code>rlang::env()</code> actually creates a <strong>child</strong> environment. You can either supply the parent or it assumes the parent is the current environment.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>e2a <span class="ot">&lt;-</span> <span class="fu">env</span>(<span class="at">d =</span> <span class="dv">4</span>, <span class="at">e =</span> <span class="dv">5</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>e2b <span class="ot">&lt;-</span> <span class="fu">env</span>(e2a, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">b =</span> <span class="dv">2</span>, <span class="at">c =</span> <span class="dv">3</span>)</span></code></pre></div>
+<p><img src="04_figs_env/parents.png" alt="parent environments" width="40%"/></p></li>
+<li><p>In the above diagram, the pale blue dot represents a pointer to the parent. The left box is the child and the right box is the parent.</p></li>
+<li><p><code>rlang::env_parent()</code> gives you the parent.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env_parent</span>(e2b)</span></code></pre></div>
+<pre><code>## &lt;environment: 0x5589ad55a158&gt;</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>e2a</span></code></pre></div>
+<pre><code>## &lt;environment: 0x5589ad55a158&gt;</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env_parent</span>(e2a)</span></code></pre></div>
+<pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre></li>
+<li><p>Every environment has as an ancestor the empty environment, which has no parent. You can access it with <code>rlang::empty_env()</code></p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>em <span class="ot">&lt;-</span> <span class="fu">empty_env</span>()</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_print</span>(em)</span></code></pre></div>
+<pre><code>## &lt;environment: empty&gt;
+## parent: NULL</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_parents</span>(em)</span></code></pre></div>
+<pre><code>## list()</code></pre></li>
+<li><p>We can make children of the empty environment with</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>e2c <span class="ot">&lt;-</span> <span class="fu">env</span>(<span class="fu">empty_env</span>(), <span class="at">d =</span> <span class="dv">4</span>, <span class="at">e =</span> <span class="dv">5</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>e2d <span class="ot">&lt;-</span> <span class="fu">env</span>(e2c, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">b =</span> <span class="dv">2</span>, <span class="at">c =</span> <span class="dv">3</span>)</span></code></pre></div>
+<p><img src="04_figs_env/parents-empty.png" alt="parent environment is now empty" width="40%"/></p></li>
+<li><p>Your global environment has the empty environment as the progentor.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_parents</span>(rlang<span class="sc">::</span><span class="fu">global_env</span>())</span></code></pre></div>
+<pre><code>##  [[1]] $ &lt;env: package:rlang&gt;
+##  [[2]] $ &lt;env: package:stats&gt;
+##  [[3]] $ &lt;env: package:graphics&gt;
+##  [[4]] $ &lt;env: package:grDevices&gt;
+##  [[5]] $ &lt;env: package:utils&gt;
+##  [[6]] $ &lt;env: package:datasets&gt;
+##  [[7]] $ &lt;env: package:methods&gt;
+##  [[8]] $ &lt;env: Autoloads&gt;
+##  [[9]] $ &lt;env: package:base&gt;
+## [[10]] $ &lt;env: empty&gt;</code></pre></li>
 </ul>
 </div>
 <div id="new-functions" class="section level1">
 <h1>New Functions</h1>
+<ul>
+<li><code>rlang::env()</code>: Create a new child environment.</li>
+<li><code>rlang::env_print()</code>: Print an environment’s bindings.</li>
+<li><code>rlang::env_names()</code>: Print names in an environment.</li>
+<li><code>rlang::env_parent()</code>: Print the parent of an environment.</li>
+<li><code>rlang::current_env()</code>: Access current environment.</li>
+<li><code>rlang::global_env()</code>: Access global environment.</li>
+<li><code>rlang::empty_env()</code>: Access the empty environment.</li>
+<li><code>identical()</code>: Check if two objects are exactly equal.</li>
+</ul>
 </div>
 
 <!DOCTYPE html>

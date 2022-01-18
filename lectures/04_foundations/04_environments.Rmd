@@ -31,13 +31,18 @@ klippy::klippy()
 
 # Environment Basics
 
-- Hadley made a really great package for handling environments called `{rlang}`. It's way better than the base R functionality.
+- Hadley and colleagues made a really great package that, among other things, allows for handling environments: `{rlang}`. It's way better than the base R functionality.
 
     ```{r}
     library(rlang)
     ```
 
 - An **environment** is a fundamental data object in R that determines lexical scoping --- i.e. they determine when a name is bound to an object.
+
+- Motivations:
+    - Environments are used to make functions self-contained.
+    - Environments are used to separate functions of the same name in different packages.
+    - Environments are used in some object oriented programming aspects of R.
 
 - An environment is like a list, except:
     - Everyname must be unique (lists can have multiple elements of the same name).
@@ -58,7 +63,208 @@ klippy::klippy()
 
     <img src="./04_figs_env/bindings.png" alt="Environment Bindings" width="40%"/>
     
-- Environments
+- Environments have "reference semantics", which means that they modify-in-place.
 
+    ```{r}
+    e2 <- e1
+    e2$d <- 4:6
+    e1$d
+    ```
+
+- One by-product is that an environemnt can contain itself.
+    ```{r}
+    e1$d <- e1
+    ```
+
+    <img src="./04_figs_env/loop.png" alt="Environment containing itself" width="40%"/>
+
+- Printing an environment just shows its address
+    ```{r}
+    e1
+    ```
+
+- To print the objects of an environment, use `rlang::env_print()`.
+
+    ```{r}
+    rlang::env_print(e1)
+    ```
+
+- Use `rlang::env_names()` to get a character vector with names.
+
+    ```{r}
+    rlang::env_names(e1)
+    ```
+
+- The current environment is the environment in which the code is currently being executed (where R looks for names). Use `rlang::current_env()` to get the current environment.
+
+    ```{r}
+    ce <- rlang::current_env()
+    typeof(ce)
+    ```
+
+- The global environment is the environment where you interactively use R. You can access it with `rlang::global_env()`
+
+    ```{r}
+    gl <- rlang::global_env()
+    typeof(gl)
+    env_print(gl)
+    ```
+    
+- We can see that the current environment is the global environment with `identical()`
+
+    ```{r}
+    identical(gl, ce)
+    ```
+
+- You should not use `==`. This is since `==` is expecting to be used on a vector, and an environment is not a vector.
+
+# Parents
+
+- Every environment has a **parent**. If a name is not found in the current environment then it is searched for in the parent. This is how lexical scoping operates in R.
+
+- `rlang::env()` actually creates a **child** environment. You can either supply the parent or it assumes the parent is the current environment.
+
+    ```{r}
+    e2a <- env(d = 4, e = 5)
+    e2b <- env(e2a, a = 1, b = 2, c = 3)
+    ```
+
+    <img src="./04_figs_env/parents.png" alt="parent environments" width="40%"/>
+    
+- In the above diagram, the pale blue dot represents a pointer to the parent. The left box is the child and the right box is the parent.
+
+- `rlang::env_parent()` gives you the parent.
+    ```{r}
+    env_parent(e2b)
+    e2a
+    env_parent(e2a)
+    ```
+    
+- Every environment has as an ancestor the empty environment, which has no parent. You can access it with `rlang::empty_env()`
+    ```{r}
+    em <- empty_env()
+    rlang::env_print(em)
+    rlang::env_parents(em)
+    ```
+    
+- We can make children of the empty environment with
+    ```{r}
+    e2c <- env(empty_env(), d = 4, e = 5)
+    e2d <- env(e2c, a = 1, b = 2, c = 3)
+    ```
+
+    <img src="./04_figs_env/parents-empty.png" alt="parent environment is now empty" width="40%"/>
+
+- Your global environment has the empty environment as the progentor.
+    ```{r}
+    rlang::env_parents(rlang::global_env())
+    ```
+    
+- The ancestors of the global environment are all of the attached packages that ultimately terminate in the empty environment. So `env_parents()` will stop at the global environment by default.
+
+```{r}
+et <- rlang::env(x = 1:3)
+rlang::env_parents(et)
+rlang::env_parents(et, last = rlang::empty_env())
+```
+
+# Super Assignmennt `<<-`
+
+- Regular assignment `<-` creates a variable in the current environment.
+
+- Super assignment `<<-` modifies an existing variable found in the parent environment. If no such variable exists, it creates one in the global environment.
+
+    ```{r}
+    x <- 0
+    f <- function() {
+      x <<- 1
+    }
+    f()
+    x
+    ```
+    
+- Most of the time, it is not a good idea to use super assignment. Global variables are vary dangerous. We'll talk about one good application of them in Chapter 10.
+
+- Get and set values from an environment the same way as from a list.
+
+    ```{r}
+    e3 <- env(x = 1, y = 2)
+    e3$x
+    e3[["x"]]
+    ```
+
+- Because environments are unordered, integer subsetting does not work
+    ```{r, error = TRUE}
+    e3[[1]]
+    ```
+
+- Because environments are not vectors, you cannot use sing brackets `[]`, so you cannot get more than one element.
+    ```{r, error = TRUE}
+    e3["x"]
+    e3[c("x", "y")]
+    ```
+
+- You get `NULL` if a variable is not in an environment, just like a list:
+    ```{r}
+    e3$z
+    ```
+
+- Test if an environment has a binding with `rlang::env_has()`
+    ```{r}
+    rlang::env_has(e3, "x")
+    rlang::env_has(e3, "z")
+    ```
+    
+    
+- Unlike a list, you do not remove elements by assigning them to `NULL`, because the name refers to `NULL`.
+
+    ```{r}
+    e3$a <- 10
+    e3$a <- NULL
+    e3$a
+    rlang::env_has(e3, "a")
+    ```
+    
+- Use `rlang::env_unbind()` to remove an object.
+
+    ```{r}
+    rlang::env_unbind(e3, "a")
+    rlang::env_has(e3, "a")
+    ```
+
+
+
+
+# Example Application
+
+- `stats::numericDeriv()` numerically evaluates the gradient of an expression at some value. It assumes that the evaluation occurs within some environment you provide.
+
+- Let's calculate the gradient of $x^y$ evaluated at $x = 3$.
+    ```{r}
+    myenv <- rlang::env(x = 3, y = 2)
+    numericDeriv(expr = rlang::expr(x ^ y), theta = "x", rho = myenv)
+    ```
+
+- From calculus, we know that the derivative of $x^2$ is $2x$, and so the gradient evaluated at $x = 3$ should be $2\times 3 = 6$.
+
+- `rlang::expr()` is discussed in Chapter 19. Basically, it captures an expression without evaluating it. This is called "quoting". We can then evaluate that expression with `eval()`. 
+    ```{r}
+    rlang::expr(x^2) 
+    rlang::expr(x^2) |> eval(envir = myenv)
+    rlang::expr(sum(c(1, 2, 3)))
+    rlang::expr(sum(c(1, 2, 3))) |> eval(envir = rlang::global_env())
+    ```
 
 # New Functions
+
+- `rlang::env()`: Create a new child environment.
+- `rlang::env_print()`: Print an environment's bindings.
+- `rlang::env_names()`: Print names in an environment.
+- `rlang::env_parent()`: Print the parent of an environment.
+- `rlang::env_has()`: Test if an environment has a binding.
+- `rlang::current_env()`: Access current environment.
+- `rlang::env_bind()`: Add objects to an environment.
+- `rlang::env_unbind()`: Remove objects from an environment.
+- `rlang::global_env()`: Access global environment.
+- `rlang::empty_env()`: Access the empty environment.
+- `identical()`: Check if two objects are exactly equal.
