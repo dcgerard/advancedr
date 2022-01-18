@@ -232,10 +232,107 @@ rlang::env_parents(et, last = rlang::empty_env())
     rlang::env_has(e3, "a")
     ```
 
+# Hadley's Advanced R Exercises
 
+1. Create an environment as illustrated by this picture.
 
+    <img src="./04_figs_env/recursive-1.png" alt="recursive" width="40%"/>
 
-# Example Application
+    ```{r, eval = FALSE, echo = FALSE}
+    loop <- rlang::env()
+    loop$loop <- loop
+    identical(loop$loop, loop)
+    ```
+
+2. Create a pair of environments as illustrated by this picture.
+
+    <img src="./04_figs_env/recursive-2.png" alt="recursive" width="40%"/>
+    
+    ```{r, eval = FALSE, echo =  FALSE}
+    loop <- rlang::env()
+    dedoop <- rlang::env()
+    dedoop$loop <- loop
+    loop$dedoop <- dedoop
+    identical(dedoop, loop$dedoop)
+    identical(loop, dedoop$loop)
+    ```
+    
+# Loop through environments
+
+- Sometimes, you want to look through all of the ancestor environments to find an object, or for exploration. Here is an example where we count how many objects are in each ancestral environment.
+
+    ```{r}
+    count_env <- function(base_env = rlang::caller_env(), 
+                          end_env = rlang::empty_env()) {
+      nenv <- length(rlang::env_parents(env = base_env, last = end_env))
+      obj_num <- rep(NA_real_, length.out = nenv)
+      env <- base_env
+      for(i in seq_len(nenv)) {
+        obj_num[[i]] <- length(env)
+        names(obj_num)[[i]] <- rlang::env_name(env)
+        env <- rlang::env_parent(env)
+      }
+      return(obj_num)
+    }
+    count_env()
+    ```
+
+- The caller environment is the environment of the function that called the current function. See below.
+    
+# Special Environments
+
+- Most environments are created by R, not by you. Let's talk about these.
+
+## Package environments.
+
+- Each package attached by `library()` creates an package environment that becomes an ancestor of the global environment. They are parents in the order that you attached them.
+
+    <img src="./04_figs_env/search-path.png" alt="recursive" width="70%"/>
+
+- This order is called the **search path** because variable names are searched in that order. You can see the search path with `rlang::search_envs()`.
+
+    ```{r}
+    rlang::search_envs()
+    ```
+    
+- So if I try to evaluate a variable/function name, then it will first search for it in the global environment, then in the `{rlang}` package environment, then in the `{stats}` package environment, etc...
+
+- Attaching a new package with `library()` makes that package the immediate parent of the global environment.
+    ```{r, eval = FALSE}
+    library(d)
+    ```
+    
+    <img src="./04_figs_env/search-path-2.png" alt="recursive" width="70%"/>
+
+## Function Environment
+
+- The **function environment** is the environment where the function finds its variables. This is the current environment when the function is created.
+
+- You can see the function environment via `rlang::fn_env()`
+
+    ```{r}
+    rlang::fn_env(base::sum)
+    ```
+
+- This may or may not be different from the environment where the name is bound to the function. This is called the **binding environment** of the function.
+
+- In many cases, the function environment is the same as the binding environment. Below, the name `f` in the global environment is bound to the function (binding environment), and the function is bound to the global environment (function environment):
+
+    <img src="./04_figs_env/binding.png" alt="recursive" width="40%"/>
+
+- Below, the name `g` in the `e` environment was created in the global environment. So the function envrionment is the global environment, but the name `g` is in the `e` environment.
+
+    ```{r}
+    e <- rlang::env()
+    e$g <- function() 1
+    ```
+
+    <img src="./04_figs_env/binding-2.png" alt="recursive" width="40%"/>
+
+    
+# Applications
+
+## Numeric Derivatives
 
 - `stats::numericDeriv()` numerically evaluates the gradient of an expression at some value. It assumes that the evaluation occurs within some environment you provide.
 
@@ -255,6 +352,52 @@ rlang::env_parents(et, last = rlang::empty_env())
     rlang::expr(sum(c(1, 2, 3))) |> eval(envir = rlang::global_env())
     ```
 
+## Managing State
+
+- An R package cannot alter the global environment. 
+
+- Objects in packages are locked, so cannot be changed.
+
+- Say you want to keep track of whether or not a function was run (e.g. to write a message on first use). I have done this to (i) say that a function is defunct or (ii) list out special licenses that cover a method.
+
+- One way you could keep track of this is to use superassign in a function that will change the value of a logical in the package environment.
+
+    ```{r}
+    ran_fun <- FALSE ## Global variable
+    fun <- function() {
+      if (!ran_fun) {
+        message("Here is a message")
+        ran_fun <<- FALSE ## this alters package environment
+      }
+    }
+    fun()
+    fun()
+    ```
+
+- What I think is better is having an environment specific to messages, that way you have to worry less about global variables.
+
+    ```{r}
+    menv <- rlang::env(ran_fun = FALSE)
+    fun <- function() {
+      if (!menv$ran_fun) {
+        message("Here is a message")
+        menv$ran_fun <- TRUE
+      }
+    }
+    fun()
+    fun()
+    ```
+    
+- This functionality is very popular, so `{rlang}` has a function dedicated to it.
+
+    ```{r}
+    fun <- function() {
+      rlang::warn("Here is a message", .frequency = "once", .frequency_id = "ran_fun")
+    }
+    fun()
+    fun()
+    ```
+
 # New Functions
 
 - `rlang::env()`: Create a new child environment.
@@ -267,4 +410,5 @@ rlang::env_parents(et, last = rlang::empty_env())
 - `rlang::env_unbind()`: Remove objects from an environment.
 - `rlang::global_env()`: Access global environment.
 - `rlang::empty_env()`: Access the empty environment.
+- `rlang::search_envs()`: Show the search path.
 - `identical()`: Check if two objects are exactly equal.

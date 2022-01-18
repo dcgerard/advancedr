@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-17" />
+<meta name="date" content="2022-01-18" />
 
 <title>Environments</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Environments</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-17</h4>
+<h4 class="date">2022-01-18</h4>
 
 </div>
 
@@ -367,6 +367,19 @@ $(document).ready(function () {
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#environment-basics">Environment Basics</a></li>
 <li><a href="#parents">Parents</a></li>
+<li><a href="#super-assignmennt--">Super Assignmennt <code>&lt;&lt;-</code></a></li>
+<li><a href="#hadleys-advanced-r-exercises">Hadley’s Advanced R Exercises</a></li>
+<li><a href="#loop-through-environments">Loop through environments</a></li>
+<li><a href="#special-environments">Special Environments</a>
+<ul>
+<li><a href="#package-environments.">Package environments.</a></li>
+<li><a href="#function-environment">Function Environment</a></li>
+</ul></li>
+<li><a href="#applications">Applications</a>
+<ul>
+<li><a href="#numeric-derivatives">Numeric Derivatives</a></li>
+<li><a href="#managing-state">Managing State</a></li>
+</ul></li>
 <li><a href="#new-functions">New Functions</a></li>
 </ul>
 </div>
@@ -389,9 +402,15 @@ $(document).ready(function () {
 <div id="environment-basics" class="section level1">
 <h1>Environment Basics</h1>
 <ul>
-<li><p>Hadley made a really great package for handling environments called <code>{rlang}</code>. It’s way better than the base R functionality.</p>
+<li><p>Hadley and colleagues made a really great package that, among other things, allows for handling environments: <code>{rlang}</code>. It’s way better than the base R functionality.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rlang)</span></code></pre></div></li>
 <li><p>An <strong>environment</strong> is a fundamental data object in R that determines lexical scoping — i.e. they determine when a name is bound to an object.</p></li>
+<li><p>Motivations:</p>
+<ul>
+<li>Environments are used to make functions self-contained.</li>
+<li>Environments are used to separate functions of the same name in different packages.</li>
+<li>Environments are used in some object oriented programming aspects of R.</li>
+</ul></li>
 <li><p>An environment is like a list, except:</p>
 <ul>
 <li>Everyname must be unique (lists can have multiple elements of the same name).</li>
@@ -416,10 +435,10 @@ $(document).ready(function () {
 <p><img src="04_figs_env/loop.png" alt="Environment containing itself" width="40%"/></p></li>
 <li><p>Printing an environment just shows its address</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>e1</span></code></pre></div>
-<pre><code>## &lt;environment: 0x5589a9280df8&gt;</code></pre></li>
+<pre><code>## &lt;environment: 0x55ee0fb0cdd0&gt;</code></pre></li>
 <li><p>To print the objects of an environment, use <code>rlang::env_print()</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_print</span>(e1)</span></code></pre></div>
-<pre><code>## &lt;environment: 0x5589a9280df8&gt;
+<pre><code>## &lt;environment: 0x55ee0fb0cdd0&gt;
 ## parent: &lt;environment: global&gt;
 ## bindings:
 ##  * a: &lt;lgl&gt;
@@ -463,9 +482,9 @@ $(document).ready(function () {
 <li><p>In the above diagram, the pale blue dot represents a pointer to the parent. The left box is the child and the right box is the parent.</p></li>
 <li><p><code>rlang::env_parent()</code> gives you the parent.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env_parent</span>(e2b)</span></code></pre></div>
-<pre><code>## &lt;environment: 0x5589ad55a158&gt;</code></pre>
+<pre><code>## &lt;environment: 0x55ee12060b08&gt;</code></pre>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>e2a</span></code></pre></div>
-<pre><code>## &lt;environment: 0x5589ad55a158&gt;</code></pre>
+<pre><code>## &lt;environment: 0x55ee12060b08&gt;</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env_parent</span>(e2a)</span></code></pre></div>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre></li>
 <li><p>Every environment has as an ancestor the empty environment, which has no parent. You can access it with <code>rlang::empty_env()</code></p>
@@ -491,7 +510,220 @@ $(document).ready(function () {
 ##  [[8]] $ &lt;env: Autoloads&gt;
 ##  [[9]] $ &lt;env: package:base&gt;
 ## [[10]] $ &lt;env: empty&gt;</code></pre></li>
+<li><p>The ancestors of the global environment are all of the attached packages that ultimately terminate in the empty environment. So <code>env_parents()</code> will stop at the global environment by default.</p></li>
 </ul>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>et <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_parents</span>(et)</span></code></pre></div>
+<pre><code>## [[1]] $ &lt;env: global&gt;</code></pre>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_parents</span>(et, <span class="at">last =</span> rlang<span class="sc">::</span><span class="fu">empty_env</span>())</span></code></pre></div>
+<pre><code>##  [[1]] $ &lt;env: global&gt;
+##  [[2]] $ &lt;env: package:rlang&gt;
+##  [[3]] $ &lt;env: package:stats&gt;
+##  [[4]] $ &lt;env: package:graphics&gt;
+##  [[5]] $ &lt;env: package:grDevices&gt;
+##  [[6]] $ &lt;env: package:utils&gt;
+##  [[7]] $ &lt;env: package:datasets&gt;
+##  [[8]] $ &lt;env: package:methods&gt;
+##  [[9]] $ &lt;env: Autoloads&gt;
+## [[10]] $ &lt;env: package:base&gt;
+## [[11]] $ &lt;env: empty&gt;</code></pre>
+</div>
+<div id="super-assignmennt--" class="section level1">
+<h1>Super Assignmennt <code>&lt;&lt;-</code></h1>
+<ul>
+<li><p>Regular assignment <code>&lt;-</code> creates a variable in the current environment.</p></li>
+<li><p>Super assignment <code>&lt;&lt;-</code> modifies an existing variable found in the parent environment. If no such variable exists, it creates one in the global environment.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;&lt;-</span> <span class="dv">1</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>()</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>## [1] 1</code></pre></li>
+<li><p>Most of the time, it is not a good idea to use super assignment. Global variables are vary dangerous. We’ll talk about one good application of them in Chapter 10.</p></li>
+<li><p>Get and set values from an environment the same way as from a list.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>e3 <span class="ot">&lt;-</span> <span class="fu">env</span>(<span class="at">x =</span> <span class="dv">1</span>, <span class="at">y =</span> <span class="dv">2</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>e3<span class="sc">$</span>x</span></code></pre></div>
+<pre><code>## [1] 1</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>e3[[<span class="st">&quot;x&quot;</span>]]</span></code></pre></div>
+<pre><code>## [1] 1</code></pre></li>
+<li><p>Because environments are unordered, integer subsetting does not work</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>e3[[<span class="dv">1</span>]]</span></code></pre></div>
+<pre><code>## Error in e3[[1]]: wrong arguments for subsetting an environment</code></pre></li>
+<li><p>Because environments are not vectors, you cannot use sing brackets <code>[]</code>, so you cannot get more than one element.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>e3[<span class="st">&quot;x&quot;</span>]</span></code></pre></div>
+<pre><code>## Error in e3[&quot;x&quot;]: object of type &#39;environment&#39; is not subsettable</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>e3[<span class="fu">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>)]</span></code></pre></div>
+<pre><code>## Error in e3[c(&quot;x&quot;, &quot;y&quot;)]: object of type &#39;environment&#39; is not subsettable</code></pre></li>
+<li><p>You get <code>NULL</code> if a variable is not in an environment, just like a list:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>e3<span class="sc">$</span>z</span></code></pre></div>
+<pre><code>## NULL</code></pre></li>
+<li><p>Test if an environment has a binding with <code>rlang::env_has()</code></p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_has</span>(e3, <span class="st">&quot;x&quot;</span>)</span></code></pre></div>
+<pre><code>##    x 
+## TRUE</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_has</span>(e3, <span class="st">&quot;z&quot;</span>)</span></code></pre></div>
+<pre><code>##     z 
+## FALSE</code></pre></li>
+<li><p>Unlike a list, you do not remove elements by assigning them to <code>NULL</code>, because the name refers to <code>NULL</code>.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>e3<span class="sc">$</span>a <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>e3<span class="sc">$</span>a <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>e3<span class="sc">$</span>a</span></code></pre></div>
+<pre><code>## NULL</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_has</span>(e3, <span class="st">&quot;a&quot;</span>)</span></code></pre></div>
+<pre><code>##    a 
+## TRUE</code></pre></li>
+<li><p>Use <code>rlang::env_unbind()</code> to remove an object.</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_unbind</span>(e3, <span class="st">&quot;a&quot;</span>)</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_has</span>(e3, <span class="st">&quot;a&quot;</span>)</span></code></pre></div>
+<pre><code>##     a 
+## FALSE</code></pre></li>
+</ul>
+</div>
+<div id="hadleys-advanced-r-exercises" class="section level1">
+<h1>Hadley’s Advanced R Exercises</h1>
+<ol style="list-style-type: decimal">
+<li><p>Create an environment as illustrated by this picture.</p>
+<p><img src="04_figs_env/recursive-1.png" alt="recursive" width="40%"/></p></li>
+<li><p>Create a pair of environments as illustrated by this picture.</p>
+<p><img src="04_figs_env/recursive-2.png" alt="recursive" width="40%"/></p></li>
+</ol>
+</div>
+<div id="loop-through-environments" class="section level1">
+<h1>Loop through environments</h1>
+<ul>
+<li><p>Sometimes, you want to look through all of the ancestor environments to find an object, or for exploration. Here is an example where we count how many objects are in each ancestral environment.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>count_env <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">base_env =</span> rlang<span class="sc">::</span><span class="fu">caller_env</span>(), </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">end_env =</span> rlang<span class="sc">::</span><span class="fu">empty_env</span>()) {</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  nenv <span class="ot">&lt;-</span> <span class="fu">length</span>(rlang<span class="sc">::</span><span class="fu">env_parents</span>(<span class="at">env =</span> base_env, <span class="at">last =</span> end_env))</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  obj_num <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA_real_</span>, <span class="at">length.out =</span> nenv)</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>  env <span class="ot">&lt;-</span> base_env</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="fu">seq_len</span>(nenv)) {</span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>    obj_num[[i]] <span class="ot">&lt;-</span> <span class="fu">length</span>(env)</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(obj_num)[[i]] <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env_name</span>(env)</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>    env <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env_parent</span>(env)</span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(obj_num)</span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a><span class="fu">count_env</span>()</span></code></pre></div>
+<pre><code>##            global     package:rlang     package:stats  package:graphics 
+##                15               478               456                88 
+## package:grDevices     package:utils  package:datasets   package:methods 
+##               119               221               104               371 
+##         Autoloads      package:base 
+##                 1              1370</code></pre></li>
+<li><p>The caller environment is the environment of the function that called the current function. See below.</p></li>
+</ul>
+</div>
+<div id="special-environments" class="section level1">
+<h1>Special Environments</h1>
+<ul>
+<li>Most environments are created by R, not by you. Let’s talk about these.</li>
+</ul>
+<div id="package-environments." class="section level2">
+<h2>Package environments.</h2>
+<ul>
+<li><p>Each package attached by <code>library()</code> creates an package environment that becomes an ancestor of the global environment. They are parents in the order that you attached them.</p>
+<p><img src="04_figs_env/search-path.png" alt="recursive" width="70%"/></p></li>
+<li><p>This order is called the <strong>search path</strong> because variable names are searched in that order. You can see the search path with <code>rlang::search_envs()</code>.</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">search_envs</span>()</span></code></pre></div>
+<pre><code>##  [[1]] $ &lt;env: global&gt;
+##  [[2]] $ &lt;env: package:rlang&gt;
+##  [[3]] $ &lt;env: package:stats&gt;
+##  [[4]] $ &lt;env: package:graphics&gt;
+##  [[5]] $ &lt;env: package:grDevices&gt;
+##  [[6]] $ &lt;env: package:utils&gt;
+##  [[7]] $ &lt;env: package:datasets&gt;
+##  [[8]] $ &lt;env: package:methods&gt;
+##  [[9]] $ &lt;env: Autoloads&gt;
+## [[10]] $ &lt;env: package:base&gt;</code></pre></li>
+<li><p>So if I try to evaluate a variable/function name, then it will first search for it in the global environment, then in the <code>{rlang}</code> package environment, then in the <code>{stats}</code> package environment, etc…</p></li>
+<li><p>Attaching a new package with <code>library()</code> makes that package the immediate parent of the global environment.</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(d)</span></code></pre></div>
+<p><img src="04_figs_env/search-path-2.png" alt="recursive" width="70%"/></p></li>
+</ul>
+</div>
+<div id="function-environment" class="section level2">
+<h2>Function Environment</h2>
+<ul>
+<li><p>The <strong>function environment</strong> is the environment where the function finds its variables. This is the current environment when the function is created.</p></li>
+<li><p>You can see the function environment via <code>rlang::fn_env()</code></p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">fn_env</span>(base<span class="sc">::</span>sum)</span></code></pre></div>
+<pre><code>## &lt;environment: namespace:base&gt;</code></pre></li>
+<li><p>This may or may not be different from the environment where the name is bound to the function. This is called the <strong>binding environment</strong> of the function.</p></li>
+<li><p>In many cases, the function environment is the same as the binding environment. Below, the name <code>f</code> in the global environment is bound to the function (binding environment), and the function is bound to the global environment (function environment):</p>
+<p><img src="04_figs_env/binding.png" alt="recursive" width="40%"/></p></li>
+<li><p>Below, the name <code>g</code> in the <code>e</code> environment was created in the global environment. So the function envrionment is the global environment, but the name <code>g</code> is in the <code>e</code> environment.</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env</span>()</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>e<span class="sc">$</span>g <span class="ot">&lt;-</span> <span class="cf">function</span>() <span class="dv">1</span></span></code></pre></div>
+<p><img src="04_figs_env/binding-2.png" alt="recursive" width="40%"/></p></li>
+</ul>
+</div>
+</div>
+<div id="applications" class="section level1">
+<h1>Applications</h1>
+<div id="numeric-derivatives" class="section level2">
+<h2>Numeric Derivatives</h2>
+<ul>
+<li><p><code>stats::numericDeriv()</code> numerically evaluates the gradient of an expression at some value. It assumes that the evaluation occurs within some environment you provide.</p></li>
+<li><p>Let’s calculate the gradient of <span class="math inline">\(x^y\)</span> evaluated at <span class="math inline">\(x = 3\)</span>.</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>myenv <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env</span>(<span class="at">x =</span> <span class="dv">3</span>, <span class="at">y =</span> <span class="dv">2</span>)</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a><span class="fu">numericDeriv</span>(<span class="at">expr =</span> rlang<span class="sc">::</span><span class="fu">expr</span>(x <span class="sc">^</span> y), <span class="at">theta =</span> <span class="st">&quot;x&quot;</span>, <span class="at">rho =</span> myenv)</span></code></pre></div>
+<pre><code>## [1] 9
+## attr(,&quot;gradient&quot;)
+##      [,1]
+## [1,]    6</code></pre></li>
+<li><p>From calculus, we know that the derivative of <span class="math inline">\(x^2\)</span> is <span class="math inline">\(2x\)</span>, and so the gradient evaluated at <span class="math inline">\(x = 3\)</span> should be <span class="math inline">\(2\times 3 = 6\)</span>.</p></li>
+<li><p><code>rlang::expr()</code> is discussed in Chapter 19. Basically, it captures an expression without evaluating it. This is called “quoting”. We can then evaluate that expression with <code>eval()</code>.</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(x<span class="sc">^</span><span class="dv">2</span>) </span></code></pre></div>
+<pre><code>## x^2</code></pre>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(x<span class="sc">^</span><span class="dv">2</span>) <span class="sc">|&gt;</span> <span class="fu">eval</span>(<span class="at">envir =</span> myenv)</span></code></pre></div>
+<pre><code>## [1] 9</code></pre>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">sum</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)))</span></code></pre></div>
+<pre><code>## sum(c(1, 2, 3))</code></pre>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">sum</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))) <span class="sc">|&gt;</span> <span class="fu">eval</span>(<span class="at">envir =</span> rlang<span class="sc">::</span><span class="fu">global_env</span>())</span></code></pre></div>
+<pre><code>## [1] 6</code></pre></li>
+</ul>
+</div>
+<div id="managing-state" class="section level2">
+<h2>Managing State</h2>
+<ul>
+<li><p>An R package cannot alter the global environment.</p></li>
+<li><p>Objects in packages are locked, so cannot be changed.</p></li>
+<li><p>Say you want to keep track of whether or not a function was run (e.g. to write a message on first use). I have done this to (i) say that a function is defunct or (ii) list out special licenses that cover a method.</p></li>
+<li><p>One way you could keep track of this is to use superassign in a function that will change the value of a logical in the package environment.</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>ran_fun <span class="ot">&lt;-</span> <span class="cn">FALSE</span> <span class="do">## Global variable</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>ran_fun) {</span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">&quot;Here is a message&quot;</span>)</span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>    ran_fun <span class="ot">&lt;&lt;-</span> <span class="cn">FALSE</span> <span class="do">## this alters package environment</span></span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
+<pre><code>## Here is a message</code></pre>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
+<pre><code>## Here is a message</code></pre></li>
+<li><p>What I think is better is having an environment specific to messages, that way you have to worry less about global variables.</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>menv <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env</span>(<span class="at">ran_fun =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>menv<span class="sc">$</span>ran_fun) {</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">&quot;Here is a message&quot;</span>)</span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>    menv<span class="sc">$</span>ran_fun <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb84-8"><a href="#cb84-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
+<pre><code>## Here is a message</code></pre>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div></li>
+<li><p>This functionality is very popular, so <code>{rlang}</code> has a function dedicated to it.</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  rlang<span class="sc">::</span><span class="fu">warn</span>(<span class="st">&quot;Here is a message&quot;</span>, <span class="at">.frequency =</span> <span class="st">&quot;once&quot;</span>, <span class="at">.frequency_id =</span> <span class="st">&quot;ran_fun&quot;</span>)</span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
+<pre><code>## Warning: Here is a message
+## This warning is displayed once per session.</code></pre>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div></li>
+</ul>
+</div>
 </div>
 <div id="new-functions" class="section level1">
 <h1>New Functions</h1>
@@ -500,9 +732,13 @@ $(document).ready(function () {
 <li><code>rlang::env_print()</code>: Print an environment’s bindings.</li>
 <li><code>rlang::env_names()</code>: Print names in an environment.</li>
 <li><code>rlang::env_parent()</code>: Print the parent of an environment.</li>
+<li><code>rlang::env_has()</code>: Test if an environment has a binding.</li>
 <li><code>rlang::current_env()</code>: Access current environment.</li>
+<li><code>rlang::env_bind()</code>: Add objects to an environment.</li>
+<li><code>rlang::env_unbind()</code>: Remove objects from an environment.</li>
 <li><code>rlang::global_env()</code>: Access global environment.</li>
 <li><code>rlang::empty_env()</code>: Access the empty environment.</li>
+<li><code>rlang::search_envs()</code>: Show the search path.</li>
 <li><code>identical()</code>: Check if two objects are exactly equal.</li>
 </ul>
 </div>
