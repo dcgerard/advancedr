@@ -46,7 +46,7 @@ body(square)
 environment(square)
 ```
 
-- Below: Black dot is environment, squares are arguments. Body is not graphed.
+- Below: Black dot is function environment (aka enclosing environment) where the function finds objects, squares are arguments. Body is not graphed.
 
     <img src="./04_figs_fun/components.png" alt="some S3 objects" width="15%"/>
 

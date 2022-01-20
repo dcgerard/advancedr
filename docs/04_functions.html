@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-17" />
+<meta name="date" content="2022-01-20" />
 
 <title>Functions</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Functions</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-17</h4>
+<h4 class="date">2022-01-20</h4>
 
 </div>
 
@@ -424,7 +424,7 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">environment</span>(square)</span></code></pre></div>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
 <ul>
-<li><p>Below: Black dot is environment, squares are arguments. Body is not graphed.</p>
+<li><p>Below: Black dot is function environment (aka enclosing environment) where the function finds objects, squares are arguments. Body is not graphed.</p>
 <p><img src="04_figs_fun/components.png" alt="some S3 objects" width="15%"/></p></li>
 <li><p><strong>Exception</strong>: Many base functions are written directly in C and don’t have these three components.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(square)</span></code></pre></div>
@@ -454,9 +454,9 @@ $(document).ready(function () {
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)</span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>oout <span class="ot">&lt;-</span> <span class="fu">optim</span>(<span class="at">par =</span> <span class="dv">0</span>, <span class="at">fn =</span> f, <span class="at">dat =</span> dat, <span class="at">method =</span> <span class="st">&quot;L-BFGS-B&quot;</span>)</span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>oout<span class="sc">$</span>par</span></code></pre></div>
-<pre><code>## [1] -0.1142</code></pre>
+<pre><code>## [1] 0.06252</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(dat)</span></code></pre></div>
-<pre><code>## [1] -0.1142</code></pre></li>
+<pre><code>## [1] 0.06252</code></pre></li>
 <li><p>Functions can return other functions (like in <code>ecdf()</code>).</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">99</span>, <span class="dv">2</span>, <span class="dv">11</span>)</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>efun <span class="ot">&lt;-</span> <span class="fu">ecdf</span>(x)</span>

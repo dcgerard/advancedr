@@ -42,13 +42,16 @@ klippy::klippy()
 - Motivations:
     - Environments are used to make functions self-contained.
     - Environments are used to separate functions of the same name in different packages.
-    - Environments are used in some object oriented programming aspects of R.
+    - Environments are used in some object oriented programming systems in R.
 
 - An environment is like a list, except:
-    - Everyname must be unique (lists can have multiple elements of the same name).
-    - Names are not ordered (lists are ordered)
-    - All environments (except the empty environment) have "parent" environments that they live in, and
-    - Environments use modify-in-place semantics (not copy-on-modify).
+    - Every name must be unique.
+        - Lists can have multiple elements of the same name.
+    - Names are not ordered.
+        - Lists are ordered.
+    - All environments (except the empty environment) have "parent" environments that they live in.
+    - Environments use modify-in-place semantics.
+        - Lists are copy-on-modify.
     
 - Create a new environment with `rlang::env()`, which behaves a lot list `list()`.
 
@@ -63,6 +66,10 @@ klippy::klippy()
 
     <img src="./04_figs_env/bindings.png" alt="Environment Bindings" width="40%"/>
     
+    - Above, the arrows indicate "bindings". So `b` is bound to `"a"` and `a` is bound to `FALSE`, etc...
+    
+    - The blue dot indicates the parent environment.
+    
 - Environments have "reference semantics", which means that they modify-in-place.
 
     ```{r}
@@ -71,14 +78,14 @@ klippy::klippy()
     e1$d
     ```
 
-- One by-product is that an environemnt can contain itself.
+- An environment can contain itself.
     ```{r}
     e1$d <- e1
     ```
 
     <img src="./04_figs_env/loop.png" alt="Environment containing itself" width="40%"/>
 
-- Printing an environment just shows its address
+- Printing an environment just shows its address in memory.
     ```{r}
     e1
     ```
@@ -147,7 +154,7 @@ klippy::klippy()
     rlang::env_parents(em)
     ```
     
-- We can make children of the empty environment with
+- We can make children of the empty environment with `rlang::env()` by including the empty environment as the first argument.
     ```{r}
     e2c <- env(empty_env(), d = 4, e = 5)
     e2d <- env(e2c, a = 1, b = 2, c = 3)
@@ -162,13 +169,13 @@ klippy::klippy()
     
 - The ancestors of the global environment are all of the attached packages that ultimately terminate in the empty environment. So `env_parents()` will stop at the global environment by default.
 
-```{r}
-et <- rlang::env(x = 1:3)
-rlang::env_parents(et)
-rlang::env_parents(et, last = rlang::empty_env())
-```
+    ```{r}
+    et <- rlang::env(x = 1:3)
+    rlang::env_parents(et)
+    rlang::env_parents(et, last = rlang::empty_env())
+    ```
 
-# Super Assignmennt `<<-`
+# Working with Objects in an Environment
 
 - Regular assignment `<-` creates a variable in the current environment.
 
@@ -236,7 +243,7 @@ rlang::env_parents(et, last = rlang::empty_env())
 
 1. Create an environment as illustrated by this picture.
 
-    <img src="./04_figs_env/recursive-1.png" alt="recursive" width="40%"/>
+    <img src="./04_figs_env/recursive-1.png" alt="recursive" width="20%"/>
 
     ```{r, eval = FALSE, echo = FALSE}
     loop <- rlang::env()
@@ -246,7 +253,7 @@ rlang::env_parents(et, last = rlang::empty_env())
 
 2. Create a pair of environments as illustrated by this picture.
 
-    <img src="./04_figs_env/recursive-2.png" alt="recursive" width="40%"/>
+    <img src="./04_figs_env/recursive-2.png" alt="recursive" width="35%"/>
     
     ```{r, eval = FALSE, echo =  FALSE}
     loop <- rlang::env()
@@ -281,11 +288,29 @@ rlang::env_parents(et, last = rlang::empty_env())
     
 # Special Environments
 
-- Most environments are created by R, not by you. Let's talk about these.
+- Most environments are created by R, not by you.
+
+- The most important ones are:
+
+    - **Global Environment**: Environment that you, the user, interact with during an interactive session.
+    
+    - **Package Environment**: External interface for a package. When you, the user, uses a function, it looks for it in the package environment.
+    
+    - **Namespace Environment**: Internal interface for apackage. When the package searches for a function within the same package, it looks for it in the namespace environment.
+    
+    - **Imports Environment**: Functions used by the package. When the package searches for a function from another package, it looks for it in the imports environment.
+    
+    - **Function Environment** (aka enclosing environment): Environment where function was created and where it has access to objects. For a function from a package, this is the namespace environment. For a function you create during an interactive session, this is the global environment.
+    
+    - **Binding Environment** of a function: Environment where the name of a function is bound to the function. May or may not be the same as the function environment.
+    
+    - **Execution Environment**: Each time a function is called, a new temporary environment is created to host execution. This is to that function calls always have a "fresh start"
+    
+    - **Caller environment**: The environment in which the function was called.
 
 ## Package environments.
 
-- Each package attached by `library()` creates an package environment that becomes an ancestor of the global environment. They are parents in the order that you attached them.
+- Each package attached by `library()` creates a package environment that becomes an ancestor of the global environment. They are parents in the order that you attached them.
 
     <img src="./04_figs_env/search-path.png" alt="recursive" width="70%"/>
 
@@ -306,21 +331,36 @@ rlang::env_parents(et, last = rlang::empty_env())
 
 ## Function Environment
 
-- The **function environment** is the environment where the function finds its variables. This is the current environment when the function is created.
+- The **function environment** is the environment where the function has access to all objects in that environment and its parent environments. This is the current environment when the function is created, **not** when the function is called.
 
 - You can see the function environment via `rlang::fn_env()`
 
+- The function environment may or may not be a new environment. E.g. most of the functions you write use the global environment as the function environment.    
+    ```{r}
+    x <- 5
+    fn <- function() {
+      sum(1:x)
+    }
+    rlang::fn_env(fn)
+    ```
+    
+- Above, since the function environment is the global environment, `fn()` has access to `x` (which is in the global environment) and to `sum()` (which is in the namespace:base environment).
+
+- Most functions in a package have the namespace environment (see below) as the function environment.
+
     ```{r}
     rlang::fn_env(base::sum)
+    rlang::fn_env(stats::lm)
+    rlang::fn_env(rlang::fn_env)
     ```
 
-- This may or may not be different from the environment where the name is bound to the function. This is called the **binding environment** of the function.
+- The function environment may or may not be different from the environment where the name is bound to the function. That space is called the **binding environment** of the function.
 
-- In many cases, the function environment is the same as the binding environment. Below, the name `f` in the global environment is bound to the function (binding environment), and the function is bound to the global environment (function environment):
+- In many cases, the function environment is the same as the binding environment. Below, the name `f` in the global environment is bound to the function (arrow moving from f to the yellow object), so the binding environment is the global environment. Also below, the function is bound to the global environment (arrow moving from the black dot to the global environment), so the global environment has the objects that the function has access to, so the function environment is also the global environment.
 
     <img src="./04_figs_env/binding.png" alt="recursive" width="40%"/>
 
-- Below, the name `g` in the `e` environment was created in the global environment. So the function envrionment is the global environment, but the name `g` is in the `e` environment.
+- Below, the name `g` in the `e` environment was created in the global environment. So the function environment is the global environment. But the name `g` is in the `e` environment, so the binding environment is `e`.
 
     ```{r}
     e <- rlang::env()
@@ -328,6 +368,189 @@ rlang::env_parents(et, last = rlang::empty_env())
     ```
 
     <img src="./04_figs_env/binding-2.png" alt="recursive" width="40%"/>
+
+- **Exercise**: Does `g()` still have access to all of the objects in the global environment?
+
+    ```{block, eval = FALSE, echo = FALSE}
+    Yes. The global environment is the function environment of `g()`.
+    ```
+    ```{r, eval = FALSE, echo = FALSE}
+    x <- 5 ## in global
+    e$g <- function() x + 1 ## binding environment is `e`, but function environment is `g()`.
+    e$g()
+    ```
+
+
+## Namespaces
+
+- The **package environment** is the external interface for a package. It contains the exported functions of a package.
+
+- The **namespace environment** of a package is the internal interface for a package. Functions in the package will search for its objects in the namespace environment.
+
+- This is what allows us to modify (rather foolishly) `var()` but still allow `sd()` to work properly.
+
+    ```{r}
+    sd
+    ```
+    
+    ```{r}
+    x <- rnorm(10)
+    sd(x)
+    var <- function(x) 0
+    var(x)
+    sd(x)
+    ```
+
+- The namespace environment acts as the function environment for all functions in a package.
+
+- An exported function has a binding both in the namespace environment and the package environment.
+
+    <img src="./04_figs_env/namespace-bind.png" alt="namespace vs packge environments" width="40%"/>
+
+- An internal function only has a binding the namespace environment.
+
+- The parent of a namespace environment is an **imports** environment that contains bindings of all functions used by the package.
+
+- The parent of the imports environment is the base namespace, where all base functions are located (this is why you don't need to import `sum()` or use `base::sum()` in your package code).
+
+- The parent of the base namespace is the global environment.
+
+    ```{r}
+    library(rlang)
+    env_parents(fn_env(stats::var))
+    env_parents(fn_env(rlang::fn_env))
+    ```
+
+    <img src="./04_figs_env/namespace-env.png" alt="ancestors of namespace environment" width="40%"/>
+    
+- Below, let the yellow object be the `sd()` function defined in the package `{stats}`. Then whenever another function in `{stats}` uses `sd()` it finds it in the `namespace:stats` environment. Right now, the `package:stats` environment also points to that function, so when the user uses `sd()` they can use the version created by the `{stats}` authors. However, if we change the definition of `sd()`, we only change the binding in the `package:stats` environment, not in the `namespace:stats` environment. This means that `{stats}` functions will work even if we change the binding.
+
+    <img src="./04_figs_env/namespace.png" alt="namespace and package" width="40%"/>
+
+## Execution Environments
+
+- Each time a function is called, a new environment is created to host execution. This is called the **execution environment**.
+
+- This is why `a` is not saved between calls:
+    ```{r}
+    fn <- function() {
+      if (!env_has(current_env(), "a")) {
+        a <- 1
+      } else {
+        a <- a + 1
+      }
+      return(a)
+    }
+    fn()
+    fn()
+    ```
+
+- The execution environment is always the child of the function environment.
+
+- Consider this function
+
+    ```{r}
+    h <- function(x) {
+      # 1.
+      a <- 2 # 2.
+      x + a
+    }
+    y <- h(1) # 3.
+    ```
+
+- The yellow object is the `h()` function. The name `h` is in the global environment (bottom right). The execution environment is the top left. `x` binds to 1. Then `a` is defined, it binds to `2`. When the function completes, it returns `3` and so `y` binds to `3` in the global environment. The execution environment is garbage collected.
+
+    <img src="./04_figs_env/execution.png" alt="execution environment" width="40%"/>
+
+- It is possible to explicitly return the execution environment so that it is not garbage collected. But this is rarely done.
+
+    ```{r}
+    h2 <- function(x) {
+      a <- x * 2
+      rlang::current_env()
+    }
+    e <- h2(x = 10)
+    rlang::env_print(e)
+    ```
+    
+- More frequently, the execution environment is maintained because it is a function environment of a returned function.
+
+    ```{r}
+    plus <- function(x) {
+      function(y) x + y
+    }
+    
+    plus_one <- plus(1)
+    plus_one
+    ```
+    
+    <img src="./04_figs_env/closure.png" alt="execution environment is function environment" width="40%"/>
+
+- Above figure: the global environment is the bottom box. The execution environment is the top box. The plus function is the right yellow object. Its function environment and binding environment is the global environment. When `plus()` is called with `x = 1`, it creates the execution environment where `x` is bound to `1`. When `plus_one()` is defined, its function environment is the execution environment (since that is where it was created), but its binding environment is the global environment (where the name is bound). Note that the parent environment of the `plus()`'s execution environment is the global environment.
+
+    ```{r}
+    rlang::fn_env(plus_one)
+    rlang::env_parent(rlang::fn_env(plus_one))
+    ```
+
+- When we call `plus_one()`, its execution environment will have the execution environment of `plus()` as its parent.
+
+    ```{r}
+    x <- 20
+    plus_one(2)
+    ```
+
+    <img src="./04_figs_env/closure-call.png" alt="execution environment of plus_one()" width="40%"/>
+
+- When we call `plus_one()` with `y` bound to 2 (execution environment top left), when it tries to find `x` it first searches in `r `rlang::fn_env(plus_one)` (execution environment top right) before going to the global environment (bottom).
+
+- **Exercise** (Advanced R): Draw a diagram that shows the function environments of this function, along with all bindings for the given execution.
+
+    ```{r}
+    f1 <- function(x1) {
+      f2 <- function(x2) {
+        f3 <- function(x3) {
+          x1 + x2 + x3
+        }
+        f3(3)
+      }
+      f2(2)
+    }
+    f1(1)
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    <img src="./04_figs_env/environment_exercise.png" alt="nested function environments" width="20%"/>
+    
+    `f1()`'s function and binding environments are the global environment.
+    
+    `f2()`'s function and binding environments are the execution environment of `f1()`. This is also where `x1` is bound to `1`.
+    
+    `f3()`'s function and binding environments are the execution environment of `f2()`. This is also where `x2` is bound to `2`.
+    
+    `f3()`'s execution environment is where `x3` is bound to `3`.
+    ```
+    
+## Caller Environment
+
+- Recall, the **function environment** is the environment in which the function was created.
+
+- The **caller environment** is the environment in which the function was called (aka "used")
+
+- You can get this environment inside a function via `rlang::caller_env()`.
+
+    ```{r}
+    fn1 <- function(x) {
+      fn2 <- function(y) {
+        rlang::caller_env()
+      }
+      e0 <- rlang::current_env() ## The execution environment of fn1()
+      e1 <- fn2() ## The caller environment of fn2()
+      e2 <- rlang::caller_env() ## The caller environment of fn1()
+      return(list(e0, e1, e2))
+    }
+    fn1()
+    ```
 
     
 # Applications
@@ -360,7 +583,7 @@ rlang::env_parents(et, last = rlang::empty_env())
 
 - Say you want to keep track of whether or not a function was run (e.g. to write a message on first use). I have done this to (i) say that a function is defunct or (ii) list out special licenses that cover a method.
 
-- One way you could keep track of this is to use superassign in a function that will change the value of a logical in the package environment.
+- One way you could keep track of this is to use super assign in a function that will change the value of a logical in the package environment.
 
     ```{r}
     ran_fun <- FALSE ## Global variable
@@ -397,6 +620,39 @@ rlang::env_parents(et, last = rlang::empty_env())
     fun()
     fun()
     ```
+    
+# R6 Objects
+
+- We will not cover R6 objects, but they use environments to do modify-by-reference instead of copy-on-modify semantics. This makes them fast.
+
+# Hashing
+
+- Hashing is a quick way to select an object from a bunch of possible objects. You use a hash key to select a hash value.
+
+- Hashing in R was done through the `{hash}` package using environments.
+
+- Hashing is way quicker than using a list or a vector.
+
+- In the below example, using hashing is about 1000 times faster than using native R vectors.
+
+    ```{r, message = FALSE}
+    library(hash)
+    words <- read.table("https://data-science-master.github.io/lectures/data/words.txt",
+                        header = TRUE, 
+                        na.strings = "")
+    h <- hash(keys = words$word, values = seq_along(words$word))
+    l <- seq_along(words$word)
+    names(l) <- words$word
+    
+    bench::mark(
+      h$MOTIVITIES,
+      l[["MOTIVITIES"]],
+    ) |>
+      dplyr::select(expression:result) |>
+      knitr::kable()
+    ```
+    
+- Though, for this lookup to be worthwhile, you would need to be doing lookups millions of times a second.
 
 # New Functions
 
@@ -410,5 +666,7 @@ rlang::env_parents(et, last = rlang::empty_env())
 - `rlang::env_unbind()`: Remove objects from an environment.
 - `rlang::global_env()`: Access global environment.
 - `rlang::empty_env()`: Access the empty environment.
+- `rlang::fn_env()`: Access the function environment.
+- `rlang::caller_env()`: Access the caller environment.
 - `rlang::search_envs()`: Show the search path.
 - `identical()`: Check if two objects are exactly equal.
