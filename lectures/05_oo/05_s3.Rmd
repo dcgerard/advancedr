@@ -29,62 +29,6 @@ klippy::klippy()
 
 # Motivation
 
-- There are various [strategies to programming](https://en.wikipedia.org/wiki/Comparison_of_programming_paradigms) that folks use.
 
-- You are mostly used to [**procedural programming**](https://en.wikipedia.org/wiki/Procedural_programming) where you list out a sequence of steps that are carried out in succession.
-    ```{r}
-    mean_vec <- rep(NA_real_, length.out = length(mtcars))
-    names(mean_vec) <- names(mtcars)
-    for (i in seq_along(mtcars)) {
-      mean_vec[[i]] <- mean(mtcars[[i]])
-    }
-    mean_vec
-    ```
-
-- You have also been exposed to [**functional programming**](https://en.wikipedia.org/wiki/Functional_programming) where you compose functions with other functions.
-
-    ```{r}
-    sapply(mtcars, mean)
-    purrr::map_dbl(mtcars, mean) ## tidyverse version
-    ```
-
-- Object oriented programming (OOP) is a different style of programming than you are used to, centered around objects. R has three native object oriented programming systems (S3, S4, and RC for "reference classes"), and many other third-party packages have made their own object oriented systems (`{R6}` being the most popular).
-
-    - These systems are listed in increasing order of complexity, with S3 being "baby" OOP, S4 being "YA" OOP, and RC and R6 being "big boy" OOP.
-    
-    - If you are in extending `{ggplot2}` then you will learn about another OOP system specific to `{ggplot2}`: ggproto.
-
-- E.g.: To calculate a mean in `R6` OOP, we would probably create a new class that has the `$mean()` method that we could call.
-
-    ```{r}
-    datFrame <- R6::R6Class(classname = "datFrame", public = list(
-      df = NULL,
-      mean_vec = NULL,
-      initialize = function(df) {
-        stopifnot(is.data.frame(df))
-        self$df <- df
-      },
-      mean = function() {
-        self$mean_vec <- rep(NA_real_, length.out = length(self$df))
-        for (i in seq_along(self$df)) self$mean_vec[[i]] <- mean(self$df[[i]])
-      }
-    )
-    )
-    
-    mtcars_df <- datFrame$new(df = mtcars)
-    mtcars_df$mean_vec
-    mtcars_df$mean()
-    mtcars_df$mean_vec
-    ```
-
-- Because R programmers are not OOP programmers, you should be coding mostly in S3 and S4 when using OOP. We'll spend most of our time on these.
-
-- S3 and S4 use **generic function OOP** where the same function name is evaluated differently based on the class of the object. 
-
-- **R6 and RC** use **encapsulated OOP** where objects are the center of everything, holding fields (data) and methods (functions) that operate on those values. These are closest to what you would be used to if you are coming from an OOP language. Try not to use them.
-
-- S3 allows you to use functions like `print()` and `summary()` and `plot()` on outputs of your functions. You can also define your own "generics."
-
-- S4 is similar to S3 but is more formal and strict. S4 is important to understand if you want to use or contribute to [Bioconductor](https://www.bioconductor.org/).
 
 

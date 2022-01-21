@@ -42,6 +42,7 @@ This repository contains material based upon work supported by the National Scie
   - [Functions](./04_functions.html)
   - [Environments](./04_environments.html)
 - 05 Object-oriented Programming
+  - [OOP Introduction](./05_oop.html)
   - [S3 Objects](./05_s3.html)
   - [S4 Objects](./05_s4.html)
 - 06 Functional Programming

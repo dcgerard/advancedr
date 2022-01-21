@@ -34,8 +34,14 @@ klippy::klippy()
 
 - The most common application of S4 objects is in the [Bioconductor](https://bioconductor.org/) project, so we will use some of those base classes as an example.
 
+# S4
+
 # File Structure
 
 - All class definitions in "R/AllClasses.R"
 - All generic function definitions in "R/AllGenerics.R"
 - Methods are defined in a file named by the generic function. For example, all `show` methods would go in "R/show-methods.R".
+
+# `{stats4}`
+
+- One application of S4 is in the `{stats4}` package for likelihood inference.

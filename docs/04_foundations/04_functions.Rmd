@@ -46,7 +46,7 @@ body(square)
 environment(square)
 ```
 
-- Below: Black dot is environment, squares are arguments. Body is not graphed.
+- Below: Black dot is function environment (aka enclosing environment) where the function finds objects, squares are arguments. Body is not graphed.
 
     <img src="./04_figs_fun/components.png" alt="some S3 objects" width="15%"/>
 
@@ -218,7 +218,12 @@ sum <- c(10, 11)
 sum(sum)
 ```
 
-- This is allowed since the function and the variable are in different environments. XYZ Explain this more.
+- This is allowed since the function and the variable are in different environments. The `sum` object is in the global environment while the `sum()` function is in the `package:base` environment. More on this in Chapter 7.
+
+    ```{r}
+    rlang::env_has(env = rlang::global_env(), nms = "sum")
+    rlang::env_has(env = rlang::env_parents()[["package:base"]], nms = "sum")
+    ```
 
 ## Dynamic lookup
 
