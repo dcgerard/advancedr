@@ -25,6 +25,7 @@ klippy::klippy()
 # Learning Objectives
 
 - Chapter 15 of [Advanced R](https://adv-r.hadley.nz/)
+- [Introduction to Matrix Package](https://cran.r-project.org/web/packages/Matrix/vignettes/Intro2Matrix.pdf)
 - [Common Bioconductor Methods and Classes](https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/)
 - [BiocGenerics](https://bioconductor.org/packages/3.14/bioc/html/BiocGenerics.html)
 - [S4Vectors](https://bioconductor.org/packages/3.14/bioc/html/S4Vectors.html)
@@ -36,12 +37,16 @@ klippy::klippy()
 
 # S4
 
-# File Structure
+# `{Matrix}`
+
+# `{stats4}`
+
+- One application of S4 is in the `{stats4}` package for likelihood inference.
+
+# Bioconductor File Structure
 
 - All class definitions in "R/AllClasses.R"
 - All generic function definitions in "R/AllGenerics.R"
 - Methods are defined in a file named by the generic function. For example, all `show` methods would go in "R/show-methods.R".
 
-# `{stats4}`
 
-- One application of S4 is in the `{stats4}` package for likelihood inference.
