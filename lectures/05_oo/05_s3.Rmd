@@ -29,6 +29,82 @@ klippy::klippy()
 
 # Motivation
 
+- S3 is the most commonly used object-oriented programming (OOP) system in R.
 
+- Most of the common data types you are used to are S3.
 
+    ```{r}
+    # Data frames are S3
+    sloop::otype(mtcars)
+    
+    # lm objects are S3
+    lmout <- lm(mpg ~ wt, data = mtcars)
+    sloop::otype(lmout) 
+    
+    # ggplot2 plots are S3
+    pl <- ggplot2::ggplot(mtcars, ggplot2::aes(x = wt, y = mpg)) + 
+      ggplot2::geom_point()
+    sloop::otype(pl)
+    
+    # tidymodels use S3
+    tdout <- 
+      parsnip::linear_reg() |>
+      parsnip::set_engine("lm") |>
+      parsnip::fit(mpg ~ wt, data = mtcars)
+    sloop::otype(tdout)
+    
+    # Factors are S3
+    x <- factor(c(1, 2, 3))
+    sloop::otype(x)
+    
+    # Dates are S3
+    x <- lubridate::make_date(year = 1970, month = 1, day = 1)
+    sloop::otype(x)
+    ```
 
+- If you are creating a package and you want OOP features, you should use S3 unless
+    1. You work in a large team (use S4 then).
+    2. Modify-by-reference is important (use R6).
+    
+- This is since most R programmers are used to S3 (intuitively) and are not used to S4 or R6.
+
+# S3 Basics
+
+- An S3 object is any variable with a `class` attribute. This is the full definition.
+
+- S3 objects may or may not have more attributes.
+
+- E.g. the `factor` class always has the `levels` attribute.
+
+    ```{r}
+    x <- factor(c("A", "B", "B", "A", "C", "A"))
+    attributes(x)
+    ```
+
+- You can get the underlying bayes type by `unclass()`.
+
+    ```{r}
+    unclass(x)
+    ```
+
+- S3 objects behave differently when passed to a **generic** function.
+
+- Use `sloop::ftype()` to see if a function is generic.
+
+- These are all generics
+    ```{r}
+    sloop::ftype(print)
+    sloop::ftype(summary)
+    sloop::ftype(plot)
+    ```
+
+- But these are not:
+    ```{r}
+    sloop::ftype(sum)
+    sloop::ftype(c)
+    ```
+
+# New functions
+
+- `unclass()`: Remove class attribute and obtain underlying base type.
+- `sloop::ftype()`: See if a function is a "regular/primitive/internal function, a internal/S3/S4 generic, or a S3/S4/RC method".
