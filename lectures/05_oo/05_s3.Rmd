@@ -37,6 +37,10 @@ klippy::klippy()
     # Data frames are S3
     sloop::otype(mtcars)
     
+    # tibbles are S3
+    mt_tb <- tibble::as_tibble(mtcars)
+    sloop::otype(mt_tb)
+    
     # lm objects are S3
     lmout <- lm(mpg ~ wt, data = mtcars)
     sloop::otype(lmout) 
@@ -104,7 +108,37 @@ klippy::klippy()
     sloop::ftype(c)
     ```
 
+- Generic functions behave differently depending on the class of the object.
+
+    ```{r}
+    print(mt_tb)
+    print(lmout)
+    print(pl)
+    ```
+    
+- This is not implemented by `if`-`else` statements. That would be inefficient because only the authors of `print()` (i.e. the R Core team) could add new functionality to new S3 objects. The idea of using generic functions allows us (new developers) to define new functionality to the same generics.
+
+- The implementation of a generic for a specific class is called a **method**.
+
+- The act of choosing a method from a generic is called **method dispatch**. Use `sloop::s3_dispatch()` to see this process.
+
+    ```{r}
+    sloop::s3_dispatch(print(mt_tb))
+    ```
+    - The `*` means the method exists but is not used.
+    - The `=>` means the method exists and is used.
+
+- You can access specific methods by `generic.class()`. E.g.
+
+    ```{r}
+    stats:::print.lm(lmout)
+    ```
+
+- But these are often not exported and should **not** be accessed directly by the user, or other developers.
+
+
 # New functions
 
 - `unclass()`: Remove class attribute and obtain underlying base type.
 - `sloop::ftype()`: See if a function is a "regular/primitive/internal function, a internal/S3/S4 generic, or a S3/S4/RC method".
+- `sloop::s3_dispatch()`: View method dispatch.
