@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-18" />
+<meta name="date" content="2022-01-25" />
 
 <title>R Packages</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">R Packages</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-18</h4>
+<h4 class="date">2022-01-25</h4>
 
 </div>
 
@@ -558,13 +558,13 @@ $(document).ready(function () {
 <li><p>In a typical R script (outside of an R package), code is run when you run it. In an R package, code is run when the package is built. So, for example, if you include the following line of code in your package.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
-<pre><code>## [1] &quot;2022-01-18 12:10:35 EST&quot;</code></pre>
+<pre><code>## [1] &quot;2022-01-25 09:26:28 EST&quot;</code></pre>
 <p>Then <code>x</code> be the time of the package build. If you want the time that a user runs some code, include this statement in a function.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ftime <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">Sys.time</span>())</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ftime</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2022-01-18 12:10:35 EST&quot;</code></pre></li>
+<pre><code>## [1] &quot;2022-01-25 09:26:28 EST&quot;</code></pre></li>
 <li><p>When you alias a function from another package, don’t do</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> pkg<span class="sc">::</span>bar</span></code></pre></div>
 <p>instead, do</p>
@@ -827,7 +827,7 @@ $(document).ready(function () {
 <ul>
 <li>There are a lot of things CRAN wants formatted for a Description section of the DESCRIPTION file. See <a href="https://cran.r-project.org/web/packages/submission_checklist.html">Checklist for CRAN Submissions</a>.</li>
 </ul></li>
-<li><p>“<a href="mailto:Authors@R" class="email">Authors@R</a>:” This field contains executable R code. See the helpfile for <code>person()</code>.</p>
+<li><p>“<a href="mailto:Authors@R" class="email">Authors@R</a>:” This field contains executable R code. See the help file for <code>person()</code>.</p>
 <ul>
 <li><p>The <code>first</code> and <code>last</code> arguments are the first and last names of the person.</p></li>
 <li><p>The <code>email</code> should be the email of the individual.</p></li>
@@ -1016,7 +1016,7 @@ $(document).ready(function () {
 <li><p><code>@docType package</code>: Should be included to show that this is not a function.</p></li>
 <li><p><code>@name ldsep-package</code>: Makes it so that if a user types <code>?`ldsep-package`</code>, then they will reach this help file.</p></li>
 <li><p><code>@aliases ldsep</code>: This makes it so that a user type <code>?ldsep</code>, then they will reach this help file as well.</p></li>
-<li><p>Just include <code>NULL</code> or <code>"ldsep-package"</code> below the documentation so that <code>{roxygen2}</code> knows to make a help file for it.</p></li>
+<li><p>Just include <code>NULL</code> below the documentation so that <code>{roxygen2}</code> knows to make a help file for it.</p></li>
 </ul>
 </div>
 

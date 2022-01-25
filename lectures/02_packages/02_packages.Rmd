@@ -794,7 +794,7 @@ klippy::klippy()
 - "Description": A paragraph of what the package does. Each line should be less than 80 characters long and each newline should be indented by 4 white spaces.
     - There are a lot of things CRAN wants formatted for a Description section of the DESCRIPTION file. See [Checklist for CRAN Submissions](https://cran.r-project.org/web/packages/submission_checklist.html).
     
-- "Authors@R:" This field contains executable R code. See the helpfile for `person()`.
+- "Authors@R:" This field contains executable R code. See the help file for `person()`.
     - The `first` and `last` arguments are the first and last names of the person.
     - The `email` should be the email of the individual.
     - The `role` should be a vector containing possible values of `"aut"` for author, `"cre"` for creator/maintainer (one one person should be `"cre"`), `"ctb"` for contributor (only providing minor edits). There are other roles that are possible.
@@ -1104,4 +1104,4 @@ klippy::klippy()
 
 - `@aliases ldsep`: This makes it so that a user type `?ldsep`, then they will reach this help file as well.
 
-- Just include `NULL` or `"ldsep-package"` below the documentation so that `{roxygen2}` knows to make a help file for it.
+- Just include `NULL` below the documentation so that `{roxygen2}` knows to make a help file for it.

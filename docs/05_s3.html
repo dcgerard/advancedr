@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-24" />
+<meta name="date" content="2022-01-25" />
 
 <title>S3 Objects</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S3 Objects</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-24</h4>
+<h4 class="date">2022-01-25</h4>
 
 </div>
 
@@ -439,7 +439,7 @@ $(document).ready(function () {
 ## 
 ## $class
 ## [1] &quot;factor&quot;</code></pre></li>
-<li><p>You can get the underlying bayes type by <code>unclass()</code>.</p>
+<li><p>You can get the underlying base type by <code>unclass()</code>.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unclass</span>(x)</span></code></pre></div>
 <pre><code>## [1] 1 2 2 1 3 1
 ## attr(,&quot;levels&quot;)
@@ -458,8 +458,7 @@ $(document).ready(function () {
 <pre><code>## [1] &quot;primitive&quot; &quot;generic&quot;</code></pre>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">ftype</span>(c)</span></code></pre></div>
 <pre><code>## [1] &quot;primitive&quot; &quot;generic&quot;</code></pre></li>
-<li><p>Generic functions behave differently depending on the class of the object.</p></li>
-</ul>
+<li><p>Generic functions behave differently depending on the class of the object.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(mt_tb)</span></code></pre></div>
 <pre><code>## # A tibble: 32 × 11
 ##      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
@@ -484,13 +483,52 @@ $(document).ready(function () {
 ## (Intercept)           wt  
 ##       37.29        -5.34</code></pre>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pl)</span></code></pre></div>
-<p><img src="05_s3_files/figure-html/unnamed-chunk-6-1.png" width="384" style="display: block; margin: auto;" /></p>
+<p><img src="05_s3_files/figure-html/unnamed-chunk-6-1.png" width="384" style="display: block; margin: auto;" /></p></li>
+<li><p>This is <em>not</em> implemented by <code>if</code>-<code>else</code> statements. That would be inefficient because only the authors of <code>print()</code> (i.e. the R Core team) could add new functionality to new S3 objects. The idea of using generic functions allows us (new developers) to define new functionality to the same generics.</p></li>
+<li><p>The implementation of a generic for a specific class is called a <strong>method</strong>.</p></li>
+<li><p>The act of choosing a method from a generic is called <strong>method dispatch</strong>. Use <code>sloop::s3_dispatch()</code> to see this process.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_dispatch</span>(<span class="fu">print</span>(mt_tb))</span></code></pre></div>
+<pre><code>##    print.tbl_df
+## =&gt; print.tbl
+##  * print.data.frame
+##  * print.default</code></pre>
+<ul>
+<li>The <code>*</code> means the method exists but is not used.</li>
+<li>The <code>=&gt;</code> means the method exists and is used.</li>
+<li>So above, it found a method for the <code>tbl_df</code> class and used it, so it did not go on to look for other methods (for objects of class <code>tbl</code>, <code>data.frame</code> or the <code>default</code> method).</li>
+</ul></li>
+<li><p>Below there is no <code>aperm()</code> method for matrices, integers, or numerics, so it used the defualt one, which is for arrays.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">ncol =</span> <span class="dv">3</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_dispatch</span>(<span class="fu">aperm</span>(mat, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>)))</span></code></pre></div>
+<pre><code>##    aperm.matrix
+##    aperm.integer
+##    aperm.numeric
+## =&gt; aperm.default</code></pre></li>
+<li><p>You can access specific methods by <code>generic.class()</code>. E.g.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>stats<span class="sc">:::</span><span class="fu">print.lm</span>(lmout)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)           wt  
+##       37.29        -5.34</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aperm.default</span>(mat, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))</span></code></pre></div>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    2    3    4
+## [2,]    5    6    7    8
+## [3,]    9   10   11   12</code></pre></li>
+<li><p>But these are often not exported and should generally <strong>not</strong> be accessed directly by the user, or other developers.</p></li>
+<li><p>Lots of methods have <code>.</code> in the middle. But not all functions with <code>.</code> are methods. E.g. <code>read.csv()</code> and <code>t.test()</code> are not methods of generic functions, they are just function names with a dot.</p></li>
+<li><p>Because of this, you should never name variables are functions with a dot in them.</p></li>
+</ul>
 </div>
 <div id="new-functions" class="section level1">
 <h1>New functions</h1>
 <ul>
 <li><code>unclass()</code>: Remove class attribute and obtain underlying base type.</li>
 <li><code>sloop::ftype()</code>: See if a function is a “regular/primitive/internal function, a internal/S3/S4 generic, or a S3/S4/RC method”.</li>
+<li><code>sloop::s3_dispatch()</code>: View method dispatch.</li>
 </ul>
 </div>
 

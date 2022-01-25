@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2021-12-15" />
+<meta name="date" content="2022-01-25" />
 
 <title>Assertions and Unit Tests</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Assertions and Unit Tests</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2021-12-15</h4>
+<h4 class="date">2022-01-25</h4>
 
 </div>
 
@@ -588,71 +588,75 @@ $(document).ready(function () {
 ## 1/1 mismatches
 ## [1] 10 - 10 == -1e-05</code></pre>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span> <span class="sc">+</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">5</span>, <span class="at">tolerance =</span> <span class="dv">10</span><span class="sc">^-</span><span class="dv">4</span>)</span></code></pre></div></li>
+<li><p>Make sure to <strong>only</strong> check for equality between two things. If you provide three unnamed arguments, the third one is interpreted as the tolerance. This is a common error that I have done many times.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Bad</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Because this will also run OK (tolerance = 10)</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="dv">10</span>, <span class="dv">2</span>, <span class="dv">10</span>)</span></code></pre></div></li>
 <li><p>Use <code>ignore_attr = TRUE</code> if your objects have different attributes and you just care about the numeric values (default <code>expect_equal()</code> will throw an error):</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">local_edition</span>(<span class="dv">3</span>) <span class="do">## not necessary for package</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">&lt;-</span> <span class="st">&quot;hello&quot;</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">local_edition</span>(<span class="dv">3</span>) <span class="do">## not necessary for package</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">&lt;-</span> <span class="st">&quot;hello&quot;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y)</span></code></pre></div>
 <pre><code>## Error: `x` (`actual`) not equal to `y` (`expected`).
 ## 
 ## `names(actual)` is a character vector (&#39;hello&#39;)
 ## `names(expected)` is absent</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y, <span class="at">ignore_attr =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(x, y, <span class="at">ignore_attr =</span> <span class="cn">TRUE</span>)</span></code></pre></div></li>
 <li><p>The <code>local_edition(3)</code> code makes it so my code chunks use the most recent <code>{testthat}</code> functions. You don’t need to worry about that in your package. <code>{usethis}</code> will automatically assume the third edition. You can explicitly use the third edition by adding the following to your DESCRIPTION file:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Config/testthat/edition</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb23"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Config/testthat/edition</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span></code></pre></div></li>
 <li><p><code>expect_match()</code> checks for a regular expression match.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_match</span>(<span class="st">&quot;hello&quot;</span>, <span class="st">&quot;ll&quot;</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_match</span>(<span class="st">&quot;helo&quot;</span>, <span class="st">&quot;ll&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_match</span>(<span class="st">&quot;hello&quot;</span>, <span class="st">&quot;ll&quot;</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_match</span>(<span class="st">&quot;helo&quot;</span>, <span class="st">&quot;ll&quot;</span>)</span></code></pre></div>
 <pre><code>## Error: &quot;helo&quot; does not match &quot;ll&quot;.
 ## Actual value: &quot;helo&quot;</code></pre></li>
 <li><p>You can use <code>expect_warning()</code> and <code>expect_error()</code> to check that your functions error correctly.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>simreg <span class="ot">&lt;-</span> <span class="cf">function</span>(n, x, beta0, beta1, sigma2) {</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Check input</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">length</span>(x) <span class="sc">==</span> n)</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Simulate y</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  eps <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">rnorm</span>(<span class="at">n =</span> n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fu">sqrt</span>(sigma2))</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> beta0 <span class="sc">+</span> beta1 <span class="sc">*</span> x <span class="sc">+</span> eps</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y)</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">100</span>)</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>beta0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>beta1 <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_error</span>(<span class="fu">simreg</span>(<span class="at">n =</span> <span class="dv">1</span>, </span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>                    <span class="at">x =</span> x, </span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta0 =</span> beta0, </span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta1 =</span> beta1, </span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sigma2 =</span> sigma2))</span></code></pre></div></li>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>simreg <span class="ot">&lt;-</span> <span class="cf">function</span>(n, x, beta0, beta1, sigma2) {</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Check input</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">length</span>(x) <span class="sc">==</span> n)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Simulate y</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  eps <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">rnorm</span>(<span class="at">n =</span> n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fu">sqrt</span>(sigma2))</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> beta0 <span class="sc">+</span> beta1 <span class="sc">*</span> x <span class="sc">+</span> eps</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">100</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>beta0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>beta1 <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_error</span>(<span class="fu">simreg</span>(<span class="at">n =</span> <span class="dv">1</span>, </span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>                    <span class="at">x =</span> x, </span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta0 =</span> beta0, </span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta1 =</span> beta1, </span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sigma2 =</span> sigma2))</span></code></pre></div></li>
 <li><p>It is recommended that you think harder about your unit tests, but you can just test for a non-error by using <code>expect_error()</code> and setting <code>regexp = NA</code></p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_error</span>(<span class="fu">simreg</span>(<span class="at">n =</span> <span class="fu">length</span>(x), </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">x =</span> x, </span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta0 =</span> beta0, </span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta1 =</span> beta1, </span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sigma2 =</span> sigma2), </span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">regexp =</span> <span class="cn">NA</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_error</span>(<span class="fu">simreg</span>(<span class="at">n =</span> <span class="fu">length</span>(x), </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">x =</span> x, </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta0 =</span> beta0, </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">beta1 =</span> beta1, </span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sigma2 =</span> sigma2), </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">regexp =</span> <span class="cn">NA</span>)</span></code></pre></div></li>
 <li><p><code>expect_type()</code> is tests for the type of the output (<code>"double"</code>, <code>"integer"</code>, <code>"character"</code>, <code>"logical"</code>, or <code>"list"</code>).</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">local_edition</span>(<span class="dv">3</span>)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(<span class="dv">1</span>, <span class="st">&quot;double&quot;</span>)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(1L, <span class="st">&quot;integer&quot;</span>)</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;character&quot;</span>)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(<span class="cn">TRUE</span>, <span class="st">&quot;logical&quot;</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">local_edition</span>(<span class="dv">3</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(<span class="dv">1</span>, <span class="st">&quot;double&quot;</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(1L, <span class="st">&quot;integer&quot;</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;character&quot;</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(<span class="cn">TRUE</span>, <span class="st">&quot;logical&quot;</span>)</span></code></pre></div></li>
 <li><p><code>expect_s3_class()</code> is used to test for the class of the object (e.g. <code>"data.frame"</code>, <code>"matrix"</code>, <code>"tibble"</code>, <code>"lm"</code>, etc..)</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">simreg</span>(<span class="at">n =</span> <span class="fu">length</span>(x), <span class="at">x =</span> x, <span class="at">beta0 =</span> beta0, <span class="at">beta1 =</span> beta1, <span class="at">sigma2 =</span> sigma2)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>lmout <span class="ot">&lt;-</span> lout <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_s3_class</span>(<span class="at">object =</span> lmout, <span class="at">class =</span> <span class="st">&quot;lm&quot;</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">simreg</span>(<span class="at">n =</span> <span class="fu">length</span>(x), <span class="at">x =</span> x, <span class="at">beta0 =</span> beta0, <span class="at">beta1 =</span> beta1, <span class="at">sigma2 =</span> sigma2)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>lmout <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_s3_class</span>(<span class="at">object =</span> lmout, <span class="at">class =</span> <span class="st">&quot;lm&quot;</span>)</span></code></pre></div></li>
 <li><p><code>expect_true()</code> acts like <code>stopifnot()</code> except for unit tests instead of assertions.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_true</span>(<span class="dv">3</span> <span class="sc">==</span> <span class="dv">3</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_true</span>(<span class="dv">3</span> <span class="sc">==</span> <span class="dv">3</span>)</span></code></pre></div></li>
 <li><p><strong>Example</strong>: A common test for a simulation script is to see if estimators that we expect to work well on average do, indeed, work well on average. In the case of the simple linear regression model, we will check that, for large <span class="math inline">\(n\)</span>, the OLS estimates are reasonably close to the true value of <span class="math inline">\(\beta_1\)</span></p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">1000000</span>)</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>beta0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>beta1 <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">simreg</span>(<span class="at">n =</span> <span class="fu">length</span>(x), <span class="at">x =</span> x, <span class="at">beta0 =</span> beta0, <span class="at">beta1 =</span> beta1, <span class="at">sigma2 =</span> sigma2)</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>lmout <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x)</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="fu">coef</span>(lmout)[[<span class="dv">2</span>]], beta1, <span class="at">tolerance =</span> <span class="fl">0.01</span>)</span></code></pre></div></li>
-<li><p><strong>Exercise</strong>: Write an expectation that the output is a numeric vector.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_type</span>(y, <span class="st">&quot;double&quot;</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">1000000</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>beta0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>beta1 <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">simreg</span>(<span class="at">n =</span> <span class="fu">length</span>(x), <span class="at">x =</span> x, <span class="at">beta0 =</span> beta0, <span class="at">beta1 =</span> beta1, <span class="at">sigma2 =</span> sigma2)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>lmout <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="fu">expect_equal</span>(<span class="fu">coef</span>(lmout)[[<span class="dv">2</span>]], beta1, <span class="at">tolerance =</span> <span class="fl">0.01</span>)</span></code></pre></div></li>
+<li><p><strong>Exercise</strong>: Write an expectation that the output is a numeric vector.</p></li>
 </ul>
 </div>
 <div id="test" class="section level2">
@@ -668,8 +672,7 @@ $(document).ready(function () {
 <ul>
 <li>An expression is a multi-lined block of R code surrounded by curly braces <code>{}</code>.</li>
 </ul></li>
-<li><p>Let’s put out a couple expectations in our test for <code>simreg()</code>.</p></li>
-</ul>
+<li><p>Let’s put out a couple expectations in our test for <code>simreg()</code>.</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">&quot;simreg() output is consistent&quot;</span>, {</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">991</span>)</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">1000000</span>)</span>
@@ -679,11 +682,10 @@ $(document).ready(function () {
 <span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">simreg</span>(<span class="at">n =</span> <span class="fu">length</span>(x), <span class="at">x =</span> x, <span class="at">beta0 =</span> beta0, <span class="at">beta1 =</span> beta1, <span class="at">sigma2 =</span> sigma2)</span>
 <span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  lmout <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x)</span>
 <span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expect_equal</span>(<span class="fu">coef</span>(lmout)[[<span class="dv">2</span>]], beta1, <span class="at">tolerance =</span> <span class="fl">0.001</span>)</span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expect_equal</span>(<span class="fu">length</span>(x), <span class="fu">length</span>(y))</span>
 <span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
-<pre><code>## Test passed 🥇</code></pre>
-<ul>
+<pre><code>## Test passed 🥇</code></pre></li>
 <li><p>Notice that I put two expectations in the same test. This is all connected to the output of <code>simreg()</code>, so it makes sense to put them in the same test.</p></li>
 <li><p>Whenever a test generates something randomly, I like to set a seed for reproducibility.</p>
 <ul>

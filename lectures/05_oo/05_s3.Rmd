@@ -85,7 +85,7 @@ klippy::klippy()
     attributes(x)
     ```
 
-- You can get the underlying bayes type by `unclass()`.
+- You can get the underlying base type by `unclass()`.
 
     ```{r}
     unclass(x)
@@ -116,7 +116,7 @@ klippy::klippy()
     print(pl)
     ```
     
-- This is not implemented by `if`-`else` statements. That would be inefficient because only the authors of `print()` (i.e. the R Core team) could add new functionality to new S3 objects. The idea of using generic functions allows us (new developers) to define new functionality to the same generics.
+- This is *not* implemented by `if`-`else` statements. That would be inefficient because only the authors of `print()` (i.e. the R Core team) could add new functionality to new S3 objects. The idea of using generic functions allows us (new developers) to define new functionality to the same generics.
 
 - The implementation of a generic for a specific class is called a **method**.
 
@@ -127,18 +127,56 @@ klippy::klippy()
     ```
     - The `*` means the method exists but is not used.
     - The `=>` means the method exists and is used.
+    - So above, it found a method for the `tbl_df` class and used it, so it did not go on to look for other methods (for objects of class `tbl`, `data.frame` or the `default` method).
+
+- Below there is no `aperm()` method for matrices, integers, or numerics, so it used the defualt one, which is for arrays.
+    ```{r}    
+    mat <- matrix(1:12, nrow = 4, ncol = 3)
+    sloop::s3_dispatch(aperm(mat, c(2, 1)))
+    ```
 
 - You can access specific methods by `generic.class()`. E.g.
 
     ```{r}
     stats:::print.lm(lmout)
+    aperm.default(mat, c(2, 1))
     ```
 
 - But these are often not exported and should generally **not** be accessed directly by the user, or other developers.
 
-- Lots of methods have `.` in the middle, but not all. E.g. `read.csv()` and `t.test()` and `
+- Lots of methods have `.` in the middle. But not all functions with `.` are methods. E.g. `read.csv()` and `t.test()` are not methods of generic functions. `read.csv()` is just a function with a dot in the name, and `t.test()` is just a generic function with a dot in the name. These functions were created before S3, which is why they are named poorly.
+
+- You can confirm that a function with a `.` in it is a method also with `sloop::ftype()`.
+
+    ```{r}
+    sloop::ftype(read.csv)
+    sloop::ftype(t.test)
+    ```
+
+- Because of this, you should never name variables are functions with a dot in them.
 
 
+- **Exercise**: Explain the difference between each of the dots in `as.data.frame.data.frame()`. How would you typically use this method? Include in your discussion calls from the functions in the `{sloop}` package.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    sloop::ftype(as.data.frame.data.frame)
+    sloop::ftype(as.data.frame.data.frame)
+    ```
+    ```{block, eval = FALSE, echo = FALSE}
+    The `.` between each `data` and each `frame` is just indicating the `data.frame` class.
+    
+    So `as.data.frame()` is an S3 generic that converts an object to a `data.frame` and then the `as.data.frame.data.frame()` is the method for inputs of class `data.frame()`.
+    
+    You would typically use this method by calling `as.data.frame()` with a `data.frame()` input, e.g. `as.data.frame(mtcars)`.
+    ```
+
+    ```{r, echo = FALSE, eval = FALSE}
+    sloop::s3_dispatch(as.data.frame(mtcars))
+    ```
+
+
+
+    
 
 
 # New functions
