@@ -134,7 +134,11 @@ klippy::klippy()
     stats:::print.lm(lmout)
     ```
 
-- But these are often not exported and should **not** be accessed directly by the user, or other developers.
+- But these are often not exported and should generally **not** be accessed directly by the user, or other developers.
+
+- Lots of methods have `.` in the middle, but not all. E.g. `read.csv()` and `t.test()` and `
+
+
 
 
 # New functions
