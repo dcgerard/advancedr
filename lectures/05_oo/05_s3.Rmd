@@ -629,17 +629,19 @@ klippy::klippy()
 
 - Let's have a constructor that can build a useful class. We will inherit from the `data.frame` class.
     ```{r}
-    new_sim <- function(dat = list(x = double(),
-                                   y = double()),
+    new_sim <- function(dat,
                         beta0 = double(),
                         beta1 = double(),
                         sigma = double(),
                         row.names = NULL) {
+      dat <- unclass(dat)
       stopifnot(is.list(dat),
                 is.double(beta0),
                 is.double(beta1),
                 is.double(sigma),
                 sigma >= 0)
+      stopifnot(length(dat) == 2)
+      
                 
       names(dat) <- c("x", "y")
       return(
