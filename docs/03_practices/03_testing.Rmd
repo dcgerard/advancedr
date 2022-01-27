@@ -295,6 +295,17 @@ tcl = -.25)
     expect_equal(10, 10 + 10^-5)
     expect_equal(10, 10 + 10^-5, tolerance = 10^-4)
     ```
+    
+- Make sure to **only** check for equality between two things. If you provide three unnamed arguments, the third one is interpreted as the tolerance. This is a common error that I have done many times.
+
+    ```{r}
+    ## Bad
+    expect_equal(10, 10, 10)
+    ## Because this will also run OK (tolerance = 10)
+    expect_equal(10, 2, 10)
+    ```
+
+    
 - Use `ignore_attr = TRUE` if your objects have different attributes and you just care about the numeric values (default `expect_equal()` will throw an error):
     ```{r, error=TRUE}
     local_edition(3) ## not necessary for package
@@ -361,7 +372,7 @@ tcl = -.25)
 - `expect_s3_class()` is used to test for the class of the object (e.g. `"data.frame"`, `"matrix"`, `"tibble"`, `"lm"`, etc..)
     ```{r}
     y <- simreg(n = length(x), x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2)
-    lmout <- lout <- lm(y ~ x)
+    lmout <- lm(y ~ x)
     expect_s3_class(object = lmout, class = "lm")
     ```
 
@@ -384,7 +395,7 @@ tcl = -.25)
 
 - **Exercise**: Write an expectation that the output is a numeric vector.
 
-    ```{r}
+    ```{r, eval = FALSE, echo = FALSE}
     expect_type(y, "double")
     ```
     
@@ -407,20 +418,20 @@ tcl = -.25)
     
 - Let's put out a couple expectations in our test for `simreg()`.
 
-```{r}
-test_that("simreg() output is consistent", {
-  set.seed(991)
-  x <- runif(1000000)
-  beta0 <- 0
-  beta1 <- 2
-  sigma2 <- 0.5
-  y <- simreg(n = length(x), x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2)
-  lmout <- lm(y ~ x)
-  expect_equal(coef(lmout)[[2]], beta1, tolerance = 0.001)
-  
-  expect_equal(length(x), length(y))
-})
-```
+    ```{r}
+    test_that("simreg() output is consistent", {
+      set.seed(991)
+      x <- runif(1000000)
+      beta0 <- 0
+      beta1 <- 2
+      sigma2 <- 0.5
+      y <- simreg(n = length(x), x = x, beta0 = beta0, beta1 = beta1, sigma2 = sigma2)
+      lmout <- lm(y ~ x)
+      expect_equal(coef(lmout)[[2]], beta1, tolerance = 0.001)
+      
+      expect_equal(length(x), length(y))
+    })
+    ```
 
 - Notice that I put two expectations in the same test. This is all connected to the output of `simreg()`, so it makes sense to put them in the same test.
 

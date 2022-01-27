@@ -477,6 +477,14 @@ klippy::klippy()
     vector(mode = "integer", length = 0)
     vector(mode = "logical", length = 0)
     ```
+    
+- Shorthand for this is
+    ```{r}
+    character()
+    double()
+    integer()
+    logical()
+    ```
 
 - Empty vectors often show up in defaults that are returned when folks ask for something of length 0. 
 
@@ -484,7 +492,7 @@ klippy::klippy()
 
     ```{r, eval = FALSE}
     f <- function(n) {
-      sout <- vector(mode = "double", length = n)
+      sout <- double(n)
       for (i in seq_len(n)) {
         sout[[i]] <- simcode(...) ## put simulation code here
       }

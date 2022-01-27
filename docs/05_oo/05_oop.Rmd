@@ -50,7 +50,9 @@ klippy::klippy()
     purrr::map_dbl(mtcars, mean) ## tidyverse version
     ```
 
-- Object oriented programming (OOP) is a different style of programming than you are used to, centered around objects. R has three native object oriented programming systems (S3, S4, and RC for "reference classes"), and many other third-party packages have made their own object oriented systems (`{R6}` being the most popular).
+- [**Object oriented programming**](https://en.wikipedia.org/wiki/Object-oriented_programming) (OOP) is a different style of programming than you are used to, centered around **objects** with data and functions attached to them and their class.
+
+- R has three native object oriented programming systems (S3, S4, and RC for "reference classes"), and many other third-party packages have made their own object oriented systems (`{R6}` being the most popular).
 
     - These systems are listed in increasing order of complexity, with S3 being "baby" OOP, S4 being "YA" OOP, and RC and R6 being "big boy" OOP.
     
@@ -83,10 +85,185 @@ klippy::klippy()
 
 - S3 and S4 use **generic function OOP** where the same function name is evaluated differently based on the class of the object. 
 
+- E.g. that allows the output of `summary()` to differ between doubles and factors.
+
+    ```{r}
+    x <- sample(1:10, size = 100, replace = TRUE)
+    summary(x)
+    y <- factor(x)
+    summary(y)
+    ```
+
 - **R6 and RC** use **encapsulated OOP** where objects are the center of everything, holding fields (data) and methods (functions) that operate on those values. These are closest to what you would be used to if you are coming from an OOP language. Try not to use them.
+
+- E.g. in R we apply a function, like `mean()` to a vector, like `x`. But in an encapsulated object oriented programming system would have the function `mean()` attached to a vector `x`. That's one difference between R and Python.
+
+    <mark style="background-color: lightblue">R</mark>
+    ```{r}
+    x <- c(19, 22, 31)
+    mean(x) ## apply mean to x
+    ```
+    
+    <mark style="background-color: lightblue">Python</mark>
+    ```{python}
+    import numpy as np
+    x = np.array([19, 22, 31])
+    x.mean() ## mean belongs to x
+    ```
 
 - S3 allows you to use functions like `print()` and `summary()` and `plot()` on outputs of your functions. You can also define your own "generics."
 
 - S4 is similar to S3 but is more formal and strict. S4 is important to understand if you want to use or contribute to [Bioconductor](https://www.bioconductor.org/).
 
+# OOP Vocabulary
 
+- **Polymorphism**: Use the same function name for different types of input, but have the function evaluate differently based on the types of input.
+
+- An **object** is a specific instance of a **class**. E.g. below, `x` is an object of class `factor`.
+
+    ```{r}
+    x <- factor(c(119, 22, 31))
+    class(x)
+    ```
+
+- A function for a specific class is a **method**. Like the `mean()` method for our R6 class above.
+
+- A **field** is data that belongs to an object. In our R6 example, we had the `df` and `mean_vec` fields.
+
+- Classes are defined in a hierarchy. So if a method does not exist in one class it is searched for in the parent class. It is said that the child class **inherits** the behavior the parent class.
+
+- E.g. `tibbles` inherit the behavior of data frames.
+    ```{r}
+    class(tibble::tibble(a = 1))
+    ```
+
+- The order in which classes are searched for methods is called **method dispatch**.
+
+# `{sloop}`
+
+- The `{sloop}` package is an interface for exploring OOP systems.
+
+- `sloop::otype()` allows you to see if the system is S3, S4, R6, etc...
+
+    ```{r}
+    sloop::otype(mtcars) ## Most R stuff is in S3.
+    
+    data("USCounties", package = "Matrix") ## Efficient matrix computations package
+    sloop::otype(USCounties) 
+    
+    pb <- progress::progress_bar$new() ## progress bars for for-loops
+    sloop::otype(pb)
+    ```
+
+# Base Types
+
+- S (the precursor to R) was developed first without an OOP system. So their only objects were "base types". But these don't have basic OOP functionality like polymorphism, inheritance, etc..
+
+- R users often call base types "objects" even though they aren't OOP objects.
+
+    ```{r}
+    x <- 1:10
+    sloop::otype(x)
+    ```
+
+- In R, an OO object has a `class` attribute and a base type does not.
+
+    ```{r}
+    y <- factor(x)
+    attr(x, "class")
+    attr(y, "class")
+    ```
+
+- `class()` will return the result of `typeof()` if an object has no `class` attribute (so it is not the most useful for determining class).
+
+    ```{r}
+    class(x)
+    typeof(x)
+    ```
+
+- Every object, including OO objects, have a base type that can be seen by `typeof()`.
+
+    ```{r}
+    typeof(y)
+    typeof(mtcars)
+    typeof(USCounties)
+    typeof(pb)
+    ```
+
+- There are 25 base types. From Hadley's list, the important ones are:
+    - Vector: `NULL`, `logical`, `integer`, `double`, `character`, `list`
+        ```{r}
+        typeof(NULL)
+        typeof(TRUE)
+        typeof(1L)
+        typeof(1)
+        typeof("1")
+        typeof(list(1))
+        ```
+    - Functions: `closure` (regular R functions), `special` (internal R functions), `builtin` ("primitive" functions in the base namespace that were built using C)
+        ```{r}
+        typeof(mean)
+        typeof(`if`)
+        typeof(sum)
+        ```
+    - Environments: `environment`
+        ```{r}
+        typeof(rlang::global_env())
+        ```
+    - S4 types: `S4`
+        ```{r}
+        typeof(USCounties)
+        ```
+    - Language types (used in metaprogramming): `symbol`, `language`, `pairlist`, and `expression`.
+        ```{r}
+        typeof(quote(a))
+        typeof(quote(a + 1))
+        typeof(formals(mean))
+        typeof(expression(a))
+        ```
+
+- **Exercise**: What's the (i) type, (ii) OOP system, and (iii) class of the following objects.
+
+    ```{r}
+    x <- lubridate::make_date(year = c(1990, 2022), month = c(1, 2), day = c(30, 22))
+    y <- matrix(NA_real_, nrow = 10, ncol = 2)
+    z <- tibble::tibble(a = 1:3)
+    aa <- lm(mpg ~ wt, data = mtcars)
+    bb <- t.test(mpg ~ am, data = mtcars)
+    cc <- rTensor::as.tensor(array(1:30, dim = c(2, 3, 5)))
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    - `x`: double, S3, `Date`.
+    - `y`: double, base type, no class (`class()` returns matrix, which is not the class), type `attr(y, "class")`.
+    - `z`: list, S3, `c("tbl_df", "tbl", "data.frame")`. Class is a vector of length 3.
+    - `aa`: list, S3, `"lm"`
+    - `bb`: list, S3, `"htest"`
+    - `cc`: S4, S4, `"Tensor"`
+    ```
+
+- **Exercise**: Why do we get different results from `summary()` with the following code?
+
+    ```{r}
+    a <- lm(mpg ~ wt, data = mtcars)
+    b <- t.test(mpg ~ am, data = mtcars)
+    summary(a)
+    summary(b)
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    They are different S3 objects, to have different `summary()` methods.
+    ```
+
+- **Exercise**: From the previous exercise, if we remove the `class` from `a` and `b`, what happens to the `summary()` call? What does this tell you about the `summary()` methods of the `htest` and `lm` classes?
+
+    ```{r, eval = FALSE, echo = FALSE}
+    class(a) <- NULL
+    class(b) <- NULL
+    summary(a)
+    summary(b)
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    `a` prints a different summary, while `b` prints the same summary. So there is no specific `summary()` method for the `htest` class and it method dispatches to the summary method of `list`s.
+    ```

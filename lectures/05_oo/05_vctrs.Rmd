@@ -1,0 +1,225 @@
+---
+title: "The `{vctrs}` Package for S3 Vectors"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output:  
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    highlight: pygments
+urlcolor: "blue"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo       = TRUE, 
+                      fig.align  = "center",
+                      fig.height = 3, fig.width = 4)
+ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
+
+# Learning Objectives
+
+- [`{vctrs}`](https://vctrs.r-lib.org/articles/s3-vector.html) package.
+- Building new vector classes.
+
+# Motivation
+
+- What if you want vectors that have special functionality for certain generics. Hadley has a great list:
+    - Percent: a double vector that prints as a percentage. 
+    - Decimal: a double vector that always prints with a fixed number of decimal places.
+    - Cached sum: a double vector that caches the total sum in an attribute.
+    - Rational: a pair of integer vectors that defines a rational number like 2 / 3.
+    - Polynomial: a list of integer vectors that define polynomials like 1 + x - x^3.
+    - Meter: a numeric vector with meter units.
+    - Period and frequency: a pair of classes represent a period, or it’s inverse, frequency.
+    
+- We need to define special S3 classes, along with a variety of useful methods for this class.
+
+- We will learn how to do this using the `{vctrs}` package here.
+
+# Basics
+
+- You create all objects for a given class with `vctrs::new_vctr()`. 
+
+    ```{r}
+    x <- vctrs::new_vctr(.data = c(10, 1, 2), class = "percent")
+    x
+    ```
+
+- The `.data` argument is a vector of one of the base types.
+
+- The `class` argument is the name of the class.
+
+- You should always use `vctrs::new_vctr()` in a constructor function.
+
+    ```{r}
+    new_percent <- function(x = double()) {
+      stopifnot(is.double(x))
+      return(vctrs::new_vctr(x, class = "percent"))
+    }
+    x <- new_percent(x = c(0.1, 0.01, 0.2))
+    x
+    ```
+
+- The resulting class inherits from the `vctrs_vctr` class:
+    ```{r}
+    sloop::s3_class(x)
+    ```
+    
+- When you inherit from the `vctrs_vctr` class, you don't need to deal with the following methods, because they should work automatically:
+    - Subsetting: `[`, `[[`, `$` should all return the correct type.
+    - `as.data.frame()` will correctly allow a vector to be incorporated in a data frame.
+    - Default subset assignment methods will coerce values to match the existing vector (`[<-`, `[[<-`, and `$<-`).
+
+    ```{r}
+    x[1]
+    x[3] <- 0.55
+    x
+    data.frame(p = x)
+    ```
+
+- Also, you only need to create a `format()` method to print since a `vctrs_vctr` object uses that for `print()` and `str()`.
+
+- To get the underlying `.data` (which you will need to do in the following methods), use `vctrs::vec_data()`.
+
+    ```{r}
+    vctrs::vec_data(x)
+    ```
+
+
+- For the helper function, it is nice to try to coerce a user's input to the base type. `vec_cast()` does this more safely than usual.
+
+    ```{r}
+    percent <- function(x = double()) {
+      x <- vctrs::vec_cast(x, double())
+      return(new_percent(x))
+    }
+    percent(c(1L, 0L))
+    ```
+
+- As usual, we should have a type predicate for a new S3 class
+
+    ```{r}
+    is_percent <- function(x) {
+      inherits(x, "percent")
+    }
+    is_percent(x)
+    ```
+
+# `format()` generic
+
+- The `format()` generic is used for printing nicely.
+
+- `vctrs_vctr` calls `format()` in its `print()` and `str()` generics, so you should always include a `format()` method when using the `{vctrs}` package.
+
+    ```{r}
+    format.percent <- function(x, ...) {
+      ret <- formatC(vctrs::vec_data(x) * 100, digits = 1, format = "f")
+      ret[is.na(x)] <- NA
+      ret[!is.na(x)] <- paste0(ret[!is.na(x)], "%")
+      return(ret)
+    }
+    ```
+
+- Now the print method should be altered
+    ```{r}
+    x <- new_percent(c(0.1, 0.2, NA))
+    x
+    ```
+    
+# Casting and Coercion
+
+- **Coercion** is changing the type implicitly. E.g. when we do
+    ```{r}
+    TRUE + FALSE
+    ```
+
+- **Casting** is when we change the type explicitly. E.g. when we do
+    ```{r}
+    vctrs::vec_cast(c(TRUE, FALSE), double())
+    ```
+
+- `{vctrs}` makes casting and coercian more formal.
+
+- You set possible coercions by `vctrs::vec_ptype2()`. This is a generic function.
+
+- You set possible castings using `vctrs::vec_cast()`. This is a generic function.
+
+- Right now, combining vectors to percents is not allowed
+    ```{r, error = TRUE}
+    vctrs::vec_c(x, 1)
+    ```
+
+- I used `vctrs::vec_c()` above because `c()` will never allow us to 
+
+- To allow for coercion, follow these steps:
+    1. Create `vec_ptype2.class1.class2()` and `vec_ptype2.class2.class1()` methods. These should only return an empty vector of the class that should result.
+        ```{r}
+        vec_ptype2.percent.double <- function(x, y, ...) {
+          percent()
+        }
+        
+        vec_ptype2.double.percent <- function(x, y, ...) {
+          percent()
+        }
+        ```
+    2. Verify that you implemented the coercion correctly with `vec_ptype_show()`
+        ```{r}
+        vctrs::vec_ptype_show(percent(), double(), percent())
+        ```
+        - The above says that percent with double and double with percent will return a percent
+    3. Create `vec_cast.class1.class2()` and `vec_cast.class2.class1()` methods for casting from the first class to the second class
+        ```{r}
+        # from double to percent
+        vec_cast.percent.double <- function(x, to, ...) percent(x) 
+        # from percent to double
+        vec_cast.double.percent <- function(x, to, ...) vctrs::vec_data(x) 
+        ```
+    4. Verify that your casting works with with `vec_cast()`.
+        ```{r}
+        vctrs::vec_cast(percent(0.5), double()) # from percent to double
+        vctrs::vec_cast(0.5, percent()) # from double to percent
+        ```
+    5. Verify that methods now work
+        ```{r}
+        vctrs::vec_c(1, percent(0.5))
+        ```
+        - Note that `c()` does not work
+            ```{r}
+            c(1, percent(0.5))
+            ```
+    
+- Note that it is usually better to explicitly state that the percent can combine with the percent, because it is faster and allows for different attributes between values.
+
+```{r}
+x <- percent(c(0.1, 0.2, 0.1))
+y <- percent(0.5)
+
+## allowed
+c(x, y)
+
+## Benchmark
+microbenchmark::microbenchmark(c(x, y))
+
+# Implement coercion and casting within same class
+vec_ptype2.percent.percent <- function(x, y, ...) percent()
+vec_cast.percent.percent <- function(x, to, ...) x
+
+# Faster
+microbenchmark::microbenchmark(c(x, y))
+```
+
+# New Functions
+
+- `vctrs::new_vctr()`: Create a vector object of a given class which inherits from the `vctrs_vctr` class.
+- `vctrs::vec_cast()`: Coerce an object to a given type.
+- `vctrs::vec_data()`: Get underlying data from a `vctrs_vctr` object.
+- `vctrs::vec_ptype2()`: Generic function for setting up possible coercions.
+- `vctrs::vec_c()`: Combine vectors with proper coercion.
+
+
