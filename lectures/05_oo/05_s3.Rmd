@@ -99,9 +99,9 @@ klippy::klippy()
     class(sout)
     ```
 
-- S3 objects behave differently when passed to a **generic** function.
+- S3 objects behave differently when passed to a **generic** function, a special type of function meant to provide different implementations based on the S3 class of the object.
 
-- Use `sloop::ftype()` to see if a function is generic. If it has the word "generic" anywhere, it can be used as an S3 generic.
+- Use `sloop::ftype()` to see if a function is generic. If it has the word "generic" is anywhere, it can be used as an S3 generic.
 
 - These are all S3 generics
     ```{r}
@@ -135,7 +135,7 @@ klippy::klippy()
     ```
     - The `*` means the method exists but is not used.
     - The `=>` means the method exists and is used.
-    - So above, it found a method for the `tbl_df` class and used it, so it did not go on to look for other methods (for objects of class `tbl`, `data.frame` or the `default` method).
+    - So above, it did not find a method for `tbl_df`, so it moved on to `tbl` which does have a method and used it. So it did not go on to look for other methods (`data.frame` or the `default` method), even those classes both have methods.
 
 - Below there is no `aperm()` method for matrices, integers, or numerics, so it used the default one, which is for arrays.
     ```{r}    
@@ -254,6 +254,12 @@ klippy::klippy()
     class(x)
     ```
     
+- Thous, it is a little safer to use `sloop::s3_class()`.
+
+    ```{r}
+    sloop::s3_class(x)
+    ```
+
 - You can test that an object is a certain class by `inherits()`.
 
     ```{r}
@@ -274,7 +280,7 @@ klippy::klippy()
 
 
 - You have to be careful about enforcing the correct structure on your class. Best practice: For any S3 class you create, you should create 3 functions to help others build and validate your class:
-    - A **constructor** to makes a new object with your class, for internal use only.
+    - A **constructor** to make a new object with your class, for internal use only.
     - A **validator** that checks the structure of objects with your class.
     - A **helper** that allows users to create objects of your class.
     
@@ -414,9 +420,9 @@ klippy::klippy()
     }
     ```
     
-- No arguments are passed to `UseMethod()`.
+- No arguments are passed to `UseMethod()` except the name of the generic.
 
-- The `x` is a required argument that all methods must have.
+- The `x` is a required argument that all methods must have. You can choose to have this be a different name, to have more required arguments, or to have no required arguments.
 
 - The `...` allows methods of your generic to include other variables than just `x`.
 
@@ -453,7 +459,7 @@ klippy::klippy()
 
 - To create a method
     1. Create a function definition for `generic.method()`.
-    2. Make sure you use the same arguments as the generic.
+    2. Make sure you use the same arguments as the generic (but you can usually include more aguements if there is `...` in the generic).
 
 - E.g., let's create plot and print methods for our `factor2` class.
 
@@ -589,7 +595,7 @@ klippy::klippy()
     class(mt_tb)
     ```
 
-- You should make sure your subclass is of the same base type as the superclass you are inheriting from. E.g. make sure anything you build off of data.frames also has a list base type.
+- You should make sure your subclass is of the same base type as the superclass you are inheriting from. E.g. make sure anything you build off of `data.frame`s also has a list base type.
 
 - You should make sure that you have at least all of the same attributes as the superclass you are inheriting from. E.g. `data.frame`s can have `names` and `row.names`, and so any subclass should also have those attributes.
 
