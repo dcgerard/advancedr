@@ -50,6 +50,101 @@
     </style>
 
 
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -272,8 +367,13 @@ $(document).ready(function () {
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#motivation">Motivation</a></li>
 <li><a href="#s4">S4</a></li>
+<li><a href="#more-on-classes">More on Classes</a></li>
+<li><a href="#some-example-uses-of-s4-by-others">Some Example Uses of S4 by Others</a>
+<ul>
 <li><a href="#matrix"><code>{Matrix}</code></a></li>
 <li><a href="#stats4"><code>{stats4}</code></a></li>
+</ul></li>
+<li><a href="#new-functions">New Functions</a></li>
 </ul>
 </div>
 
@@ -296,14 +396,277 @@ $(document).ready(function () {
 </div>
 <div id="s4" class="section level1">
 <h1>S4</h1>
-</div>
-<div id="matrix" class="section level1">
-<h1><code>{Matrix}</code></h1>
-</div>
-<div id="stats4" class="section level1">
-<h1><code>{stats4}</code></h1>
 <ul>
-<li>One application of S4 is in the <code>{stats4}</code> package for likelihood inference.</li>
+<li><p>All functions for S4 are in the <code>{methods}</code> package which comes with R by default.</p>
+<ul>
+<li>So in a package you either need to import the <code>{methods}</code> package, or you need to use <code>::</code> to use these functions create S4 objects.</li>
+<li>Running R in batch mode (e.g. running it on the supercomputer) also does not attach the <code>{methods}</code> package, so you need to do <code>library(methods)</code> if you intend to use S4 in batch mode.</li>
+</ul></li>
+<li><p>In S3, <em>any</em> object with a <code>class</code> attribute is an S3 object.</p></li>
+<li><p>In S4, you need to explicitly run the <code>methods::setClass()</code> function to define the class.</p>
+<ul>
+<li>The <code>Class</code> argument is the name of the new class.</li>
+<li>The <code>slots</code> argument contains a <em>named</em> character vector with the name of the fields in the class and the type for each field.</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setClass</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">slots =</span> <span class="fu">c</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">&quot;character&quot;</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">age =</span> <span class="st">&quot;numeric&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p><em>Note</em>: In S4, they call fields <strong>slots</strong> (i.e. data that belongs to the class).</p></li>
+<li><p>You then use <code>methods::new()</code> to create objects of the given S4 class, specifying the class and filling in the slots.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>david <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>, <span class="at">name =</span> <span class="st">&quot;David Gerard&quot;</span>, <span class="at">age =</span> <span class="dv">34</span>)</span></code></pre></div></li>
+<li><p><code>david</code> is an S4 object</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(david)</span></code></pre></div>
+<pre><code>## [1] &quot;S4&quot;</code></pre></li>
+<li><p>You use <code>methods::is()</code> to see (via one argument) and test (via two arguments) the S4 class of an object.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is</span>(david)</span></code></pre></div>
+<pre><code>## [1] &quot;Person&quot;</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is</span>(david, <span class="st">&quot;Person&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre></li>
+<li><p>You extract the data from a slot with <code>methods::slot()</code></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slot</span>(david, <span class="st">&quot;age&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] 34</code></pre></li>
+<li><p>Equivalently, you can use <code>@</code> notation to extract slots. (You do not use <code>$</code> or <code>[[</code> notation for S4 objects).</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>david<span class="sc">@</span>age</span></code></pre></div>
+<pre><code>## [1] 34</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## will error</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>david<span class="sc">$</span>age</span></code></pre></div>
+<pre><code>## Error in david$age: $ operator not defined for this S4 class</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## will error</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>david[[<span class="st">&quot;age&quot;</span>]]</span></code></pre></div>
+<pre><code>## Error in david[[&quot;age&quot;]]: this S4 class is not subsettable</code></pre></li>
+<li><p>The <code>@</code> notation is typically only used internally. If you want folks to access slots, you need to define an <strong>accessor</strong> function. Accessor’s are usually methods for S4 generics, so let’s go through how to create generics and methods.</p></li>
+<li><p>You create generic functions with <code>setGeneric()</code>.</p>
+<ul>
+<li>The <code>name</code> is the name of the new generic.</li>
+<li>The <code>def</code> is the function of the generic. Recall that S3 generics are eally simple and just call <code>UseMethod("generic"). Similarly, S4 generic functions should be really simple and just call</code>standardGeneric(“generic”)`.</li>
+</ul></li>
+<li><p>Below we are defining a generic called <code>age()</code> and a generic for <code>age()&lt;-</code> which will act as a replacement function.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;age&quot;</span>,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">def =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">standardGeneric</span>(<span class="st">&quot;age&quot;</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>             }</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>           )</span></code></pre></div>
+<pre><code>## [1] &quot;age&quot;</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;age&lt;-&quot;</span>, </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">def =</span> <span class="cf">function</span>(x, value) {</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">standardGeneric</span>(<span class="st">&quot;age&lt;-&quot;</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>             }</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>           )</span></code></pre></div>
+<pre><code>## [1] &quot;age&lt;-&quot;</code></pre></li>
+<li><p>You define a method for a given generic with <code>setMethod()</code></p>
+<ul>
+<li><code>f</code>: The name of the gneric.</li>
+<li><code>Person</code>: The name of the class(es) to which to apply the method.</li>
+<li><code>definition</code>: The method function.</li>
+</ul>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(<span class="at">f =</span> <span class="st">&quot;age&quot;</span>, </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">signature =</span> <span class="st">&quot;Person&quot;</span>, </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">definition =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>            <span class="fu">return</span>(x<span class="sc">@</span>age)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>         )</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(<span class="at">f =</span> <span class="st">&quot;age&lt;-&quot;</span>,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">signature =</span> <span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">definition =</span> <span class="cf">function</span>(x, value) {</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>            x<span class="sc">@</span>age <span class="ot">&lt;-</span> value</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">return</span>(x)</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>         )</span></code></pre></div></li>
+<li><p>Let’s look at these</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">age</span>(david)</span></code></pre></div>
+<pre><code>## [1] 34</code></pre></li>
+<li><p>Let’s reassign age</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">age</span>(david) <span class="ot">&lt;-</span> <span class="dv">21</span> <span class="co"># ah, young again</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">age</span>(david)</span></code></pre></div>
+<pre><code>## [1] 21</code></pre></li>
+<li><p>The <code>age()</code> method is called an <strong>accessor</strong> or, more informally, a <strong>getter</strong>.</p></li>
+<li><p>The <code>age()&lt;-</code> method is called a <strong>replacement function</strong> or, more informally, a <strong>setter</strong>.</p></li>
+<li><p>To read the help file of an S4 class, put <code>class?</code> before the name of the class. E.g. the following will open up the helpfile of the <code>GRanges</code> class from the <code>{GenomicRanges}</code> package from Bioconductor.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GenomicRanges)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>class?GRanges</span></code></pre></div></li>
+<li><p>To read the help file of method, put a question mark before the call of a generic. E.g., to see the help file for the <code>coverage()</code> method of a <code>GRanges</code> object, run</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>gobj <span class="ot">&lt;-</span> <span class="fu">GRanges</span>() <span class="do">## creates empty GRanges object</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>?<span class="fu">coverage</span>(gobj) <span class="do">## opens help file</span></span></code></pre></div></li>
+<li><p><code>{sloop}</code> is useful for seeing</p>
+<ol style="list-style-type: decimal">
+<li><p>If an object is an S4 object</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(david)</span></code></pre></div>
+<pre><code>## [1] &quot;S4&quot;</code></pre></li>
+<li><p>If a function is an S4 generic</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">ftype</span>(age)</span></code></pre></div>
+<pre><code>## [1] &quot;function&quot;</code></pre></li>
+<li><p>A list of all methods associated with an S4 class</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s4_methods_class</span>(<span class="st">&quot;Person&quot;</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 4
+##   generic class  visible source     
+##   &lt;chr&gt;   &lt;chr&gt;  &lt;lgl&gt;   &lt;chr&gt;      
+## 1 age     Person TRUE    R_GlobalEnv
+## 2 age&lt;-   Person TRUE    R_GlobalEnv</code></pre></li>
+<li><p>A list of all methods associated with an S4 generic</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s4_methods_generic</span>(<span class="st">&quot;age&quot;</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 4
+##   generic class  visible source     
+##   &lt;chr&gt;   &lt;chr&gt;  &lt;lgl&gt;   &lt;chr&gt;      
+## 1 age     Person TRUE    R_GlobalEnv</code></pre></li>
+</ol></li>
+<li><p><strong>Exercise</strong>: XYZ</p></li>
+</ul>
+</div>
+<div id="more-on-classes" class="section level1">
+<h1>More on Classes</h1>
+</div>
+<div id="some-example-uses-of-s4-by-others" class="section level1">
+<h1>Some Example Uses of S4 by Others</h1>
+<div id="matrix" class="section level2">
+<h2><code>{Matrix}</code></h2>
+<ul>
+<li><p>The <code>{Matrix}</code> package provides classes for many types of matrices:</p>
+<ul>
+<li>sparse (mostly zeros)</li>
+<li>triangular (either the upper or lower triangle elements are all 0).]</li>
+<li>symmetric (upper and lower triangle elements are equal).</li>
+</ul>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span></code></pre></div></li>
+<li><p>Many matrix operations can be more efficiently executed given knowledge of these structures.</p></li>
+<li><p>The <code>USCounties</code> matrix is a 3111 by 3111 matrix where an element measures a spatial relationship between counties. It is non-zero only if counties are contiguous.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;USCounties&quot;</span>, <span class="at">package =</span> <span class="st">&quot;Matrix&quot;</span>)</span></code></pre></div></li>
+<li><p>This is an S4 object of class <code>dsCMatrix</code>, used for handling sparse matrices (only 0.0094% of the values in this matrix are non-zero).</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(USCounties)</span></code></pre></div>
+<pre><code>## [1] &quot;S4&quot;</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(USCounties)</span></code></pre></div>
+<pre><code>## [1] &quot;dsCMatrix&quot;
+## attr(,&quot;package&quot;)
+## [1] &quot;Matrix&quot;</code></pre></li>
+<li><p>Almost every matrix operation you can imagine has been optimized for this sparsity:</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(sloop<span class="sc">::</span><span class="fu">s4_methods_class</span>(<span class="st">&quot;dsCMatrix&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] 383</code></pre></li>
+<li><p>This makes things like matrix multiplication much faster:</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>densemat <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(USCounties)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>ones <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="at">length.out =</span> <span class="fu">ncol</span>(densemat))</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  densemat <span class="sc">%*%</span> ones,</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  USCounties <span class="sc">%*%</span> ones</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## Unit: microseconds
+##                 expr    min      lq    mean  median      uq   max neval
+##    densemat %*% ones 9956.7 12300.2 13102.8 12926.0 13717.2 22285   100
+##  USCounties %*% ones  174.2   193.5   257.8   250.3   270.6  1146   100</code></pre>
+<ul>
+<li>This application doesn’t really demonstrate its abilities. It can be even more orders of magnitude faster.</li>
+</ul></li>
+</ul>
+</div>
+<div id="stats4" class="section level2">
+<h2><code>{stats4}</code></h2>
+<ul>
+<li><p>One application of S4 is in the <code>{stats4}</code> package for likelihood inference.</p></li>
+<li><p>The <strong>likelihood</strong> is the kind of like the probability of the data that we observed given some parameter values. (not exactly for continuous data)</p></li>
+<li><p>E.g., let’s say we observed heights (in inches)</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">72</span>, <span class="dv">66</span>, <span class="dv">74</span>, <span class="dv">64</span>, <span class="dv">70</span>)</span></code></pre></div>
+<p>and let’s assume that these data were generated from a normal distribution.</p></li>
+<li><p>Then, given any two parameters of the mean (<code>mu</code>) and standard deviation (<code>sigma</code>), the likelihood of these parameters at each observation would be from <code>dnorm()</code></p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma)</span></code></pre></div></li>
+<li><p>If the individuals that these heights are from are <strong>independent</strong> (e.g. they aren’t family members), then the likelihood of these parameters given all of the data would be</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma))</span></code></pre></div></li>
+<li><p>We can calculate this likelihood for a few values of <code>mu</code> and <code>sigma</code></p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="dv">72</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma))</span></code></pre></div>
+<pre><code>## [1] 1.031e-07</code></pre>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="dv">70</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma))</span></code></pre></div>
+<pre><code>## [1] 1.04e-06</code></pre></li>
+<li><p>Typically, the parameters are not known (<code>mu</code> and <code>sigma</code> are unknown) and our goal is to estimate them when we only see <code>x</code>.</p></li>
+<li><p>One way to do this is to find the <code>mu</code> and <code>sigma</code> that maximize this likelihood. The resulting estimators are called the <strong>maximum likelihood estimators</strong> (MLE’s). This is one of the most common methods for estimating parameters from a statistical model.</p></li>
+<li><p>Intuition: the MLE’s are the parameters that make our observed data as probable to have observed as possible.</p></li>
+<li><p>Typically, the likelihood produces very small numbers, so folks maximize the log-likelihood, which results in the same MLE’s since <span class="math inline">\(\log()\)</span> is a monotone increasing function.</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>ll <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma, <span class="at">log =</span> <span class="cn">TRUE</span>)) <span class="do">## log likelihood</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>like <span class="ot">&lt;-</span> <span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma)) <span class="do">## likelihood</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="do">## they are the same</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(like)</span></code></pre></div>
+<pre><code>## [1] -13.78</code></pre>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>ll</span></code></pre></div>
+<pre><code>## [1] -13.78</code></pre></li>
+<li><p>The <code>{stats4}</code> package provides a bunch of S4 objects and methods for dealing with MLE’s.</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stats4)</span></code></pre></div></li>
+<li><p>To use the <code>{stats4}</code> package, first create a function that takes as input your parameters nothing else. It assumes that all data comes from the parent environment. It should output the <em>negative</em> log-likelihood.</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param mu The mean</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param sigma The standard deviation</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>neg_ll <span class="ot">&lt;-</span> <span class="cf">function</span>(mu, sigma) {</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span><span class="fu">sum</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma, <span class="at">log =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>Then, use the <code>mle()</code> function. Include some starting values, and place some limits on constrained parameters.</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>mlout <span class="ot">&lt;-</span> stats4<span class="sc">::</span><span class="fu">mle</span>(<span class="at">minuslogl =</span> neg_ll, </span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start =</span> <span class="fu">c</span>(<span class="at">mu =</span> <span class="dv">72</span>, <span class="at">sigma =</span> <span class="dv">1</span>), </span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lower =</span> <span class="fu">c</span>(<span class="at">mu =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">sigma =</span> <span class="dv">0</span>),</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">upper =</span> <span class="fu">c</span>(<span class="at">mu =</span> <span class="cn">Inf</span>, <span class="at">sigma =</span> <span class="cn">Inf</span>))</span></code></pre></div></li>
+<li><p>This object is S4.</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(mlout)</span></code></pre></div>
+<pre><code>## [1] &quot;S4&quot;</code></pre>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(mlout)</span></code></pre></div>
+<pre><code>## [1] &quot;mle&quot;
+## attr(,&quot;package&quot;)
+## [1] &quot;stats4&quot;</code></pre></li>
+<li><p>What generics are available for the objects of type <code>mle</code>?</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s4_methods_class</span>(<span class="st">&quot;mle&quot;</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 9 × 4
+##   generic class visible source
+##   &lt;chr&gt;   &lt;chr&gt; &lt;lgl&gt;   &lt;chr&gt; 
+## 1 coef    mle   TRUE    stats4
+## 2 confint mle   TRUE    stats4
+## 3 logLik  mle   TRUE    stats4
+## 4 nobs    mle   TRUE    stats4
+## 5 profile mle   TRUE    stats4
+## 6 show    mle   TRUE    stats4
+## 7 summary mle   TRUE    stats4
+## 8 update  mle   TRUE    stats4
+## 9 vcov    mle   TRUE    stats4</code></pre></li>
+<li><p><code>coef()</code> will get you the parameter estimates</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(mlout)</span></code></pre></div>
+<pre><code>##     mu  sigma 
+## 69.200  3.709</code></pre></li>
+<li><p><code>vcov()</code> will you you the estimated variance/covariance matrix of the MLE’s (for their sampling distribution).</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vcov</span>(mlout)</span></code></pre></div>
+<pre><code>##              mu     sigma
+## mu    2.752e+00 1.093e-07
+## sigma 1.093e-07 1.376e+00</code></pre></li>
+<li><p>So the standard errors are from</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">diag</span>(<span class="fu">vcov</span>(mlout)))</span></code></pre></div>
+<pre><code>##    mu sigma 
+## 1.659 1.173</code></pre></li>
+<li><p><code>confint()</code> will get you confidence intervals</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(mlout)</span></code></pre></div>
+<pre><code>## Profiling...</code></pre>
+<pre><code>##        2.5 % 97.5 %
+## mu    65.210 73.190
+## sigma  2.219  8.083</code></pre></li>
+<li><p>In the normal case, these estimates are the same as the sample mean and the sample variance (not adjusting for degrees of freedom).</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x)</span></code></pre></div>
+<pre><code>## [1] 69.2</code></pre>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">var</span>(x) <span class="sc">*</span> (<span class="fu">length</span>(x) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="fu">length</span>(x))</span></code></pre></div>
+<pre><code>## [1] 3.709</code></pre></li>
+<li><p>But the MLE is general to many more complicated applications.</p></li>
+<li><p><strong>Exercise</strong>: The number of heads in <span class="math inline">\(n\)</span> coin flips is binomially distributed with size <span class="math inline">\(n\)</span> and success probability <span class="math inline">\(p\)</span>, where <span class="math inline">\(p\)</span> is the probability that a single flip turns up heads. The likelihood, given that <code>x</code> heads turned up, is</p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbinom</span>(<span class="at">x =</span> x, <span class="at">size =</span> n, <span class="at">prob =</span> p)</span></code></pre></div>
+<p>When <span class="math inline">\(x = 11\)</span> and <span class="math inline">\(n = 31\)</span>, calculate the MLE of <span class="math inline">\(p\)</span>.</p></li>
+</ul>
+</div>
+</div>
+<div id="new-functions" class="section level1">
+<h1>New Functions</h1>
+<ul>
+<li><code>methods::setClass()</code>: Define a new S4 class.</li>
+<li><code>methods::new()</code>: Create a new object of a given S4 class.</li>
+<li><code>methods::is()</code>: See the class of an object (if you give it just the object), or test that an object is a certain class (if you give it the object and a class name).</li>
+<li><code>methods::slot()</code>: Extract the data from a slot. Equivalen to <code>@</code> notation.</li>
+<li><code>methods::setGeneric()</code>: Create a new generic function</li>
+<li><code>methods::setMethod()</code>: Create a method for a generic.</li>
 </ul>
 </div>
 

@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-26" />
+<meta name="date" content="2022-01-29" />
 
 <title>Vectors</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Vectors</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-26</h4>
+<h4 class="date">2022-01-29</h4>
 
 </div>
 
@@ -738,7 +738,7 @@ $(document).ready(function () {
 ## $class
 ## [1] &quot;factor&quot;</code></pre>
 <p><img src="04_figs_vec/factor.png" alt="factors" width="25%"/></p></li>
-<li><p>R also does some stuff under the hood for encoding factors.</p></li>
+<li><p>R also does some stuff under the hood for encoding factors (i.e. has a lot of methods specifically for factors).</p></li>
 <li><p>Factors are R’s way of storing categorical variables, and are useful when a variable only has a certain number of possible values.</p></li>
 <li><p>Learn more about factors <a href="https://dcgerard.github.io/stat_412_612/lectures/09_factors/09_factors.pdf">here</a>.</p></li>
 <li><p>A <strong>Date</strong> is a double vector with class attribute <code>Date</code>.</p>
@@ -752,7 +752,7 @@ $(document).ready(function () {
 <pre><code>## [1] &quot;Date&quot;</code></pre></li>
 <li><p>Let’s look at the underlying double to today:</p>
 <div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unclass</span>(today)</span></code></pre></div>
-<pre><code>## [1] 19018</code></pre>
+<pre><code>## [1] 19021</code></pre>
 <ul>
 <li>This is the number of days since January 1, 1970:</li>
 </ul>
@@ -819,7 +819,7 @@ $(document).ready(function () {
 <span id="cb154-6"><a href="#cb154-6" aria-hidden="true" tabindex="-1"></a>  mvec[[i]] <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">rnorm</span>(<span class="at">n =</span> nsamp, <span class="at">mean =</span> true_mean))</span>
 <span id="cb154-7"><a href="#cb154-7" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb154-8"><a href="#cb154-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>((mvec <span class="sc">-</span> true_mean)<span class="sc">^</span><span class="dv">2</span>) <span class="do">## mean squared error</span></span></code></pre></div>
-<pre><code>## [1] 0.1005</code></pre></li>
+<pre><code>## [1] 0.09419</code></pre></li>
 <li><p>If you are filling in the values of a matrix, you need to be able to create a matrix with missing values.</p>
 <div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
 <span id="cb156-2"><a href="#cb156-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">3</span></span>
@@ -900,7 +900,7 @@ $(document).ready(function () {
 ## [1,] integer,2 numeric,4  
 ## [2,] integer,8 character,2</code></pre>
 <div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="#cb176-1" aria-hidden="true" tabindex="-1"></a>lmat[[<span class="dv">1</span>, <span class="dv">2</span>]]</span></code></pre></div>
-<pre><code>## [1] 0.1817 0.8338 0.7576 0.3201</code></pre></li>
+<pre><code>## [1] 0.4651 0.2727 0.7979 0.1244</code></pre></li>
 </ul>
 </div>
 <div id="data-frames" class="section level1">
