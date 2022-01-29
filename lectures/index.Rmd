@@ -46,6 +46,7 @@ This repository contains material based upon work supported by the National Scie
   - [S3 Objects](./05_s3.html)
   - [`{vctrs}` Package](./05_vctrs.html)
   - [S4 Objects](./05_s4.html)
+  - [S4 and Bioconductor](./05_bioconductor.html)
 - 06 Functional Programming
 - 07 Metaprogramming
 - 08 Performance/Profiling/Memory

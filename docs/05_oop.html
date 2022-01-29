@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-21" />
+<meta name="date" content="2022-01-29" />
 
 <title>Introduction to Object Oriented Programming</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Introduction to Object Oriented Programming</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-21</h4>
+<h4 class="date">2022-01-29</h4>
 
 </div>
 
@@ -417,49 +417,68 @@ $(document).ready(function () {
 <li><p>These systems are listed in increasing order of complexity, with S3 being “baby” OOP, S4 being “YA” OOP, and RC and R6 being “big boy” OOP.</p></li>
 <li><p>If you are in extending <code>{ggplot2}</code> then you will learn about another OOP system specific to <code>{ggplot2}</code>: ggproto.</p></li>
 </ul></li>
-<li><p>E.g.: To calculate a mean in <code>R6</code> OOP, we would probably create a new class that has the <code>$mean()</code> method that we could call.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>datFrame <span class="ot">&lt;-</span> R6<span class="sc">::</span><span class="fu">R6Class</span>(<span class="at">classname =</span> <span class="st">&quot;datFrame&quot;</span>, <span class="at">public =</span> <span class="fu">list</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">df =</span> <span class="cn">NULL</span>,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean_vec =</span> <span class="cn">NULL</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">initialize =</span> <span class="cf">function</span>(df) {</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stopifnot</span>(<span class="fu">is.data.frame</span>(df))</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>df <span class="ot">&lt;-</span> df</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  },</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean =</span> <span class="cf">function</span>() {</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>mean_vec <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA_real_</span>, <span class="at">length.out =</span> <span class="fu">length</span>(self<span class="sc">$</span>df))</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(self<span class="sc">$</span>df)) self<span class="sc">$</span>mean_vec[[i]] <span class="ot">&lt;-</span> <span class="fu">mean</span>(self<span class="sc">$</span>df[[i]])</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>mtcars_df <span class="ot">&lt;-</span> datFrame<span class="sc">$</span><span class="fu">new</span>(<span class="at">df =</span> mtcars)</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>mtcars_df<span class="sc">$</span>mean_vec</span></code></pre></div>
+<li><p>E.g.: To calculate the column means in S3 OOP, we would probably create a generic function for column means.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>col_means <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ...) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">UseMethod</span>(<span class="st">&quot;col_means&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>and then create a specific method for the <code>data.frame</code> class</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>col_means.data.frame <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  mean_vec <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA_real_</span>, <span class="at">length.out =</span> <span class="fu">length</span>(x))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(mean_vec) <span class="ot">&lt;-</span> <span class="fu">names</span>(x)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(x)) {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    mean_vec[[i]] <span class="ot">&lt;-</span> <span class="fu">mean</span>(x[[i]])</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  mean_vec</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Finally, we would call the generic function on a object of class <code>data.frame</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_means</span>(mtcars)</span></code></pre></div>
+<pre><code>##      mpg      cyl     disp       hp     drat       wt     qsec       vs 
+##  20.0906   6.1875 230.7219 146.6875   3.5966   3.2172  17.8487   0.4375 
+##       am     gear     carb 
+##   0.4062   3.6875   2.8125</code></pre></li>
+<li><p>E.g.: To calculate the column means in R6 OOP, we would probably create a new class that has the <code>$col_means()</code> method that we could call.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>datFrame <span class="ot">&lt;-</span> R6<span class="sc">::</span><span class="fu">R6Class</span>(<span class="at">classname =</span> <span class="st">&quot;datFrame&quot;</span>, <span class="at">public =</span> <span class="fu">list</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">df =</span> <span class="cn">NULL</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean_vec =</span> <span class="cn">NULL</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">initialize =</span> <span class="cf">function</span>(df) {</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stopifnot</span>(<span class="fu">is.data.frame</span>(df))</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>df <span class="ot">&lt;-</span> df</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_means =</span> <span class="cf">function</span>() {</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>mean_vec <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA_real_</span>, <span class="at">length.out =</span> <span class="fu">length</span>(self<span class="sc">$</span>df))</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(self<span class="sc">$</span>df)) self<span class="sc">$</span>mean_vec[[i]] <span class="ot">&lt;-</span> <span class="fu">mean</span>(self<span class="sc">$</span>df[[i]])</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>mtcars_df <span class="ot">&lt;-</span> datFrame<span class="sc">$</span><span class="fu">new</span>(<span class="at">df =</span> mtcars)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>mtcars_df<span class="sc">$</span>mean_vec</span></code></pre></div>
 <pre><code>## NULL</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mtcars_df<span class="sc">$</span><span class="fu">mean</span>()</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>mtcars_df<span class="sc">$</span>mean_vec</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>mtcars_df<span class="sc">$</span><span class="fu">col_means</span>()</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>mtcars_df<span class="sc">$</span>mean_vec</span></code></pre></div>
 <pre><code>##  [1]  20.0906   6.1875 230.7219 146.6875   3.5966   3.2172  17.8487   0.4375
 ##  [9]   0.4062   3.6875   2.8125</code></pre></li>
 <li><p>Because R programmers are not OOP programmers, you should be coding mostly in S3 and S4 when using OOP. We’ll spend most of our time on these.</p></li>
 <li><p>S3 and S4 use <strong>generic function OOP</strong> where the same function name is evaluated differently based on the class of the object.</p></li>
 <li><p>E.g. that allows the output of <code>summary()</code> to differ between doubles and factors.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">size =</span> <span class="dv">100</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">size =</span> <span class="dv">100</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(x)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##    1.00    2.00    6.00    5.71    9.00   10.00</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">factor</span>(x)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(y)</span></code></pre></div>
+##    1.00    3.00    6.00    5.84    8.25   10.00</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">factor</span>(x)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(y)</span></code></pre></div>
 <pre><code>##  1  2  3  4  5  6  7  8  9 10 
-## 16 11  8  2  8  6  9 12 14 14</code></pre></li>
-<li><p><strong>R6 and RC</strong> use <strong>encapsulated OOP</strong> where objects are the center of everything, holding fields (data) and methods (functions) that operate on those values. These are closest to what you would be used to if you are coming from an OOP language. Try not to use them.</p></li>
+## 11 11  7  5  8 11 15  7  7 18</code></pre></li>
+<li><p>R6 and RC use <strong>encapsulated OOP</strong> where objects are the center of everything, holding fields (data) and methods (functions) that operate on those values. These are closest to what you would be used to if you are coming from an OOP language. Try not to use them.</p></li>
 <li><p>E.g. in R we apply a function, like <code>mean()</code> to a vector, like <code>x</code>. But in an encapsulated object oriented programming system would have the function <code>mean()</code> attached to a vector <code>x</code>. That’s one difference between R and Python.</p>
 <p><mark style="background-color: lightblue">R</mark></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">19</span>, <span class="dv">22</span>, <span class="dv">31</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x) <span class="do">## apply mean to x</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">19</span>, <span class="dv">22</span>, <span class="dv">31</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x) <span class="do">## apply mean to x</span></span></code></pre></div>
 <pre><code>## [1] 24</code></pre>
 <p><mark style="background-color: lightblue">Python</mark></p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array([<span class="dv">19</span>, <span class="dv">22</span>, <span class="dv">31</span>])</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>x.mean() <span class="co">## mean belongs to x</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array([<span class="dv">19</span>, <span class="dv">22</span>, <span class="dv">31</span>])</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>x.mean() <span class="co">## mean belongs to x</span></span></code></pre></div>
 <pre><code>## 24.0</code></pre></li>
 <li><p>S3 allows you to use functions like <code>print()</code> and <code>summary()</code> and <code>plot()</code> on outputs of your functions. You can also define your own “generics.”</p></li>
 <li><p>S4 is similar to S3 but is more formal and strict. S4 is important to understand if you want to use or contribute to <a href="https://www.bioconductor.org/">Bioconductor</a>.</p></li>
@@ -470,14 +489,14 @@ $(document).ready(function () {
 <ul>
 <li><p><strong>Polymorphism</strong>: Use the same function name for different types of input, but have the function evaluate differently based on the types of input.</p></li>
 <li><p>An <strong>object</strong> is a specific instance of a <strong>class</strong>. E.g. below, <code>x</code> is an object of class <code>factor</code>.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="dv">119</span>, <span class="dv">22</span>, <span class="dv">31</span>))</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="dv">119</span>, <span class="dv">22</span>, <span class="dv">31</span>))</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(x)</span></code></pre></div>
 <pre><code>## [1] &quot;factor&quot;</code></pre></li>
-<li><p>A function for a specific class is a <strong>method</strong>. Like the <code>mean()</code> method for our R6 class above.</p></li>
+<li><p>A function for a specific class is a <strong>method</strong>. Like the <code>col_means()</code> method for our R6 class above.</p></li>
 <li><p>A <strong>field</strong> is data that belongs to an object. In our R6 example, we had the <code>df</code> and <code>mean_vec</code> fields.</p></li>
 <li><p>Classes are defined in a hierarchy. So if a method does not exist in one class it is searched for in the parent class. It is said that the child class <strong>inherits</strong> the behavior the parent class.</p></li>
 <li><p>E.g. <code>tibbles</code> inherit the behavior of data frames.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="at">a =</span> <span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="at">a =</span> <span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## [1] &quot;tbl_df&quot;     &quot;tbl&quot;        &quot;data.frame&quot;</code></pre></li>
 <li><p>The order in which classes are searched for methods is called <strong>method dispatch</strong>.</p></li>
 </ul>
@@ -487,13 +506,13 @@ $(document).ready(function () {
 <ul>
 <li><p>The <code>{sloop}</code> package is an interface for exploring OOP systems.</p></li>
 <li><p><code>sloop::otype()</code> allows you to see if the system is S3, S4, R6, etc…</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(mtcars) <span class="do">## Most R stuff is in S3.</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(mtcars) <span class="do">## Most R stuff is in S3.</span></span></code></pre></div>
 <pre><code>## [1] &quot;S3&quot;</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;USCounties&quot;</span>, <span class="at">package =</span> <span class="st">&quot;Matrix&quot;</span>) <span class="do">## Efficient matrix computations package</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(USCounties) </span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;USCounties&quot;</span>, <span class="at">package =</span> <span class="st">&quot;Matrix&quot;</span>) <span class="do">## Efficient matrix computations package</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(USCounties) </span></code></pre></div>
 <pre><code>## [1] &quot;S4&quot;</code></pre>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>pb <span class="ot">&lt;-</span> progress<span class="sc">::</span>progress_bar<span class="sc">$</span><span class="fu">new</span>() <span class="do">## progress bars for for-loops</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(pb)</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>pb <span class="ot">&lt;-</span> progress<span class="sc">::</span>progress_bar<span class="sc">$</span><span class="fu">new</span>() <span class="do">## progress bars for for-loops</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(pb)</span></code></pre></div>
 <pre><code>## [1] &quot;R6&quot;</code></pre></li>
 </ul>
 </div>
@@ -502,78 +521,79 @@ $(document).ready(function () {
 <ul>
 <li><p>S (the precursor to R) was developed first without an OOP system. So their only objects were “base types”. But these don’t have basic OOP functionality like polymorphism, inheritance, etc..</p></li>
 <li><p>R users often call base types “objects” even though they aren’t OOP objects.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(x)</span></code></pre></div>
 <pre><code>## [1] &quot;base&quot;</code></pre></li>
 <li><p>In R, an OO object has a <code>class</code> attribute and a base type does not.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">factor</span>(x)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(x, <span class="st">&quot;class&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(x, <span class="st">&quot;class&quot;</span>)</span></code></pre></div>
 <pre><code>## NULL</code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(y, <span class="st">&quot;class&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">factor</span>(x)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(y, <span class="st">&quot;class&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;factor&quot;</code></pre></li>
 <li><p><code>class()</code> will return the result of <code>typeof()</code> if an object has no <code>class</code> attribute (so it is not the most useful for determining class).</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(x)</span></code></pre></div>
 <pre><code>## [1] &quot;integer&quot;</code></pre>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(x)</span></code></pre></div>
 <pre><code>## [1] &quot;integer&quot;</code></pre></li>
 <li><p>Every object, including OO objects, have a base type that can be seen by <code>typeof()</code>.</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(y)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(y)</span></code></pre></div>
 <pre><code>## [1] &quot;integer&quot;</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(mtcars)</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(mtcars)</span></code></pre></div>
 <pre><code>## [1] &quot;list&quot;</code></pre>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(USCounties)</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(USCounties)</span></code></pre></div>
 <pre><code>## [1] &quot;S4&quot;</code></pre>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(pb)</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(pb)</span></code></pre></div>
 <pre><code>## [1] &quot;environment&quot;</code></pre></li>
 <li><p>There are 25 base types. From Hadley’s list, the important ones are:</p>
 <ul>
 <li><p>Vector: <code>NULL</code>, <code>logical</code>, <code>integer</code>, <code>double</code>, <code>character</code>, <code>list</code></p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="cn">NULL</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="cn">NULL</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;NULL&quot;</code></pre>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;logical&quot;</code></pre>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(1L)</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(1L)</span></code></pre></div>
 <pre><code>## [1] &quot;integer&quot;</code></pre>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;double&quot;</code></pre>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="st">&quot;1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="st">&quot;1&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;character&quot;</code></pre>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">list</span>(<span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">list</span>(<span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## [1] &quot;list&quot;</code></pre></li>
 <li><p>Functions: <code>closure</code> (regular R functions), <code>special</code> (internal R functions), <code>builtin</code> (“primitive” functions in the base namespace that were built using C)</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(mean)</span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(mean)</span></code></pre></div>
 <pre><code>## [1] &quot;closure&quot;</code></pre>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="st">`</span><span class="at">if</span><span class="st">`</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="st">`</span><span class="at">if</span><span class="st">`</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;special&quot;</code></pre>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(sum)</span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(sum)</span></code></pre></div>
 <pre><code>## [1] &quot;builtin&quot;</code></pre></li>
 <li><p>Environments: <code>environment</code></p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(rlang<span class="sc">::</span><span class="fu">global_env</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(rlang<span class="sc">::</span><span class="fu">global_env</span>())</span></code></pre></div>
 <pre><code>## [1] &quot;environment&quot;</code></pre></li>
 <li><p>S4 types: <code>S4</code></p>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(USCounties)</span></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(USCounties)</span></code></pre></div>
 <pre><code>## [1] &quot;S4&quot;</code></pre></li>
 <li><p>Language types (used in metaprogramming): <code>symbol</code>, <code>language</code>, <code>pairlist</code>, and <code>expression</code>.</p>
-<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">quote</span>(a))</span></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">quote</span>(a))</span></code></pre></div>
 <pre><code>## [1] &quot;symbol&quot;</code></pre>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">quote</span>(a <span class="sc">+</span> <span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">quote</span>(a <span class="sc">+</span> <span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## [1] &quot;language&quot;</code></pre>
-<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">formals</span>(mean))</span></code></pre></div>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">formals</span>(mean))</span></code></pre></div>
 <pre><code>## [1] &quot;pairlist&quot;</code></pre>
-<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">expression</span>(a))</span></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">expression</span>(a))</span></code></pre></div>
 <pre><code>## [1] &quot;expression&quot;</code></pre></li>
 </ul></li>
 <li><p><strong>Exercise</strong>: What’s the (i) type, (ii) OOP system, and (iii) class of the following objects.</p>
-<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> lubridate<span class="sc">::</span><span class="fu">make_date</span>(<span class="at">year =</span> <span class="fu">c</span>(<span class="dv">1990</span>, <span class="dv">2022</span>), <span class="at">month =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">day =</span> <span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">22</span>))</span>
-<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="at">nrow =</span> <span class="dv">10</span>, <span class="at">ncol =</span> <span class="dv">2</span>)</span>
-<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="at">a =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
-<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>aa <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)</span>
-<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>bb <span class="ot">&lt;-</span> <span class="fu">t.test</span>(mpg <span class="sc">~</span> am, <span class="at">data =</span> mtcars)</span>
-<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>cc <span class="ot">&lt;-</span> rTensor<span class="sc">::</span><span class="fu">as.tensor</span>(<span class="fu">array</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>, <span class="at">dim =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>)))</span></code></pre></div></li>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> lubridate<span class="sc">::</span><span class="fu">make_date</span>(<span class="at">year =</span> <span class="fu">c</span>(<span class="dv">1990</span>, <span class="dv">2022</span>), <span class="at">month =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">day =</span> <span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">22</span>))</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="at">nrow =</span> <span class="dv">10</span>, <span class="at">ncol =</span> <span class="dv">2</span>)</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="at">a =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>aa <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)</span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>bb <span class="ot">&lt;-</span> <span class="fu">t.test</span>(mpg <span class="sc">~</span> am, <span class="at">data =</span> mtcars)</span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>cc <span class="ot">&lt;-</span> rTensor<span class="sc">::</span><span class="fu">as.tensor</span>(<span class="fu">array</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>, <span class="at">dim =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>)))</span></code></pre></div></li>
 <li><p><strong>Exercise</strong>: Why do we get different results from <code>summary()</code> with the following code?</p>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)</span>
-<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">t.test</span>(mpg <span class="sc">~</span> am, <span class="at">data =</span> mtcars)</span>
-<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(a)</span></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)</span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">t.test</span>(mpg <span class="sc">~</span> am, <span class="at">data =</span> mtcars)</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(a)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = mpg ~ wt, data = mtcars)
@@ -590,7 +610,7 @@ $(document).ready(function () {
 ## Residual standard error: 3.05 on 30 degrees of freedom
 ## Multiple R-squared:  0.753,  Adjusted R-squared:  0.745 
 ## F-statistic: 91.4 on 1 and 30 DF,  p-value: 1.29e-10</code></pre>
-<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(b)</span></code></pre></div>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(b)</span></code></pre></div>
 <pre><code>##             Length Class  Mode     
 ## statistic   1      -none- numeric  
 ## parameter   1      -none- numeric  

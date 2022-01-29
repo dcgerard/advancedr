@@ -13,7 +13,7 @@
 
 <meta name="date" content="2022-01-29" />
 
-<title>S4 Objects</title>
+<title>S4 and Bioconductor</title>
 
 <script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -261,7 +261,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">S4 Objects</h1>
+<h1 class="title toc-ignore">S4 and Bioconductor</h1>
 <h4 class="author">David Gerard</h4>
 <h4 class="date">2022-01-29</h4>
 
@@ -271,9 +271,7 @@ $(document).ready(function () {
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#motivation">Motivation</a></li>
-<li><a href="#s4">S4</a></li>
-<li><a href="#matrix"><code>{Matrix}</code></a></li>
-<li><a href="#stats4"><code>{stats4}</code></a></li>
+<li><a href="#bioconductor-file-structure">Bioconductor File Structure</a></li>
 </ul>
 </div>
 
@@ -284,26 +282,25 @@ $(document).ready(function () {
 <div id="learning-objectives" class="section level1">
 <h1>Learning Objectives</h1>
 <ul>
-<li>Chapter 15 of <a href="https://adv-r.hadley.nz/">Advanced R</a></li>
-<li><a href="https://cran.r-project.org/web/packages/Matrix/vignettes/Intro2Matrix.pdf">Introduction to Matrix Package</a></li>
+<li><a href="https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/">Common Bioconductor Methods and Classes</a></li>
+<li><a href="https://bioconductor.org/packages/3.14/bioc/html/BiocGenerics.html">BiocGenerics</a></li>
+<li><a href="https://bioconductor.org/packages/3.14/bioc/html/S4Vectors.html">S4Vectors</a></li>
+<li><a href="https://bioconductor.org/packages/3.14/bioc/html/IRanges.html">IRanges</a></li>
+<li><a href="https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html">VariantAnnotation</a></li>
 </ul>
 </div>
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
 <ul>
-<li>Because S3 is really informal, it is also really easy to make dangerous mistakes.</li>
+<li>The most common application of S4 objects is in the <a href="https://bioconductor.org/">Bioconductor</a> project, so we will use some of those base classes as an example.</li>
 </ul>
 </div>
-<div id="s4" class="section level1">
-<h1>S4</h1>
-</div>
-<div id="matrix" class="section level1">
-<h1><code>{Matrix}</code></h1>
-</div>
-<div id="stats4" class="section level1">
-<h1><code>{stats4}</code></h1>
+<div id="bioconductor-file-structure" class="section level1">
+<h1>Bioconductor File Structure</h1>
 <ul>
-<li>One application of S4 is in the <code>{stats4}</code> package for likelihood inference.</li>
+<li>All class definitions in “R/AllClasses.R”</li>
+<li>All generic function definitions in “R/AllGenerics.R”</li>
+<li>Methods are defined in a file named by the generic function. For example, all <code>show</code> methods would go in “R/show-methods.R”.</li>
 </ul>
 </div>
 

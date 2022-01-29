@@ -57,8 +57,31 @@ klippy::klippy()
     - These systems are listed in increasing order of complexity, with S3 being "baby" OOP, S4 being "YA" OOP, and RC and R6 being "big boy" OOP.
     
     - If you are in extending `{ggplot2}` then you will learn about another OOP system specific to `{ggplot2}`: ggproto.
+    
+- E.g.: To calculate the column means in S3 OOP, we would probably create a generic function for column means.
 
-- E.g.: To calculate a mean in `R6` OOP, we would probably create a new class that has the `$mean()` method that we could call.
+    ```{r}
+    col_means <- function(x, ...) {
+      UseMethod("col_means")
+    }
+    ```
+    and then create a specific method for the `data.frame` class
+    ```{r}
+    col_means.data.frame <- function(x) {
+      mean_vec <- rep(NA_real_, length.out = length(x))
+      names(mean_vec) <- names(x)
+      for (i in seq_along(x)) {
+        mean_vec[[i]] <- mean(x[[i]])
+      }
+      mean_vec
+    }
+    ```
+    Finally, we would call the generic function on a object of class `data.frame`.
+    ```{r}
+    col_means(mtcars)
+    ```
+
+- E.g.: To calculate the column means in R6 OOP, we would probably create a new class that has the `$col_means()` method that we could call.
 
     ```{r}
     datFrame <- R6::R6Class(classname = "datFrame", public = list(
@@ -68,7 +91,7 @@ klippy::klippy()
         stopifnot(is.data.frame(df))
         self$df <- df
       },
-      mean = function() {
+      col_means = function() {
         self$mean_vec <- rep(NA_real_, length.out = length(self$df))
         for (i in seq_along(self$df)) self$mean_vec[[i]] <- mean(self$df[[i]])
       }
@@ -77,7 +100,7 @@ klippy::klippy()
     
     mtcars_df <- datFrame$new(df = mtcars)
     mtcars_df$mean_vec
-    mtcars_df$mean()
+    mtcars_df$col_means()
     mtcars_df$mean_vec
     ```
 
@@ -94,7 +117,7 @@ klippy::klippy()
     summary(y)
     ```
 
-- **R6 and RC** use **encapsulated OOP** where objects are the center of everything, holding fields (data) and methods (functions) that operate on those values. These are closest to what you would be used to if you are coming from an OOP language. Try not to use them.
+- R6 and RC use **encapsulated OOP** where objects are the center of everything, holding fields (data) and methods (functions) that operate on those values. These are closest to what you would be used to if you are coming from an OOP language. Try not to use them.
 
 - E.g. in R we apply a function, like `mean()` to a vector, like `x`. But in an encapsulated object oriented programming system would have the function `mean()` attached to a vector `x`. That's one difference between R and Python.
 
@@ -126,7 +149,7 @@ klippy::klippy()
     class(x)
     ```
 
-- A function for a specific class is a **method**. Like the `mean()` method for our R6 class above.
+- A function for a specific class is a **method**. Like the `col_means()` method for our R6 class above.
 
 - A **field** is data that belongs to an object. In our R6 example, we had the `df` and `mean_vec` fields.
 
@@ -169,8 +192,9 @@ klippy::klippy()
 - In R, an OO object has a `class` attribute and a base type does not.
 
     ```{r}
-    y <- factor(x)
+    x <- 1:10
     attr(x, "class")
+    y <- factor(x)
     attr(y, "class")
     ```
 

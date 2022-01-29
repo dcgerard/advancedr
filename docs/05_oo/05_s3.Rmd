@@ -67,7 +67,7 @@ klippy::klippy()
     ```
 
 - If you are creating a package and you want OOP features, you should use S3 unless
-    1. You work in a large team (use S4 then).
+    1. You work in a large team, or you need to contribute to [Bioconductor](https://www.bioconductor.org/) (use S4).
     2. Modify-by-reference is important (use R6).
     
 - This is since most R programmers are used to S3 (intuitively) and are not used to S4 or R6.
@@ -99,11 +99,11 @@ klippy::klippy()
     class(sout)
     ```
 
-- S3 objects behave differently when passed to a **generic** function.
+- S3 objects behave differently when passed to a **generic** function, a special type of function meant to provide different implementations based on the S3 class of the object.
 
-- Use `sloop::ftype()` to see if a function is generic.
+- Use `sloop::ftype()` to see if a function is generic. If it has the word "generic" is anywhere, it can be used as an S3 generic.
 
-- These are all generics
+- These are all S3 generics
     ```{r}
     sloop::ftype(print)
     sloop::ftype(summary)
@@ -112,8 +112,8 @@ klippy::klippy()
 
 - But these are not:
     ```{r}
-    sloop::ftype(sum)
-    sloop::ftype(c)
+    sloop::ftype(lm)
+    sloop::ftype(stop)
     ```
 
 - Generic functions behave differently depending on the class of the object.
@@ -135,7 +135,7 @@ klippy::klippy()
     ```
     - The `*` means the method exists but is not used.
     - The `=>` means the method exists and is used.
-    - So above, it found a method for the `tbl_df` class and used it, so it did not go on to look for other methods (for objects of class `tbl`, `data.frame` or the `default` method).
+    - So above, it did not find a method for `tbl_df`, so it moved on to `tbl` which does have a method and used it. So it did not go on to look for other methods (`data.frame` or the `default` method), even those classes both have methods.
 
 - Below there is no `aperm()` method for matrices, integers, or numerics, so it used the default one, which is for arrays.
     ```{r}    
@@ -154,14 +154,15 @@ klippy::klippy()
 
 - Lots of methods have `.` in the middle. But not all functions with `.` are methods. E.g. `read.csv()` and `t.test()` are not methods of generic functions. `read.csv()` is just a function with a dot in the name, and `t.test()` is just a generic function with a dot in the name. These functions were created before S3, which is why they are named poorly.
 
-- You can confirm that a function with a `.` in it is a method also with `sloop::ftype()`.
+- You can confirm that a function with a `.` in it is a method also with `sloop::is_s3_method()`.
 
     ```{r}
-    sloop::ftype(read.csv)
-    sloop::ftype(t.test)
+    sloop::is_s3_method("read.csv")
+    sloop::is_s3_method("t.test")
+    sloop::is_s3_method("print.default")
     ```
 
-- Because of this, you should never name variables are functions with a dot in them.
+- Because of the important role of `.`, you should never name variables or non method functions with a dot in them.
 
 - To find all of the methods of a generic, use `sloop::s3_methods_generic()`.
 
@@ -192,7 +193,7 @@ klippy::klippy()
     sloop::s3_dispatch(as.data.frame(mtcars))
     ```
 
-2. `mean()` is an S3 generic. What classes have a method for `mean()`. What is the difference between them?
+- **Exercise**: `mean()` is an S3 generic. What classes have a method for `mean()`. What is the difference between them?
 
     ```{r, echo = FALSE, eval = FALSE}
     sloop::s3_methods_generic("mean")
@@ -202,7 +203,7 @@ klippy::klippy()
     `mean.default()` will work with numeric and logical vector. The different date versions of `mean()` will return a date.
     ```
 
-3. (Advanced R): What class of object does the following code return? What base type is it built on? What attributes does it use?
+- **Exercise** (Advanced R): What class of object does the following code return? What base type is it built on? What attributes does it use?
 
     ```{r}
     set.seed(21)
@@ -210,7 +211,7 @@ klippy::klippy()
     x
     ```
 
-    ```{r}
+    ```{r, eval = FALSE, echo = FALSE}
     sloop::otype(x)
     class(x)
     typeof(x)
@@ -221,7 +222,7 @@ klippy::klippy()
     It's an `ecdf` class S3 object with the function (aka "closure") base type. It has a class and a call attribute.
     ```
 
-4. (Advanced R): What class of object does the following code return? What base type is it built on? What attributes does it use?
+- **Exercise**: (Advanced R): What class of object does the following code return? What base type is it built on? What attributes does it use?
 
     ```{r}
     x <- table(rpois(100, 5))
@@ -253,6 +254,12 @@ klippy::klippy()
     class(x)
     ```
     
+- Thous, it is a little safer to use `sloop::s3_class()`.
+
+    ```{r}
+    sloop::s3_class(x)
+    ```
+
 - You can test that an object is a certain class by `inherits()`.
 
     ```{r}
@@ -272,8 +279,8 @@ klippy::klippy()
     ```
 
 
-- You have to be careful about enforcing the correct structure on your class. For any S3 class you create, you should create 3 functions to help others build and validate your class:
-    - A **constructor** to makes a new object with your class, for internal use only.
+- You have to be careful about enforcing the correct structure on your class. Best practice: For any S3 class you create, you should create 3 functions to help others build and validate your class:
+    - A **constructor** to make a new object with your class, for internal use only.
     - A **validator** that checks the structure of objects with your class.
     - A **helper** that allows users to create objects of your class.
     
@@ -363,13 +370,44 @@ klippy::klippy()
     match(c("A", "A", "B", "A", "B"), c("A", "B"))
     ```
 
-- **Exercise** (Advanced R): Write a constructor for data.frame objects, but call it a `dataframe`. What base type is a data frame built on? What attributes does it use? What are the restrictions placed on the individual elements? What about the names?
+- **Exercise** (Advanced R): Write a constructor for data.frame objects. What base type is a data frame built on? What attributes does it use? What are the restrictions placed on the individual elements? What about the names?
+
+```{block, eval = FALSE, echo = FALSE}
+1. Built on a list.
+2. Uses `names` and `row.names`
+```
+
 
     ```{r, eval = FALSE, echo = FALSE}
-    new_dataframe <- function(x = list(), 
-                              names = character(),
-                              row.names = character()) {
+    new_data.frame <- function(x, 
+                              names = NULL,
+                              row.names = NULL) {
+      x <- unclass(x)
+      stopifnot(is.list(x))
+      
+      n <- length(x[[1]])
+      
+      stopifnot(all(lengths(x) == n))
+      
+      if (!is.null(row.names)) {
+        stopifnot(length(row.names) == n)
+        attr(x, "row.names") <- row.names
+      } else {
+        attr(x, "row.names") <- as.character(1:n)
+      }
+      
+      if (!is.null(names)) {
+        stopifnot(length(names) == length(x))
+        attr(x, "names") <- names
+      }
+      
+      return(structure(x, class = "data.frame"))
     }
+    
+    new_data.frame(x = list(a = 1:3, b = 4:6))
+    new_data.frame(x = list(a = 1:3, b = 4:6), names = c("c", "d"))
+    new_data.frame(x = list(a = 1:3, b = 4:6), row.names = c("e", "f", "g"))
+    new_data.frame(x = mtcars)
     ```
 
 # Generics
@@ -382,9 +420,9 @@ klippy::klippy()
     }
     ```
     
-- No arguments are passed to `UseMethod()`.
+- No arguments are passed to `UseMethod()` except the name of the generic.
 
-- The `x` is a required argument that all methods must have.
+- The `x` is a required argument that all methods must have. You can choose to have this be a different name, to have more required arguments, or to have no required arguments.
 
 - The `...` allows methods of your generic to include other variables than just `x`.
 
@@ -421,7 +459,7 @@ klippy::klippy()
 
 - To create a method
     1. Create a function definition for `generic.method()`.
-    2. Make sure you use the same arguments as the generic.
+    2. Make sure you use the same arguments as the generic (but you can usually include more aguements if there is `...` in the generic).
 
 - E.g., let's create plot and print methods for our `factor2` class.
 
@@ -557,7 +595,7 @@ klippy::klippy()
     class(mt_tb)
     ```
 
-- You should make sure your subclass is of the same base type as the superclass you are inheriting from. E.g. make sure anything you build off of data.frames also has a list base type.
+- You should make sure your subclass is of the same base type as the superclass you are inheriting from. E.g. make sure anything you build off of `data.frame`s also has a list base type.
 
 - You should make sure that you have at least all of the same attributes as the superclass you are inheriting from. E.g. `data.frame`s can have `names` and `row.names`, and so any subclass should also have those attributes.
 
@@ -772,6 +810,19 @@ klippy::klippy()
     }
     ```
 
+# Type Predicates
+
+- Whenever you make a new S3 class, you should always provide a type predict to test if an object is a certaint type.
+
+    ```{r}
+    is_sim <- function(x) {
+      return(inherits(x, "sim"))
+    }
+    dat <- simreg(x = runif(100), beta0 = 1, beta1 = 2, sigma = 0.25)
+    is_sim(dat)
+    is_sim(mtcars)  
+    ```
+
 # Method Dispatch Technicalities
 
 - Every variable in R has some **implicit class** even if it does not have a `class` attribute.
@@ -814,5 +865,6 @@ klippy::klippy()
 - `sloop::s3_methods_generic()`: View all methods of a generic function.
 - `sloop::s3_methods_class()`: View all methods implemented for a specific class.
 - `sloop::s3_class()`: Returns implicit and explicit class.
+- `sloop::is_s3_method()`: Predicate function for determining if a function is an S3 method.
 - `UseMethod()`: Used in a generic to define it as a generic.
 - `NextMethod()`: Apply the next method, in the method dispatch chain, of the called generic.
