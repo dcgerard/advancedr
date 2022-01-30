@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-28" />
+<meta name="date" content="2022-01-30" />
 
 <title>S3 Objects</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S3 Objects</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-28</h4>
+<h4 class="date">2022-01-30</h4>
 
 </div>
 
@@ -384,6 +384,7 @@ $(document).ready(function () {
 <li><a href="#documenting-s3">Documenting S3</a></li>
 <li><a href="#type-predicates">Type Predicates</a></li>
 <li><a href="#method-dispatch-technicalities">Method Dispatch Technicalities</a></li>
+<li><a href="#vctrs-package"><code>{vctrs}</code> package</a></li>
 <li><a href="#new-functions">New functions</a></li>
 </ul>
 </div>
@@ -555,7 +556,7 @@ $(document).ready(function () {
 <li><p>Because of the important role of <code>.</code>, you should never name variables or non method functions with a dot in them.</p></li>
 <li><p>To find all of the methods of a generic, use <code>sloop::s3_methods_generic()</code>.</p>
 <div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_methods_generic</span>(<span class="st">&quot;print&quot;</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 311 × 4
+<pre><code>## # A tibble: 309 × 4
 ##    generic class       visible source             
 ##    &lt;chr&gt;   &lt;chr&gt;       &lt;lgl&gt;   &lt;chr&gt;              
 ##  1 print   acf         FALSE   registered S3method
@@ -568,7 +569,7 @@ $(document).ready(function () {
 ##  8 print   aov         FALSE   registered S3method
 ##  9 print   aovlist     FALSE   registered S3method
 ## 10 print   ar          FALSE   registered S3method
-## # … with 301 more rows</code></pre></li>
+## # … with 299 more rows</code></pre></li>
 <li><p>To find all methods for a class, use <code>sloop::s3_methods_class()</code>.</p>
 <div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_methods_class</span>(<span class="st">&quot;data.frame&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 55 × 4
@@ -748,22 +749,22 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>mean</span></code></pre></div>
 <pre><code>## function (x, ...) 
 ## UseMethod(&quot;mean&quot;)
-## &lt;bytecode: 0x558ade914078&gt;
+## &lt;bytecode: 0x55ce30b6ceb0&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>print</span></code></pre></div>
 <pre><code>## function (x, ...) 
 ## UseMethod(&quot;print&quot;)
-## &lt;bytecode: 0x558adeee08f0&gt;
+## &lt;bytecode: 0x55ce3115ee58&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
 <pre><code>## function (x, y, ...) 
 ## UseMethod(&quot;plot&quot;)
-## &lt;bytecode: 0x558adcc4eeb8&gt;
+## &lt;bytecode: 0x55ce2ffef4a0&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>summary</span></code></pre></div>
 <pre><code>## function (object, ...) 
 ## UseMethod(&quot;summary&quot;)
-## &lt;bytecode: 0x558ae1dcccb8&gt;
+## &lt;bytecode: 0x55ce34202df8&gt;
 ## &lt;environment: namespace:base&gt;</code></pre></li>
 <li><p>The key of a generic is its goals. Methods should generally align with the goals of the generic so that R users don’t get unexpected results. E.g. when you type <code>plot()</code> you shouldn’t output a mean (even though S3 makes this valid behavior).</p></li>
 <li><p>How <code>UseMethod()</code> works: If an object has a class vector of <code>c("cl1", "cl2")</code> then <code>UseMethod()</code> will first search for a method for <code>cl1</code>, if it does not exist it will use the method for <code>cl2</code>, and if that does not exist it will use the default method (there is usually one).</p></li>
@@ -1080,6 +1081,86 @@ $(document).ready(function () {
 <p>even though <code>matrix</code> is not an S3 class.</p></li>
 <li><p>The following functions are called “group generics” <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>, <code>%%</code>, <code>%/%</code>, <code>&amp;</code>, <code>|</code>, <code>!</code>, <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, and <code>&gt;</code>.</p></li>
 <li><p>You can define methods for these group generics, but undergo what’s called double dispatch, choosing a method based on both arguments. This is what allows you to add integers and dates together. We will talk about how to do this correctly in the next lecture.</p></li>
+</ul>
+</div>
+<div id="vctrs-package" class="section level1">
+<h1><code>{vctrs}</code> package</h1>
+<ul>
+<li><p>By far, the most common use for S3 objects are list-like objects to add <code>plot()</code>/<code>summary()</code>/<code>print()</code> methods for folks who use your package.</p></li>
+<li><p>But what if you want to create vector-like objects (e.g. <code>Dates</code> and <code>factors</code>)? Hadley provides a lot of nice examples:</p>
+<ul>
+<li>Percent: a double vector that prints as a percentage.</li>
+<li>Decimal: a double vector that always prints with a fixed number of decimal places.</li>
+<li>Cached sum: a double vector that caches the total sum in an attribute.</li>
+<li>Rational: a pair of integer vectors that defines a rational number like 2 / 3.</li>
+<li>Polynomial: a list of integer vectors that define polynomials like 1 + x - x^3.</li>
+<li>Meter: a numeric vector with meter units.</li>
+<li>Period and frequency: a pair of classes represent a period, or it’s inverse, frequency.</li>
+</ul></li>
+<li><p>It’s a lot of bookkeeping to do this properly. The <code>{vctrs}</code> package makes it a lot easier.</p></li>
+<li><p>Read the <code>{vctrs}</code> vignette for more: <a href="https://vctrs.r-lib.org/articles/s3-vector.html" class="uri">https://vctrs.r-lib.org/articles/s3-vector.html</a></p></li>
+<li><p>The simplest class, for percents, just changes the print method for doubles, but it is still a lot of work to get it to work:</p></li>
+<li><p><code>percent</code> constructor</p>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="#cb168-1" aria-hidden="true" tabindex="-1"></a>new_percent <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">x =</span> <span class="fu">double</span>()) {</span>
+<span id="cb168-2"><a href="#cb168-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">is.double</span>(x))</span>
+<span id="cb168-3"><a href="#cb168-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(vctrs<span class="sc">::</span><span class="fu">new_vctr</span>(x, <span class="at">class =</span> <span class="st">&quot;percent&quot;</span>))</span>
+<span id="cb168-4"><a href="#cb168-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p><code>percent</code> helper</p>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a>percent <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">x =</span> <span class="fu">double</span>()) {</span>
+<span id="cb169-2"><a href="#cb169-2" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> vctrs<span class="sc">::</span><span class="fu">vec_cast</span>(x, <span class="fu">double</span>()) <span class="co"># tries to convert to double</span></span>
+<span id="cb169-3"><a href="#cb169-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">new_percent</span>(x))</span>
+<span id="cb169-4"><a href="#cb169-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p><code>format()</code> method for <code>percent</code> (in <code>{vctrs}</code> this also controls the <code>print()</code> method)</p>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a>format.percent <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ...) {</span>
+<span id="cb170-2"><a href="#cb170-2" aria-hidden="true" tabindex="-1"></a>  ret <span class="ot">&lt;-</span> <span class="fu">formatC</span>(vctrs<span class="sc">::</span><span class="fu">vec_data</span>(x) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">digits =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;f&quot;</span>)</span>
+<span id="cb170-3"><a href="#cb170-3" aria-hidden="true" tabindex="-1"></a>  ret[<span class="fu">is.na</span>(x)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb170-4"><a href="#cb170-4" aria-hidden="true" tabindex="-1"></a>  ret[<span class="sc">!</span><span class="fu">is.na</span>(x)] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(ret[<span class="sc">!</span><span class="fu">is.na</span>(x)], <span class="st">&quot;%&quot;</span>)</span>
+<span id="cb170-5"><a href="#cb170-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ret)</span>
+<span id="cb170-6"><a href="#cb170-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>Allow <code>percent</code> objects to be combined with doubles (using <code>vec_c()</code>)</p>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="co"># type for combination should be percent</span></span>
+<span id="cb171-2"><a href="#cb171-2" aria-hidden="true" tabindex="-1"></a>vec_ptype2.percent.double <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, ...) {</span>
+<span id="cb171-3"><a href="#cb171-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">percent</span>()</span>
+<span id="cb171-4"><a href="#cb171-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb171-5"><a href="#cb171-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb171-6"><a href="#cb171-6" aria-hidden="true" tabindex="-1"></a>vec_ptype2.double.percent <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, ...) {</span>
+<span id="cb171-7"><a href="#cb171-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">percent</span>()</span>
+<span id="cb171-8"><a href="#cb171-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb171-9"><a href="#cb171-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb171-10"><a href="#cb171-10" aria-hidden="true" tabindex="-1"></a><span class="co"># How to cast (change type) based on operation</span></span>
+<span id="cb171-11"><a href="#cb171-11" aria-hidden="true" tabindex="-1"></a>vec_cast.percent.double <span class="ot">&lt;-</span> <span class="cf">function</span>(x, to, ...) <span class="fu">percent</span>(x) </span>
+<span id="cb171-12"><a href="#cb171-12" aria-hidden="true" tabindex="-1"></a>vec_cast.double.percent <span class="ot">&lt;-</span> <span class="cf">function</span>(x, to, ...) vctrs<span class="sc">::</span><span class="fu">vec_data</span>(x) </span></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">percent</span>(<span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.2</span>))</span>
+<span id="cb172-2"><a href="#cb172-2" aria-hidden="true" tabindex="-1"></a>vctrs<span class="sc">::</span><span class="fu">vec_c</span>(x, <span class="fl">0.1</span>)</span></code></pre></div>
+<pre><code>## &lt;percent[3]&gt;
+## [1] 10.0% 20.0% 10.0%</code></pre></li>
+<li><p>Allow percents to be added/subtracted</p>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="#cb174-1" aria-hidden="true" tabindex="-1"></a>vec_arith.percent <span class="ot">&lt;-</span> <span class="cf">function</span>(op, x, y, ...) {</span>
+<span id="cb174-2"><a href="#cb174-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">UseMethod</span>(<span class="st">&quot;vec_arith.percent&quot;</span>, y)</span>
+<span id="cb174-3"><a href="#cb174-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb174-4"><a href="#cb174-4" aria-hidden="true" tabindex="-1"></a>vec_arith.percent.default <span class="ot">&lt;-</span> <span class="cf">function</span>(op, x, y, ...) {</span>
+<span id="cb174-5"><a href="#cb174-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stop_incompatible_op</span>(op, x, y)</span>
+<span id="cb174-6"><a href="#cb174-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb174-7"><a href="#cb174-7" aria-hidden="true" tabindex="-1"></a>vec_arith.percent.percent <span class="ot">&lt;-</span> <span class="cf">function</span>(op, x, y, ...) { <span class="co"># method when have two percents</span></span>
+<span id="cb174-8"><a href="#cb174-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">switch</span>(</span>
+<span id="cb174-9"><a href="#cb174-9" aria-hidden="true" tabindex="-1"></a>    op,</span>
+<span id="cb174-10"><a href="#cb174-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;+&quot;</span> <span class="ot">=</span> , <span class="co"># go to next</span></span>
+<span id="cb174-11"><a href="#cb174-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;-&quot;</span> <span class="ot">=</span> <span class="fu">new_percent</span>(vctrs<span class="sc">::</span><span class="fu">vec_arith_base</span>(op, x, y)), <span class="co"># do double ops, then convert</span></span>
+<span id="cb174-12"><a href="#cb174-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;/&quot;</span> <span class="ot">=</span> vctrs<span class="sc">::</span><span class="fu">vec_arith_base</span>(op, x, y), <span class="co"># units cancel</span></span>
+<span id="cb174-13"><a href="#cb174-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop_incompatible_op</span>(op, x, y) <span class="co"># * makes less sense</span></span>
+<span id="cb174-14"><a href="#cb174-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb174-15"><a href="#cb174-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">percent</span>(<span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.1</span>))</span>
+<span id="cb175-2"><a href="#cb175-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">percent</span>(<span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.7</span>))</span>
+<span id="cb175-3"><a href="#cb175-3" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> y</span></code></pre></div>
+<pre><code>## &lt;percent[2]&gt;
+## [1] 60.0% 80.0%</code></pre>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="#cb177-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">-</span> y</span></code></pre></div>
+<pre><code>## &lt;percent[2]&gt;
+## [1] -40.0% -60.0%</code></pre>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="#cb179-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">/</span> y</span></code></pre></div>
+<pre><code>## [1] 0.2000 0.1429</code></pre></li>
+<li><p>Most folks don’t need to create new vectors, so we won’t cover this package in more detail. But it is really cool what you can do with it.</p></li>
 </ul>
 </div>
 <div id="new-functions" class="section level1">

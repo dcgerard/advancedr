@@ -855,6 +855,103 @@ klippy::klippy()
 
 - You can define methods for these group generics, but undergo what's called double dispatch, choosing a method based on both arguments. This is what allows you to add integers and dates together. We will talk about how to do this correctly in the next lecture.
 
+# `{vctrs}` package
+
+- By far, the most common use for S3 objects are list-like objects to add `plot()`/`summary()`/`print()` methods for folks who use your package.
+
+- But what if you want to create vector-like objects (e.g. `Dates` and `factors`)? Hadley provides a lot of nice examples:
+    - Percent: a double vector that prints as a percentage. 
+    - Decimal: a double vector that always prints with a fixed number of decimal places.
+    - Cached sum: a double vector that caches the total sum in an attribute.
+    - Rational: a pair of integer vectors that defines a rational number like 2 / 3.
+    - Polynomial: a list of integer vectors that define polynomials like 1 + x - x^3.
+    - Meter: a numeric vector with meter units.
+    - Period and frequency: a pair of classes represent a period, or it’s inverse, frequency.
+    
+- It's a lot of bookkeeping to do this properly. The `{vctrs}` package makes it a lot easier.
+
+- Read the `{vctrs}` vignette for more: <https://vctrs.r-lib.org/articles/s3-vector.html>
+
+- The simplest class, for percents, just changes the print method for doubles, but it is still a lot of work to get it to work:
+
+- `percent` constructor
+    
+    ```{r}
+    new_percent <- function(x = double()) {
+      stopifnot(is.double(x))
+      return(vctrs::new_vctr(x, class = "percent"))
+    }
+    ```
+    
+- `percent` helper
+    ```{r}
+    percent <- function(x = double()) {
+      x <- vctrs::vec_cast(x, double()) # tries to convert to double
+      return(new_percent(x))
+    }
+    ```
+
+- `format()` method for `percent` (in `{vctrs}` this also controls the `print()` method)
+    ```{r}
+    format.percent <- function(x, ...) {
+      ret <- formatC(vctrs::vec_data(x) * 100, digits = 1, format = "f")
+      ret[is.na(x)] <- NA
+      ret[!is.na(x)] <- paste0(ret[!is.na(x)], "%")
+      return(ret)
+    }
+    ```
+    
+- Allow `percent` objects to be combined with doubles (using `vec_c()`)
+    ```{r}
+    # type for combination should be percent
+    vec_ptype2.percent.double <- function(x, y, ...) {
+      percent()
+    }
+    
+    vec_ptype2.double.percent <- function(x, y, ...) {
+      percent()
+    }
+    
+    # How to cast (change type) based on operation
+    vec_cast.percent.double <- function(x, to, ...) percent(x) 
+    vec_cast.double.percent <- function(x, to, ...) vctrs::vec_data(x) 
+    ```
+    
+    ```{r}
+    x <- percent(c(0.1, 0.2))
+    vctrs::vec_c(x, 0.1)
+    ```
+    
+- Allow percents to be added/subtracted
+    ```{r}
+    vec_arith.percent <- function(op, x, y, ...) {
+      UseMethod("vec_arith.percent", y)
+    }
+    vec_arith.percent.default <- function(op, x, y, ...) {
+      stop_incompatible_op(op, x, y)
+    }
+    vec_arith.percent.percent <- function(op, x, y, ...) { # method when have two percents
+      switch(
+        op,
+        "+" = , # go to next
+        "-" = new_percent(vctrs::vec_arith_base(op, x, y)), # do double ops, then convert
+        "/" = vctrs::vec_arith_base(op, x, y), # units cancel
+        stop_incompatible_op(op, x, y) # * makes less sense
+      )
+    }
+    ```
+    
+    ```{r}
+    x <- percent(c(0.1, 0.1))
+    y <- percent(c(0.5, 0.7))
+    x + y
+    x - y
+    x / y
+    ```
+    
+- Most folks don't need to create new vectors, so we won't cover this package in more detail. But it is really cool what you can do with it.
+
+
 # New functions
 
 - `class()`: Assign or get the class attribute.

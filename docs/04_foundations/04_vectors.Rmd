@@ -407,7 +407,7 @@ klippy::klippy()
 
     <img src="./04_figs_vec/factor.png" alt="factors" width="25%"/>
     
-- R also does some stuff under the hood for encoding factors.
+- R also does some stuff under the hood for encoding factors (i.e. has a lot of methods specifically for factors).
     
 - Factors are R's way of storing categorical variables, and are useful when a variable only has a certain number of possible values.
 

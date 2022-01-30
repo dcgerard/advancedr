@@ -169,7 +169,7 @@ klippy::klippy()
     x[, 1]
     ```
 
-- If you what it to stay a matrix (not convert to a vector), use `drop = FALSE`
+- If you want it to stay a matrix (not convert to a vector), use `drop = FALSE`
     ```{r}
     x[, 1, drop = FALSE]
     x[1, , drop = FALSE]
@@ -390,7 +390,7 @@ klippy::klippy()
 
 - Resampling: You sample each observation with replacement.
 
-- We typically resample entire rows of data frames.
+- We typically resample entire rows of data frames (though not always, we'll have a homework about this).
 
     ```{r}
     ## Create fake data
