@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-29" />
+<meta name="date" content="2022-01-31" />
 
 <title>S4 Objects</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S4 Objects</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-29</h4>
+<h4 class="date">2022-01-31</h4>
 
 </div>
 
@@ -366,8 +366,29 @@ $(document).ready(function () {
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#motivation">Motivation</a></li>
-<li><a href="#s4">S4</a></li>
-<li><a href="#more-on-classes">More on Classes</a></li>
+<li><a href="#methods-package"><code>{methods}</code> Package</a></li>
+<li><a href="#s4-classes">S4 Classes</a>
+<ul>
+<li><a href="#inheritance">Inheritance</a></li>
+<li><a href="#helper-function">Helper Function</a></li>
+<li><a href="#validator-functions">Validator Functions</a></li>
+</ul></li>
+<li><a href="#s4-generics-and-methods">S4 Generics and Methods</a>
+<ul>
+<li><a href="#show-method"><code>show()</code> method</a></li>
+</ul></li>
+<li><a href="#accessors">Accessors</a></li>
+<li><a href="#coercion">Coercion</a></li>
+<li><a href="#converting-from-s3-so-s4">Converting from S3 so S4</a></li>
+<li><a href="#method-dispatch">Method Dispatch</a>
+<ul>
+<li><a href="#multiple-inheritance">Multiple inheritance</a></li>
+<li><a href="#multiple-dispatch">Multiple dispatch</a></li>
+</ul></li>
+<li><a href="#rational-vector-example">Rational Vector Example</a></li>
+<li><a href="#methods-for-generic-functions">Methods for Generic Functions</a></li>
+<li><a href="#getting-help">Getting Help</a></li>
+<li><a href="#documenting-s4-objects">Documenting S4 objects</a></li>
 <li><a href="#some-example-uses-of-s4-by-others">Some Example Uses of S4 by Others</a>
 <ul>
 <li><a href="#matrix"><code>{Matrix}</code></a></li>
@@ -385,139 +406,757 @@ $(document).ready(function () {
 <h1>Learning Objectives</h1>
 <ul>
 <li>Chapter 15 of <a href="https://adv-r.hadley.nz/">Advanced R</a></li>
+<li><a href="https://cran.r-project.org/doc/Rnews/Rnews_2003-1.pdf">Converting Packages to S4</a></li>
 <li><a href="https://cran.r-project.org/web/packages/Matrix/vignettes/Intro2Matrix.pdf">Introduction to Matrix Package</a></li>
 </ul>
 </div>
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
 <ul>
-<li>Because S3 is really informal, it is also really easy to make dangerous mistakes.</li>
+<li><p>Because S3 is really informal, it is also really easy to make dangerous mistakes.</p></li>
+<li><p><strong>Example</strong>: Class structures are not enforced.</p>
+<ul>
+<li><p>E.g. you can do</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>mt <span class="ot">&lt;-</span> mtcars</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(mt) <span class="ot">&lt;-</span> <span class="st">&quot;lm&quot;</span></span></code></pre></div>
+<p>and method dispatch will try to use <code>lm</code> methods on <code>mt</code> even though that makes no sense.</p></li>
+<li><p>This is because in S3 the class <em>is</em> the <code>class</code> attribute.</p></li>
+<li><p>The structure of a class is not enforced, except by perhaps a “gentleman’s agreement” that classes should be of a certain form.</p></li>
+</ul></li>
+<li><p><strong>Example</strong>: Using function names to identify methods is dangerous. E.g. is <code>row.names.data.frame()</code></p>
+<ol style="list-style-type: decimal">
+<li>The <code>row()</code> method of the <code>names.data.frame</code> class?</li>
+<li>The <code>row.names()</code> method of the <code>data.frame</code> class?</li>
+<li>The <code>row.names.data()</code> method of the <code>frame</code> class?</li>
+</ol></li>
+<li><p>S3 is also limiting because the method is only determined by the class of one object. But what if you have a function <code>f(x, y)</code> and you want the method to be different based on:</p>
+<ul>
+<li><code>x</code> and <code>y</code> are both class <code>foo</code>.</li>
+<li><code>x</code> is class <code>foo</code> and <code>y</code> is class <code>bar</code>.</li>
+<li><code>x</code> is class <code>bar</code> and <code>y</code> is class <code>foo</code>.</li>
+<li><code>x</code> and <code>y</code> are both class <code>bar</code></li>
+</ul></li>
+<li><p>S4</p>
+<ol style="list-style-type: decimal">
+<li>Makes creating objects of a class more strict, to enforce structure.</li>
+<li>Makes method creation more strict, so you don’t have to name a new function <code>generic.class()</code> and just hope for the best.</li>
+<li>Allows for multiple dispatch, where you can choose the method based on the class of more than one object.</li>
+</ol></li>
 </ul>
 </div>
-<div id="s4" class="section level1">
-<h1>S4</h1>
+<div id="methods-package" class="section level1">
+<h1><code>{methods}</code> Package</h1>
 <ul>
-<li><p>All functions for S4 are in the <code>{methods}</code> package which comes with R by default.</p>
+<li>All functions for S4 are in the <code>{methods}</code> package which comes with R by default.
 <ul>
 <li>So in a package you either need to import the <code>{methods}</code> package, or you need to use <code>::</code> to use these functions create S4 objects.</li>
 <li>Running R in batch mode (e.g. running it on the supercomputer) also does not attach the <code>{methods}</code> package, so you need to do <code>library(methods)</code> if you intend to use S4 in batch mode.</li>
 </ul></li>
+</ul>
+</div>
+<div id="s4-classes" class="section level1">
+<h1>S4 Classes</h1>
+<ul>
 <li><p>In S3, <em>any</em> object with a <code>class</code> attribute is an S3 object.</p></li>
-<li><p>In S4, you need to explicitly run the <code>methods::setClass()</code> function to define the class.</p>
+<li><p>In S4, you need to explicitly run the <code>methods::setClass()</code> function to define the class. This makes the structure explicitly enforced.</p>
 <ul>
 <li>The <code>Class</code> argument is the name of the new class.</li>
-<li>The <code>slots</code> argument contains a <em>named</em> character vector with the name of the fields in the class and the type for each field.</li>
+<li>The <code>slots</code> argument contains a <em>named</em> character vector with the name of the fields in the class and the type for each field.
+<ul>
+<li>Note that it supports <code>"numeric"</code> and not <code>"double"</code>.</li>
+</ul></li>
+<li>The <code>prototype</code> argument contains a list of default values for each slot. You should always include a prototype.</li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setClass</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">slots =</span> <span class="fu">c</span>(</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">&quot;character&quot;</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">age =</span> <span class="st">&quot;numeric&quot;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setClass</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">slots =</span> <span class="fu">c</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">&quot;character&quot;</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">age =</span> <span class="st">&quot;numeric&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">prototype =</span> <span class="fu">list</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="fu">character</span>(),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">double</span>()</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
 <li><p><em>Note</em>: In S4, they call fields <strong>slots</strong> (i.e. data that belongs to the class).</p></li>
 <li><p>You then use <code>methods::new()</code> to create objects of the given S4 class, specifying the class and filling in the slots.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>david <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>, <span class="at">name =</span> <span class="st">&quot;David Gerard&quot;</span>, <span class="at">age =</span> <span class="dv">34</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>david <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>, <span class="at">name =</span> <span class="st">&quot;David Gerard&quot;</span>, <span class="at">age =</span> <span class="dv">34</span>)</span></code></pre></div></li>
 <li><p><code>david</code> is an S4 object</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(david)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(david)</span></code></pre></div>
 <pre><code>## [1] &quot;S4&quot;</code></pre></li>
 <li><p>You use <code>methods::is()</code> to see (via one argument) and test (via two arguments) the S4 class of an object.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is</span>(david)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is</span>(david)</span></code></pre></div>
 <pre><code>## [1] &quot;Person&quot;</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is</span>(david, <span class="st">&quot;Person&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is</span>(david, <span class="st">&quot;Person&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre></li>
 <li><p>You extract the data from a slot with <code>methods::slot()</code></p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slot</span>(david, <span class="st">&quot;age&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slot</span>(david, <span class="st">&quot;age&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] 34</code></pre></li>
 <li><p>Equivalently, you can use <code>@</code> notation to extract slots. (You do not use <code>$</code> or <code>[[</code> notation for S4 objects).</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>david<span class="sc">@</span>age</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>david<span class="sc">@</span>age</span></code></pre></div>
 <pre><code>## [1] 34</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## will error</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>david<span class="sc">$</span>age</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## will error</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>david<span class="sc">$</span>age</span></code></pre></div>
 <pre><code>## Error in david$age: $ operator not defined for this S4 class</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## will error</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>david[[<span class="st">&quot;age&quot;</span>]]</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">## will error</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>david[[<span class="st">&quot;age&quot;</span>]]</span></code></pre></div>
 <pre><code>## Error in david[[&quot;age&quot;]]: this S4 class is not subsettable</code></pre></li>
-<li><p>The <code>@</code> notation is typically only used internally. If you want folks to access slots, you need to define an <strong>accessor</strong> function. Accessor’s are usually methods for S4 generics, so let’s go through how to create generics and methods.</p></li>
+<li><p>The <code>@</code> notation is typically only used <em>internally.</em> If you want folks to access slots, you need to define an <strong>accessor</strong> function. Accessor’s are usually methods for S4 generics, which we will cover later.</p></li>
+</ul>
+<div id="inheritance" class="section level2">
+<h2>Inheritance</h2>
+<ul>
+<li><p>Inheritance is really informal in S3. <code>class</code> is a vector and method dispatch just sequentially goes down the vector. But there is no guarantee that a subclass will have the correct structure of a superclass, or that the <code>class</code> vector is consistent across all members of a class.</p></li>
+<li><p>In S4, use the <code>contains</code> argument in <code>setClass()</code> to explicitly define the superclass that your class is inheriting from.</p></li>
+<li><p>E.g. we can create a class called <code>Employee</code> that inherits from <code>Person</code>.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setClass</span>(</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;Employee&quot;</span>, </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">contains =</span> <span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">slots =</span> <span class="fu">c</span>(</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">boss =</span> <span class="st">&quot;character&quot;</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">years =</span> <span class="st">&quot;numeric&quot;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">prototype =</span> <span class="fu">list</span>(</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">boss =</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">years =</span> <span class="cn">NA_real_</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p>Now, we can create an <code>Employee</code> object with all of the slots of <code>Person</code>, along with the new slots from <code>Employee</code>.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>david <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Employee&quot;</span>, </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">name =</span> <span class="st">&quot;David Gerard&quot;</span>, </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">age =</span> <span class="dv">34</span>, </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">boss =</span> <span class="st">&quot;Self&quot;</span>, </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">years =</span> <span class="dv">4</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>david</span></code></pre></div>
+<pre><code>## An object of class &quot;Employee&quot;
+## Slot &quot;boss&quot;:
+## [1] &quot;Self&quot;
+## 
+## Slot &quot;years&quot;:
+## [1] 4
+## 
+## Slot &quot;name&quot;:
+## [1] &quot;David Gerard&quot;
+## 
+## Slot &quot;age&quot;:
+## [1] 34</code></pre></li>
+</ul>
+</div>
+<div id="helper-function" class="section level2">
+<h2>Helper Function</h2>
+<ul>
+<li><p>You should not expect users to use <code>new()</code>. Instead you should create a helper function for them. E.g.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>Employee <span class="ot">&lt;-</span> <span class="cf">function</span>(name, </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">age =</span> <span class="cn">NA_real_</span>, </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">boss =</span> <span class="cn">NA_character_</span>, </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">years =</span> <span class="cn">NA_real_</span>) {</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  age <span class="ot">&lt;-</span> <span class="fu">as.double</span>(age)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  boss <span class="ot">&lt;-</span> <span class="fu">as.character</span>(boss)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  years <span class="ot">&lt;-</span> <span class="fu">as.double</span>(years)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">new</span>(<span class="st">&quot;Employee&quot;</span>, <span class="at">name =</span> name, <span class="at">age =</span> age, <span class="at">boss =</span> boss, <span class="at">years =</span> years))</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>david <span class="ot">&lt;-</span> <span class="fu">Employee</span>(<span class="at">name =</span> <span class="st">&quot;David Gerard&quot;</span>, <span class="at">age =</span> <span class="dv">34</span>, <span class="at">boss =</span> <span class="st">&quot;Self&quot;</span>, <span class="at">years =</span> <span class="dv">4</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>david</span></code></pre></div>
+<pre><code>## An object of class &quot;Employee&quot;
+## Slot &quot;boss&quot;:
+## [1] &quot;Self&quot;
+## 
+## Slot &quot;years&quot;:
+## [1] 4
+## 
+## Slot &quot;name&quot;:
+## [1] &quot;David Gerard&quot;
+## 
+## Slot &quot;age&quot;:
+## [1] 34</code></pre></li>
+<li><p>Try to make sensible defaults, and try to type-cast as much as you can.</p></li>
+</ul>
+</div>
+<div id="validator-functions" class="section level2">
+<h2>Validator Functions</h2>
+<ul>
+<li><p>Suppose we want <code>Person</code> to be a vector-type object. So we should constrain the <code>age</code> and <code>name</code> slots to be the same size.</p></li>
+<li><p>This is not currently a constraint</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>profs <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>, <span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;David Gerard&quot;</span>, <span class="st">&quot;Zois Boukouvalas&quot;</span>), <span class="at">age =</span> <span class="dv">34</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>profs</span></code></pre></div>
+<pre><code>## An object of class &quot;Person&quot;
+## Slot &quot;name&quot;:
+## [1] &quot;David Gerard&quot;     &quot;Zois Boukouvalas&quot;
+## 
+## Slot &quot;age&quot;:
+## [1] 34</code></pre></li>
+<li><p>You define S4 validators with <code>setValidity()</code>.</p>
+<ul>
+<li><code>Class</code> is the name of the class to create a validator for.</li>
+<li><code>method</code> is the function that should be run on the class.
+<ul>
+<li>It returns <code>TRUE</code> if all validity checks pass.</li>
+<li>It returns a character string describing the issues if some of the validity checks fail.</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setValidity</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>, </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="cf">function</span>(object) {</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">length</span>(object<span class="sc">@</span>name) <span class="sc">!=</span> <span class="fu">length</span>(object<span class="sc">@</span>age)) {</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;@name and @age must be same length&quot;</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="cn">TRUE</span>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## Class &quot;Person&quot; [in &quot;.GlobalEnv&quot;]
+## 
+## Slots:
+##                           
+## Name:       name       age
+## Class: character   numeric
+## 
+## Known Subclasses: &quot;Employee&quot;</code></pre></li>
+<li><p>Now it is impossible to make <code>@name</code> and <code>@age</code> slots of different lengths</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>    profs <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>, <span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;David Gerard&quot;</span>, <span class="st">&quot;Zois Boukouvalas&quot;</span>), <span class="at">age =</span> <span class="dv">34</span>)</span></code></pre></div>
+<pre><code>## Error in validObject(.Object): invalid class &quot;Person&quot; object: @name and @age must be same length</code></pre></li>
+<li><p>Note: Validity checks only run automatically with <code>new()</code>, so you can edit the slot to have invalid inputs.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>profs <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;David Gerard&quot;</span>, <span class="st">&quot;Zois Boukouvalas&quot;</span>),</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">age =</span> <span class="fu">c</span>(<span class="dv">34</span>, <span class="cn">NA_real_</span>))</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>profs<span class="sc">@</span>age <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span></span></code></pre></div></li>
+<li><p>But you can manually check validity with <code>validObject()</code>.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validObject</span>(profs)</span></code></pre></div>
+<pre><code>## Error in validObject(profs): invalid class &quot;Person&quot; object: @name and @age must be same length</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>profs <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>, </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;David Gerard&quot;</span>, <span class="st">&quot;Zois Boukouvalas&quot;</span>), </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">age =</span> <span class="fu">c</span>(<span class="dv">34</span>, <span class="cn">NA_real_</span>))</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="fu">validObject</span>(profs)</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre></li>
+<li><p><strong>Exercise</strong>: Create a <code>factor2</code> S4 class that tries to implement the <code>factor</code> class for S4.</p>
+<ul>
+<li>Define the class (with appropriate slots and prototypes)</li>
+<li>Create a helper function. It should be able to take a character vector as input and define the</li>
+<li>Create a validator. It should check that the the maximum integer is less than or equal to the number of levels.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="s4-generics-and-methods" class="section level1">
+<h1>S4 Generics and Methods</h1>
+<ul>
 <li><p>You create generic functions with <code>setGeneric()</code>.</p>
 <ul>
 <li>The <code>name</code> is the name of the new generic.</li>
-<li>The <code>def</code> is the function of the generic. Recall that S3 generics are eally simple and just call <code>UseMethod("generic"). Similarly, S4 generic functions should be really simple and just call</code>standardGeneric(“generic”)`.</li>
+<li>The <code>def</code> is the function of the generic. Recall that S3 generics are really simple and just call <code>UseMethod("generic")</code>. Similarly, S4 generic functions should be really simple and just call <code>standardGeneric("generic")</code>.</li>
 </ul></li>
-<li><p>Below we are defining a generic called <code>age()</code> and a generic for <code>age()&lt;-</code> which will act as a replacement function.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;age&quot;</span>,</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">def =</span> <span class="cf">function</span>(x) {</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">standardGeneric</span>(<span class="st">&quot;age&quot;</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>             }</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>           )</span></code></pre></div>
+<li><p>Below we are defining a generic called <code>age()</code> (for getting the age of individuals) and a generic for <code>age()&lt;-</code> which will act as a replacement function.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;age&quot;</span>, </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">def =</span> <span class="cf">function</span>(x) <span class="fu">standardGeneric</span>(<span class="st">&quot;age&quot;</span>))</span></code></pre></div>
 <pre><code>## [1] &quot;age&quot;</code></pre>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;age&lt;-&quot;</span>, </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">def =</span> <span class="cf">function</span>(x, value) {</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">standardGeneric</span>(<span class="st">&quot;age&lt;-&quot;</span>)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>             }</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>           )</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;age&lt;-&quot;</span>, </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">def =</span> <span class="cf">function</span>(x, value) <span class="fu">standardGeneric</span>(<span class="st">&quot;age&lt;-&quot;</span>))</span></code></pre></div>
 <pre><code>## [1] &quot;age&lt;-&quot;</code></pre></li>
+<li><p>Literally most S4 generics look like this</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>append</span></code></pre></div>
+<pre><code>## standardGeneric for &quot;append&quot; defined from package &quot;BiocGenerics&quot;
+## 
+## function (x, values, after = length(x)) 
+## standardGeneric(&quot;append&quot;)
+## &lt;bytecode: 0x558b13cfc9c0&gt;
+## &lt;environment: 0x558b13ce26c8&gt;
+## Methods may be defined for arguments: x, values
+## Use  showMethods(append)  for currently available ones.</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>dims</span></code></pre></div>
+<pre><code>## standardGeneric for &quot;dims&quot; defined from package &quot;BiocGenerics&quot;
+## 
+## function (x) 
+## standardGeneric(&quot;dims&quot;)
+## &lt;bytecode: 0x558b145aafb8&gt;
+## &lt;environment: 0x558b145a6848&gt;
+## Methods may be defined for arguments: x
+## Use  showMethods(dims)  for currently available ones.</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>get</span></code></pre></div>
+<pre><code>## standardGeneric for &quot;get&quot; defined from package &quot;BiocGenerics&quot;
+## 
+## function (x, pos = -1L, envir = as.environment(pos), mode = &quot;any&quot;, 
+##     inherits = TRUE) 
+## standardGeneric(&quot;get&quot;)
+## &lt;bytecode: 0x558b147a08d0&gt;
+## &lt;environment: 0x558b1479b890&gt;
+## Methods may be defined for arguments: x, pos, envir
+## Use  showMethods(get)  for currently available ones.</code></pre></li>
+<li><p>The only other argument you should usually use in <code>setGeneric()</code> is <code>signature</code>.</p>
+<ul>
+<li><p>By default, method dispatch is determined by <em>all</em> of the arguments in the <code>def</code> function</p></li>
+<li><p>You can choose to only do method dispatch based on some arguments via signature.</p></li>
+<li><p>E.g. below only <code>x</code> determines method dispatch:</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;age&lt;-&quot;</span>, </span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">def =</span> <span class="cf">function</span>(x, value) <span class="fu">standardGeneric</span>(<span class="st">&quot;age&lt;-&quot;</span>),</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">signature =</span> <span class="st">&quot;x&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;age&lt;-&quot;</code></pre></li>
+</ul></li>
 <li><p>You define a method for a given generic with <code>setMethod()</code></p>
 <ul>
-<li><code>f</code>: The name of the gneric.</li>
-<li><code>Person</code>: The name of the class(es) to which to apply the method.</li>
+<li><code>f</code>: The name of the generic.</li>
+<li><code>signature</code>: The name of the class(es) to which to apply the method.</li>
 <li><code>definition</code>: The method function.</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(<span class="at">f =</span> <span class="st">&quot;age&quot;</span>, </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">signature =</span> <span class="st">&quot;Person&quot;</span>, </span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">definition =</span> <span class="cf">function</span>(x) {</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>            <span class="fu">return</span>(x<span class="sc">@</span>age)</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>          }</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>         )</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(<span class="at">f =</span> <span class="st">&quot;age&lt;-&quot;</span>,</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">signature =</span> <span class="st">&quot;Person&quot;</span>,</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">definition =</span> <span class="cf">function</span>(x, value) {</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>            x<span class="sc">@</span>age <span class="ot">&lt;-</span> value</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">return</span>(x)</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>          }</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>         )</span></code></pre></div></li>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(<span class="at">f =</span> <span class="st">&quot;age&quot;</span>, </span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">signature =</span> <span class="st">&quot;Person&quot;</span>, </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">definition =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>            <span class="fu">return</span>(x<span class="sc">@</span>age)</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>         )</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(<span class="at">f =</span> <span class="st">&quot;age&lt;-&quot;</span>,</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">signature =</span> <span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">definition =</span> <span class="cf">function</span>(x, value) {</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>            x<span class="sc">@</span>age <span class="ot">&lt;-</span> value</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">return</span>(x)</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>         )</span></code></pre></div></li>
 <li><p>Let’s look at these</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">age</span>(david)</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>david <span class="ot">&lt;-</span> <span class="fu">Employee</span>(<span class="at">name =</span> <span class="st">&quot;David Gerard&quot;</span>, <span class="at">age =</span> <span class="dv">34</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">age</span>(david)</span></code></pre></div>
 <pre><code>## [1] 34</code></pre></li>
+<li><p>Notice that this worked with an <code>Employee</code> object even though we only defined the method for <code>Person</code>. This is because <code>Employee</code> inherits from <code>Person</code>.</p></li>
 <li><p>Let’s reassign age</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">age</span>(david) <span class="ot">&lt;-</span> <span class="dv">21</span> <span class="co"># ah, young again</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">age</span>(david)</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">age</span>(david) <span class="ot">&lt;-</span> <span class="dv">21</span> <span class="co"># ah, young again</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">age</span>(david)</span></code></pre></div>
 <pre><code>## [1] 21</code></pre></li>
 <li><p>The <code>age()</code> method is called an <strong>accessor</strong> or, more informally, a <strong>getter</strong>.</p></li>
 <li><p>The <code>age()&lt;-</code> method is called a <strong>replacement function</strong> or, more informally, a <strong>setter</strong>.</p></li>
-<li><p>To read the help file of an S4 class, put <code>class?</code> before the name of the class. E.g. the following will open up the helpfile of the <code>GRanges</code> class from the <code>{GenomicRanges}</code> package from Bioconductor.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GenomicRanges)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>class?GRanges</span></code></pre></div></li>
+</ul>
+<div id="show-method" class="section level2">
+<h2><code>show()</code> method</h2>
+<ul>
+<li><p>You should always define a <code>show()</code> method. This is used for printing S4 objects.</p></li>
+<li><p>You need to use the same arguments of a generic that already exists. E.g. show needs <code>object</code></p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">args</span>(<span class="fu">getGeneric</span>(<span class="st">&quot;show&quot;</span>))</span></code></pre></div>
+<pre><code>## function (object) 
+## NULL</code></pre></li>
+<li><p>You usually use the <code>cat()</code> function for printing.</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;show&quot;</span>, </span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;Person&quot;</span>, </span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(object) {</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">is</span>(object)[[<span class="dv">1</span>]], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;  Name: &quot;</span>, object<span class="sc">@</span>name, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;   Age: &quot;</span>, object<span class="sc">@</span>age, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p>Now we get better printing for <code>Person</code>’s and <code>Employee</code>’s.</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>david</span></code></pre></div>
+<pre><code>## Employee
+##   Name: David Gerard
+##    Age: 21</code></pre></li>
+</ul>
+</div>
+</div>
+<div id="accessors" class="section level1">
+<h1>Accessors</h1>
+<ul>
+<li><p>Above, we defined the accessor <code>age</code> as a generic.</p></li>
+<li><p>But if you have slots unique to your class, you don’t need to go all out OOP like that.</p></li>
+<li><p>A basic accessor can be defined as follows:</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>person_name <span class="ot">&lt;-</span> <span class="cf">function</span>(x) x<span class="sc">@</span>name</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">person_name</span>(david)</span></code></pre></div>
+<pre><code>## [1] &quot;David Gerard&quot;</code></pre></li>
+<li><p>Or we can go through the whole rigmarole so that other classes can use your generic.</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;name&quot;</span>, <span class="at">def =</span> <span class="cf">function</span>(x) <span class="fu">standardGeneric</span>(<span class="st">&quot;name&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] &quot;name&quot;</code></pre>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(<span class="at">f =</span> <span class="st">&quot;name&quot;</span>, <span class="at">signature =</span> <span class="st">&quot;Person&quot;</span>, <span class="at">definition =</span> <span class="cf">function</span>(x) x<span class="sc">@</span>name)</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;name&lt;-&quot;</span>, <span class="at">def =</span> <span class="cf">function</span>(x, value) <span class="fu">standardGeneric</span>(<span class="st">&quot;name&lt;-&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] &quot;name&lt;-&quot;</code></pre>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;name&lt;-&quot;</span>, </span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(x, value) {</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>    x<span class="sc">@</span>name <span class="ot">&lt;-</span> value</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">validObject</span>(x)</span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(x)</span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span>(david)</span></code></pre></div>
+<pre><code>## [1] &quot;David Gerard&quot;</code></pre>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span>(david) <span class="ot">&lt;-</span> <span class="st">&quot;DG&quot;</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>david</span></code></pre></div>
+<pre><code>## Employee
+##   Name: DG
+##    Age: 21</code></pre></li>
+<li><p><strong>Exercise</strong>: Define a <code>show()</code> method for the <code>factor2</code> class. It should have similar output as</p></li>
+<li><p><strong>Exercise</strong>: Define a <code>levels2()</code> and <code>levels2&lt;-</code> generic and method for the <code>factor2</code> class that will set and get the <code>levels</code> slot.</p></li>
+</ul>
+</div>
+<div id="coercion" class="section level1">
+<h1>Coercion</h1>
+<ul>
+<li><p>Use <code>setAs()</code> to define a method for coercing an object to a given class.</p>
+<ul>
+<li><code>from</code>: The class you are coercing from.</li>
+<li><code>to</code>: The class you are coercing to.</li>
+<li><code>def</code> A function of one argument, of class <code>from</code> that will convert it to class <code>to</code>. Typically the name of the argument is just <code>from</code>.</li>
+</ul></li>
+<li><p>Let’s coerce a <code>character</code> vector into a <code>Person</code> by assuming that the character vector contains the names.</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setAs</span>(</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">from =</span> <span class="st">&quot;character&quot;</span>,</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">to =</span> <span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">def =</span> <span class="cf">function</span>(from) {</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>, </span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">name =</span> from, </span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">age =</span> <span class="fu">rep</span>(<span class="cn">NA_real_</span>, <span class="at">length.out =</span> <span class="fu">length</span>(from)))</span>
+<span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p>You then use <code>methods::as()</code> to apply the coercion.</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>pvec <span class="ot">&lt;-</span> <span class="fu">as</span>(<span class="at">object =</span> <span class="fu">c</span>(<span class="st">&quot;David&quot;</span>, <span class="st">&quot;Alice&quot;</span>, <span class="st">&quot;John&quot;</span>, <span class="st">&quot;Jenny&quot;</span>), <span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>)</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>pvec</span></code></pre></div>
+<pre><code>## Person
+##   Name: DavidAliceJohnJenny
+##    Age: NANANANA</code></pre></li>
+<li><p>Though, just as with <code>new()</code> and <code>is()</code>, you try to hide <code>as()</code> from the user through a generic function</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;asPerson&quot;</span>, <span class="at">def =</span> <span class="cf">function</span>(x) <span class="fu">standardGeneric</span>(<span class="st">&quot;asPerson&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] &quot;asPerson&quot;</code></pre>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;asPerson&quot;</span>, </span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;character&quot;</span>, </span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as</span>(<span class="at">object =</span> x, <span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>)</span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a>pvec <span class="ot">&lt;-</span> <span class="fu">asPerson</span>(<span class="fu">c</span>(<span class="st">&quot;David&quot;</span>, <span class="st">&quot;Bob&quot;</span>, <span class="st">&quot;Megan&quot;</span>))</span>
+<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a>pvec</span></code></pre></div>
+<pre><code>## Person
+##   Name: DavidBobMegan
+##    Age: NANANA</code></pre></li>
+<li><p><strong>Exercise</strong>: Create a coercion for <code>factor2</code> from <code>character</code>.</p></li>
+</ul>
+</div>
+<div id="converting-from-s3-so-s4" class="section level1">
+<h1>Converting from S3 so S4</h1>
+<ul>
+<li><p>It’s possible to register an S3 class to be an S4 class by <code>setOldClass()</code>. You do this after calling <code>setClass()</code>.</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setClass</span>(<span class="st">&quot;factor&quot;</span>,</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">contains =</span> <span class="st">&quot;integer&quot;</span>,</span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">slots =</span> <span class="fu">c</span>(</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="st">&quot;character&quot;</span></span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">prototype =</span> <span class="fu">structure</span>(</span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">integer</span>(),</span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">character</span>()</span>
+<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a><span class="fu">setOldClass</span>(<span class="st">&quot;factor&quot;</span>, <span class="at">S4Class =</span> <span class="st">&quot;factor&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning in rm(list = what, pos = classWhere): object &#39;.__C__factor&#39; not found</code></pre></li>
+<li><p>Above, we inherit from the <code>integer</code> base type.</p></li>
+<li><p>When you inherit from a base type, it has a slot <code>.Data</code> which is where the base type’s values live. Let’s use this to make new S4 factors.</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;factor&quot;</span>, <span class="at">.Data =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>), <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>))</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(x)</span></code></pre></div>
+<pre><code>## [1] &quot;S4&quot;</code></pre>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>## Object of class &quot;factor&quot;
+## [1] A B A B A
+## Levels: A B</code></pre>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>x<span class="sc">@</span>.Data</span></code></pre></div>
+<pre><code>## [1] 1 2 1 2 1</code></pre></li>
+<li><p>It is possible to convert any S3 generic to an S4 generic by simply running</p>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="st">&quot;mean&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;mean&quot;</code></pre></li>
+</ul>
+</div>
+<div id="method-dispatch" class="section level1">
+<h1>Method Dispatch</h1>
+<div id="multiple-inheritance" class="section level2">
+<h2>Multiple inheritance</h2>
+<ul>
+<li><p>It’s possible to create a class that inherits from two or more classes (i.e. have two superclasses). This is called <strong>multiple inheritance</strong>.</p></li>
+<li><p>Issue: If the subclass does not not have a method, but both superclasses have methods, then R will choose the method based on alphabetical order. This is dangerous, so we won’t cover it.</p></li>
+</ul>
+</div>
+<div id="multiple-dispatch" class="section level2">
+<h2>Multiple dispatch</h2>
+<ul>
+<li><p>A method can be determined by the classes of multiple objects in the generic call. This is called <strong>multiple dispatch</strong>.</p></li>
+<li><p>E.g. how should <code>c(x, y)</code> behave if</p>
+<ol style="list-style-type: decimal">
+<li><code>x</code> and <code>y</code> are both factors?</li>
+<li><code>x</code> is a factor and <code>y</code> is a character?</li>
+<li><code>x</code> and <code>y</code> are both characters?</li>
+</ol></li>
+<li><p>We will demonstrate this using the <code>Rational</code> class defined next.</p></li>
+</ul>
+</div>
+</div>
+<div id="rational-vector-example" class="section level1">
+<h1>Rational Vector Example</h1>
+<ul>
+<li><p>I will create a new <code>Rational</code> class that contains numerator and denominator slots:</p>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setClass</span>(</span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;Rational&quot;</span>, </span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">slots =</span> <span class="fu">c</span>(</span>
+<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">num =</span> <span class="st">&quot;integer&quot;</span>,</span>
+<span id="cb85-5"><a href="#cb85-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">den =</span> <span class="st">&quot;integer&quot;</span></span>
+<span id="cb85-6"><a href="#cb85-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb85-7"><a href="#cb85-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">prototype =</span> <span class="fu">list</span>(</span>
+<span id="cb85-8"><a href="#cb85-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">num =</span> <span class="fu">integer</span>(),</span>
+<span id="cb85-9"><a href="#cb85-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">den =</span> <span class="fu">integer</span>()</span>
+<span id="cb85-10"><a href="#cb85-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb85-11"><a href="#cb85-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb85-12"><a href="#cb85-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb85-13"><a href="#cb85-13" aria-hidden="true" tabindex="-1"></a><span class="fu">setValidity</span>(</span>
+<span id="cb85-14"><a href="#cb85-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;Rational&quot;</span>, </span>
+<span id="cb85-15"><a href="#cb85-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="cf">function</span>(object) {</span>
+<span id="cb85-16"><a href="#cb85-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">length</span>(object<span class="sc">@</span>num) <span class="sc">!=</span> <span class="fu">length</span>(object<span class="sc">@</span>den)) {</span>
+<span id="cb85-17"><a href="#cb85-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="st">&quot;numerator length must equal denominator length&quot;</span>)</span>
+<span id="cb85-18"><a href="#cb85-18" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb85-19"><a href="#cb85-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="cn">TRUE</span>)</span>
+<span id="cb85-20"><a href="#cb85-20" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb85-21"><a href="#cb85-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb85-22"><a href="#cb85-22" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## Class &quot;Rational&quot; [in &quot;.GlobalEnv&quot;]
+## 
+## Slots:
+##                       
+## Name:      num     den
+## Class: integer integer</code></pre></li>
+<li><p>Let’s create a helper function</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>Rational <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">num =</span> <span class="fu">integer</span>(), <span class="at">den =</span> <span class="fu">integer</span>()) {</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  num <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(num)</span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>  den <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(den)</span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Rational&quot;</span>, <span class="at">num =</span> num, <span class="at">den =</span> den))</span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>And let’s create <code>show()</code>, <code>den()</code>, and <code>num()</code> methods</p>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;show&quot;</span>, </span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;Rational&quot;</span>, </span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(object) {</span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">paste0</span>(object<span class="sc">@</span>num, <span class="st">&quot;/&quot;</span>, object<span class="sc">@</span>den))</span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;den&quot;</span>, <span class="at">def =</span> <span class="cf">function</span>(x) <span class="fu">standardGeneric</span>(<span class="st">&quot;den&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] &quot;den&quot;</code></pre>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;den&lt;-&quot;</span>, <span class="at">def =</span> <span class="cf">function</span>(x, value) <span class="fu">standardGeneric</span>(<span class="st">&quot;den&lt;-&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] &quot;den&lt;-&quot;</code></pre>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;num&quot;</span>, <span class="at">def =</span> <span class="cf">function</span>(x) <span class="fu">standardGeneric</span>(<span class="st">&quot;num&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] &quot;num&quot;</code></pre>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;num&lt;-&quot;</span>, <span class="at">def =</span> <span class="cf">function</span>(x, value) <span class="fu">standardGeneric</span>(<span class="st">&quot;num&lt;-&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] &quot;num&lt;-&quot;</code></pre>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;den&quot;</span>, </span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;Rational&quot;</span>, </span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span>  <span class="cf">function</span>(x) {</span>
+<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(x<span class="sc">@</span>den)</span>
+<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb96-7"><a href="#cb96-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb96-8"><a href="#cb96-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb96-9"><a href="#cb96-9" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb96-10"><a href="#cb96-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;num&quot;</span>, </span>
+<span id="cb96-11"><a href="#cb96-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;Rational&quot;</span>, </span>
+<span id="cb96-12"><a href="#cb96-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span>  <span class="cf">function</span>(x) {</span>
+<span id="cb96-13"><a href="#cb96-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(x<span class="sc">@</span>num)</span>
+<span id="cb96-14"><a href="#cb96-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb96-15"><a href="#cb96-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb96-16"><a href="#cb96-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb96-17"><a href="#cb96-17" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb96-18"><a href="#cb96-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;den&lt;-&quot;</span>, </span>
+<span id="cb96-19"><a href="#cb96-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;Rational&quot;</span>, </span>
+<span id="cb96-20"><a href="#cb96-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span>  <span class="cf">function</span>(x, value) {</span>
+<span id="cb96-21"><a href="#cb96-21" aria-hidden="true" tabindex="-1"></a>    x<span class="sc">@</span>den <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(value)</span>
+<span id="cb96-22"><a href="#cb96-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">validObject</span>(x)</span>
+<span id="cb96-23"><a href="#cb96-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(x)</span>
+<span id="cb96-24"><a href="#cb96-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb96-25"><a href="#cb96-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb96-26"><a href="#cb96-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb96-27"><a href="#cb96-27" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb96-28"><a href="#cb96-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;num&lt;-&quot;</span>, </span>
+<span id="cb96-29"><a href="#cb96-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;Rational&quot;</span>, </span>
+<span id="cb96-30"><a href="#cb96-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span>  <span class="cf">function</span>(x, value) {</span>
+<span id="cb96-31"><a href="#cb96-31" aria-hidden="true" tabindex="-1"></a>    x<span class="sc">@</span>num <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(value)</span>
+<span id="cb96-32"><a href="#cb96-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">validObject</span>(x)</span>
+<span id="cb96-33"><a href="#cb96-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(x)</span>
+<span id="cb96-34"><a href="#cb96-34" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb96-35"><a href="#cb96-35" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p>Let’s see how it works</p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Rational</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="fu">c</span>(<span class="dv">9</span>, <span class="dv">5</span>, <span class="dv">2</span>))</span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>## 1/9 2/5 3/2</code></pre>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">den</span>(x)</span></code></pre></div>
+<pre><code>## [1] 9 5 2</code></pre>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">num</span>(x)</span></code></pre></div>
+<pre><code>## [1] 1 2 3</code></pre>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">den</span>(x) <span class="ot">&lt;-</span> <span class="dv">11</span><span class="sc">:</span><span class="dv">13</span></span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>## 1/11 2/12 3/13</code></pre></li>
+</ul>
+</div>
+<div id="methods-for-generic-functions" class="section level1">
+<h1>Methods for Generic Functions</h1>
+<ul>
+<li><p>Can we add rational objects to each other?</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Rational</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="fu">c</span>(<span class="dv">9</span>, <span class="dv">5</span>, <span class="dv">2</span>))</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">Rational</span>(<span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">2</span>, <span class="dv">6</span>), <span class="fu">c</span>(<span class="dv">11</span>, <span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> y</span></code></pre></div>
+<pre><code>## Error in x + y: non-numeric argument to binary operator</code></pre></li>
+<li><p><code>+</code> is not an S3 generic, it is a group generic (see <code>?S4groupGeneric</code> for a full list of group generics used by S4).</p></li>
+<li><p>S4 automatically allows for group generics to be used as S4 generics, and so we do not need to do that conversion via <code>setGeneric("+")</code>.</p></li>
+<li><p><code>+</code> takes arguments <code>e1</code> and <code>e2</code>, which we will need to use when creating a method:</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">args</span>(<span class="fu">getGeneric</span>(<span class="st">&quot;+&quot;</span>))</span></code></pre></div>
+<pre><code>## function (e1, e2) 
+## NULL</code></pre></li>
+<li><p>Let’s create a method for <code>Rational</code> addition.</p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;+&quot;</span>, </span>
+<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;Rational&quot;</span>, </span>
+<span id="cb109-4"><a href="#cb109-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(e1, e2) {</span>
+<span id="cb109-5"><a href="#cb109-5" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> e1<span class="sc">@</span>num <span class="sc">+</span> e2<span class="sc">@</span>num</span>
+<span id="cb109-6"><a href="#cb109-6" aria-hidden="true" tabindex="-1"></a>    den <span class="ot">&lt;-</span> e1<span class="sc">@</span>den <span class="sc">+</span> e2<span class="sc">@</span>den</span>
+<span id="cb109-7"><a href="#cb109-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Rational&quot;</span>, <span class="at">num =</span> num, <span class="at">den =</span> den))</span>
+<span id="cb109-8"><a href="#cb109-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb109-9"><a href="#cb109-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p>Now let’s try it out</p>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> y</span></code></pre></div>
+<pre><code>## 6/20 4/6 9/4</code></pre></li>
+<li><p>Now <code>1</code> is just <code>9/9</code> or <code>5/5</code> etc…, But we cannot just add an integer to a <code>Rational</code>?</p>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> 1L</span></code></pre></div>
+<pre><code>## Error in x + 1L: trying to get slot &quot;num&quot; from an object of a basic class (&quot;integer&quot;) with no slots</code></pre></li>
+<li><p>We need to define a method based on <strong>double dispatch</strong>, where one input is a <code>Rational</code> and one is an <code>integer</code>.</p>
+<ul>
+<li>In the signature, you tell R which class each argument is.</li>
+<li>You need to create two methods if you want commutivity. But the second one just calls the first one.</li>
+</ul>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(<span class="at">f =</span> <span class="st">&quot;+&quot;</span>, </span>
+<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="fu">c</span>(<span class="at">e1 =</span> <span class="st">&quot;Rational&quot;</span>, <span class="at">e2 =</span> <span class="st">&quot;integer&quot;</span>), </span>
+<span id="cb114-3"><a href="#cb114-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(e1, e2) {</span>
+<span id="cb114-4"><a href="#cb114-4" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> e1<span class="sc">@</span>num <span class="sc">+</span> e1<span class="sc">@</span>den <span class="sc">*</span> e2</span>
+<span id="cb114-5"><a href="#cb114-5" aria-hidden="true" tabindex="-1"></a>    den <span class="ot">&lt;-</span> e1<span class="sc">@</span>den</span>
+<span id="cb114-6"><a href="#cb114-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Rational&quot;</span>, <span class="at">num =</span> num, <span class="at">den =</span> den))</span>
+<span id="cb114-7"><a href="#cb114-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb114-8"><a href="#cb114-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb114-9"><a href="#cb114-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb114-10"><a href="#cb114-10" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(<span class="at">f =</span> <span class="st">&quot;+&quot;</span>, </span>
+<span id="cb114-11"><a href="#cb114-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="fu">c</span>(<span class="at">e1 =</span> <span class="st">&quot;integer&quot;</span>, <span class="at">e2 =</span> <span class="st">&quot;Rational&quot;</span>), </span>
+<span id="cb114-12"><a href="#cb114-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(e1, e2) e2 <span class="sc">+</span> e1</span>
+<span id="cb114-13"><a href="#cb114-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p>It works!</p>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> 2L</span></code></pre></div>
+<pre><code>## 19/9 12/5 7/2</code></pre>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a>2L  <span class="sc">+</span> x</span></code></pre></div>
+<pre><code>## 19/9 12/5 7/2</code></pre></li>
+<li><p>A shorthand to define all arithmetic operations is by the <code>Arith</code> generic</p>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;Arith&quot;</span>, </span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="fu">c</span>(<span class="at">e1 =</span> <span class="st">&quot;Rational&quot;</span>, <span class="at">e2 =</span> <span class="st">&quot;integer&quot;</span>), </span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(e1, e2) {</span>
+<span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a>    op <span class="ot">&lt;-</span> .Generic[[<span class="dv">1</span>]]</span>
+<span id="cb119-6"><a href="#cb119-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (op <span class="sc">==</span> <span class="st">&quot;+&quot;</span>) {</span>
+<span id="cb119-7"><a href="#cb119-7" aria-hidden="true" tabindex="-1"></a>      num <span class="ot">&lt;-</span> e1<span class="sc">@</span>num <span class="sc">+</span> e1<span class="sc">@</span>den <span class="sc">*</span> e2</span>
+<span id="cb119-8"><a href="#cb119-8" aria-hidden="true" tabindex="-1"></a>      den <span class="ot">&lt;-</span> e1<span class="sc">@</span>den</span>
+<span id="cb119-9"><a href="#cb119-9" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> <span class="cf">if</span> (op <span class="sc">==</span> <span class="st">&quot;*&quot;</span>) {</span>
+<span id="cb119-10"><a href="#cb119-10" aria-hidden="true" tabindex="-1"></a>      num <span class="ot">&lt;-</span> e1<span class="sc">@</span>num <span class="sc">*</span> e2</span>
+<span id="cb119-11"><a href="#cb119-11" aria-hidden="true" tabindex="-1"></a>      den <span class="ot">&lt;-</span> e1<span class="sc">@</span>den</span>
+<span id="cb119-12"><a href="#cb119-12" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb119-13"><a href="#cb119-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">stop</span>(<span class="st">&quot;only +/* are defined right now&quot;</span>)</span>
+<span id="cb119-14"><a href="#cb119-14" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb119-15"><a href="#cb119-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Rational&quot;</span>, <span class="at">num =</span> num, <span class="at">den =</span> den))</span>
+<span id="cb119-16"><a href="#cb119-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb119-17"><a href="#cb119-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb119-18"><a href="#cb119-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-19"><a href="#cb119-19" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb119-20"><a href="#cb119-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;Arith&quot;</span>,</span>
+<span id="cb119-21"><a href="#cb119-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="fu">c</span>(<span class="at">e1 =</span> <span class="st">&quot;integer&quot;</span>, <span class="at">e2 =</span> <span class="st">&quot;Rational&quot;</span>),</span>
+<span id="cb119-22"><a href="#cb119-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(e1, e2) {</span>
+<span id="cb119-23"><a href="#cb119-23" aria-hidden="true" tabindex="-1"></a>    op <span class="ot">&lt;-</span> .Generic[[<span class="dv">1</span>]]</span>
+<span id="cb119-24"><a href="#cb119-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">switch</span>(op,</span>
+<span id="cb119-25"><a href="#cb119-25" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;+&quot;</span> <span class="ot">=</span> e2 <span class="sc">+</span> e1,</span>
+<span id="cb119-26"><a href="#cb119-26" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;*&quot;</span> <span class="ot">=</span> e2 <span class="sc">*</span> e1,</span>
+<span id="cb119-27"><a href="#cb119-27" aria-hidden="true" tabindex="-1"></a>           <span class="fu">stop</span>(<span class="st">&quot;only +/* are defined right now&quot;</span>)</span>
+<span id="cb119-28"><a href="#cb119-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb119-29"><a href="#cb119-29" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb119-30"><a href="#cb119-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb119-31"><a href="#cb119-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-32"><a href="#cb119-32" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Rational</span>(<span class="at">num =</span> <span class="fu">c</span>(1L, 2L, 3L), <span class="at">den =</span> <span class="fu">c</span>(4L, 5L, 6L))</span>
+<span id="cb119-33"><a href="#cb119-33" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> 1L</span></code></pre></div>
+<pre><code>## 5/4 7/5 9/6</code></pre>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">*</span> 2L</span></code></pre></div>
+<pre><code>## 2/4 4/5 6/6</code></pre>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a>2L <span class="sc">*</span> x</span></code></pre></div>
+<pre><code>## 2/4 4/5 6/6</code></pre></li>
+<li><p>Above, <code>.Generic</code> is a variable defined inside the evaluation environment of the <code>setMethod()</code> definition.</p></li>
+<li><p>To define</p></li>
+</ul>
+</div>
+<div id="getting-help" class="section level1">
+<h1>Getting Help</h1>
+<ul>
+<li><p>To read the help file of an S4 class, put <code>class?</code> before the name of the class. E.g. the following will open up the help file of the <code>GRanges</code> class from the <code>{GenomicRanges}</code> package from Bioconductor.</p>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GenomicRanges)</span>
+<span id="cb125-2"><a href="#cb125-2" aria-hidden="true" tabindex="-1"></a>class?GRanges</span></code></pre></div></li>
+<li><p>This is equivalent to</p>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">GRanges-class</span><span class="st">`</span></span></code></pre></div></li>
 <li><p>To read the help file of method, put a question mark before the call of a generic. E.g., to see the help file for the <code>coverage()</code> method of a <code>GRanges</code> object, run</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>gobj <span class="ot">&lt;-</span> <span class="fu">GRanges</span>() <span class="do">## creates empty GRanges object</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>?<span class="fu">coverage</span>(gobj) <span class="do">## opens help file</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a>gobj <span class="ot">&lt;-</span> <span class="fu">GRanges</span>() <span class="do">## creates empty GRanges object</span></span>
+<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>?<span class="fu">coverage</span>(gobj) <span class="do">## opens help file</span></span></code></pre></div></li>
 <li><p><code>{sloop}</code> is useful for seeing</p>
 <ol style="list-style-type: decimal">
 <li><p>If an object is an S4 object</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(david)</span></code></pre></div>
+<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(david)</span></code></pre></div>
 <pre><code>## [1] &quot;S4&quot;</code></pre></li>
 <li><p>If a function is an S4 generic</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">ftype</span>(age)</span></code></pre></div>
-<pre><code>## [1] &quot;function&quot;</code></pre></li>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">ftype</span>(age)</span></code></pre></div>
+<pre><code>## [1] &quot;S4&quot;      &quot;generic&quot;</code></pre></li>
 <li><p>A list of all methods associated with an S4 class</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s4_methods_class</span>(<span class="st">&quot;Person&quot;</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 2 × 4
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s4_methods_class</span>(<span class="st">&quot;Person&quot;</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 7 × 4
 ##   generic class  visible source     
 ##   &lt;chr&gt;   &lt;chr&gt;  &lt;lgl&gt;   &lt;chr&gt;      
 ## 1 age     Person TRUE    R_GlobalEnv
-## 2 age&lt;-   Person TRUE    R_GlobalEnv</code></pre></li>
+## 2 age&lt;-   Person TRUE    R_GlobalEnv
+## 3 coerce  Person TRUE    R_GlobalEnv
+## 4 coerce  Person TRUE    R_GlobalEnv
+## 5 name    Person TRUE    R_GlobalEnv
+## 6 name&lt;-  Person TRUE    R_GlobalEnv
+## 7 show    Person TRUE    R_GlobalEnv</code></pre></li>
 <li><p>A list of all methods associated with an S4 generic</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s4_methods_generic</span>(<span class="st">&quot;age&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s4_methods_generic</span>(<span class="st">&quot;age&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 4
 ##   generic class  visible source     
 ##   &lt;chr&gt;   &lt;chr&gt;  &lt;lgl&gt;   &lt;chr&gt;      
 ## 1 age     Person TRUE    R_GlobalEnv</code></pre></li>
 </ol></li>
-<li><p><strong>Exercise</strong>: XYZ</p></li>
 </ul>
 </div>
-<div id="more-on-classes" class="section level1">
-<h1>More on Classes</h1>
+<div id="documenting-s4-objects" class="section level1">
+<h1>Documenting S4 objects</h1>
+<ul>
+<li><p>To document an S4 class, add <code>{roxygen2}</code> comments before <code>setClass()</code>.</p></li>
+<li><p>Use the <code>@slot</code> tag to document each slot, just like you would document each parameter of a function.</p></li>
+<li><p>Let’s document the <code>Person</code> class.</p>
+<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; An S4 class representing a person</span></span>
+<span id="cb136-2"><a href="#cb136-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; </span></span>
+<span id="cb136-3"><a href="#cb136-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @slot name The name of the person.</span></span>
+<span id="cb136-4"><a href="#cb136-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @slot age The age of the person.</span></span>
+<span id="cb136-5"><a href="#cb136-5" aria-hidden="true" tabindex="-1"></a><span class="fu">setClass</span>(</span>
+<span id="cb136-6"><a href="#cb136-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb136-7"><a href="#cb136-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">slots =</span> <span class="fu">c</span>(</span>
+<span id="cb136-8"><a href="#cb136-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">&quot;character&quot;</span>,</span>
+<span id="cb136-9"><a href="#cb136-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">age =</span> <span class="st">&quot;numeric&quot;</span></span>
+<span id="cb136-10"><a href="#cb136-10" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb136-11"><a href="#cb136-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">prototype =</span> <span class="fu">list</span>(</span>
+<span id="cb136-12"><a href="#cb136-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="fu">character</span>(),</span>
+<span id="cb136-13"><a href="#cb136-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">double</span>()</span>
+<span id="cb136-14"><a href="#cb136-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb136-15"><a href="#cb136-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p>S4 generics are regular functions, so document them like usual.</p></li>
+<li><p>All S4 methods are required to be documented.</p></li>
+<li><p>You can use <code>@describeIn</code> to simplify documentation of S4 methods by combining them with the generic or the class documentation.</p></li>
+<li><p>In an R package, the files are loaded in alphabetical order. However, for S4 objects, you need to super superclasses before you are allowed to create subclasses.</p></li>
+<li><p>To force another file to load before the current file, put this at the top of the current file</p>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @include foo.R bar.R</span></span>
+<span id="cb137-2"><a href="#cb137-2" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div>
+<pre><code>## NULL</code></pre></li>
+<li><p>The above says that foo.R and bar.R should be loaded before the current file.</p></li>
+</ul>
 </div>
 <div id="some-example-uses-of-s4-by-others" class="section level1">
 <h1>Some Example Uses of S4 by Others</h1>
@@ -530,31 +1169,31 @@ $(document).ready(function () {
 <li>triangular (either the upper or lower triangle elements are all 0).]</li>
 <li>symmetric (upper and lower triangle elements are equal).</li>
 </ul>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span></code></pre></div></li>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span></code></pre></div></li>
 <li><p>Many matrix operations can be more efficiently executed given knowledge of these structures.</p></li>
 <li><p>The <code>USCounties</code> matrix is a 3111 by 3111 matrix where an element measures a spatial relationship between counties. It is non-zero only if counties are contiguous.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;USCounties&quot;</span>, <span class="at">package =</span> <span class="st">&quot;Matrix&quot;</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="#cb140-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;USCounties&quot;</span>, <span class="at">package =</span> <span class="st">&quot;Matrix&quot;</span>)</span></code></pre></div></li>
 <li><p>This is an S4 object of class <code>dsCMatrix</code>, used for handling sparse matrices (only 0.0094% of the values in this matrix are non-zero).</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(USCounties)</span></code></pre></div>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(USCounties)</span></code></pre></div>
 <pre><code>## [1] &quot;S4&quot;</code></pre>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(USCounties)</span></code></pre></div>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="#cb143-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(USCounties)</span></code></pre></div>
 <pre><code>## [1] &quot;dsCMatrix&quot;
 ## attr(,&quot;package&quot;)
 ## [1] &quot;Matrix&quot;</code></pre></li>
 <li><p>Almost every matrix operation you can imagine has been optimized for this sparsity:</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(sloop<span class="sc">::</span><span class="fu">s4_methods_class</span>(<span class="st">&quot;dsCMatrix&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(sloop<span class="sc">::</span><span class="fu">s4_methods_class</span>(<span class="st">&quot;dsCMatrix&quot;</span>))</span></code></pre></div>
 <pre><code>## [1] 383</code></pre></li>
 <li><p>This makes things like matrix multiplication much faster:</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>densemat <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(USCounties)</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>ones <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="at">length.out =</span> <span class="fu">ncol</span>(densemat))</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  densemat <span class="sc">%*%</span> ones,</span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  USCounties <span class="sc">%*%</span> ones</span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true" tabindex="-1"></a>densemat <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(USCounties)</span>
+<span id="cb147-2"><a href="#cb147-2" aria-hidden="true" tabindex="-1"></a>ones <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="at">length.out =</span> <span class="fu">ncol</span>(densemat))</span>
+<span id="cb147-3"><a href="#cb147-3" aria-hidden="true" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
+<span id="cb147-4"><a href="#cb147-4" aria-hidden="true" tabindex="-1"></a>  densemat <span class="sc">%*%</span> ones,</span>
+<span id="cb147-5"><a href="#cb147-5" aria-hidden="true" tabindex="-1"></a>  USCounties <span class="sc">%*%</span> ones</span>
+<span id="cb147-6"><a href="#cb147-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## Unit: microseconds
-##                 expr    min      lq    mean  median      uq   max neval
-##    densemat %*% ones 9956.7 12300.2 13102.8 12926.0 13717.2 22285   100
-##  USCounties %*% ones  174.2   193.5   257.8   250.3   270.6  1146   100</code></pre>
+##                 expr  min      lq  mean  median      uq   max neval
+##    densemat %*% ones 9813 12492.8 13365 12993.4 13783.1 24017   100
+##  USCounties %*% ones  170   192.3   246   241.6   271.5  1644   100</code></pre>
 <ul>
 <li>This application doesn’t really demonstrate its abilities. It can be even more orders of magnitude faster.</li>
 </ul></li>
@@ -566,55 +1205,55 @@ $(document).ready(function () {
 <li><p>One application of S4 is in the <code>{stats4}</code> package for likelihood inference.</p></li>
 <li><p>The <strong>likelihood</strong> is the kind of like the probability of the data that we observed given some parameter values. (not exactly for continuous data)</p></li>
 <li><p>E.g., let’s say we observed heights (in inches)</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">72</span>, <span class="dv">66</span>, <span class="dv">74</span>, <span class="dv">64</span>, <span class="dv">70</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">72</span>, <span class="dv">66</span>, <span class="dv">74</span>, <span class="dv">64</span>, <span class="dv">70</span>)</span></code></pre></div>
 <p>and let’s assume that these data were generated from a normal distribution.</p></li>
 <li><p>Then, given any two parameters of the mean (<code>mu</code>) and standard deviation (<code>sigma</code>), the likelihood of these parameters at each observation would be from <code>dnorm()</code></p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma)</span></code></pre></div></li>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="#cb150-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma)</span></code></pre></div></li>
 <li><p>If the individuals that these heights are from are <strong>independent</strong> (e.g. they aren’t family members), then the likelihood of these parameters given all of the data would be</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma))</span></code></pre></div></li>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma))</span></code></pre></div></li>
 <li><p>We can calculate this likelihood for a few values of <code>mu</code> and <code>sigma</code></p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="dv">72</span></span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="dv">3</span></span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma))</span></code></pre></div>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="#cb152-1" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="dv">72</span></span>
+<span id="cb152-2"><a href="#cb152-2" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb152-3"><a href="#cb152-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma))</span></code></pre></div>
 <pre><code>## [1] 1.031e-07</code></pre>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="dv">70</span></span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="dv">4</span></span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma))</span></code></pre></div>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="#cb154-1" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="dv">70</span></span>
+<span id="cb154-2"><a href="#cb154-2" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb154-3"><a href="#cb154-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma))</span></code></pre></div>
 <pre><code>## [1] 1.04e-06</code></pre></li>
 <li><p>Typically, the parameters are not known (<code>mu</code> and <code>sigma</code> are unknown) and our goal is to estimate them when we only see <code>x</code>.</p></li>
 <li><p>One way to do this is to find the <code>mu</code> and <code>sigma</code> that maximize this likelihood. The resulting estimators are called the <strong>maximum likelihood estimators</strong> (MLE’s). This is one of the most common methods for estimating parameters from a statistical model.</p></li>
 <li><p>Intuition: the MLE’s are the parameters that make our observed data as probable to have observed as possible.</p></li>
 <li><p>Typically, the likelihood produces very small numbers, so folks maximize the log-likelihood, which results in the same MLE’s since <span class="math inline">\(\log()\)</span> is a monotone increasing function.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>ll <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma, <span class="at">log =</span> <span class="cn">TRUE</span>)) <span class="do">## log likelihood</span></span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>like <span class="ot">&lt;-</span> <span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma)) <span class="do">## likelihood</span></span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="do">## they are the same</span></span>
-<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(like)</span></code></pre></div>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true" tabindex="-1"></a>ll <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma, <span class="at">log =</span> <span class="cn">TRUE</span>)) <span class="do">## log likelihood</span></span>
+<span id="cb156-2"><a href="#cb156-2" aria-hidden="true" tabindex="-1"></a>like <span class="ot">&lt;-</span> <span class="fu">prod</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma)) <span class="do">## likelihood</span></span>
+<span id="cb156-3"><a href="#cb156-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-4"><a href="#cb156-4" aria-hidden="true" tabindex="-1"></a><span class="do">## they are the same</span></span>
+<span id="cb156-5"><a href="#cb156-5" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(like)</span></code></pre></div>
 <pre><code>## [1] -13.78</code></pre>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>ll</span></code></pre></div>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="#cb158-1" aria-hidden="true" tabindex="-1"></a>ll</span></code></pre></div>
 <pre><code>## [1] -13.78</code></pre></li>
 <li><p>The <code>{stats4}</code> package provides a bunch of S4 objects and methods for dealing with MLE’s.</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stats4)</span></code></pre></div></li>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="#cb160-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stats4)</span></code></pre></div></li>
 <li><p>To use the <code>{stats4}</code> package, first create a function that takes as input your parameters nothing else. It assumes that all data comes from the parent environment. It should output the <em>negative</em> log-likelihood.</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param mu The mean</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param sigma The standard deviation</span></span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>neg_ll <span class="ot">&lt;-</span> <span class="cf">function</span>(mu, sigma) {</span>
-<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span><span class="fu">sum</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma, <span class="at">log =</span> <span class="cn">TRUE</span>)))</span>
-<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param mu The mean</span></span>
+<span id="cb161-2"><a href="#cb161-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param sigma The standard deviation</span></span>
+<span id="cb161-3"><a href="#cb161-3" aria-hidden="true" tabindex="-1"></a>neg_ll <span class="ot">&lt;-</span> <span class="cf">function</span>(mu, sigma) {</span>
+<span id="cb161-4"><a href="#cb161-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span><span class="fu">sum</span>(<span class="fu">dnorm</span>(<span class="at">x =</span> x, <span class="at">mean =</span> mu, <span class="at">sd =</span> sigma, <span class="at">log =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb161-5"><a href="#cb161-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
 <li><p>Then, use the <code>mle()</code> function. Include some starting values, and place some limits on constrained parameters.</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>mlout <span class="ot">&lt;-</span> stats4<span class="sc">::</span><span class="fu">mle</span>(<span class="at">minuslogl =</span> neg_ll, </span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start =</span> <span class="fu">c</span>(<span class="at">mu =</span> <span class="dv">72</span>, <span class="at">sigma =</span> <span class="dv">1</span>), </span>
-<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lower =</span> <span class="fu">c</span>(<span class="at">mu =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">sigma =</span> <span class="dv">0</span>),</span>
-<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">upper =</span> <span class="fu">c</span>(<span class="at">mu =</span> <span class="cn">Inf</span>, <span class="at">sigma =</span> <span class="cn">Inf</span>))</span></code></pre></div></li>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="#cb162-1" aria-hidden="true" tabindex="-1"></a>mlout <span class="ot">&lt;-</span> stats4<span class="sc">::</span><span class="fu">mle</span>(<span class="at">minuslogl =</span> neg_ll, </span>
+<span id="cb162-2"><a href="#cb162-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start =</span> <span class="fu">c</span>(<span class="at">mu =</span> <span class="dv">72</span>, <span class="at">sigma =</span> <span class="dv">1</span>), </span>
+<span id="cb162-3"><a href="#cb162-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lower =</span> <span class="fu">c</span>(<span class="at">mu =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">sigma =</span> <span class="dv">0</span>),</span>
+<span id="cb162-4"><a href="#cb162-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">upper =</span> <span class="fu">c</span>(<span class="at">mu =</span> <span class="cn">Inf</span>, <span class="at">sigma =</span> <span class="cn">Inf</span>))</span></code></pre></div></li>
 <li><p>This object is S4.</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(mlout)</span></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(mlout)</span></code></pre></div>
 <pre><code>## [1] &quot;S4&quot;</code></pre>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(mlout)</span></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(mlout)</span></code></pre></div>
 <pre><code>## [1] &quot;mle&quot;
 ## attr(,&quot;package&quot;)
 ## [1] &quot;stats4&quot;</code></pre></li>
 <li><p>What generics are available for the objects of type <code>mle</code>?</p>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s4_methods_class</span>(<span class="st">&quot;mle&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s4_methods_class</span>(<span class="st">&quot;mle&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 9 × 4
 ##   generic class visible source
 ##   &lt;chr&gt;   &lt;chr&gt; &lt;lgl&gt;   &lt;chr&gt; 
@@ -628,32 +1267,32 @@ $(document).ready(function () {
 ## 8 update  mle   TRUE    stats4
 ## 9 vcov    mle   TRUE    stats4</code></pre></li>
 <li><p><code>coef()</code> will get you the parameter estimates</p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(mlout)</span></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(mlout)</span></code></pre></div>
 <pre><code>##     mu  sigma 
 ## 69.200  3.709</code></pre></li>
 <li><p><code>vcov()</code> will you you the estimated variance/covariance matrix of the MLE’s (for their sampling distribution).</p>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vcov</span>(mlout)</span></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vcov</span>(mlout)</span></code></pre></div>
 <pre><code>##              mu     sigma
 ## mu    2.752e+00 1.093e-07
 ## sigma 1.093e-07 1.376e+00</code></pre></li>
 <li><p>So the standard errors are from</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">diag</span>(<span class="fu">vcov</span>(mlout)))</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">diag</span>(<span class="fu">vcov</span>(mlout)))</span></code></pre></div>
 <pre><code>##    mu sigma 
 ## 1.659 1.173</code></pre></li>
 <li><p><code>confint()</code> will get you confidence intervals</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(mlout)</span></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(mlout)</span></code></pre></div>
 <pre><code>## Profiling...</code></pre>
 <pre><code>##        2.5 % 97.5 %
 ## mu    65.210 73.190
 ## sigma  2.219  8.083</code></pre></li>
 <li><p>In the normal case, these estimates are the same as the sample mean and the sample variance (not adjusting for degrees of freedom).</p>
-<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x)</span></code></pre></div>
 <pre><code>## [1] 69.2</code></pre>
-<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">var</span>(x) <span class="sc">*</span> (<span class="fu">length</span>(x) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="fu">length</span>(x))</span></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="#cb180-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">var</span>(x) <span class="sc">*</span> (<span class="fu">length</span>(x) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="fu">length</span>(x))</span></code></pre></div>
 <pre><code>## [1] 3.709</code></pre></li>
 <li><p>But the MLE is general to many more complicated applications.</p></li>
 <li><p><strong>Exercise</strong>: The number of heads in <span class="math inline">\(n\)</span> coin flips is binomially distributed with size <span class="math inline">\(n\)</span> and success probability <span class="math inline">\(p\)</span>, where <span class="math inline">\(p\)</span> is the probability that a single flip turns up heads. The likelihood, given that <code>x</code> heads turned up, is</p>
-<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbinom</span>(<span class="at">x =</span> x, <span class="at">size =</span> n, <span class="at">prob =</span> p)</span></code></pre></div>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="#cb182-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbinom</span>(<span class="at">x =</span> x, <span class="at">size =</span> n, <span class="at">prob =</span> p)</span></code></pre></div>
 <p>When <span class="math inline">\(x = 11\)</span> and <span class="math inline">\(n = 31\)</span>, calculate the MLE of <span class="math inline">\(p\)</span>.</p></li>
 </ul>
 </div>
@@ -664,9 +1303,14 @@ $(document).ready(function () {
 <li><code>methods::setClass()</code>: Define a new S4 class.</li>
 <li><code>methods::new()</code>: Create a new object of a given S4 class.</li>
 <li><code>methods::is()</code>: See the class of an object (if you give it just the object), or test that an object is a certain class (if you give it the object and a class name).</li>
-<li><code>methods::slot()</code>: Extract the data from a slot. Equivalen to <code>@</code> notation.</li>
-<li><code>methods::setGeneric()</code>: Create a new generic function</li>
-<li><code>methods::setMethod()</code>: Create a method for a generic.</li>
+<li><code>methods::slot()</code>: Extract the data from a slot. Equivalent to <code>@</code> notation.</li>
+<li><code>methods::setGeneric()</code>: Create a new S4 generic function</li>
+<li><code>methods::setMethod()</code>: Create a method for a S4 generic.</li>
+<li><code>methods::setValidity()</code>: Enforce structure on an S4 object created by <code>new()</code>.</li>
+<li><code>methods::validObject()</code>: Check validity of an S4 object based on <code>setValidity()</code> definition.</li>
+<li><code>methods::setOldClass()</code>: Register an S3 class to be an S4 class.</li>
+<li><code>methods::setAs()</code>: Define a coercion method.</li>
+<li><code>methods::as()</code>: Apply a coercion method.</li>
 </ul>
 </div>
 

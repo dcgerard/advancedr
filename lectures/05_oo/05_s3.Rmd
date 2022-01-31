@@ -482,10 +482,12 @@ klippy::klippy()
     print(x)
     ```
 
-- If you don't know, whenever you just run something and have it print to the console, that is R implicitly running `print()`. So this looks better too:
+- Note: If you don't know, whenever you just run something and have it print to the console, that is R implicitly running `print()`. So this looks better too:
     ```{r}
     x
     ```
+    
+- Note: In a print method, you either call the `print()` method of another S3 object, or you call `cat()`, which does less under the hood than `print()`.
 
 - We can verify that method dispatch is working appropriately
     ```{r}

@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-30" />
+<meta name="date" content="2022-01-31" />
 
 <title>S3 Objects</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S3 Objects</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-30</h4>
+<h4 class="date">2022-01-31</h4>
 
 </div>
 
@@ -749,22 +749,22 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>mean</span></code></pre></div>
 <pre><code>## function (x, ...) 
 ## UseMethod(&quot;mean&quot;)
-## &lt;bytecode: 0x55ce30b6ceb0&gt;
+## &lt;bytecode: 0x55702c91aeb0&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>print</span></code></pre></div>
 <pre><code>## function (x, ...) 
 ## UseMethod(&quot;print&quot;)
-## &lt;bytecode: 0x55ce3115ee58&gt;
+## &lt;bytecode: 0x55702cf0ce58&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
 <pre><code>## function (x, y, ...) 
 ## UseMethod(&quot;plot&quot;)
-## &lt;bytecode: 0x55ce2ffef4a0&gt;
+## &lt;bytecode: 0x55702bd9c748&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>summary</span></code></pre></div>
 <pre><code>## function (object, ...) 
 ## UseMethod(&quot;summary&quot;)
-## &lt;bytecode: 0x55ce34202df8&gt;
+## &lt;bytecode: 0x55702ffb1948&gt;
 ## &lt;environment: namespace:base&gt;</code></pre></li>
 <li><p>The key of a generic is its goals. Methods should generally align with the goals of the generic so that R users don’t get unexpected results. E.g. when you type <code>plot()</code> you shouldn’t output a mean (even though S3 makes this valid behavior).</p></li>
 <li><p>How <code>UseMethod()</code> works: If an object has a class vector of <code>c("cl1", "cl2")</code> then <code>UseMethod()</code> will first search for a method for <code>cl1</code>, if it does not exist it will use the method for <code>cl2</code>, and if that does not exist it will use the default method (there is usually one).</p></li>
@@ -819,9 +819,10 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">factor2</span>(<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>))</span>
 <span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(x)</span></code></pre></div>
 <pre><code>## [1] &quot;A&quot; &quot;A&quot; &quot;B&quot; &quot;B&quot; &quot;A&quot; &quot;B&quot;</code></pre></li>
-<li><p>If you don’t know, whenever you just run something and have it print to the console, that is R implicitly running <code>print()</code>. So this looks better too:</p>
+<li><p>Note: If you don’t know, whenever you just run something and have it print to the console, that is R implicitly running <code>print()</code>. So this looks better too:</p>
 <div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
 <pre><code>## [1] &quot;A&quot; &quot;A&quot; &quot;B&quot; &quot;B&quot; &quot;A&quot; &quot;B&quot;</code></pre></li>
+<li><p>Note: In a print method, you either call the <code>print()</code> method of another S3 object, or you call <code>cat()</code>, which does less under the hood than <code>print()</code>.</p></li>
 <li><p>We can verify that method dispatch is working appropriately</p>
 <div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_dispatch</span>(<span class="fu">print</span>(x))</span></code></pre></div>
 <pre><code>## =&gt; print.factor2
