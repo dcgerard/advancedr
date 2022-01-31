@@ -386,7 +386,7 @@ $(document).ready(function () {
 <li><a href="#multiple-dispatch">Multiple dispatch</a></li>
 </ul></li>
 <li><a href="#rational-vector-example">Rational Vector Example</a></li>
-<li><a href="#methods-for-generic-functions">Methods for Generic Functions</a></li>
+<li><a href="#methods-for-group-generic-functions">Methods for Group Generic Functions</a></li>
 <li><a href="#getting-help">Getting Help</a></li>
 <li><a href="#documenting-s4-objects">Documenting S4 objects</a></li>
 <li><a href="#some-example-uses-of-s4-by-others">Some Example Uses of S4 by Others</a>
@@ -659,8 +659,8 @@ $(document).ready(function () {
 ## 
 ## function (x, values, after = length(x)) 
 ## standardGeneric(&quot;append&quot;)
-## &lt;bytecode: 0x558b13cfc9c0&gt;
-## &lt;environment: 0x558b13ce26c8&gt;
+## &lt;bytecode: 0x564849dd1510&gt;
+## &lt;environment: 0x564849db7218&gt;
 ## Methods may be defined for arguments: x, values
 ## Use  showMethods(append)  for currently available ones.</code></pre>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>dims</span></code></pre></div>
@@ -668,8 +668,8 @@ $(document).ready(function () {
 ## 
 ## function (x) 
 ## standardGeneric(&quot;dims&quot;)
-## &lt;bytecode: 0x558b145aafb8&gt;
-## &lt;environment: 0x558b145a6848&gt;
+## &lt;bytecode: 0x56484a67fb38&gt;
+## &lt;environment: 0x56484a67b3c8&gt;
 ## Methods may be defined for arguments: x
 ## Use  showMethods(dims)  for currently available ones.</code></pre>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>get</span></code></pre></div>
@@ -678,8 +678,8 @@ $(document).ready(function () {
 ## function (x, pos = -1L, envir = as.environment(pos), mode = &quot;any&quot;, 
 ##     inherits = TRUE) 
 ## standardGeneric(&quot;get&quot;)
-## &lt;bytecode: 0x558b147a08d0&gt;
-## &lt;environment: 0x558b1479b890&gt;
+## &lt;bytecode: 0x56484a875450&gt;
+## &lt;environment: 0x56484a870410&gt;
 ## Methods may be defined for arguments: x, pos, envir
 ## Use  showMethods(get)  for currently available ones.</code></pre></li>
 <li><p>The only other argument you should usually use in <code>setGeneric()</code> is <code>signature</code>.</p>
@@ -990,8 +990,8 @@ $(document).ready(function () {
 <pre><code>## 1/11 2/12 3/13</code></pre></li>
 </ul>
 </div>
-<div id="methods-for-generic-functions" class="section level1">
-<h1>Methods for Generic Functions</h1>
+<div id="methods-for-group-generic-functions" class="section level1">
+<h1>Methods for Group Generic Functions</h1>
 <ul>
 <li><p>Can we add rational objects to each other?</p>
 <div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Rational</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="fu">c</span>(<span class="dv">9</span>, <span class="dv">5</span>, <span class="dv">2</span>))</span>
@@ -1191,9 +1191,9 @@ $(document).ready(function () {
 <span id="cb147-5"><a href="#cb147-5" aria-hidden="true" tabindex="-1"></a>  USCounties <span class="sc">%*%</span> ones</span>
 <span id="cb147-6"><a href="#cb147-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## Unit: microseconds
-##                 expr  min      lq  mean  median      uq   max neval
-##    densemat %*% ones 9813 12492.8 13365 12993.4 13783.1 24017   100
-##  USCounties %*% ones  170   192.3   246   241.6   271.5  1644   100</code></pre>
+##                 expr     min      lq    mean  median      uq   max neval
+##    densemat %*% ones 10887.2 12533.7 13558.2 13059.1 14103.1 22434   100
+##  USCounties %*% ones   171.7   192.9   247.2   216.3   276.4  1694   100</code></pre>
 <ul>
 <li>This application doesn’t really demonstrate its abilities. It can be even more orders of magnitude faster.</li>
 </ul></li>

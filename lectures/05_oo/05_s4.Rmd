@@ -683,7 +683,7 @@ klippy::klippy()
     x
     ```
     
-# Methods for Generic Functions
+# Methods for Group Generic Functions
 
 - Can we add rational objects to each other?
     ```{r, error = TRUE}
