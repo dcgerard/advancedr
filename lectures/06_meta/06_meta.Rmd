@@ -1,0 +1,94 @@
+---
+title: "A Brief Overview of Metaprogramming"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output:  
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    highlight: pygments
+urlcolor: "blue"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo       = TRUE, 
+                      fig.align  = "center",
+                      fig.height = 3, fig.width = 4)
+ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
+
+# Learning Objectives
+
+- Overview of Metaprogramming.
+- Learn a couple tricks.
+- Hadley goes into a lot of depth in Chapters 17--21 of [Advanced R](https://adv-r.hadley.nz/). But we'll just learn some common and simple use-cases. 
+    - Those chapters only need to be understood in great depth if you actually want to help contribute to the tidyverse.
+
+# Overview
+
+- Metaprogramming refers to treating code as data. You can save code as a variable, modify the code with other code, then evaluate the code.
+
+- In R, we call saved code **expressions**.
+
+- You can use `rlang::expr()` to save an expression.
+
+    ```{r}
+    my_exp <- rlang::expr(x + y)
+    ```
+
+- The result is an expression of type `language`
+    ```{r}
+    typeof(my_exp)
+    ```
+
+- If we print out `my_exp`, we just see our code
+    ```{r}
+    my_exp
+    ```
+
+- We can **evaluate** it (make the code run and provide a result) with `base::eval()`
+
+    ```{r}
+    x <- 10
+    y <- 11
+    base::eval(my_exp)
+    ```
+
+- The main ideas of metaprogramming:
+  1. Save source code as data
+  2. Possibly modify source code programattically,
+  3. Evaluate source code in a given environment.
+  
+# Types of Expressions
+
+- **Symbols** are names of objects.
+
+    ```{r}
+    y <- rlang::expr(x)
+    x <- c(22, 11, 13)
+    eval(y)
+    typeof(y)
+    ```
+
+- **Calls** are function calls. Base R calls these **languages**.
+    ```{r}
+    y <- rlang::expr(sum(x))
+    eval(y)
+    typeof(y)
+    ```
+  
+# Application: Capturing Argument Names
+
+# Application: Using `dplyr` Style Code on New Classes.
+
+- Suppose we have 
+
+# New Functions
+
+- `rlang::expr()`: Create an expression.
+- `base::eval()`: Evaluate an epxression.

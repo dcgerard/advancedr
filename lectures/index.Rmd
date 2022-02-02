@@ -46,10 +46,20 @@ This repository contains material based upon work supported by the National Scie
   - [S3 Objects](./05_s3.html)
   - [S4 Objects](./05_s4.html)
   - [S4 and Bioconductor](./05_bioconductor.html)
-- 06 Functional Programming
-- 07 Metaprogramming
-- 08 Performance/Profiling/Memory
-- 09 C++ and Rcpp
+- 06 Metaprogramming
+  - [Brief Overview of Metaprogramming](./06_meta.html)
+- 07 Performance/Profiling/Memory
+  - Profiling / Microbenchmarking
+  - Vectorization
+- 08 C++ and Rcpp
+  - Integrating C++ and R
+  - Data Types
+  - Vectors / Vector Operations
+  - Control Flow
+  - Rcpp Sugar
+- 09 Parallel Processing
+  - Futures and Running R in Batch
+  - Schedulers and LSF
 
 # Final Project
 

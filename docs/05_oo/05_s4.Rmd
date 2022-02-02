@@ -25,23 +25,54 @@ klippy::klippy()
 # Learning Objectives
 
 - Chapter 15 of [Advanced R](https://adv-r.hadley.nz/)
+- [Converting Packages to S4](https://cran.r-project.org/doc/Rnews/Rnews_2003-1.pdf)
 - [Introduction to Matrix Package](https://cran.r-project.org/web/packages/Matrix/vignettes/Intro2Matrix.pdf)
 
 # Motivation
 
 - Because S3 is really informal, it is also really easy to make dangerous mistakes.
 
-# S4
+- **Example**: Class structures are not enforced.
+    - E.g. you can do 
+        ```{r}
+        mt <- mtcars
+        class(mt) <- "lm"
+        ```
+        and method dispatch will try to use `lm` methods on `mt` even though that makes no sense. 
+    - This is because in S3 the class *is* the `class` attribute.
+    - The structure of a class is not enforced, except by perhaps a "gentleman's agreement" that classes should be of a certain form.
+
+- **Example**: Using function names to identify methods is dangerous. E.g. is `row.names.data.frame()`
+    1. The `row()` method of the `names.data.frame` class?
+    2. The `row.names()` method of the `data.frame` class?
+    3. The `row.names.data()` method of the `frame` class?
+
+- S3 is also limiting because the method is only determined by the class of one object. But what if you have a function `f(x, y)` and you want the method to be different based on:
+    - `x` and `y` are both class `foo`.
+    - `x` is class `foo` and `y` is class `bar`.
+    - `x` is class `bar` and `y` is class `foo`.
+    - `x` and `y` are both class `bar`
+    
+- S4 
+    1. Makes creating objects of a class more strict, to enforce structure.
+    2. Makes method creation more strict, so you don't have to name a new function `generic.class()` and just hope for the best.
+    3. Allows for multiple dispatch, where you can choose the method based on the class of more than one object.
+
+# `{methods}` Package
 
 - All functions for S4 are in the `{methods}` package which comes with R by default.
     - So in a package you either need to import the `{methods}` package, or you need to use `::` to use these functions create S4 objects.
     - Running R in batch mode (e.g. running it on the supercomputer) also does not attach the `{methods}` package, so you need to do `library(methods)` if you intend to use S4 in batch mode.
 
+# S4 Classes
+
 - In S3, *any* object with a `class` attribute is an S3 object.
 
-- In S4, you need to explicitly run the `methods::setClass()` function to define the class.
+- In S4, you need to explicitly run the `methods::setClass()` function to define the class. This makes the structure explicitly enforced.
     - The `Class` argument is the name of the new class.
-    - The `slots` argument contains a *named* character vector with the name of the fields in the class and the type for each field.
+    - The `slots` argument contains a *named* character vector with the name of the fields in the class and the type for each field. 
+        - Note that it supports `"numeric"` and not `"double"`.
+    - The `prototype` argument contains a list of default values for each slot. You should always include a prototype.
 
     ```{r}
     setClass(
@@ -49,6 +80,10 @@ klippy::klippy()
       slots = c(
         name = "character",
          age = "numeric"
+      ),
+      prototype = list(
+        name = character(),
+        age = double()
       )
     )
     ```
@@ -92,30 +127,195 @@ klippy::klippy()
     david[["age"]]
     ```
 
-- The `@` notation is typically only used internally. If you want folks to access slots, you need to define an **accessor** function. Accessor's are usually methods for S4 generics, so let's go through how to create generics and methods.
+- The `@` notation is typically only used *internally.* If you want folks to access slots, you need to define an **accessor** function. Accessor's are usually methods for S4 generics, which we will cover later.
+
+## Inheritance
+
+- Inheritance is really informal in S3. `class` is a vector and method dispatch just sequentially goes down the vector. But there is no guarantee that a subclass will have the correct structure of a superclass, or that the `class` vector is consistent across all members of a class.
+
+- In S4, use the `contains` argument in `setClass()` to explicitly define the superclass that your class is inheriting from.
+
+- E.g. we can create a class called `Employee` that inherits from `Person`.
+
+    ```{r}
+    setClass(
+      Class = "Employee", 
+      contains = "Person",
+      slots = c(
+        boss = "character",
+        years = "numeric"
+      ),
+      prototype = list(
+        boss = NA_character_,
+        years = NA_real_
+      )
+    )
+    ```
+
+- Now, we can create an `Employee` object with all of the slots of `Person`, along with the new slots from `Employee`.
+
+    ```{r}
+    david <- new(Class = "Employee", 
+                 name = "David Gerard", 
+                 age = 34, 
+                 boss = "Self", 
+                 years = 4)
+    david
+    ```
+
+## Helper Function
+
+- You should not expect users to use `new()`. Instead you should create a helper function for them. E.g.
+
+    ```{r}
+    Employee <- function(name, 
+                         age = NA_real_, 
+                         boss = NA_character_, 
+                         years = NA_real_) {
+      age <- as.double(age)
+      boss <- as.character(boss)
+      years <- as.double(years)
+      
+      return(new("Employee", name = name, age = age, boss = boss, years = years))
+    }
+    ```
+    
+    ```{r}
+    david <- Employee(name = "David Gerard", age = 34, boss = "Self", years = 4)
+    david
+    ```
+
+- Try to make sensible defaults, and try to type-cast as much as you can.
+
+## Validator Functions
+
+- Suppose we want `Person` to be a vector-type object. So we should constrain the `age` and `name` slots to be the same size.
+
+- This is not currently a constraint
+    ```{r}
+    profs <- new(Class = "Person", name = c("David Gerard", "Zois Boukouvalas"), age = 34)
+    profs
+    ```
+
+- You define S4 validators with `setValidity()`.
+    - `Class` is the name of the class to create a validator for.
+    - `method` is the function that should be run on the class.
+        - It returns `TRUE` if all validity checks pass.
+        - It returns a character string describing the issues if some of the validity checks fail.
+
+    ```{r}
+    setValidity(
+      Class = "Person", 
+      method = function(object) {
+        if(length(object@name) != length(object@age)) {
+          "@name and @age must be same length"
+        } else {
+          return(TRUE)
+        }
+      }
+    )
+    ```
+
+- Now it is impossible to make `@name` and `@age` slots of different lengths
+    ```{r, error = TRUE}
+        profs <- new(Class = "Person", name = c("David Gerard", "Zois Boukouvalas"), age = 34)
+    ```
+
+- Note: Validity checks only run automatically with `new()`, so you can edit the slot to have invalid inputs.
+
+    ```{r}
+    profs <- new(Class = "Person",
+                 name = c("David Gerard", "Zois Boukouvalas"),
+                 age = c(34, NA_real_))
+    profs@age <- 1:20
+    ```
+
+- But you can manually check validity with `validObject()`.
+
+    ```{r, error = TRUE}
+    validObject(profs)
+    profs <- new(Class = "Person", 
+                 name = c("David Gerard", "Zois Boukouvalas"), 
+                 age = c(34, NA_real_))
+    validObject(profs)
+    ```
+
+- **Exercise**: Create a `factor2` S4 class that tries to implement the `factor` class for S4.
+    - Define the class (with appropriate slots and prototypes)
+    - Create a helper function. It should be able to take a character vector as input and define the 
+    - Create a validator. It should check that the the maximum integer is less than or equal to the number of levels.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    setClass(
+      Class = "factor2",
+      slots = c(
+        x = "integer",
+        levels = "character"
+      ),
+      prototype = list(
+        x = integer(),
+        levels = character()
+      )
+    )
+    
+    setValidity(
+      Class = "factor2", 
+      method = function(object) {
+        if (length(object@x) == 0 & length(object@levels) == 0) {
+          return(TRUE)
+        } else if (length(object@levels) < max(object@x)) {
+          return(paste0("Number of levels must be greater than or equal to", max(object@x)))
+        } else {
+          return(TRUE)
+        }
+      }
+    )
+    
+    factor2 <- function(x) {
+      levels <- sort(unique(x))
+      dat <- match(x, levels)
+      return(new(Class = "factor2", x = dat, levels = levels))
+    }
+    
+    factor2(c("A", "A", "B", "A", "B"))
+    ```
+
+
+
+# S4 Generics and Methods
 
 - You create generic functions with `setGeneric()`.
     - The `name` is the name of the new generic.
-    - The `def` is the function of the generic. Recall that S3 generics are eally simple and just call `UseMethod("generic"). Similarly, S4 generic functions should be really simple and just call `standardGeneric("generic")`.
+    - The `def` is the function of the generic. Recall that S3 generics are really simple and just call `UseMethod("generic")`. Similarly, S4 generic functions should be really simple and just call `standardGeneric("generic")`.
     
-- Below we are defining a generic called `age()` and a generic for `age()<-` which will act as a replacement function.
+- Below we are defining a generic called `age()` (for getting the age of individuals) and a generic for `age()<-` which will act as a replacement function.
     ```{r}
-    setGeneric(name = "age",
-               def = function(x) {
-                 standardGeneric("age")
-                 }
-               )
+    setGeneric(name = "age", 
+               def = function(x) standardGeneric("age"))
     setGeneric(name = "age<-", 
-               def = function(x, value) {
-                 standardGeneric("age<-")
-                 }
-               )
+               def = function(x, value) standardGeneric("age<-"))
     ```
-    
+
+- Literally most S4 generics look like this
+    ```{r}
+    BiocGenerics::append
+    BiocGenerics::dims
+    BiocGenerics::get
+    ```
+
+- The only other argument you should usually use in `setGeneric()` is `signature`.
+    - By default, method dispatch is determined by *all* of the arguments in the `def` function
+    - You can choose to only do method dispatch based on some arguments via signature. 
+    - E.g. below only `x` determines method dispatch:
+        ```{r}
+        setGeneric(name = "age<-", 
+                   def = function(x, value) standardGeneric("age<-"),
+                   signature = "x")
+        ```
 
 - You define a method for a given generic with `setMethod()`
-    - `f`: The name of the gneric.
-    - `Person`: The name of the class(es) to which to apply the method.
+    - `f`: The name of the generic.
+    - `signature`: The name of the class(es) to which to apply the method.
     - `definition`: The method function.
 
     ```{r}
@@ -137,8 +337,11 @@ klippy::klippy()
 - Let's look at these
 
     ```{r}
+    david <- Employee(name = "David Gerard", age = 34)
     age(david)
     ```
+
+- Notice that this worked with an `Employee` object even though we only defined the method for `Person`. This is because `Employee` inherits from `Person`.
 
 - Let's reassign age
     ```{r}
@@ -150,11 +353,461 @@ klippy::klippy()
 
 - The `age()<-` method is called a **replacement function** or, more informally, a **setter**.
 
-- To read the help file of an S4 class, put `class?` before the name of the class. E.g. the following will open up the helpfile of the `GRanges` class from the `{GenomicRanges}` package from Bioconductor.
+## `show()` method
+
+- You should always define a `show()` method. This is used for printing S4 objects.
+
+- You need to use the same arguments of a generic that already exists. E.g. show needs `object`
+    ```{r}
+    args(getGeneric("show"))
+    ```
+
+- You usually use the `cat()` function for printing.
+
+    ```{r}
+    setMethod(
+      f = "show", 
+      signature = "Person", 
+      definition = function(object) {
+        cat(is(object)[[1]], "\n",
+            "  Name: ", object@name, "\n",
+            "   Age: ", object@age, "\n",
+            sep = "")
+      }
+    )
+    ```
+
+- Now we get better printing for `Person`'s and `Employee`'s.
+
+    ```{r}
+    david
+    ```
+
+# Accessors
+
+- Above, we defined the accessor `age` as a generic. 
+
+- But if you have slots unique to your class, you don't need to go all out OOP like that.
+
+- A basic accessor can be defined as follows:
+
+    ```{r}
+    person_name <- function(x) x@name
+    person_name(david)
+    ```
+    
+- Or we can go through the whole rigmarole so that other classes can use your generic.
+
+    ```{r}
+    setGeneric(name = "name", def = function(x) standardGeneric("name"))
+    setMethod(f = "name", signature = "Person", definition = function(x) x@name)
+    
+    setGeneric(name = "name<-", def = function(x, value) standardGeneric("name<-"))
+    setMethod(
+      f = "name<-", 
+      signature = "Person",
+      definition = function(x, value) {
+        x@name <- value
+        validObject(x)
+        return(x)
+      }
+    )
+    ```
+    
+    ```{r}
+    name(david)
+    name(david) <- "DG"
+    david
+    ```
+
+- **Exercise**: Define a `show()` method for the `factor2` class. It should have similar output as
+    ```{r, eval = FALSE, echo = FALSE}
+    setMethod(
+      f = "show",
+      signature = "factor2",
+      definition = function(object) {
+        cat(object@levels[object@x], sep = " ")
+      }
+    )
+    x <- factor2(c("A", "B", "A", "A", "B"))
+    x
+    ```
+
+
+- **Exercise**: Define a `levels2()` and `levels2<-` generic and method for the `factor2` class that will set and get the `levels` slot.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    setGeneric(name = "levels2", def = function(x) standardGeneric("levels2"))
+    setGeneric(name = "levels2<-", def = function(x, value) standardGeneric("levels2<-"))
+    
+    setMethod(
+      f = "levels2", 
+      signature = "factor2", 
+      definition = function(x) {
+        return(x@levels)
+      }
+    )
+    
+    setMethod(
+      f = "levels2<-", 
+      signature = "factor2", 
+      definition = function(x, value) {
+        x@levels <- value
+        return(x)
+      }
+    )
+    
+    
+    levels2(x) <- c("C", "D")
+    levels2(x)
+    x
+    
+    ## Subsetting still works
+    levels2(x)[1] <- "B"
+    levels2(x)
+    x
+    ```
+
+# Coercion
+
+- Use `setAs()` to define a method for coercing an object to a given class.
+    - `from`: The class you are coercing from.
+    - `to`: The class you are coercing to.
+    - `def` A function of one argument, of class `from` that will convert it to class `to`. Typically the name of the argument is just `from`.
+
+- Let's coerce a `character` vector into a `Person` by assuming that the character vector contains the names.
+
+    ```{r}
+    setAs(
+      from = "character",
+      to = "Person",
+      def = function(from) {
+        return(
+          new(Class = "Person", 
+              name = from, 
+              age = rep(NA_real_, length.out = length(from)))
+        )
+      }
+    )
+    ```
+
+- You then use `methods::as()` to apply the coercion.
+
+    ```{r}
+    pvec <- as(object = c("David", "Alice", "John", "Jenny"), Class = "Person")
+    pvec
+    ```
+
+- Though, just as with `new()` and `is()`, you try to hide `as()` from the user through a generic function
+
+    ```{r}
+    setGeneric(name = "asPerson", def = function(x) standardGeneric("asPerson"))
+    
+    setMethod(
+      f = "asPerson", 
+      signature = "character", 
+      definition = function(x) {
+        as(object = x, Class = "Person")
+      }
+    )
+    
+    pvec <- asPerson(c("David", "Bob", "Megan"))
+    pvec
+    ```
+
+
+- **Exercise**: Create a coercion for `factor2` from `character`.
+    ```{r, eval = FALSE, echo = FALSE}
+    setAs(from = "character", 
+          to = "factor2",
+          def = function(from) {
+            levels <- sort(unique(from@.Data))
+            return(new(Class = "factor2", x = match(from@.Data, levels), levels = levels))
+          }
+    )
+    as(object = c("A", "B", "B"), Class = "factor2")
+    ```
+
+# Converting from S3 so S4
+
+- It's possible to register an S3 class to be an S4 class by `setOldClass()`. You do this after calling `setClass()`.
+
+    ```{r}
+    setClass("factor",
+      contains = "integer",
+      slots = c(
+        levels = "character"
+      ),
+      prototype = structure(
+        integer(),
+        levels = character()
+      )
+    )
+    setOldClass("factor", S4Class = "factor")
+    ```
+
+- Above, we inherit from the `integer` base type. 
+
+- When you inherit from a base type, it has a slot `.Data` which is where the base type's values live. Let's use this to make new S4 factors.
+
+    ```{r}
+    x <- new(Class = "factor", .Data = c(1, 2, 1, 2, 1), levels = c("A", "B"))
+    sloop::otype(x)
+    x
+    x@.Data
+    ```
+
+- It is possible to convert any S3 generic to an S4 generic by simply running
+    ```{r}
+    setGeneric("mean")
+    ```
+
+# Method Dispatch
+
+## Multiple inheritance 
+
+- It's possible to create a class that inherits from two or more classes (i.e. have two superclasses). This is called **multiple inheritance**.
+
+- Issue: If the subclass does not not have a method, but both superclasses have methods, then R will choose the method based on alphabetical order. This is dangerous, so we won't cover it.
+
+## Multiple dispatch
+
+- A method can be determined by the classes of multiple objects in the generic call. This is called **multiple dispatch**.
+
+- E.g. how should `c(x, y)` behave if
+    1. `x` and `y` are both factors?
+    2. `x` is a factor and `y` is a character?
+    3.  `x` and `y` are both characters?
+
+- We will demonstrate this using the `Rational` class defined next.
+
+
+# Rational Vector Example
+
+- I will create a new `Rational` class that contains numerator and denominator slots:
+
+    ```{r}
+    setClass(
+      Class = "Rational", 
+      slots = c(
+        num = "integer",
+        den = "integer"
+      ),
+      prototype = list(
+        num = integer(),
+        den = integer()
+      )
+    )
+    
+    setValidity(
+      Class = "Rational", 
+      method = function(object) {
+        if (length(object@num) != length(object@den)) {
+          return("numerator length must equal denominator length")
+        } else {
+          return(TRUE)
+        }
+      }
+    )
+    ```
+
+- Let's create a helper function
+    ```{r}
+    Rational <- function(num = integer(), den = integer()) {
+      num <- as.integer(num)
+      den <- as.integer(den)
+      return(new(Class = "Rational", num = num, den = den))
+    }
+    ```
+
+- And let's create `show()`, `den()`, and `num()` methods
+
+    ```{r}
+    setMethod(
+      f = "show", 
+      signature = "Rational", 
+      definition = function(object) {
+        cat(paste0(object@num, "/", object@den))
+      }
+    )
+    
+    setGeneric(name = "den", def = function(x) standardGeneric("den"))
+    setGeneric(name = "den<-", def = function(x, value) standardGeneric("den<-"))
+    setGeneric(name = "num", def = function(x) standardGeneric("num"))
+    setGeneric(name = "num<-", def = function(x, value) standardGeneric("num<-"))
+    
+    setMethod(
+      f = "den", 
+      signature = "Rational", 
+      definition =  function(x) {
+        return(x@den)
+      }
+    )
+    
+    setMethod(
+      f = "num", 
+      signature = "Rational", 
+      definition =  function(x) {
+        return(x@num)
+      }
+    )
+    
+    setMethod(
+      f = "den<-", 
+      signature = "Rational", 
+      definition =  function(x, value) {
+        x@den <- as.integer(value)
+        validObject(x)
+        return(x)
+      }
+    )
+    
+    setMethod(
+      f = "num<-", 
+      signature = "Rational", 
+      definition =  function(x, value) {
+        x@num <- as.integer(value)
+        validObject(x)
+        return(x)
+      }
+    )
+    ```
+
+- Let's see how it works
+    ```{r}
+    x <- Rational(c(1, 2, 3), c(9, 5, 2))
+    x
+    den(x)
+    num(x)
+    den(x) <- 11:13
+    x
+    ```
+    
+# Methods for Group Generic Functions
+
+- Can we add rational objects to each other?
+    ```{r, error = TRUE}
+    x <- Rational(c(1, 2, 3), c(9, 5, 2))
+    y <- Rational(c(5, 2, 6), c(11, 1, 2))
+    x + y
+    ```
+
+- `+` is not an S3 generic, it is a group generic (see `?S4groupGeneric` for a full list of group generics used by S4).
+
+- S4 automatically allows for group generics to be used as S4 generics, and so we do not need to do that conversion via `setGeneric("+")`. 
+
+- `+` takes arguments `e1` and `e2`, which we will need to use when creating a method:
+    ```{r}
+    args(getGeneric("+"))
+    ```
+
+- Let's create a method for `Rational` addition.
+
+    ```{r}
+    setMethod(
+      f = "+", 
+      signature = "Rational", 
+      definition = function(e1, e2) {
+        num <- e1@num + e2@num
+        den <- e1@den + e2@den
+        return(new(Class = "Rational", num = num, den = den))
+      }
+    )
+    ```
+
+- Now let's try it out
+    ```{r}
+    x + y
+    ```
+
+- Now `1` is just `9/9` or `5/5` etc..., But we cannot just add an integer to a `Rational`?
+
+    ```{r, error = TRUE}
+    x + 1L
+    ```
+
+- We need to define a method based on **double dispatch**, where one input is a `Rational` and one is an `integer`.
+    - In the signature, you tell R which class each argument is.
+    - You need to create two methods if you want commutivity. But the second one just calls the first one.
+
+    ```{r}
+    setMethod(f = "+", 
+      signature = c(e1 = "Rational", e2 = "integer"), 
+      definition = function(e1, e2) {
+        num <- e1@num + e1@den * e2
+        den <- e1@den
+        return(new(Class = "Rational", num = num, den = den))
+      }
+    )
+    
+    setMethod(f = "+", 
+      signature = c(e1 = "integer", e2 = "Rational"), 
+      definition = function(e1, e2) e2 + e1
+    )
+    ```
+
+- It works!
+    ```{r}
+    x + 2L
+    2L  + x
+    ```
+
+- A shorthand to define all arithmetic operations is by the `Arith` generic
+
+    ```{r}
+    setMethod(
+      f = "Arith", 
+      signature = c(e1 = "Rational", e2 = "integer"), 
+      definition = function(e1, e2) {
+        op <- .Generic[[1]]
+        if (op == "+") {
+          num <- e1@num + e1@den * e2
+          den <- e1@den
+        } else if (op == "*") {
+          num <- e1@num * e2
+          den <- e1@den
+        } else {
+          stop("only +/* are defined right now")
+        }
+        return(new(Class = "Rational", num = num, den = den))
+      }
+    )
+    
+    setMethod(
+      f = "Arith",
+      signature = c(e1 = "integer", e2 = "Rational"),
+      definition = function(e1, e2) {
+        op <- .Generic[[1]]
+        switch(op,
+               "+" = e2 + e1,
+               "*" = e2 * e1,
+               stop("only +/* are defined right now")
+        )
+      }
+    )
+    
+    x <- Rational(num = c(1L, 2L, 3L), den = c(4L, 5L, 6L))
+    x + 1L
+    x * 2L
+    2L * x
+    ```
+
+- Above, `.Generic` is a variable defined inside the evaluation environment of the `setMethod()` definition.
+
+- To define 
+
+# Getting Help
+
+- To read the help file of an S4 class, put `class?` before the name of the class. E.g. the following will open up the help file of the `GRanges` class from the `{GenomicRanges}` package from Bioconductor.
 
     ```{r, eval = FALSE}
     library(GenomicRanges)
     class?GRanges
+    ```
+    
+- This is equivalent to
+    ```{r, eval = FALSE}
+    ?`GRanges-class`
     ```
 
 - To read the help file of method, put a question mark before the call of a generic. E.g., to see the help file for the `coverage()` method of a `GRanges` object, run
@@ -181,11 +834,48 @@ klippy::klippy()
         ```{r, warning = FALSE}
         sloop::s4_methods_generic("age")
         ```
-        
-- **Exercise**: XYZ
 
-# More on Classes
+# Documenting S4 objects
+
+- To document an S4 class, add `{roxygen2}` comments before `setClass()`.
+
+- Use the `@slot` tag to document each slot, just like you would document each parameter of a function.
+
+- Let's document the `Person` class.
+    ```{r, eval = FALSE}
+    #' An S4 class representing a person
+    #' 
+    #' @slot name The name of the person.
+    #' @slot age The age of the person.
+    setClass(
+      Class = "Person",
+      slots = c(
+        name = "character",
+         age = "numeric"
+      ),
+      prototype = list(
+        name = character(),
+        age = double()
+      )
+    )
+    ```
     
+- S4 generics are regular functions, so document them like usual.
+
+- All S4 methods are required to be documented.
+
+- You can use `@describeIn` to simplify documentation of S4 methods by combining them with the generic or the class documentation.
+
+- In an R package, the files are loaded in alphabetical order. However, for S4 objects, you need to super superclasses before you are allowed to create subclasses.
+
+- To force another file to load before the current file, put this at the top of the current file
+
+    ```{r}
+    #' @include foo.R bar.R
+    NULL
+    ```
+
+- The above says that foo.R and bar.R should be loaded before the current file.
 
 # Some Example Uses of S4 by Others
 
@@ -379,6 +1069,11 @@ klippy::klippy()
 - `methods::setClass()`: Define a new S4 class.
 - `methods::new()`: Create a new object of a given S4 class.
 - `methods::is()`: See the class of an object (if you give it just the object), or test that an object is a certain class (if you give it the object and a class name).
-- `methods::slot()`: Extract the data from a slot. Equivalen to `@` notation.
-- `methods::setGeneric()`: Create a new generic function
-- `methods::setMethod()`: Create a method for a generic.
+- `methods::slot()`: Extract the data from a slot. Equivalent to `@` notation.
+- `methods::setGeneric()`: Create a new S4 generic function
+- `methods::setMethod()`: Create a method for a S4 generic.
+- `methods::setValidity()`: Enforce structure on an S4 object created by `new()`.
+- `methods::validObject()`: Check validity of an S4 object based on `setValidity()` definition.
+- `methods::setOldClass()`: Register an S3 class to be an S4 class.
+- `methods::setAs()`: Define a coercion method.
+- `methods::as()`: Apply a coercion method.
