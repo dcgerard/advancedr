@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-31" />
+<meta name="date" content="2022-02-02" />
 
 <title>S3 Objects</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S3 Objects</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-31</h4>
+<h4 class="date">2022-02-02</h4>
 
 </div>
 
@@ -556,7 +556,7 @@ $(document).ready(function () {
 <li><p>Because of the important role of <code>.</code>, you should never name variables or non method functions with a dot in them.</p></li>
 <li><p>To find all of the methods of a generic, use <code>sloop::s3_methods_generic()</code>.</p>
 <div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_methods_generic</span>(<span class="st">&quot;print&quot;</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 309 × 4
+<pre><code>## # A tibble: 314 × 4
 ##    generic class       visible source             
 ##    &lt;chr&gt;   &lt;chr&gt;       &lt;lgl&gt;   &lt;chr&gt;              
 ##  1 print   acf         FALSE   registered S3method
@@ -569,7 +569,7 @@ $(document).ready(function () {
 ##  8 print   aov         FALSE   registered S3method
 ##  9 print   aovlist     FALSE   registered S3method
 ## 10 print   ar          FALSE   registered S3method
-## # … with 299 more rows</code></pre></li>
+## # … with 304 more rows</code></pre></li>
 <li><p>To find all methods for a class, use <code>sloop::s3_methods_class()</code>.</p>
 <div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_methods_class</span>(<span class="st">&quot;data.frame&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 55 × 4
@@ -749,22 +749,22 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>mean</span></code></pre></div>
 <pre><code>## function (x, ...) 
 ## UseMethod(&quot;mean&quot;)
-## &lt;bytecode: 0x55702c91aeb0&gt;
+## &lt;bytecode: 0x5599739286d8&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>print</span></code></pre></div>
 <pre><code>## function (x, ...) 
 ## UseMethod(&quot;print&quot;)
-## &lt;bytecode: 0x55702cf0ce58&gt;
+## &lt;bytecode: 0x559973a354a0&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
 <pre><code>## function (x, y, ...) 
 ## UseMethod(&quot;plot&quot;)
-## &lt;bytecode: 0x55702bd9c748&gt;
+## &lt;bytecode: 0x55997358c018&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>summary</span></code></pre></div>
 <pre><code>## function (object, ...) 
 ## UseMethod(&quot;summary&quot;)
-## &lt;bytecode: 0x55702ffb1948&gt;
+## &lt;bytecode: 0x55997764abe0&gt;
 ## &lt;environment: namespace:base&gt;</code></pre></li>
 <li><p>The key of a generic is its goals. Methods should generally align with the goals of the generic so that R users don’t get unexpected results. E.g. when you type <code>plot()</code> you shouldn’t output a mean (even though S3 makes this valid behavior).</p></li>
 <li><p>How <code>UseMethod()</code> works: If an object has a class vector of <code>c("cl1", "cl2")</code> then <code>UseMethod()</code> will first search for a method for <code>cl1</code>, if it does not exist it will use the method for <code>cl2</code>, and if that does not exist it will use the default method (there is usually one).</p></li>
@@ -1048,7 +1048,7 @@ $(document).ready(function () {
 <div id="type-predicates" class="section level1">
 <h1>Type Predicates</h1>
 <ul>
-<li><p>Whenever you make a new S3 class, you should always provide a type predict to test if an object is a certaint type.</p>
+<li><p>Whenever you make a new S3 class, you should always provide a type predict to test if an object is a certain type.</p>
 <div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="#cb155-1" aria-hidden="true" tabindex="-1"></a>is_sim <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
 <span id="cb155-2"><a href="#cb155-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">inherits</span>(x, <span class="st">&quot;sim&quot;</span>))</span>
 <span id="cb155-3"><a href="#cb155-3" aria-hidden="true" tabindex="-1"></a>}</span>

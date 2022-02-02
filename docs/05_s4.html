@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-31" />
+<meta name="date" content="2022-02-02" />
 
 <title>S4 Objects</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S4 Objects</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-31</h4>
+<h4 class="date">2022-02-02</h4>
 
 </div>
 
@@ -659,8 +659,8 @@ $(document).ready(function () {
 ## 
 ## function (x, values, after = length(x)) 
 ## standardGeneric(&quot;append&quot;)
-## &lt;bytecode: 0x564849dd1510&gt;
-## &lt;environment: 0x564849db7218&gt;
+## &lt;bytecode: 0x55a76e9fd940&gt;
+## &lt;environment: 0x55a76e9f2478&gt;
 ## Methods may be defined for arguments: x, values
 ## Use  showMethods(append)  for currently available ones.</code></pre>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>dims</span></code></pre></div>
@@ -668,8 +668,8 @@ $(document).ready(function () {
 ## 
 ## function (x) 
 ## standardGeneric(&quot;dims&quot;)
-## &lt;bytecode: 0x56484a67fb38&gt;
-## &lt;environment: 0x56484a67b3c8&gt;
+## &lt;bytecode: 0x55a76f1a6e60&gt;
+## &lt;environment: 0x55a76f1a0b88&gt;
 ## Methods may be defined for arguments: x
 ## Use  showMethods(dims)  for currently available ones.</code></pre>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>get</span></code></pre></div>
@@ -678,8 +678,8 @@ $(document).ready(function () {
 ## function (x, pos = -1L, envir = as.environment(pos), mode = &quot;any&quot;, 
 ##     inherits = TRUE) 
 ## standardGeneric(&quot;get&quot;)
-## &lt;bytecode: 0x56484a875450&gt;
-## &lt;environment: 0x56484a870410&gt;
+## &lt;bytecode: 0x55a76f4d6c30&gt;
+## &lt;environment: 0x55a76f4d0df0&gt;
 ## Methods may be defined for arguments: x, pos, envir
 ## Use  showMethods(get)  for currently available ones.</code></pre></li>
 <li><p>The only other argument you should usually use in <code>setGeneric()</code> is <code>signature</code>.</p>
@@ -849,6 +849,7 @@ $(document).ready(function () {
 <span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a><span class="fu">setOldClass</span>(<span class="st">&quot;factor&quot;</span>, <span class="at">S4Class =</span> <span class="st">&quot;factor&quot;</span>)</span></code></pre></div>
 <pre><code>## Warning in rm(list = what, pos = classWhere): object &#39;.__C__factor&#39; not found</code></pre></li>
 <li><p>Above, we inherit from the <code>integer</code> base type.</p></li>
+<li><p>Notice that we used <code>structure()</code> in the prototype, not <code>list()</code>. This is because we are building on factors, which are integers with attributes, not list-like objects.</p></li>
 <li><p>When you inherit from a base type, it has a slot <code>.Data</code> which is where the base type’s values live. Let’s use this to make new S4 factors.</p>
 <div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;factor&quot;</span>, <span class="at">.Data =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>), <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>))</span>
 <span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(x)</span></code></pre></div>
@@ -1131,24 +1132,26 @@ $(document).ready(function () {
 <ul>
 <li><p>To document an S4 class, add <code>{roxygen2}</code> comments before <code>setClass()</code>.</p></li>
 <li><p>Use the <code>@slot</code> tag to document each slot, just like you would document each parameter of a function.</p></li>
+<li><p>Make sure you also provide a <code>@name</code> tag of the form <code>classname-class</code></p></li>
 <li><p>Let’s document the <code>Person</code> class.</p>
 <div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; An S4 class representing a person</span></span>
 <span id="cb136-2"><a href="#cb136-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; </span></span>
 <span id="cb136-3"><a href="#cb136-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @slot name The name of the person.</span></span>
 <span id="cb136-4"><a href="#cb136-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @slot age The age of the person.</span></span>
-<span id="cb136-5"><a href="#cb136-5" aria-hidden="true" tabindex="-1"></a><span class="fu">setClass</span>(</span>
-<span id="cb136-6"><a href="#cb136-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>,</span>
-<span id="cb136-7"><a href="#cb136-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">slots =</span> <span class="fu">c</span>(</span>
-<span id="cb136-8"><a href="#cb136-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">&quot;character&quot;</span>,</span>
-<span id="cb136-9"><a href="#cb136-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">age =</span> <span class="st">&quot;numeric&quot;</span></span>
-<span id="cb136-10"><a href="#cb136-10" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb136-11"><a href="#cb136-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">prototype =</span> <span class="fu">list</span>(</span>
-<span id="cb136-12"><a href="#cb136-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="fu">character</span>(),</span>
-<span id="cb136-13"><a href="#cb136-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">double</span>()</span>
-<span id="cb136-14"><a href="#cb136-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb136-15"><a href="#cb136-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<span id="cb136-5"><a href="#cb136-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; </span></span>
+<span id="cb136-6"><a href="#cb136-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @name Person-class</span></span>
+<span id="cb136-7"><a href="#cb136-7" aria-hidden="true" tabindex="-1"></a><span class="fu">setClass</span>(</span>
+<span id="cb136-8"><a href="#cb136-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb136-9"><a href="#cb136-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">slots =</span> <span class="fu">c</span>(</span>
+<span id="cb136-10"><a href="#cb136-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">&quot;character&quot;</span>,</span>
+<span id="cb136-11"><a href="#cb136-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">age =</span> <span class="st">&quot;numeric&quot;</span></span>
+<span id="cb136-12"><a href="#cb136-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb136-13"><a href="#cb136-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">prototype =</span> <span class="fu">list</span>(</span>
+<span id="cb136-14"><a href="#cb136-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="fu">character</span>(),</span>
+<span id="cb136-15"><a href="#cb136-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">double</span>()</span>
+<span id="cb136-16"><a href="#cb136-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb136-17"><a href="#cb136-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
 <li><p>S4 generics are regular functions, so document them like usual.</p></li>
-<li><p>All S4 methods are required to be documented.</p></li>
 <li><p>You can use <code>@describeIn</code> to simplify documentation of S4 methods by combining them with the generic or the class documentation.</p></li>
 <li><p>In an R package, the files are loaded in alphabetical order. However, for S4 objects, you need to super superclasses before you are allowed to create subclasses.</p></li>
 <li><p>To force another file to load before the current file, put this at the top of the current file</p>
@@ -1191,9 +1194,9 @@ $(document).ready(function () {
 <span id="cb147-5"><a href="#cb147-5" aria-hidden="true" tabindex="-1"></a>  USCounties <span class="sc">%*%</span> ones</span>
 <span id="cb147-6"><a href="#cb147-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## Unit: microseconds
-##                 expr     min      lq    mean  median      uq   max neval
-##    densemat %*% ones 10887.2 12533.7 13558.2 13059.1 14103.1 22434   100
-##  USCounties %*% ones   171.7   192.9   247.2   216.3   276.4  1694   100</code></pre>
+##                 expr     min      lq    mean median      uq   max neval
+##    densemat %*% ones 11991.3 18358.0 19527.2  19078 20269.3 25939   100
+##  USCounties %*% ones   203.6   256.9   338.4    285   391.1  2542   100</code></pre>
 <ul>
 <li>This application doesn’t really demonstrate its abilities. It can be even more orders of magnitude faster.</li>
 </ul></li>
@@ -1273,8 +1276,8 @@ $(document).ready(function () {
 <li><p><code>vcov()</code> will you you the estimated variance/covariance matrix of the MLE’s (for their sampling distribution).</p>
 <div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vcov</span>(mlout)</span></code></pre></div>
 <pre><code>##              mu     sigma
-## mu    2.752e+00 1.093e-07
-## sigma 1.093e-07 1.376e+00</code></pre></li>
+## mu    2.752e+00 1.085e-07
+## sigma 1.085e-07 1.376e+00</code></pre></li>
 <li><p>So the standard errors are from</p>
 <div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">diag</span>(<span class="fu">vcov</span>(mlout)))</span></code></pre></div>
 <pre><code>##    mu sigma 

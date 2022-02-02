@@ -814,7 +814,7 @@ klippy::klippy()
 
 # Type Predicates
 
-- Whenever you make a new S3 class, you should always provide a type predict to test if an object is a certaint type.
+- Whenever you make a new S3 class, you should always provide a type predict to test if an object is a certain type.
 
     ```{r}
     is_sim <- function(x) {

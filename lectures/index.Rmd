@@ -45,6 +45,7 @@ This repository contains material based upon work supported by the National Scie
   - [OOP Introduction](./05_oop.html)
   - [S3 Objects](./05_s3.html)
   - [S4 Objects](./05_s4.html)
+  - [Lab S4](https://github.com/advanced-r-spring-2022/lab_s4)
   - [S4 and Bioconductor](./05_bioconductor.html)
 - 06 Metaprogramming
   - [Brief Overview of Metaprogramming](./06_meta.html)

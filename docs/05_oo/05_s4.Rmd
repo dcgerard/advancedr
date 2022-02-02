@@ -548,6 +548,8 @@ klippy::klippy()
 
 - Above, we inherit from the `integer` base type. 
 
+- Notice that we used `structure()` in the prototype, not `list()`. This is because we are building on factors, which are integers with attributes, not list-like objects.
+
 - When you inherit from a base type, it has a slot `.Data` which is where the base type's values live. Let's use this to make new S4 factors.
 
     ```{r}
@@ -841,12 +843,16 @@ klippy::klippy()
 
 - Use the `@slot` tag to document each slot, just like you would document each parameter of a function.
 
+- Make sure you also provide a `@name` tag of the form `classname-class`
+
 - Let's document the `Person` class.
     ```{r, eval = FALSE}
     #' An S4 class representing a person
     #' 
     #' @slot name The name of the person.
     #' @slot age The age of the person.
+    #' 
+    #' @name Person-class
     setClass(
       Class = "Person",
       slots = c(
@@ -861,8 +867,6 @@ klippy::klippy()
     ```
     
 - S4 generics are regular functions, so document them like usual.
-
-- All S4 methods are required to be documented.
 
 - You can use `@describeIn` to simplify documentation of S4 methods by combining them with the generic or the class documentation.
 
