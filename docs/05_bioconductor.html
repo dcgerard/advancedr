@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-29" />
+<meta name="date" content="2022-02-03" />
 
 <title>S4 and Bioconductor</title>
 
@@ -50,6 +50,101 @@
     </style>
 
 
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -263,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S4 and Bioconductor</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-29</h4>
+<h4 class="date">2022-02-03</h4>
 
 </div>
 
@@ -271,6 +366,29 @@ $(document).ready(function () {
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#motivation">Motivation</a></li>
+<li><a href="#bioconductor-setup">Bioconductor Setup</a></li>
+<li><a href="#basic-objects">Basic Objects</a>
+<ul>
+<li><a href="#simplelist"><code>SimpleList</code></a></li>
+<li><a href="#dataframe"><code>DataFrame</code></a></li>
+<li><a href="#integerlist-characterlist-etc"><code>IntegerList</code>, <code>CharacterList</code>, etc…</a></li>
+<li><a href="#dnastringset"><code>DNAStringSet</code></a></li>
+<li><a href="#dnastringsetlist"><code>DNAStringSetList</code></a></li>
+<li><a href="#rle"><code>Rle</code></a></li>
+<li><a href="#iranges"><code>IRanges</code></a></li>
+<li><a href="#granges"><code>GRanges</code></a></li>
+</ul></li>
+<li><a href="#vcf-file-backgrounds">VCF File Backgrounds</a></li>
+<li><a href="#variantannotation">VariantAnnotation</a>
+<ul>
+<li><a href="#fixed-slot"><code>fixed</code> slot:</a></li>
+<li><a href="#info-slot"><code>info</code> slot</a></li>
+<li><a href="#metadata-slot"><code>metadata</code> slot</a></li>
+<li><a href="#rowranges-slot"><code>rowRanges</code> slot</a></li>
+<li><a href="#coldata-slot"><code>colData</code> slot</a></li>
+<li><a href="#geno-slot"><code>geno</code> slot</a></li>
+</ul></li>
+<li><a href="#practical-usage-of-variantannotation">Practical Usage of <code>{VariantAnnotation}</code></a></li>
 <li><a href="#bioconductor-file-structure">Bioconductor File Structure</a></li>
 </ul>
 </div>
@@ -282,18 +400,351 @@ $(document).ready(function () {
 <div id="learning-objectives" class="section level1">
 <h1>Learning Objectives</h1>
 <ul>
-<li><a href="https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/">Common Bioconductor Methods and Classes</a></li>
-<li><a href="https://bioconductor.org/packages/3.14/bioc/html/BiocGenerics.html">BiocGenerics</a></li>
-<li><a href="https://bioconductor.org/packages/3.14/bioc/html/S4Vectors.html">S4Vectors</a></li>
-<li><a href="https://bioconductor.org/packages/3.14/bioc/html/IRanges.html">IRanges</a></li>
+<li>Chapter 11 of <a href="http://genomicsclass.github.io/book/pages/dataman2019.html#managing-information-on-large-numbers-of-dna-variants">Biomedical Data Science</a> starting at the VCF background.</li>
+<li><a href="https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/">Common Bioconductor Methods and Classes</a> <!-- - [BiocGenerics](https://bioconductor.org/packages/3.14/bioc/html/BiocGenerics.html) --> <!-- - [S4Vectors](https://bioconductor.org/packages/3.14/bioc/html/S4Vectors.html) --> <!-- - [IRanges](https://bioconductor.org/packages/3.14/bioc/html/IRanges.html) --></li>
 <li><a href="https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html">VariantAnnotation</a></li>
 </ul>
 </div>
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
 <ul>
-<li>The most common application of S4 objects is in the <a href="https://bioconductor.org/">Bioconductor</a> project, so we will use some of those base classes as an example.</li>
+<li><p>The most common application of S4 objects is in the <a href="https://bioconductor.org/">Bioconductor</a> project, so we will use some of those base classes as an example.</p></li>
+<li><p>Bioconductor also provides some of the best software to analyze genome-scale data.</p></li>
+<li><p>Bioconductor is huge, and learning that ecosystem would take a semester. Here, we will just learn the basic data types used within the <code>{VariantAnnotation}</code> package.</p></li>
 </ul>
+</div>
+<div id="bioconductor-setup" class="section level1">
+<h1>Bioconductor Setup</h1>
+<ul>
+<li><p><a href="https://bioconductor.org/">Bioconductor</a> is a repository for hosting R packages (just like CRAN).</p></li>
+<li><p>But Bioconductor packages are focused on biological applications. They also share S4 objects that are designed to make analyzing biological data easier.</p></li>
+<li><p>You do not use <code>install.packages()</code> to install packages from Bioconductor, you use <code>BiocManager::install()</code>. So first make sure you have <code>{BiocManager}</code> installed on your computer:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</span></code></pre></div></li>
+<li><p>Now install some of the more useful Bioconductor packages.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;VariantAnnotation&quot;</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;SummarizedExperiment&quot;</span>, </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;GenomicAlignments&quot;</span>)</span></code></pre></div></li>
+<li><p>One thing you will notice from Bioconductor is that all S4 classes are in <code>UpperCamelCase</code>, and S4 methods are in <code>lowerCamelCase</code>.</p></li>
+</ul>
+</div>
+<div id="basic-objects" class="section level1">
+<h1>Basic Objects</h1>
+<div id="simplelist" class="section level2">
+<h2><code>SimpleList</code></h2>
+</div>
+<div id="dataframe" class="section level2">
+<h2><code>DataFrame</code></h2>
+</div>
+<div id="integerlist-characterlist-etc" class="section level2">
+<h2><code>IntegerList</code>, <code>CharacterList</code>, etc…</h2>
+</div>
+<div id="dnastringset" class="section level2">
+<h2><code>DNAStringSet</code></h2>
+</div>
+<div id="dnastringsetlist" class="section level2">
+<h2><code>DNAStringSetList</code></h2>
+</div>
+<div id="rle" class="section level2">
+<h2><code>Rle</code></h2>
+</div>
+<div id="iranges" class="section level2">
+<h2><code>IRanges</code></h2>
+</div>
+<div id="granges" class="section level2">
+<h2><code>GRanges</code></h2>
+</div>
+</div>
+<div id="vcf-file-backgrounds" class="section level1">
+<h1>VCF File Backgrounds</h1>
+<ul>
+<li><p>VCF Description: <a href="http://vcftools.sourceforge.net/VCF-poster.pdf" class="uri">http://vcftools.sourceforge.net/VCF-poster.pdf</a></p></li>
+<li><p>Wikipedia Description: <a href="https://en.wikipedia.org/wiki/Variant_Call_Format" class="uri">https://en.wikipedia.org/wiki/Variant_Call_Format</a></p></li>
+</ul>
+</div>
+<div id="variantannotation" class="section level1">
+<h1>VariantAnnotation</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(VariantAnnotation)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>fl <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;chr22.vcf.gz&quot;</span>, <span class="at">package=</span><span class="st">&quot;VariantAnnotation&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>vcf <span class="ot">&lt;-</span> <span class="fu">readVcf</span>(fl, <span class="st">&quot;hg19&quot;</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>vcf</span></code></pre></div>
+<pre><code>## class: CollapsedVCF 
+## dim: 10376 5 
+## rowRanges(vcf):
+##   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER
+## info(vcf):
+##   DataFrame with 22 columns: LDAF, AVGPOST, RSQ, ERATE, THETA, CIEND, CIPOS,...
+## info(header(vcf)):
+##              Number Type    Description                                        
+##    LDAF      1      Float   MLE Allele Frequency Accounting for LD             
+##    AVGPOST   1      Float   Average posterior probability from MaCH/Thunder    
+##    RSQ       1      Float   Genotype imputation quality from MaCH/Thunder      
+##    ERATE     1      Float   Per-marker Mutation rate from MaCH/Thunder         
+##    THETA     1      Float   Per-marker Transition rate from MaCH/Thunder       
+##    CIEND     2      Integer Confidence interval around END for imprecise var...
+##    CIPOS     2      Integer Confidence interval around POS for imprecise var...
+##    END       1      Integer End position of the variant described in this re...
+##    HOMLEN    .      Integer Length of base pair identical micro-homology at ...
+##    HOMSEQ    .      String  Sequence of base pair identical micro-homology a...
+##    SVLEN     1      Integer Difference in length between REF and ALT alleles   
+##    SVTYPE    1      String  Type of structural variant                         
+##    AC        .      Integer Alternate Allele Count                             
+##    AN        1      Integer Total Allele Count                                 
+##    AA        1      String  Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.u...
+##    AF        1      Float   Global Allele Frequency based on AC/AN             
+##    AMR_AF    1      Float   Allele Frequency for samples from AMR based on A...
+##    ASN_AF    1      Float   Allele Frequency for samples from ASN based on A...
+##    AFR_AF    1      Float   Allele Frequency for samples from AFR based on A...
+##    EUR_AF    1      Float   Allele Frequency for samples from EUR based on A...
+##    VT        1      String  indicates what type of variant the line represents 
+##    SNPSOURCE .      String  indicates if a snp was called when analysing the...
+## geno(vcf):
+##   List of length 3: GT, DS, GL
+## geno(header(vcf)):
+##       Number Type   Description                      
+##    GT 1      String Genotype                         
+##    DS 1      Float  Genotype dosage from MaCH/Thunder
+##    GL G      Float  Genotype Likelihoods</code></pre>
+<div id="fixed-slot" class="section level2">
+<h2><code>fixed</code> slot:</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixed</span>(vcf)</span></code></pre></div>
+<pre><code>## DataFrame with 10376 rows and 4 columns
+##                  REF                ALT      QUAL      FILTER
+##       &lt;DNAStringSet&gt; &lt;DNAStringSetList&gt; &lt;numeric&gt; &lt;character&gt;
+## 1                  A                  G       100        PASS
+## 2                  C                  T       100        PASS
+## 3                  G                  A       100        PASS
+## 4                  C                  T       100        PASS
+## 5                  C                  T       100        PASS
+## ...              ...                ...       ...         ...
+## 10372              A                  G       100        PASS
+## 10373              A                  G       100        PASS
+## 10374              A                  G       100        PASS
+## 10375              G                  A       100        PASS
+## 10376              G                  C       100        PASS</code></pre>
+<ul>
+<li><p><code>REF</code>: <code>DNAStringSet</code> object</p></li>
+<li><p><code>ALT</code>: <code>DNAStringSetList</code> object</p></li>
+<li><p><code>QUAL</code>: Numeric vector.</p></li>
+<li><p><code>FILTER</code>: Character vector</p></li>
+</ul>
+</div>
+<div id="info-slot" class="section level2">
+<h2><code>info</code> slot</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span>(vcf)</span></code></pre></div>
+<pre><code>## DataFrame with 10376 rows and 22 columns
+##                  LDAF   AVGPOST       RSQ     ERATE     THETA         CIEND
+##             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;IntegerList&gt;
+## rs7410291      0.3431    0.9890    0.9856     2e-03    0.0005         NA,NA
+## rs147922003    0.0091    0.9963    0.8398     5e-04    0.0011         NA,NA
+## rs114143073    0.0098    0.9891    0.5919     7e-04    0.0008         NA,NA
+## rs141778433    0.0062    0.9950    0.6756     9e-04    0.0003         NA,NA
+## rs182170314    0.0041    0.9981    0.7909     7e-04    0.0004         NA,NA
+## ...               ...       ...       ...       ...       ...           ...
+## rs187302552    0.0009    0.9992    0.5571    0.0003    0.0026         NA,NA
+## rs9628178      0.0727    0.9997    0.9983    0.0003    0.0011         NA,NA
+## rs5770892      0.3678    0.9868    0.9784    0.0021    0.0007         NA,NA
+## rs144055359    0.0011    0.9987    0.5323    0.0005    0.0004         NA,NA
+## rs114526001    0.0543    0.9622    0.7595    0.0021    0.0005         NA,NA
+##                     CIPOS       END        HOMLEN          HOMSEQ     SVLEN
+##             &lt;IntegerList&gt; &lt;integer&gt; &lt;IntegerList&gt; &lt;CharacterList&gt; &lt;integer&gt;
+## rs7410291           NA,NA        NA                                      NA
+## rs147922003         NA,NA        NA                                      NA
+## rs114143073         NA,NA        NA                                      NA
+## rs141778433         NA,NA        NA                                      NA
+## rs182170314         NA,NA        NA                                      NA
+## ...                   ...       ...           ...             ...       ...
+## rs187302552         NA,NA        NA                                      NA
+## rs9628178           NA,NA        NA                                      NA
+## rs5770892           NA,NA        NA                                      NA
+## rs144055359         NA,NA        NA                                      NA
+## rs114526001         NA,NA        NA                                      NA
+##                  SVTYPE            AC        AN          AA        AF    AMR_AF
+##             &lt;character&gt; &lt;IntegerList&gt; &lt;integer&gt; &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt;
+## rs7410291            NA           751      2184           N    0.3400    0.2000
+## rs147922003          NA            20      2184           c    0.0100    0.0100
+## rs114143073          NA            20      2184           G    0.0100    0.0028
+## rs141778433          NA            12      2184           C    0.0100    0.0100
+## rs182170314          NA             8      2184           C    0.0037    0.0100
+## ...                 ...           ...       ...         ...       ...       ...
+## rs187302552          NA             1      2184           a    0.0005        NA
+## rs9628178            NA           158      2184           a    0.0700      0.03
+## rs5770892            NA           801      2184           a    0.3700      0.32
+## rs144055359          NA             1      2184           g    0.0005        NA
+## rs114526001          NA           113      2184           g    0.0500      0.01
+##                ASN_AF    AFR_AF    EUR_AF          VT       SNPSOURCE
+##             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;CharacterList&gt;
+## rs7410291        0.19      0.83      0.22         SNP          LOWCOV
+## rs147922003        NA      0.02      0.01         SNP          LOWCOV
+## rs114143073      0.02      0.01      0.01         SNP          LOWCOV
+## rs141778433        NA      0.02        NA         SNP          LOWCOV
+## rs182170314        NA      0.01        NA         SNP          LOWCOV
+## ...               ...       ...       ...         ...             ...
+## rs187302552    0.0017        NA        NA         SNP          LOWCOV
+## rs9628178      0.0100      0.17    0.0800         SNP          LOWCOV
+## rs5770892      0.3800      0.59    0.2300         SNP          LOWCOV
+## rs144055359        NA        NA    0.0013         SNP          LOWCOV
+## rs114526001    0.0100      0.16    0.0400         SNP          LOWCOV</code></pre>
+<ul>
+<li><p><code>DataFrame</code> object with information on each variant.</p></li>
+<li><p>Table of common INFO fields (from <a href="https://en.wikipedia.org/wiki/Variant_Call_Format">Wikipedia</a>):</p></li>
+</ul>
+<table>
+<colgroup>
+<col width="7%" />
+<col width="92%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Brief description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AA</td>
+<td>ancestral allele</td>
+</tr>
+<tr class="even">
+<td>AC</td>
+<td>allele count in genotypes, for each ALT allele, in the same order as listed</td>
+</tr>
+<tr class="odd">
+<td>AF</td>
+<td>allele frequency for each ALT allele in the same order as listed (use this when estimated from primary data, not called genotypes)</td>
+</tr>
+<tr class="even">
+<td>AN</td>
+<td>total number of alleles in called genotypes</td>
+</tr>
+<tr class="odd">
+<td>BQ</td>
+<td>RMS base quality at this position</td>
+</tr>
+<tr class="even">
+<td>CIGAR</td>
+<td>cigar string describing how to align an alternate allele to the reference allele</td>
+</tr>
+<tr class="odd">
+<td>DB</td>
+<td>dbSNP membership</td>
+</tr>
+<tr class="even">
+<td>DP</td>
+<td>combined depth across samples, e.g. DP=154</td>
+</tr>
+<tr class="odd">
+<td>END</td>
+<td>end position of the variant described in this record (for use with symbolic alleles)</td>
+</tr>
+<tr class="even">
+<td>H2</td>
+<td>membership in hapmap2</td>
+</tr>
+<tr class="odd">
+<td>H3</td>
+<td>membership in hapmap3</td>
+</tr>
+<tr class="even">
+<td>MQ</td>
+<td>RMS mapping quality, e.g. MQ=52</td>
+</tr>
+<tr class="odd">
+<td>MQ0</td>
+<td>Number of MAPQ == 0 reads covering this record</td>
+</tr>
+<tr class="even">
+<td>NS</td>
+<td>Number of samples with data</td>
+</tr>
+<tr class="odd">
+<td>SB</td>
+<td>strand bias at this position</td>
+</tr>
+<tr class="even">
+<td>SOMATIC</td>
+<td>indicates that the record is a somatic mutation, for cancer genomics</td>
+</tr>
+<tr class="odd">
+<td>VALIDATED</td>
+<td>validated by follow-up experiment</td>
+</tr>
+<tr class="even">
+<td>1000G</td>
+<td>membership in 1000 Genomes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="metadata-slot" class="section level2">
+<h2><code>metadata</code> slot</h2>
+<ul>
+<li><p>A list having header information. This is mostly arbitrary information.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span>(vcf)</span></code></pre></div>
+<pre><code>## $header
+## class: VCFHeader 
+## samples(5): HG00096 HG00097 HG00099 HG00100 HG00101
+## meta(1): fileformat
+## fixed(2): FILTER ALT
+## info(22): LDAF AVGPOST ... VT SNPSOURCE
+## geno(3): GT DS GL</code></pre></li>
+</ul>
+</div>
+<div id="rowranges-slot" class="section level2">
+<h2><code>rowRanges</code> slot</h2>
+<ul>
+<li>A <code>GRanges</code> object, describing genomic locations of variant allong with annotations.</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rowRanges</span>(vcf)</span></code></pre></div>
+<pre><code>## GRanges object with 10376 ranges and 5 metadata columns:
+##               seqnames    ranges strand | paramRangeID            REF
+##                  &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;
+##     rs7410291       22  50300078      * |           NA              A
+##   rs147922003       22  50300086      * |           NA              C
+##   rs114143073       22  50300101      * |           NA              G
+##   rs141778433       22  50300113      * |           NA              C
+##   rs182170314       22  50300166      * |           NA              C
+##           ...      ...       ...    ... .          ...            ...
+##   rs187302552       22  50999536      * |           NA              A
+##     rs9628178       22  50999538      * |           NA              A
+##     rs5770892       22  50999681      * |           NA              A
+##   rs144055359       22  50999830      * |           NA              G
+##   rs114526001       22  50999964      * |           NA              G
+##                              ALT      QUAL      FILTER
+##               &lt;DNAStringSetList&gt; &lt;numeric&gt; &lt;character&gt;
+##     rs7410291                  G       100        PASS
+##   rs147922003                  T       100        PASS
+##   rs114143073                  A       100        PASS
+##   rs141778433                  T       100        PASS
+##   rs182170314                  T       100        PASS
+##           ...                ...       ...         ...
+##   rs187302552                  G       100        PASS
+##     rs9628178                  G       100        PASS
+##     rs5770892                  G       100        PASS
+##   rs144055359                  A       100        PASS
+##   rs114526001                  C       100        PASS
+##   -------
+##   seqinfo: 1 sequence from hg19 genome; no seqlengths</code></pre>
+</div>
+<div id="coldata-slot" class="section level2">
+<h2><code>colData</code> slot</h2>
+<ul>
+<li>A <code>DataFrame</code> object describing sample information.</li>
+</ul>
+</div>
+<div id="geno-slot" class="section level2">
+<h2><code>geno</code> slot</h2>
+<ul>
+<li><p>A <code>SimpleList</code> of matrix-like objects, containing the genotype data</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(vcf)</span></code></pre></div>
+<pre><code>## List of length 3
+## names(3): GT DS GL</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(<span class="fu">geno</span>(vcf)<span class="sc">$</span>GT)</span></code></pre></div>
+<pre><code>## [1] &quot;matrix&quot; &quot;array&quot;</code></pre></li>
+</ul>
+</div>
+</div>
+<div id="practical-usage-of-variantannotation" class="section level1">
+<h1>Practical Usage of <code>{VariantAnnotation}</code></h1>
 </div>
 <div id="bioconductor-file-structure" class="section level1">
 <h1>Bioconductor File Structure</h1>

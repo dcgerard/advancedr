@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-29" />
+<meta name="date" content="2022-02-03" />
 
 <title>Subsetting</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Subsetting</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-29</h4>
+<h4 class="date">2022-02-03</h4>
 
 </div>
 
@@ -376,6 +376,7 @@ $(document).ready(function () {
 <li><a href="#lookup-tables">Lookup Tables</a></li>
 <li><a href="#bootstrapping">Bootstrapping</a></li>
 </ul></li>
+<li><a href="#exercises">Exercises</a></li>
 </ul>
 </div>
 
@@ -742,6 +743,19 @@ $(document).ready(function () {
 <span id="cb134-8"><a href="#cb134-8" aria-hidden="true" tabindex="-1"></a>df_samp <span class="ot">&lt;-</span> df[ind, ]</span></code></pre></div></li>
 </ul>
 </div>
+</div>
+<div id="exercises" class="section level1">
+<h1>Exercises</h1>
+<p>These are just meant to buff up your Base R skills. Consider the data from the <code>{Sleuth3}</code> package that contains information on sex and salary at a bank.</p>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Sleuth3)</span>
+<span id="cb135-2"><a href="#cb135-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;case0102&quot;</span>)</span>
+<span id="cb135-3"><a href="#cb135-3" aria-hidden="true" tabindex="-1"></a>sal <span class="ot">&lt;-</span> case0102</span></code></pre></div>
+<ol style="list-style-type: decimal">
+<li><p>What is the salary of the person in the 51st row? Use two different subsetting strategies to get this.</p></li>
+<li><p>What is the mean salary of Male’s?</p></li>
+<li><p>How many Females are in the data?</p></li>
+<li><p>How many Females make over $6000?</p></li>
+</ol>
 </div>
 
 <!DOCTYPE html>

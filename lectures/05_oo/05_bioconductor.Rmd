@@ -24,15 +24,149 @@ klippy::klippy()
 
 # Learning Objectives
 
+- Chapter 11 of [Biomedical Data Science](http://genomicsclass.github.io/book/pages/dataman2019.html#managing-information-on-large-numbers-of-dna-variants) starting at the VCF background.
 - [Common Bioconductor Methods and Classes](https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/)
-- [BiocGenerics](https://bioconductor.org/packages/3.14/bioc/html/BiocGenerics.html)
-- [S4Vectors](https://bioconductor.org/packages/3.14/bioc/html/S4Vectors.html)
-- [IRanges](https://bioconductor.org/packages/3.14/bioc/html/IRanges.html)
+<!-- - [BiocGenerics](https://bioconductor.org/packages/3.14/bioc/html/BiocGenerics.html) -->
+<!-- - [S4Vectors](https://bioconductor.org/packages/3.14/bioc/html/S4Vectors.html) -->
+<!-- - [IRanges](https://bioconductor.org/packages/3.14/bioc/html/IRanges.html) -->
 - [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html)
 
 # Motivation
 
 - The most common application of S4 objects is in the [Bioconductor](https://bioconductor.org/) project, so we will use some of those base classes as an example.
+
+- Bioconductor also provides some of the best software to analyze genome-scale data.
+
+- Bioconductor is huge, and learning that ecosystem would take a semester. Here, we will just learn the basic data types used within the `{VariantAnnotation}` package.
+
+# Bioconductor Setup
+
+- [Bioconductor](https://bioconductor.org/) is a repository for hosting R packages (just like CRAN).
+
+- But Bioconductor packages are focused on biological applications. They also share S4 objects that are designed to make analyzing biological data easier.
+
+- You do not use `install.packages()` to install packages from Bioconductor, you use `BiocManager::install()`. So first make sure you have `{BiocManager}` installed on your computer:
+    ```{r, eval = FALSE}
+    install.packages("BiocManager")
+    ```
+    
+- Now install some of the more useful Bioconductor packages.
+
+    ```{r, eval = FALSE}
+    BiocManager::install("VariantAnnotation",
+                         "SummarizedExperiment", 
+                         "GenomicAlignments")
+    ```
+    
+- One thing you will notice from Bioconductor is that all S4 classes are in `UpperCamelCase`, and S4 methods are in `lowerCamelCase`.
+    
+# Basic Objects
+
+## `SimpleList`
+
+## `DataFrame`
+
+## `IntegerList`, `CharacterList`, etc...
+
+## `DNAStringSet`
+
+## `DNAStringSetList`
+
+## `Rle`
+
+## `IRanges`
+
+## `GRanges`
+
+# VCF File Backgrounds
+
+- VCF Description: <http://vcftools.sourceforge.net/VCF-poster.pdf>
+
+- Wikipedia Description: <https://en.wikipedia.org/wiki/Variant_Call_Format>
+
+# VariantAnnotation
+
+```{r, message=FALSE}
+library(VariantAnnotation)
+fl <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
+vcf <- readVcf(fl, "hg19")
+vcf
+```
+
+## `fixed` slot:
+
+```{r}
+fixed(vcf)
+```
+
+- `REF`: `DNAStringSet` object
+
+- `ALT`: `DNAStringSetList` object
+    
+- `QUAL`: Numeric vector.
+
+- `FILTER`: Character vector
+
+## `info` slot
+
+```{r}
+info(vcf)
+```
+
+- `DataFrame` object with information on each variant.
+
+- Table of common INFO fields (from [Wikipedia](https://en.wikipedia.org/wiki/Variant_Call_Format)):
+
+| Name      | Brief description                                                                                                                    |
+|-----------|--------------------------------------------------------------------------------------------------------------------------------------|
+| AA        | ancestral allele                                                                                                                     |
+| AC        | allele count in genotypes, for each ALT allele, in the same order as listed                                                          |
+| AF        | allele frequency for each ALT allele in the same order as listed  (use this when estimated from primary data, not called genotypes)  |
+| AN        | total number of alleles in called genotypes                                                                                          |
+| BQ        | RMS base quality at this position                                                                                                    |
+| CIGAR     | cigar string describing how to align an alternate allele to the reference allele                                                     |
+| DB        | dbSNP membership                                                                                                                     |
+| DP        | combined depth across samples, e.g. DP=154                                                                                           |
+| END       | end position of the variant described in this record (for use with symbolic alleles)                                                 |
+| H2        | membership in hapmap2                                                                                                                |
+| H3        | membership in hapmap3                                                                                                                |
+| MQ        | RMS mapping quality, e.g. MQ=52                                                                                                      |
+| MQ0       | Number of MAPQ == 0 reads covering this record                                                                                       |
+| NS        | Number of samples with data                                                                                                          |
+| SB        | strand bias at this position                                                                                                         |
+| SOMATIC   | indicates that the record is a somatic mutation, for cancer genomics                                                                 |
+| VALIDATED | validated by follow-up experiment                                                                                                    |
+| 1000G     | membership in 1000 Genomes                                                                                                           |
+
+## `metadata` slot
+
+- A list having header information. This is mostly arbitrary information.
+
+    ```{r}
+    metadata(vcf)
+    ```
+
+## `rowRanges` slot
+
+- A `GRanges` object, describing genomic locations of variant allong with annotations.
+
+```{r}
+rowRanges(vcf)
+```
+## `colData` slot
+
+- A `DataFrame` object describing sample information.
+
+## `geno` slot
+
+- A `SimpleList` of matrix-like objects, containing the genotype data
+
+    ```{r}
+    geno(vcf)
+    class(geno(vcf)$GT)
+    ```
+
+# Practical Usage of `{VariantAnnotation}`
 
 # Bioconductor File Structure
 
