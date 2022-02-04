@@ -397,6 +397,7 @@ $(document).ready(function () {
 <li><a href="#geno-slot"><code>geno</code> slot</a></li>
 <li><a href="#filtering">Filtering</a></li>
 </ul></li>
+<li><a href="#saving">Saving</a></li>
 </ul>
 </div>
 
@@ -583,28 +584,28 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_size</span>(pvec)</span></code></pre></div>
 <pre><code>## 4,000,048 B</code></pre>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_size</span>(rvec)</span></code></pre></div>
-<pre><code>## 1,203,400 B</code></pre></li>
+<pre><code>## 1,205,096 B</code></pre></li>
 <li><p>You can treat <code>Rle</code> objects just like regular vectors.</p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>rvec[<span class="dv">100</span>]</span></code></pre></div>
 <pre><code>## integer-Rle of length 1 with 1 run
 ##   Lengths: 1
 ##   Values : 0</code></pre>
 <div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>rvec <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
-<pre><code>## numeric-Rle of length 1000000 with 150280 runs
-##   Lengths:  228    1 1690    1 2114    1  474 ...    1    1    1 4478    1   42
-##   Values :    1    2    1    2    1    2    1 ...    1    2    3    1    2    1</code></pre>
+<pre><code>## numeric-Rle of length 1000000 with 150492 runs
+##   Lengths: 2477    1 1107    1  510    1  408 ...    1 1742    1  672    1  315
+##   Values :    1    2    1    2    1    2    1 ...    2    1    2    1    2    1</code></pre>
 <div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(rvec)</span></code></pre></div>
 <pre><code>## [1] 1000000</code></pre>
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(rvec)</span></code></pre></div>
-<pre><code>## [1] 906667</code></pre></li>
+<pre><code>## [1] 905096</code></pre></li>
 <li><p><code>Rle</code> has more efficient ways to subset regions via the <code>window()</code> generic.</p>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">window</span>(rvec, <span class="dv">510445</span>, <span class="dv">788990</span>)</span></code></pre></div>
-<pre><code>## integer-Rle of length 278546 with 42463 runs
-##   Lengths:   63    1    5    1    1    1    3 ...    1    2    1 2249    1  251
-##   Values :    0    1    0    1    0    1    0 ...    2    0    1    0    1    0</code></pre></li>
+<pre><code>## integer-Rle of length 278546 with 42384 runs
+##   Lengths:   57    1    4    1   10    1    5 ...    2 1034    1 1376    1   88
+##   Values :    0    1    0    1    0    1    0 ...    1    0    1    0    1    0</code></pre></li>
 <li><p>Get the run lengths via <code>runLength()</code></p>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">runLength</span>(rvec))</span></code></pre></div>
-<pre><code>## [1]  228    1 1690    1 2114    1</code></pre></li>
+<pre><code>## [1] 2477    1 1107    1  510    1</code></pre></li>
 <li><p>Get the values via <code>runValue()</code></p>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">runValue</span>(rvec))</span></code></pre></div>
 <pre><code>## [1] 0 1 0 1 0 1</code></pre></li>
@@ -653,14 +654,14 @@ $(document).ready(function () {
 <li><p>I ranges are often used to extract elements with regions of interest.</p></li>
 <li><p>E.g., remember the <code>Rle</code> object that we constructed:</p>
 <div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>rvec</span></code></pre></div>
-<pre><code>## integer-Rle of length 1000000 with 150280 runs
-##   Lengths:  228    1 1690    1 2114    1  474 ...    1    1    1 4478    1   42
-##   Values :    0    1    0    1    0    1    0 ...    0    1    2    0    1    0</code></pre>
+<pre><code>## integer-Rle of length 1000000 with 150492 runs
+##   Lengths: 2477    1 1107    1  510    1  408 ...    1 1742    1  672    1  315
+##   Values :    0    1    0    1    0    1    0 ...    1    0    1    0    1    0</code></pre>
 <p>What if we want to get the values within the ranges that we constructed via the <code>IRanges</code> object? Then we just use regular bracket subsetting:</p>
 <div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>rvec[iobj]</span></code></pre></div>
-<pre><code>## integer-Rle of length 258 with 97 runs
-##   Lengths: 157   1   2   1   1   1   1   1 ...   1   1   1   1   1   1   1   1
-##   Values :   0   8  11  17  15  14   8   9 ...   7   8  14   9  11  12   4   6</code></pre></li>
+<pre><code>## integer-Rle of length 258 with 94 runs
+##   Lengths: 157   1   1   2   1   1   1   1 ...   1   1   1   1   1   1   1   1
+##   Values :   0   7   6  11  10   7  11  13 ...   6  12   9   6   8   7  10   8</code></pre></li>
 <li><p>There is lots more that <code>IRanges</code> implements. See the help file for more.</p>
 <div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">IRanges-class</span><span class="st">`</span></span></code></pre></div></li>
 </ul>
@@ -1274,7 +1275,7 @@ $(document).ready(function () {
 <h1>VariantAnnotation</h1>
 <ul>
 <li><p>The <code>{VariantAnnotation}</code> package provides an S4 object that has a slot for each field from a VCF file.</p></li>
-<li><p>Let’s load in an example VCF file that comes with the package:</p>
+<li><p>Let’s load in an example VCF file that comes with the package (using <code>readVcf()</code>.</p>
 <div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a>fl <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;chr22.vcf.gz&quot;</span>, <span class="at">package=</span><span class="st">&quot;VariantAnnotation&quot;</span>)</span>
 <span id="cb137-2"><a href="#cb137-2" aria-hidden="true" tabindex="-1"></a>vcf <span class="ot">&lt;-</span> <span class="fu">readVcf</span>(fl, <span class="st">&quot;hg19&quot;</span>)</span>
 <span id="cb137-3"><a href="#cb137-3" aria-hidden="true" tabindex="-1"></a>vcf</span></code></pre></div>
@@ -1518,11 +1519,17 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(vcf)</span>
 <span id="cb167-2"><a href="#cb167-2" aria-hidden="true" tabindex="-1"></a>vcf[<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, ]</span></code></pre></div></li>
 </ul>
+</div>
+</div>
+<div id="saving" class="section level1">
+<h1>Saving</h1>
+<ul>
+<li>Use <code>writeVcf()</code> to save a VCF file.</li>
+</ul>
 <!-- # Bioconductor File Structure -->
 <!-- - All class definitions in "R/AllClasses.R" -->
 <!-- - All generic function definitions in "R/AllGenerics.R" -->
 <!-- - Methods are defined in a file named by the generic function. For example, all `show` methods would go in "R/show-methods.R". -->
-</div>
 </div>
 
 <!DOCTYPE html>

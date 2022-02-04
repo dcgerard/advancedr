@@ -28,6 +28,7 @@ klippy::klippy()
 
 - Required Reading:
     - [Wikipedia page on VCF Files](https://en.wikipedia.org/wiki/Variant_Call_Format)
+    - [GATK Description of VCF Files](https://gatk.broadinstitute.org/hc/en-us/articles/360035531692-VCF-Variant-Call-Format)
     - [Introduction to VariantAnnotation](https://bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.pdf)
 - More resources:
     - [Common Bioconductor Methods and Classes](https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/)
@@ -637,6 +638,7 @@ klippy::klippy()
 
     | Field | Number | Type | Description |
     |-------|--------|------|-------------|
+    | **AA** | 1 | Integer | Read depth for alternative allele |
     | **AD** | R | Integer | Read depth for each allele |
     | ADF | R | Integer | Read depth for each allele on the forward strand |
     | ADR | R | Integer | Read depth for each allele on the reverse strand |
@@ -654,12 +656,13 @@ klippy::klippy()
     | **PP** | G | Integer | Phred-scaled genotype posterior probabilities rounded to the closest integer |
     | PQ | 1 | Integer | Phasing quality |
     | PS | 1 | Integer | Phase set |
+    | **RA** | 1 | Integer | Read depth for reference allele |
 
 # VariantAnnotation
 
 - The `{VariantAnnotation}` package provides an S4 object that has a slot for each field from a VCF file.
 
-- Let's load in an example VCF file that comes with the package:
+- Let's load in an example VCF file that comes with the package (using `readVcf()`.
 
     ```{r, message=FALSE}
     fl <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
@@ -784,6 +787,11 @@ klippy::klippy()
     dim(vcf)
     vcf[1:20, ]
     ```
+
+
+# Saving
+
+- Use `writeVcf()` to save a VCF file.
 
 
 <!-- # Bioconductor File Structure -->
