@@ -641,6 +641,7 @@ klippy::klippy()
     | ADF | R | Integer | Read depth for each allele on the forward strand |
     | ADR | R | Integer | Read depth for each allele on the reverse strand |
     | **DP** | 1 | Integer | Read depth |
+    | **DS** | 1 | Float | Posterior mean genotype |
     | EC | A | Integer | Expected alternate allele counts |
     | FT | 1 | String | Filter indicating if this genotype was "called" |
     | **GL** | G | Float Genotype likelihoods |
@@ -666,6 +667,12 @@ klippy::klippy()
     vcf
     ```
     
+
+- A quick view of the different slots can be seen with `header()`    
+    ```{r}
+    header(vcf)
+    ```
+
 ## `metadata` slot
 
 - A list having header information. This is mostly arbitrary information.
@@ -682,19 +689,26 @@ klippy::klippy()
     fixed(vcf)
     ```
 
-- `REF`: `DNAStringSet` object. This contains the reference alleles at each locus.
+- `REF`: `DNAStringSet` object. This contains the reference alleles at each locus. You can access it with `ref()`
     ```{r}
-    fixed(vcf)$REF[[1]]
+    ref(vcf)
     ```
 
-- `ALT`: `DNAStringSetList` object. Each element is a `DNAStringSet` containing the alternative alleles at each locus. In this case, there is only one alternative allele at every locus, but multiple alternative alleles are possible:
+- `ALT`: `DNAStringSetList` object. Each element is a `DNAStringSet` containing the alternative alleles at each locus. In this case, there is only one alternative allele at every locus, but multiple alternative alleles are possible. You can access it with `alt()`
     ```{r}
-    all(lengths(fixed(vcf)$ALT) == 1)
+    alt(vcf)
+    all(lengths(alt(vcf)) == 1)
     ```
 
-- `QUAL`: Numeric vector. Again, this is $-10\log_{10}\text{Pr(call in ALT is wrong)}$.
+- `QUAL`: Numeric vector. Again, this is $-10\log_{10}\text{Pr(call in ALT is wrong)}$. You can access this with `qual()`
+    ```{r}
+    qual(vcf) |>
+      head()
+    ```
 
-- `FILTER`: Character vector. Again, this is either `"PASS"` or a code for why it failed the filter.
+
+- `FILTER`: Character vector. Again, this is either `"PASS"` or a code for why it failed the filter. 
+
 
 ## `rowRanges` slot
 
@@ -739,7 +753,7 @@ klippy::klippy()
 
 ## `geno` slot
 
-- A `SimpleList` of matrix-like objects, containing the genotype data
+- A `SimpleList` of matrix or array objects, containing the genotype data
 
     ```{r}
     geno(vcf)
@@ -747,7 +761,7 @@ klippy::klippy()
 
 - The different genotype data possible are described above.
 
-- In this example, we have fields GT (the genotype), DS (genotype dosage), and GL (genotype likelihoods).
+- In this example, we have fields GT (the genotype), DS (genotype dosage, aka posterior mean genotype), and GL (genotype likelihoods).
 
 - You can always get a description of the genotype fields with:
 
@@ -755,13 +769,21 @@ klippy::klippy()
     geno(header(vcf))
     ```
 
-- You can access these different matrices by
+- You can access these different genotype fields by
     ```{r, eval = FALSE}
     geno(vcf)$GL
     ```
 
-# Practical Usage of `{VariantAnnotation}`
 
+## Filtering
+
+- There are many operations available to filer loci using the `VCF` class.
+
+- Get first twenty rows:
+    ```{r, eval = FALSE}
+    dim(vcf)
+    vcf[1:20, ]
+    ```
 
 
 <!-- # Bioconductor File Structure -->
