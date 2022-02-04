@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-03" />
+<meta name="date" content="2022-02-04" />
 
 <title>S4 and Bioconductor</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S4 and Bioconductor</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-03</h4>
+<h4 class="date">2022-02-04</h4>
 
 </div>
 
@@ -371,25 +371,32 @@ $(document).ready(function () {
 <ul>
 <li><a href="#simplelist"><code>SimpleList</code></a></li>
 <li><a href="#dataframe"><code>DataFrame</code></a></li>
-<li><a href="#integerlist-characterlist-etc"><code>IntegerList</code>, <code>CharacterList</code>, etc…</a></li>
-<li><a href="#dnastringset"><code>DNAStringSet</code></a></li>
-<li><a href="#dnastringsetlist"><code>DNAStringSetList</code></a></li>
+<li><a href="#characterlist-numericlist-integerlist-logicallist"><code>CharacterList</code>, <code>NumericList</code>, <code>IntegerList</code>, <code>LogicalList</code></a></li>
 <li><a href="#rle"><code>Rle</code></a></li>
 <li><a href="#iranges"><code>IRanges</code></a></li>
 <li><a href="#granges"><code>GRanges</code></a></li>
+<li><a href="#dnastring"><code>DNAString</code></a></li>
+<li><a href="#dnastringset"><code>DNAStringSet</code></a></li>
+<li><a href="#dnastringsetlist"><code>DNAStringSetList</code></a></li>
 </ul></li>
-<li><a href="#vcf-file-backgrounds">VCF File Backgrounds</a></li>
+<li><a href="#vcf-files">VCF Files</a>
+<ul>
+<li><a href="#vcf-diagram">VCF Diagram</a></li>
+<li><a href="#metadata">Metadata</a></li>
+<li><a href="#fixed-field">Fixed Field</a></li>
+<li><a href="#info-field">INFO field</a></li>
+<li><a href="#genotype-fields">Genotype Fields</a></li>
+</ul></li>
 <li><a href="#variantannotation">VariantAnnotation</a>
 <ul>
-<li><a href="#fixed-slot"><code>fixed</code> slot:</a></li>
-<li><a href="#info-slot"><code>info</code> slot</a></li>
 <li><a href="#metadata-slot"><code>metadata</code> slot</a></li>
+<li><a href="#fixed-slot"><code>fixed</code> slot:</a></li>
 <li><a href="#rowranges-slot"><code>rowRanges</code> slot</a></li>
+<li><a href="#info-slot"><code>info</code> slot</a></li>
 <li><a href="#coldata-slot"><code>colData</code> slot</a></li>
 <li><a href="#geno-slot"><code>geno</code> slot</a></li>
 </ul></li>
 <li><a href="#practical-usage-of-variantannotation">Practical Usage of <code>{VariantAnnotation}</code></a></li>
-<li><a href="#bioconductor-file-structure">Bioconductor File Structure</a></li>
 </ul>
 </div>
 
@@ -399,17 +406,29 @@ $(document).ready(function () {
 </script>
 <div id="learning-objectives" class="section level1">
 <h1>Learning Objectives</h1>
+<!-- - Chapter 11 of [Biomedical Data Science](http://genomicsclass.github.io/book/pages/dataman2019.html#managing-information-on-large-numbers-of-dna-variants) starting at the VCF background. -->
 <ul>
-<li>Chapter 11 of <a href="http://genomicsclass.github.io/book/pages/dataman2019.html#managing-information-on-large-numbers-of-dna-variants">Biomedical Data Science</a> starting at the VCF background.</li>
-<li><a href="https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/">Common Bioconductor Methods and Classes</a> <!-- - [BiocGenerics](https://bioconductor.org/packages/3.14/bioc/html/BiocGenerics.html) --> <!-- - [S4Vectors](https://bioconductor.org/packages/3.14/bioc/html/S4Vectors.html) --> <!-- - [IRanges](https://bioconductor.org/packages/3.14/bioc/html/IRanges.html) --></li>
-<li><a href="https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html">VariantAnnotation</a></li>
+<li>Required Reading:
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Variant_Call_Format">Wikipedia page on VCF Files</a></li>
+<li><a href="https://bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.pdf">Introduction to VariantAnnotation</a></li>
+</ul></li>
+<li>More resources:
+<ul>
+<li><a href="https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/">Common Bioconductor Methods and Classes</a></li>
+<li><a href="https://doi.org/doi:10.18129/B9.bioc.S4Vectors">S4Vectors</a></li>
+<li><a href="https://doi.org/doi:10.18129/B9.bioc.IRanges">IRanges</a></li>
+<li><a href="https://doi.org/doi:10.18129/B9.bioc.Biostrings">Biostrings</a></li>
+<li><a href="https://doi.org/doi:10.18129/B9.bioc.VariantAnnotation">VariantAnnotation</a></li>
+<li><a href="http://samtools.github.io/hts-specs/VCFv4.3.pdf">VCF Specifications</a></li>
+</ul></li>
 </ul>
 </div>
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
 <ul>
 <li><p>The most common application of S4 objects is in the <a href="https://bioconductor.org/">Bioconductor</a> project, so we will use some of those base classes as an example.</p></li>
-<li><p>Bioconductor also provides some of the best software to analyze genome-scale data.</p></li>
+<li><p>Bioconductor also provides some of the best software to analyze genome-scale data. Being able to use it is vital for genomic researchers.</p></li>
 <li><p>Bioconductor is huge, and learning that ecosystem would take a semester. Here, we will just learn the basic data types used within the <code>{VariantAnnotation}</code> package.</p></li>
 </ul>
 </div>
@@ -420,53 +439,839 @@ $(document).ready(function () {
 <li><p>But Bioconductor packages are focused on biological applications. They also share S4 objects that are designed to make analyzing biological data easier.</p></li>
 <li><p>You do not use <code>install.packages()</code> to install packages from Bioconductor, you use <code>BiocManager::install()</code>. So first make sure you have <code>{BiocManager}</code> installed on your computer:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</span></code></pre></div></li>
-<li><p>Now install some of the more useful Bioconductor packages.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;VariantAnnotation&quot;</span>,</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;SummarizedExperiment&quot;</span>, </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;GenomicAlignments&quot;</span>)</span></code></pre></div></li>
-<li><p>One thing you will notice from Bioconductor is that all S4 classes are in <code>UpperCamelCase</code>, and S4 methods are in <code>lowerCamelCase</code>.</p></li>
+<li><p>Now install the <code>{VariantAnnotation}</code> package, which is used for storing and manipulating genomic variants.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;VariantAnnotation&quot;</span>)</span></code></pre></div></li>
+<li><p>One thing you will notice from Bioconductor is that all S4 classes and all packages are in <code>UpperCamelCase</code>, and S4 methods are in <code>lowerCamelCase</code>.</p></li>
 </ul>
 </div>
 <div id="basic-objects" class="section level1">
 <h1>Basic Objects</h1>
+<ul>
+<li><p>The <code>{VariantAnnotation}</code> package uses a lot of S4 objects which are common in the Bioconductor ecosystem.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(VariantAnnotation)</span></code></pre></div></li>
+<li><p>We will go through these base classes before discussing the <code>{VariantAnnotation}</code> package itself.</p></li>
+</ul>
 <div id="simplelist" class="section level2">
 <h2><code>SimpleList</code></h2>
+<ul>
+<li><p>The <code>SimpleList</code> class is the S4 version of the basetype <code>list</code>.</p></li>
+<li><p>The <code>SimpleList</code> is defined in the <code>{S4Vectors}</code> package.</p></li>
+<li><p>Wherever you used a <code>list</code>, you can also use a <code>SimpleList</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sval <span class="ot">&lt;-</span> <span class="fu">SimpleList</span>(<span class="at">a =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">b =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(sval)</span></code></pre></div>
+<pre><code>## [1] &quot;S4&quot;</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(sval)</span></code></pre></div>
+<pre><code>## [1] &quot;SimpleList&quot;
+## attr(,&quot;package&quot;)
+## [1] &quot;S4Vectors&quot;</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sval</span></code></pre></div>
+<pre><code>## List of length 2
+## names(2): a b</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>sval<span class="sc">$</span>a</span></code></pre></div>
+<pre><code>## [1] 1 2 3 4</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sval<span class="sc">$</span>b</span></code></pre></div>
+<pre><code>## [1] &quot;A&quot; &quot;B&quot; &quot;C&quot;</code></pre></li>
+<li><p>Internally, the slots are</p>
+<ul>
+<li><code>@listData</code>: A list containing the data.</li>
+<li><code>@elementType</code>: A character of length 1 describing the subclass of the <code>SimpleList</code>.</li>
+<li><code>@elementMetadata</code>: Annotates individual elements of the <code>SimpleList</code>.</li>
+<li><code>@metadata</code>: Annotates the <code>SimpleList</code> as a whole.</li>
+</ul></li>
+</ul>
 </div>
 <div id="dataframe" class="section level2">
 <h2><code>DataFrame</code></h2>
+<ul>
+<li><p>The <code>DataFrame</code> is an S4 version of a <code>data.frame</code> (which is an S3 class).</p></li>
+<li><p>The <code>DataFrame</code> class is from the <code>{S4Vectors}</code> package.</p></li>
+<li><p>Most of the operations you are used to for <code>data.frame</code>s can be used for <code>DataFrame</code>s.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">DataFrame</span>(<span class="at">a =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">b =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(df)</span></code></pre></div>
+<pre><code>## [1] &quot;S4&quot;</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df</span></code></pre></div>
+<pre><code>## DataFrame with 3 rows and 2 columns
+##           a           b
+##   &lt;integer&gt; &lt;character&gt;
+## 1         1           A
+## 2         2           B
+## 3         3           C</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>a</span></code></pre></div>
+<pre><code>## [1] 1 2 3</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df[, <span class="dv">2</span>]</span></code></pre></div>
+<pre><code>## [1] &quot;A&quot; &quot;B&quot; &quot;C&quot;</code></pre></li>
+<li><p>Two differences:</p>
+<ol style="list-style-type: decimal">
+<li>The <code>row.names</code> attribute is optional in <code>DataFrame</code>s, but is required in <code>data.frame</code>s.</li>
+<li>The <code>DataFrame</code> object can have an slot called <code>elementMetadata</code>, which is a another <code>DataFrame</code> where each row indexes one of the columns of the original <code>DataFrame</code>. So each row of the metadata contains information on each column of the data. You set and get this metadata with <code>mcols()</code>.</li>
+</ol>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">row.names</span>(df) <span class="do">## no row.names</span></span></code></pre></div>
+<pre><code>## NULL</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mcols</span>(df) <span class="ot">&lt;-</span> <span class="fu">DataFrame</span>(<span class="fu">DataFrame</span>(<span class="at">info =</span> <span class="fu">c</span>(<span class="st">&quot;1st&quot;</span>, <span class="st">&quot;2nd&quot;</span>),</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">description =</span> <span class="fu">c</span>(<span class="st">&quot;random&quot;</span>, <span class="st">&quot;stuff&quot;</span>)))</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mcols</span>(df)</span></code></pre></div>
+<pre><code>## DataFrame with 2 rows and 2 columns
+##          info description
+##   &lt;character&gt; &lt;character&gt;
+## a         1st      random
+## b         2nd       stuff</code></pre></li>
+<li><p>There are other methods for <code>DataFrame</code> objects that do not exist for <code>data.frame</code> objects. See</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">DataFrame-class</span><span class="st">`</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">DataFrame-combine</span><span class="st">`</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">DataFrame-utils</span><span class="st">`</span></span></code></pre></div></li>
+</ul>
 </div>
-<div id="integerlist-characterlist-etc" class="section level2">
-<h2><code>IntegerList</code>, <code>CharacterList</code>, etc…</h2>
-</div>
-<div id="dnastringset" class="section level2">
-<h2><code>DNAStringSet</code></h2>
-</div>
-<div id="dnastringsetlist" class="section level2">
-<h2><code>DNAStringSetList</code></h2>
+<div id="characterlist-numericlist-integerlist-logicallist" class="section level2">
+<h2><code>CharacterList</code>, <code>NumericList</code>, <code>IntegerList</code>, <code>LogicalList</code></h2>
+<ul>
+<li><p>These atomic lists are extentions of the S4 <code>List</code> object that only holds atomic vectors.</p></li>
+<li><p>These are defined in the <code>{IRanges}</code> package.</p></li>
+<li><p>E.g. an <code>IntegerList</code> can have many elements, but each one has to be an integer vector.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>il <span class="ot">&lt;-</span> <span class="fu">IntegerList</span>(<span class="at">a =</span> <span class="fu">c</span>(1L, 2L, 3L),</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">b =</span> <span class="fu">c</span>(4L, 5L, 6L, 7L, 8L))</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>il</span></code></pre></div>
+<pre><code>## IntegerList of length 2
+## [[&quot;a&quot;]] 1 2 3
+## [[&quot;b&quot;]] 4 5 6 7 8</code></pre></li>
+<li><p>The reason to define lists in this way, is that you can perform operations simultaneously on all vectors in these atomic lists.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>il <span class="sc">+</span> 1L</span></code></pre></div>
+<pre><code>## IntegerList of length 2
+## [[&quot;a&quot;]] 2 3 4
+## [[&quot;b&quot;]] 5 6 7 8 9</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>il <span class="sc">==</span> <span class="dv">2</span></span></code></pre></div>
+<pre><code>## LogicalList of length 2
+## [[&quot;a&quot;]] FALSE TRUE FALSE
+## [[&quot;b&quot;]] FALSE FALSE FALSE FALSE FALSE</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(il)</span></code></pre></div>
+<pre><code>## a b 
+## 3 8</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(il)</span></code></pre></div>
+<pre><code>##  a  b 
+##  6 30</code></pre></li>
+<li><p>See the following for more information</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">AtomicList</span><span class="st">`</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">AtomicList-utils</span><span class="st">`</span></span></code></pre></div></li>
+</ul>
 </div>
 <div id="rle" class="section level2">
 <h2><code>Rle</code></h2>
+<ul>
+<li><p><code>Rle</code> class is a an atomic vector that can more efficiently store vectors with long repeats via <a href="https://en.wikipedia.org/wiki/Run-length_encoding">run-length encoding</a>.</p></li>
+<li><p>It is defined in the <code>{S4Vectors}</code> package.</p></li>
+<li><p>Instead of storing the entire vector when there are lots of repeats, run-length encoding just stores the value that is repeated (“values”) along with the number of times it is repeated (“lengths”).</p></li>
+<li><p>Consider this vector with lots of repeats</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;T&quot;</span>, <span class="st">&quot;G&quot;</span>), <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>##  [1] &quot;A&quot; &quot;C&quot; &quot;C&quot; &quot;T&quot; &quot;T&quot; &quot;T&quot; &quot;G&quot; &quot;G&quot; &quot;G&quot; &quot;G&quot;</code></pre>
+<p>We can instead store it as - “A” is copied once. - “C” is copied twice. - “T” is copied three times. - “G” is copied four times.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>base<span class="sc">::</span><span class="fu">rle</span>(x)</span></code></pre></div>
+<pre><code>## Run Length Encoding
+##   lengths: int [1:4] 1 2 3 4
+##   values : chr [1:4] &quot;A&quot; &quot;C&quot; &quot;T&quot; &quot;G&quot;</code></pre></li>
+<li><p>The <code>Rle</code> class does this run-length encoding behind-the-scenes.</p></li>
+<li><p>Let’s generate some very long data with lots of repeats:</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>lambda <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="fl">0.001</span>, <span class="dv">4500</span>), </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>            <span class="fu">seq</span>(<span class="fl">0.001</span>, <span class="dv">10</span>, <span class="at">length=</span><span class="dv">500</span>), </span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>            <span class="fu">seq</span>(<span class="dv">10</span>, <span class="fl">0.001</span>, <span class="at">length=</span><span class="dv">500</span>))</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>pvec <span class="ot">&lt;-</span> <span class="fu">rpois</span>(<span class="fl">1e6</span>, lambda)</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(pvec)</span></code></pre></div>
+<pre><code>## [1] 0 0 0 0 0 0</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>rvec <span class="ot">&lt;-</span> <span class="fu">Rle</span>(pvec)</span></code></pre></div></li>
+<li><p>The size of the objects is dramatically different.</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_size</span>(pvec)</span></code></pre></div>
+<pre><code>## 4,000,048 B</code></pre>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_size</span>(rvec)</span></code></pre></div>
+<pre><code>## 1,205,384 B</code></pre></li>
+<li><p>You can treat <code>Rle</code> objects just like regular vectors.</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>rvec[<span class="dv">100</span>]</span></code></pre></div>
+<pre><code>## integer-Rle of length 1 with 1 run
+##   Lengths: 1
+##   Values : 0</code></pre>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>rvec <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
+<pre><code>## numeric-Rle of length 1000000 with 150528 runs
+##   Lengths:  311    1  166    1 2539    1  523 ...    1  602    1  398    1   11
+##   Values :    1    2    1    2    1    2    1 ...    2    1    2    1    2    1</code></pre>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(rvec)</span></code></pre></div>
+<pre><code>## [1] 1000000</code></pre>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(rvec)</span></code></pre></div>
+<pre><code>## [1] 905136</code></pre></li>
+<li><p><code>Rle</code> has more efficient ways to subset regions via the <code>window()</code> generic.</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">window</span>(rvec, <span class="dv">510445</span>, <span class="dv">788990</span>)</span></code></pre></div>
+<pre><code>## integer-Rle of length 278546 with 42414 runs
+##   Lengths:  70   2   7   1   1   1   1   3 ...   1 219   1 550   1 875   1 101
+##   Values :   0   1   0   1   2   1   2   1 ...   1   0   1   0   1   0   1   0</code></pre></li>
+<li><p>Get the run lengths via <code>runLength()</code></p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">runLength</span>(rvec))</span></code></pre></div>
+<pre><code>## [1]  311    1  166    1 2539    1</code></pre></li>
+<li><p>Get the values via <code>runValue()</code></p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">runValue</span>(rvec))</span></code></pre></div>
+<pre><code>## [1] 0 1 0 1 0 1</code></pre></li>
+<li><p>This class is really beneficial for genomic data, where DNA often has sequences of long repeats.</p></li>
+<li><p>See the following for more operations available on <code>Rle</code> objects.</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">Rle-class</span><span class="st">`</span></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">Rle-utils</span><span class="st">`</span></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">Rle-runstat</span><span class="st">`</span></span></code></pre></div></li>
+</ul>
 </div>
 <div id="iranges" class="section level2">
 <h2><code>IRanges</code></h2>
+<ul>
+<li><p>The <code>IRanges</code> class contains two integer vectors. The first specifies “start” positions, the second specifies “width” of the position.</p></li>
+<li><p>You should consider an <code>IRanges</code> object like a vector, where each element has a start position and a width.</p></li>
+<li><p>The idea is that you might want to describe what part of the genome you are considering (e.g. from base pair 107889 of width 2000 base pairs) without having to describe the sequence in that range.</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>iobj <span class="ot">&lt;-</span> <span class="fu">IRanges</span>(<span class="at">start =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">1001</span>, <span class="dv">59999</span>), <span class="at">width =</span> <span class="fu">c</span>(<span class="dv">87</span>, <span class="dv">70</span>, <span class="dv">101</span>))</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>iobj</span></code></pre></div>
+<pre><code>## IRanges object with 3 ranges and 0 metadata columns:
+##           start       end     width
+##       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
+##   [1]         5        91        87
+##   [2]      1001      1070        70
+##   [3]     59999     60099       101</code></pre></li>
+<li><p>The “end” positions is not an internal slot. It is just printed via the <code>show()</code> method of the <code>IRanges</code> class.</p></li>
+<li><p>You can access the start, end, and widths of the ranges via</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">start</span>(iobj)</span></code></pre></div>
+<pre><code>## [1]     5  1001 59999</code></pre>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">end</span>(iobj)</span></code></pre></div>
+<pre><code>## [1]    91  1070 60099</code></pre>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">width</span>(iobj)</span></code></pre></div>
+<pre><code>## [1]  87  70 101</code></pre></li>
+<li><p>You can subset like a regular vector</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>iobj[<span class="dv">1</span>]</span></code></pre></div>
+<pre><code>## IRanges object with 1 range and 0 metadata columns:
+##           start       end     width
+##       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
+##   [1]         5        91        87</code></pre></li>
+<li><p>You can choose to only include regions that begin or end at some position</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>iobj[<span class="fu">start</span>(iobj) <span class="sc">&gt;</span> <span class="dv">100</span>]</span></code></pre></div>
+<pre><code>## IRanges object with 2 ranges and 0 metadata columns:
+##           start       end     width
+##       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
+##   [1]      1001      1070        70
+##   [2]     59999     60099       101</code></pre></li>
+<li><p>I ranges are often used to extract elements with regions of interest.</p></li>
+<li><p>E.g., remember the <code>Rle</code> object that we constructed:</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>rvec</span></code></pre></div>
+<pre><code>## integer-Rle of length 1000000 with 150528 runs
+##   Lengths:  311    1  166    1 2539    1  523 ...    1  602    1  398    1   11
+##   Values :    0    1    0    1    0    1    0 ...    1    0    1    0    1    0</code></pre>
+<p>What if we want to get the values within the ranges that we constructed via the <code>IRanges</code> object? Then we just use regular bracket subsetting:</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>rvec[iobj]</span></code></pre></div>
+<pre><code>## integer-Rle of length 258 with 92 runs
+##   Lengths: 157   1   1   1   1   1   1   1 ...   1   1   1   1   2   1   1   2
+##   Values :   0   4  16   5  11   8  10   9 ...   8   5   8   7   5   9  10   7</code></pre></li>
+<li><p>There is lots more that <code>IRanges</code> implements. See the help file for more.</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">IRanges-class</span><span class="st">`</span></span></code></pre></div></li>
+</ul>
 </div>
 <div id="granges" class="section level2">
 <h2><code>GRanges</code></h2>
-</div>
-</div>
-<div id="vcf-file-backgrounds" class="section level1">
-<h1>VCF File Backgrounds</h1>
 <ul>
-<li><p>VCF Description: <a href="http://vcftools.sourceforge.net/VCF-poster.pdf" class="uri">http://vcftools.sourceforge.net/VCF-poster.pdf</a></p></li>
-<li><p>Wikipedia Description: <a href="https://en.wikipedia.org/wiki/Variant_Call_Format" class="uri">https://en.wikipedia.org/wiki/Variant_Call_Format</a></p></li>
+<li><p>The <code>GRanges</code> S4 class is a vector-like class that represents genomic locations and their annotations.</p></li>
+<li><p>This class is defined in the <code>{GenomicRanges}</code> package.</p></li>
+<li><p>Each element of a <code>GRanges</code> class contains (i) a sequence name, (ii) an interval of the sequence’s location, (iii) the <a href="https://en.wikipedia.org/wiki/Sense_(molecular_biology)">strand</a>, (iv) optional sequence information, and (v) some optional metadata.</p></li>
+<li><p>Below are the slots:</p>
+<ul>
+<li><code>@seqnames</code>: An <code>Rle</code> object containing the sequence names (like chromosome 1, or mitochondrial chromosome, etc…)</li>
+<li><code>@ranges</code>: An <code>IRanges</code> object containing the location and ranges of the DNA sequence.</li>
+<li><code>@strand</code>: An <code>RLE</code> object containing the strand information.</li>
+<li><code>@seqinfo</code>: Optionally provided. This is a <code>Seqinfo</code> class object (which we haven’t covered) which contains metainformation on each <em>sequence name</em>. Specifically, the sequence name, the sequence length, whether the chromosome is circular, and the genome that the sequence comes from (like a <a href="https://www.ncbi.nlm.nih.gov/assembly/GCF_000001405.39">specific assembly of the human genome</a>)</li>
+<li><code>@elementMetadata</code>: An optional <code>DataFrame</code> object containing metainformation for each <em>element</em>. The rows index the different locations on the genome and the columns index different types of metainformation.</li>
+</ul></li>
+<li><p><em>Warning: Biology Note</em>: Recall that DNA is a double helix with “A” paired with “T” and “G” paired with “C”. So you can read the sequences going in one direction (ATTTG) or in the other direction (CAAAT). One direction, which is the same order in which RNA builds proteins, is called the “sense” strand, or the “+” strand, or the 5’ to 3’ strand. The other direction, which is not the same direction that RNA uses to build proteins, is called the “antisense” strand, or the “-” strand, or the 3’ to 5’ strand. Undetermined strand is represented by “*“.</p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>gr1 <span class="ot">&lt;-</span> <span class="fu">GRanges</span>(<span class="at">seqnames =</span> <span class="fu">Rle</span>(<span class="fu">c</span>(<span class="st">&quot;ch1&quot;</span>, <span class="st">&quot;chMT&quot;</span>), <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>)),</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">ranges =</span> <span class="fu">IRanges</span>(<span class="dv">16</span><span class="sc">:</span><span class="dv">21</span>, <span class="dv">20</span>),</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">strand =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">&quot;+&quot;</span>, <span class="st">&quot;-&quot;</span>, <span class="st">&quot;*&quot;</span>), <span class="dv">2</span>))</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>gr1</span></code></pre></div>
+<pre><code>## GRanges object with 6 ranges and 0 metadata columns:
+##       seqnames    ranges strand
+##          &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;
+##   [1]      ch1     16-20      +
+##   [2]      ch1     17-20      -
+##   [3]     chMT     18-20      *
+##   [4]     chMT     19-20      +
+##   [5]     chMT        20      -
+##   [6]     chMT     21-20      *
+##   -------
+##   seqinfo: 2 sequences from an unspecified genome; no seqlengths</code></pre></li>
+<li><p>These are the various getters for the slots:</p>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seqnames</span>(gr1)</span></code></pre></div>
+<pre><code>## factor-Rle of length 6 with 2 runs
+##   Lengths:    2    4
+##   Values : ch1  chMT
+## Levels(2): ch1 chMT</code></pre>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranges</span>(gr1)</span></code></pre></div>
+<pre><code>## IRanges object with 6 ranges and 0 metadata columns:
+##           start       end     width
+##       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
+##   [1]        16        20         5
+##   [2]        17        20         4
+##   [3]        18        20         3
+##   [4]        19        20         2
+##   [5]        20        20         1
+##   [6]        21        20         0</code></pre>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">strand</span>(gr1)</span></code></pre></div>
+<pre><code>## factor-Rle of length 6 with 6 runs
+##   Lengths: 1 1 1 1 1 1
+##   Values : + - * + - *
+## Levels(3): + - *</code></pre>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seqinfo</span>(gr1)</span></code></pre></div>
+<pre><code>## Seqinfo object with 2 sequences from an unspecified genome; no seqlengths:
+##   seqnames seqlengths isCircular genome
+##   ch1              NA         NA   &lt;NA&gt;
+##   chMT             NA         NA   &lt;NA&gt;</code></pre>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mcols</span>(gr1)</span></code></pre></div>
+<pre><code>## DataFrame with 6 rows and 0 columns</code></pre></li>
+<li><p>You can access start, end, and width directions directly without first extracting the <code>@ranges</code> slot.</p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">start</span>(gr1)</span></code></pre></div>
+<pre><code>## [1] 16 17 18 19 20 21</code></pre>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">end</span>(gr1)</span></code></pre></div>
+<pre><code>## [1] 20 20 20 20 20 20</code></pre>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">width</span>(gr1)</span></code></pre></div>
+<pre><code>## [1] 5 4 3 2 1 0</code></pre></li>
+<li><p>You should think of a <code>GRanges</code> object as a vector where each element is a location on the genome.</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>gr1[<span class="dv">1</span>]</span></code></pre></div>
+<pre><code>## GRanges object with 1 range and 0 metadata columns:
+##       seqnames    ranges strand
+##          &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;
+##   [1]      ch1     16-20      +
+##   -------
+##   seqinfo: 2 sequences from an unspecified genome; no seqlengths</code></pre>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(gr1)</span></code></pre></div>
+<pre><code>## [1] 6</code></pre>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>gr1[<span class="fu">start</span>(gr1) <span class="sc">&gt;</span> <span class="dv">18</span>]</span></code></pre></div>
+<pre><code>## GRanges object with 3 ranges and 0 metadata columns:
+##       seqnames    ranges strand
+##          &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;
+##   [1]     chMT     19-20      +
+##   [2]     chMT        20      -
+##   [3]     chMT     21-20      *
+##   -------
+##   seqinfo: 2 sequences from an unspecified genome; no seqlengths</code></pre></li>
+<li><p>See more by</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">GRanges-class</span><span class="st">`</span></span></code></pre></div></li>
 </ul>
+</div>
+<div id="dnastring" class="section level2">
+<h2><code>DNAString</code></h2>
+<ul>
+<li><p>The <code>DNAString</code> class (from the <code>{Biostrings}</code> package) allows for efficient storage of a single DNA sequence.</p></li>
+<li><p>The idea is that a <code>DNAString</code> is a single short sequence, or a whole chromosome, but only sequence.</p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>dna1 <span class="ot">&lt;-</span> <span class="fu">DNAString</span>(<span class="st">&quot;ACGT-N&quot;</span>)</span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>dna1</span></code></pre></div>
+<pre><code>## 6-letter DNAString object
+## seq: ACGT-N</code></pre></li>
+<li><p>This is the same as a <code>character</code> except it can only be length 1, and there is alimit to the types of characters possible.</p></li>
+<li><p>The different characters possible are found via</p>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>IUPAC_CODE_MAP</span></code></pre></div>
+<pre><code>##      A      C      G      T      M      R      W      S      Y      K      V 
+##    &quot;A&quot;    &quot;C&quot;    &quot;G&quot;    &quot;T&quot;   &quot;AC&quot;   &quot;AG&quot;   &quot;AT&quot;   &quot;CG&quot;   &quot;CT&quot;   &quot;GT&quot;  &quot;ACG&quot; 
+##      H      D      B      N 
+##  &quot;ACT&quot;  &quot;AGT&quot;  &quot;CGT&quot; &quot;ACGT&quot;</code></pre>
+<ul>
+<li>E.g. “B” means that the nucleotide could be C, G, or T, but not A.</li>
+</ul></li>
+<li><p>In addition, “-” means a gap (because of an alignment, not a physical gap).</p></li>
+<li><p>Sequence length is found by <code>length()</code> or <code>ncar()</code> methods.</p>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(dna1)</span></code></pre></div>
+<pre><code>## [1] 6</code></pre>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nchar</span>(dna1)</span></code></pre></div>
+<pre><code>## [1] 6</code></pre></li>
+<li><p>You can access a subsequence by bracket subsetting</p>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a>dna1[<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>]</span></code></pre></div>
+<pre><code>## 3-letter DNAString object
+## seq: CGT</code></pre></li>
+<li><p>See more by</p>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">DNAString-class</span><span class="st">`</span></span></code></pre></div></li>
+</ul>
+</div>
+<div id="dnastringset" class="section level2">
+<h2><code>DNAStringSet</code></h2>
+<ul>
+<li><p>The <code>DNAStringSet</code> is a like a <code>character</code> vector, except each element is a <code>DNAString</code> instead of a <code>string</code>.</p></li>
+<li><p>This class is also from the <code>{Biostrings}</code> package.</p>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a>ds <span class="ot">&lt;-</span> <span class="fu">DNAStringSet</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="st">&quot;AAAGCC&quot;</span>, <span class="st">&quot;ACTATC&quot;</span>, <span class="st">&quot;TGCNNAA-CCTT&quot;</span>))</span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a>ds</span></code></pre></div>
+<pre><code>## DNAStringSet object of length 3:
+##     width seq
+## [1]     6 AAAGCC
+## [2]     6 ACTATC
+## [3]    12 TGCNNAA-CCTT</code></pre></li>
+<li><p>It operates like a character vector</p>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>ds[[<span class="dv">1</span>]]</span></code></pre></div>
+<pre><code>## 6-letter DNAString object
+## seq: AAAGCC</code></pre>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>ds[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span></code></pre></div>
+<pre><code>## DNAStringSet object of length 2:
+##     width seq
+## [1]     6 AAAGCC
+## [2]     6 ACTATC</code></pre>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(ds)</span></code></pre></div>
+<pre><code>## [1] 3</code></pre></li>
+<li><p>You can operate on all DNA sequences at the same time with a few operations.</p>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a><span class="fu">subseq</span>(ds, <span class="at">start =</span> <span class="dv">2</span>, <span class="at">end =</span> <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>## DNAStringSet object of length 3:
+##     width seq
+## [1]     3 AAG
+## [2]     3 CTA
+## [3]     3 GCN</code></pre></li>
+<li><p>See more by</p>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">DNAStringSet-class</span><span class="st">`</span></span></code></pre></div></li>
+</ul>
+</div>
+<div id="dnastringsetlist" class="section level2">
+<h2><code>DNAStringSetList</code></h2>
+<ul>
+<li><p>The <code>DNAStringSetList</code> class (also from <code>{Biostrings}</code>) is a list-like class where each element is a <code>DNAStringSet</code>.</p>
+<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a>dna1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;AAA&quot;</span>, <span class="st">&quot;AC&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;T&quot;</span>, <span class="st">&quot;GGATA&quot;</span>)</span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>dna2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;G&quot;</span>, <span class="st">&quot;TT&quot;</span>, <span class="st">&quot;C&quot;</span>)</span>
+<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">DNAStringSetList</span>(dna1, dna2)</span>
+<span id="cb128-4"><a href="#cb128-4" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>## DNAStringSetList of length 2
+## [[1]] AAA AC  T GGATA
+## [[2]] G TT C</code></pre></li>
+<li><p>This is useful for storing multiple possible alleles that are varying in the population. E.g. below indicates that the first location is an A, the second is either an A or G, and the third is either an A or a T or a G.</p>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>dna_ex <span class="ot">&lt;-</span> <span class="fu">DNAStringSetList</span>(<span class="st">&quot;A&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;G&quot;</span>), <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;T&quot;</span>, <span class="st">&quot;G&quot;</span>))</span>
+<span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a>dna_ex</span></code></pre></div>
+<pre><code>## DNAStringSetList of length 3
+## [[1]] A
+## [[2]] A G
+## [[3]] A T G</code></pre></li>
+<li><p>See more by</p>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">DNAStringSetList-class</span><span class="st">`</span></span></code></pre></div></li>
+</ul>
+</div>
+</div>
+<div id="vcf-files" class="section level1">
+<h1>VCF Files</h1>
+<ul>
+<li><p>Most DNA between two individuals of the same species is <strong>the exact same</strong>.</p></li>
+<li><p>The differences are the interesting parts.</p></li>
+<li><p>A location on the genome where there is a difference is called a <strong>variant</strong>.</p></li>
+<li><p>The type of difference is called an <strong>allele</strong>.</p></li>
+<li><p>E.g., suppose this is small part of the genome.</p>
+<ul>
+<li>Individual 1:
+<ul>
+<li>…AAATAA<span style="color: red">A</span>CAGGCCAAA<span style="color: orange">T</span>CCT…</li>
+<li>…AAATAA<span style="color: orange">T</span>CAGGCCAAA<span style="color: green">G</span>CCT…</li>
+</ul></li>
+<li>Individual 2:
+<ul>
+<li>…AAATAA<span style="color: orange">T</span>CAGGCCAAA<span style="color: orange">T</span>CCT…</li>
+<li>…AAATAA<span style="color: orange">T</span>CAGGCCAAA<span style="color: green">G</span>CCT…</li>
+</ul></li>
+<li>Individual 3:
+<ul>
+<li>…AAATAA<span style="color: red">A</span>CAGGCCAAA<span style="color: green">G</span>CCT…</li>
+<li>…AAATAA<span style="color: orange">T</span>CAGGCCAAA<span style="color: green">G</span>CCT…</li>
+</ul></li>
+<li>At this location on the genome, there are two variants on the left and right (where the nucleotides are color-coded).</li>
+<li>At the first variant, we have two possible alleles — an “A” allele and a “T” allele.</li>
+<li>At the other variant we also have two alleles — a “T” allele and a “G” allele.</li>
+</ul></li>
+<li><p>Each individual has two copies of their genome, and each copy is double-stranded. The above represents each copy, looking only at the sequence on one strand.</p></li>
+<li><p>Most variants are like the two above, where there is only a single nucleotide that differs between individuals. These are callsed SNPs (Single Nucleotide Polymorphisms), pronounced “snips”.</p></li>
+<li><p>Because we only care about the differences, we could represent them concisely with something like</p>
+<pre><code>##      Ind1  Ind2  Ind3 
+## SNP1 &quot;A/T&quot; &quot;T/T&quot; &quot;A/T&quot;
+## SNP2 &quot;T/G&quot; &quot;T/G&quot; &quot;G/G&quot;</code></pre></li>
+<li><p>The combination of alleles that an individual has a single locus is called its <strong>genotype</strong>. E.g. individual 1 has a genotype of “A/T” at SNP1, and individual 3 has genotype “G/G” at locus 2.</p></li>
+<li><p>We often want to perform numerical operations on the genotypes, so we often choose one allele to act as the <strong>reference</strong> and the other as the <strong>alternative</strong> at each variant. The choice is usually arbitrary. We can then count the number of “alternative” alleles at each variant for each individual.</p></li>
+<li><p>E.g., if we choose “A” to be the reference at SNP1, and G to be the reference at SNP2, then we can represent the above genotype matrix by</p>
+<pre><code>##      Ind1 Ind2 Ind3
+## SNP1    1    1    1
+## SNP2    0    1    2</code></pre></li>
+<li><p>But we would probably like to store which alleles are the references at which SNP’s, so that we don’t lose that information. If we were building an S4 class, we would probably include a slot for this.</p></li>
+<li><p>This motivates the Variant Call Format (VCF) file for storing variant information.</p></li>
+<li><p>The Variant Call Format (VCF) is a text-file format used to store variants between individuals at different locations (loci) on the genome.</p></li>
+<li><p>The <code>{VariantAnnotation}</code> reads in the VCF file and converts its format to an S4 object, obviating much of the need to understand the specifics of the format.</p></li>
+<li><p>But if you work with genomic data, you need to know the format.</p></li>
+</ul>
+<div id="vcf-diagram" class="section level2">
+<h2>VCF Diagram</h2>
+<ul>
+<li><p>Below is a sample VCF file (from the VCF spec) with 5 variants and 3 individuals.</p>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="at">path =</span> <span class="st">&quot;./05_figs/vcf_fig.png&quot;</span>)</span></code></pre></div>
+<p><img src="05_figs/vcf_fig.png" width="3542" style="display: block; margin: auto;" /></p></li>
+<li><p>The VCF file is proken down as follows:</p>
+<ul>
+<li>A header with metadata (begginning with <code>##</code>). These describe properties of other parts of the file.</li>
+<li>Below the header, each row corresponds to a different variant. The columns can be subdivided as follows:</li>
+<li>A fixed field (columns <code>CHROM</code>, <code>POS</code>, <code>ID</code>, <code>REF</code>, <code>ALT</code>, <code>QUAL</code>, and <code>FILTER</code>). These contain information that are variant specific (i.e. are the same for all individuals).</li>
+<li>An info field (column <code>INFO</code>) that contains additional variant specific information.</li>
+<li>A genotype field, where the column names are the names of the individuals. In the above example, <code>NA00001</code>, <code>NA00002</code>, and <code>NA00003</code>, but these names may vary. The genotype field contains information that is specific for that individual at that locus.</li>
+</ul></li>
+<li><p>The above file has five variants (five rows):</p>
+<ol style="list-style-type: decimal">
+<li>A SNP with one reference allele “G” and one alternative allele “A”,</li>
+<li>Another SNP that did not pass quality checks, and so was filtered out.</li>
+<li>A SNP with one reference allele “A” and two alternative alleles “G” and “T”.</li>
+<li>A locus that is not a variant, because all individuals have a “T” there (this is called a monomorphic location)</li>
+<li>A more complicated variant (called a “microsattelite”) where the reference allele is “GTC” and the two alternative alleles are “G” and “GTCT”.</li>
+</ol></li>
+<li><p>VCF files can get really complicated, since they have to be able to store complicated differences between genomes. Here, we will just talk about basic information, which is what most people use it for anyway.</p></li>
+<li><p>See the spec for more information: <a href="http://samtools.github.io/hts-specs/VCFv4.3.pdf" class="uri">http://samtools.github.io/hts-specs/VCFv4.3.pdf</a></p></li>
+</ul>
+</div>
+<div id="metadata" class="section level2">
+<h2>Metadata</h2>
+<ul>
+<li><p>The Metadata field is at the top of the VCF file and begins with <code>##</code>.</p></li>
+<li><p>The first line should say the version of VCF file format used (this is version 4.3).</p></li>
+<li><p>There are some structured lines that must follow a certain format.</p></li>
+<li><p><code>##INFO</code> lines describe properties of the SNPs. You tell the VCF file the format of the INFO field through the metadata. <code>##INFO=&lt;ID=ID,Number=number,Type=type,Description="description",Source="source",Version="version"&gt;</code></p>
+<ul>
+<li><code>ID</code>: Should be the name of the INFO field.</li>
+<li><code>Number</code>: The number values for an INFO field.</li>
+<li><code>Type</code>: The base type of the field.</li>
+<li>The other arguments (<code>Description</code>, <code>Source</code>, <code>Version</code>) are just strings that don’t matter, and are optional.</li>
+</ul></li>
+<li><p>The possible values of <code>Number</code></p>
+<table>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Descriptions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>An integer, like <code>1</code> or <code>2</code></td>
+<td>The exact number of values</td>
+</tr>
+<tr class="even">
+<td><code>A</code></td>
+<td>One value per alternate allele</td>
+</tr>
+<tr class="odd">
+<td><code>R</code></td>
+<td>One value for each allele</td>
+</tr>
+<tr class="even">
+<td><code>G</code></td>
+<td>One value per genotype</td>
+</tr>
+<tr class="odd">
+<td><code>.</code></td>
+<td>Any number of possible values</td>
+</tr>
+</tbody>
+</table></li>
+<li><p>The possible values of <code>Type</code>: <code>Integer</code>, <code>Float</code>, <code>Flag</code>, <code>Character</code>, or <code>String</code>.</p>
+<ul>
+<li><code>Float</code> means decimal (kind of like doubles in R)</li>
+<li><code>Flag</code> No value. Either it shows up or doesn’t.</li>
+</ul></li>
+<li><p><code>##FORMAT</code> lines describe the genotype fields that are possible. <code>##FORMAT=&lt;ID=ID,Number=number,Type=type,Description="description"&gt;</code></p>
+<ul>
+<li><code>number</code> and <code>Type</code> have the same possibilities as the <code>##INFO</code> line.</li>
+</ul></li>
+</ul>
+</div>
+<div id="fixed-field" class="section level2">
+<h2>Fixed Field</h2>
+<ul>
+<li><p>Under the metadata, you have the the “fixed” field, where each line is a specific property of the variant.</p></li>
+<li><p>The header looks like this (with one <code>#</code>)</p>
+<pre><code>#CHROM POS ID REF ALT QUAL FILTER INFO</code></pre></li>
+<li><p><code>CHROM</code>: An identifier from the reference genome used to build the VCF file.</p></li>
+<li><p><code>POS</code>: Reference position on the chromosome.</p></li>
+<li><p><code>ID</code>: Name of the variant.</p></li>
+<li><p><code>REF</code>: Reference allele.</p></li>
+<li><p><code>ALT</code>: Alternative allele.</p></li>
+<li><p><code>QUAL</code>: Quality of the SNP. Officially, this is an estimate of <span class="math inline">\(-10\log_{10}\text{Pr(call in ALT is wrong)}\)</span>. This is usually output by genotyping software.</p></li>
+<li><p><code>FILTER</code>: <code>PASS</code> if the variant passed filters placed on it by the genotyping software. Otherwise a code for why it failed to the filter.</p></li>
+</ul>
+</div>
+<div id="info-field" class="section level2">
+<h2>INFO field</h2>
+<ul>
+<li><p>The INFO field is also a part of the fixed data, where each line is information on an entire variant. But it can contain a lot of different information, so I’ll treat it as an additional field.</p></li>
+<li><p><code>INFO</code>: Semicolan separated additional information.</p></li>
+<li><p>The different keys in the <code>INFO</code> column are described by the <code>##INFO</code> line in the metadata.</p></li>
+<li><p>Table of common INFO keys (from VCF spec).</p>
+<table>
+<colgroup>
+<col width="15%" />
+<col width="25%" />
+<col width="18%" />
+<col width="40%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Key</th>
+<th>Number</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AA</td>
+<td>1</td>
+<td>String</td>
+<td>Ancestral allele</td>
+</tr>
+<tr class="even">
+<td>AC</td>
+<td>A</td>
+<td>Integer</td>
+<td>Allele count in genotypes, for each ALT allele, in the same order as listed</td>
+</tr>
+<tr class="odd">
+<td>AD</td>
+<td>R</td>
+<td>Integer</td>
+<td>Total read depth for each allele</td>
+</tr>
+<tr class="even">
+<td>ADF</td>
+<td>R</td>
+<td>Integer</td>
+<td>Read depth for each allele on the forward strand</td>
+</tr>
+<tr class="odd">
+<td>ADR</td>
+<td>R</td>
+<td>Integer</td>
+<td>Read depth for each allele on the reverse strand</td>
+</tr>
+<tr class="even">
+<td>AF</td>
+<td>A</td>
+<td>Float</td>
+<td>Allele frequency for each ALT allele in the same order as listed (estimated from primary data, not called genotypes)</td>
+</tr>
+<tr class="odd">
+<td>AN</td>
+<td>1</td>
+<td>Integer</td>
+<td>Total number of alleles in called genotypes</td>
+</tr>
+<tr class="even">
+<td>BQ</td>
+<td>1</td>
+<td>Float</td>
+<td>RMS base quality</td>
+</tr>
+<tr class="odd">
+<td>CIGAR</td>
+<td>A</td>
+<td>String</td>
+<td>Cigar string describing how to align an alternate allele to the reference allele</td>
+</tr>
+<tr class="even">
+<td>DB</td>
+<td>0</td>
+<td>Flag</td>
+<td>dbSNP membership</td>
+</tr>
+<tr class="odd">
+<td>DP</td>
+<td>1</td>
+<td>Integer</td>
+<td>Combined depth across samples</td>
+</tr>
+<tr class="even">
+<td>END</td>
+<td>1</td>
+<td>Integer</td>
+<td>End position on CHROM (used with symbolic alleles; see below)</td>
+</tr>
+<tr class="odd">
+<td>H2</td>
+<td>0</td>
+<td>Flag</td>
+<td>HapMap2 membership</td>
+</tr>
+<tr class="even">
+<td>H3</td>
+<td>0</td>
+<td>Flag</td>
+<td>HapMap3 membership</td>
+</tr>
+<tr class="odd">
+<td>MQ</td>
+<td>1</td>
+<td>Float</td>
+<td>RMS mapping quality</td>
+</tr>
+<tr class="even">
+<td>MQ0</td>
+<td>1</td>
+<td>Integer</td>
+<td>Number of MAPQ == 0 reads</td>
+</tr>
+<tr class="odd">
+<td>NS</td>
+<td>1</td>
+<td>Integer</td>
+<td>Number of samples with data</td>
+</tr>
+<tr class="even">
+<td>SB</td>
+<td>4</td>
+<td>Integer</td>
+<td>Strand bias</td>
+</tr>
+<tr class="odd">
+<td>SOMATIC</td>
+<td>0</td>
+<td>Flag</td>
+<td>Somatic mutation (for cancer genomics)</td>
+</tr>
+<tr class="even">
+<td>VALIDATED</td>
+<td>0</td>
+<td>Flag</td>
+<td>Validated by follow-up experiment</td>
+</tr>
+<tr class="odd">
+<td>1000G</td>
+<td>0</td>
+<td>Flag</td>
+<td>1000 Genomes membership</td>
+</tr>
+</tbody>
+</table></li>
+</ul>
+</div>
+<div id="genotype-fields" class="section level2">
+<h2>Genotype Fields</h2>
+<ul>
+<li><p>Genotype information according to a VCF file is a property of an individual at a locus.</p></li>
+<li><p>This is different from the Fixed field. The Fixed field has information on variants (same across individuals). The Genotype field has information that differs based on both variants and individuals.</p></li>
+<li><p>The genotype field for each sample is colon separated.</p></li>
+<li><p>The <code>FORMAT</code> column provides the order of the genotypes.</p></li>
+<li><p>The <code>##FORMAT</code> line in the metadata provides information on what the genotypes are.</p></li>
+<li><p>Common genotype keys (from VCF spec), with bold for the ones I see most often:</p>
+<table>
+<colgroup>
+<col width="20%" />
+<col width="23%" />
+<col width="17%" />
+<col width="38%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Number</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>AD</strong></td>
+<td>R</td>
+<td>Integer</td>
+<td>Read depth for each allele</td>
+</tr>
+<tr class="even">
+<td>ADF</td>
+<td>R</td>
+<td>Integer</td>
+<td>Read depth for each allele on the forward strand</td>
+</tr>
+<tr class="odd">
+<td>ADR</td>
+<td>R</td>
+<td>Integer</td>
+<td>Read depth for each allele on the reverse strand</td>
+</tr>
+<tr class="even">
+<td><strong>DP</strong></td>
+<td>1</td>
+<td>Integer</td>
+<td>Read depth</td>
+</tr>
+<tr class="odd">
+<td>EC</td>
+<td>A</td>
+<td>Integer</td>
+<td>Expected alternate allele counts</td>
+</tr>
+<tr class="even">
+<td>FT</td>
+<td>1</td>
+<td>String</td>
+<td>Filter indicating if this genotype was “called”</td>
+</tr>
+<tr class="odd">
+<td><strong>GL</strong></td>
+<td>G</td>
+<td>Float Genotype likelihoods</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>GP</strong></td>
+<td>G</td>
+<td>Float Genotype posterior probabilities</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>GQ</td>
+<td>1</td>
+<td>Integer</td>
+<td>Conditional genotype quality</td>
+</tr>
+<tr class="even">
+<td><strong>GT</strong></td>
+<td>1</td>
+<td>String</td>
+<td>Genotype, with”<code>/</code>” meaning unphased and “<code>|</code>” meaning phased</td>
+</tr>
+<tr class="odd">
+<td>HQ</td>
+<td>2</td>
+<td>Integer</td>
+<td>Haplotype quality</td>
+</tr>
+<tr class="even">
+<td>MQ</td>
+<td>1</td>
+<td>Integer</td>
+<td>RMS mapping quality</td>
+</tr>
+<tr class="odd">
+<td><strong>PL</strong></td>
+<td>G</td>
+<td>Integer</td>
+<td>Phred-scaled genotype likelihoods rounded to the closest integer</td>
+</tr>
+<tr class="even">
+<td><strong>PP</strong></td>
+<td>G</td>
+<td>Integer</td>
+<td>Phred-scaled genotype posterior probabilities rounded to the closest integer</td>
+</tr>
+<tr class="odd">
+<td>PQ</td>
+<td>1</td>
+<td>Integer</td>
+<td>Phasing quality</td>
+</tr>
+<tr class="even">
+<td>PS</td>
+<td>1</td>
+<td>Integer</td>
+<td>Phase set</td>
+</tr>
+</tbody>
+</table></li>
+</ul>
+</div>
 </div>
 <div id="variantannotation" class="section level1">
 <h1>VariantAnnotation</h1>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(VariantAnnotation)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>fl <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;chr22.vcf.gz&quot;</span>, <span class="at">package=</span><span class="st">&quot;VariantAnnotation&quot;</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>vcf <span class="ot">&lt;-</span> <span class="fu">readVcf</span>(fl, <span class="st">&quot;hg19&quot;</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>vcf</span></code></pre></div>
+<ul>
+<li><p>The <code>{VariantAnnotation}</code> package provides an S4 object that has a slot for each field from a VCF file.</p></li>
+<li><p>Let’s load in an example VCF file that comes with the package:</p>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a>fl <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;chr22.vcf.gz&quot;</span>, <span class="at">package=</span><span class="st">&quot;VariantAnnotation&quot;</span>)</span>
+<span id="cb137-2"><a href="#cb137-2" aria-hidden="true" tabindex="-1"></a>vcf <span class="ot">&lt;-</span> <span class="fu">readVcf</span>(fl, <span class="st">&quot;hg19&quot;</span>)</span>
+<span id="cb137-3"><a href="#cb137-3" aria-hidden="true" tabindex="-1"></a>vcf</span></code></pre></div>
 <pre><code>## class: CollapsedVCF 
 ## dim: 10376 5 
 ## rowRanges(vcf):
@@ -503,10 +1308,27 @@ $(document).ready(function () {
 ##       Number Type   Description                      
 ##    GT 1      String Genotype                         
 ##    DS 1      Float  Genotype dosage from MaCH/Thunder
-##    GL G      Float  Genotype Likelihoods</code></pre>
+##    GL G      Float  Genotype Likelihoods</code></pre></li>
+</ul>
+<div id="metadata-slot" class="section level2">
+<h2><code>metadata</code> slot</h2>
+<ul>
+<li><p>A list having header information. This is mostly arbitrary information.</p>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span>(vcf)</span></code></pre></div>
+<pre><code>## $header
+## class: VCFHeader 
+## samples(5): HG00096 HG00097 HG00099 HG00100 HG00101
+## meta(1): fileformat
+## fixed(2): FILTER ALT
+## info(22): LDAF AVGPOST ... VT SNPSOURCE
+## geno(3): GT DS GL</code></pre></li>
+</ul>
+</div>
 <div id="fixed-slot" class="section level2">
 <h2><code>fixed</code> slot:</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixed</span>(vcf)</span></code></pre></div>
+<ul>
+<li><p>This contains information from the <code>REF</code>, <code>ALT</code>, <code>QUAL</code>, and <code>FILTER</code> columns from teh VCF file.</p>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixed</span>(vcf)</span></code></pre></div>
 <pre><code>## DataFrame with 10376 rows and 4 columns
 ##                  REF                ALT      QUAL      FILTER
 ##       &lt;DNAStringSet&gt; &lt;DNAStringSetList&gt; &lt;numeric&gt; &lt;character&gt;
@@ -520,181 +1342,23 @@ $(document).ready(function () {
 ## 10373              A                  G       100        PASS
 ## 10374              A                  G       100        PASS
 ## 10375              G                  A       100        PASS
-## 10376              G                  C       100        PASS</code></pre>
-<ul>
-<li><p><code>REF</code>: <code>DNAStringSet</code> object</p></li>
-<li><p><code>ALT</code>: <code>DNAStringSetList</code> object</p></li>
-<li><p><code>QUAL</code>: Numeric vector.</p></li>
-<li><p><code>FILTER</code>: Character vector</p></li>
-</ul>
-</div>
-<div id="info-slot" class="section level2">
-<h2><code>info</code> slot</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span>(vcf)</span></code></pre></div>
-<pre><code>## DataFrame with 10376 rows and 22 columns
-##                  LDAF   AVGPOST       RSQ     ERATE     THETA         CIEND
-##             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;IntegerList&gt;
-## rs7410291      0.3431    0.9890    0.9856     2e-03    0.0005         NA,NA
-## rs147922003    0.0091    0.9963    0.8398     5e-04    0.0011         NA,NA
-## rs114143073    0.0098    0.9891    0.5919     7e-04    0.0008         NA,NA
-## rs141778433    0.0062    0.9950    0.6756     9e-04    0.0003         NA,NA
-## rs182170314    0.0041    0.9981    0.7909     7e-04    0.0004         NA,NA
-## ...               ...       ...       ...       ...       ...           ...
-## rs187302552    0.0009    0.9992    0.5571    0.0003    0.0026         NA,NA
-## rs9628178      0.0727    0.9997    0.9983    0.0003    0.0011         NA,NA
-## rs5770892      0.3678    0.9868    0.9784    0.0021    0.0007         NA,NA
-## rs144055359    0.0011    0.9987    0.5323    0.0005    0.0004         NA,NA
-## rs114526001    0.0543    0.9622    0.7595    0.0021    0.0005         NA,NA
-##                     CIPOS       END        HOMLEN          HOMSEQ     SVLEN
-##             &lt;IntegerList&gt; &lt;integer&gt; &lt;IntegerList&gt; &lt;CharacterList&gt; &lt;integer&gt;
-## rs7410291           NA,NA        NA                                      NA
-## rs147922003         NA,NA        NA                                      NA
-## rs114143073         NA,NA        NA                                      NA
-## rs141778433         NA,NA        NA                                      NA
-## rs182170314         NA,NA        NA                                      NA
-## ...                   ...       ...           ...             ...       ...
-## rs187302552         NA,NA        NA                                      NA
-## rs9628178           NA,NA        NA                                      NA
-## rs5770892           NA,NA        NA                                      NA
-## rs144055359         NA,NA        NA                                      NA
-## rs114526001         NA,NA        NA                                      NA
-##                  SVTYPE            AC        AN          AA        AF    AMR_AF
-##             &lt;character&gt; &lt;IntegerList&gt; &lt;integer&gt; &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt;
-## rs7410291            NA           751      2184           N    0.3400    0.2000
-## rs147922003          NA            20      2184           c    0.0100    0.0100
-## rs114143073          NA            20      2184           G    0.0100    0.0028
-## rs141778433          NA            12      2184           C    0.0100    0.0100
-## rs182170314          NA             8      2184           C    0.0037    0.0100
-## ...                 ...           ...       ...         ...       ...       ...
-## rs187302552          NA             1      2184           a    0.0005        NA
-## rs9628178            NA           158      2184           a    0.0700      0.03
-## rs5770892            NA           801      2184           a    0.3700      0.32
-## rs144055359          NA             1      2184           g    0.0005        NA
-## rs114526001          NA           113      2184           g    0.0500      0.01
-##                ASN_AF    AFR_AF    EUR_AF          VT       SNPSOURCE
-##             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;CharacterList&gt;
-## rs7410291        0.19      0.83      0.22         SNP          LOWCOV
-## rs147922003        NA      0.02      0.01         SNP          LOWCOV
-## rs114143073      0.02      0.01      0.01         SNP          LOWCOV
-## rs141778433        NA      0.02        NA         SNP          LOWCOV
-## rs182170314        NA      0.01        NA         SNP          LOWCOV
-## ...               ...       ...       ...         ...             ...
-## rs187302552    0.0017        NA        NA         SNP          LOWCOV
-## rs9628178      0.0100      0.17    0.0800         SNP          LOWCOV
-## rs5770892      0.3800      0.59    0.2300         SNP          LOWCOV
-## rs144055359        NA        NA    0.0013         SNP          LOWCOV
-## rs114526001    0.0100      0.16    0.0400         SNP          LOWCOV</code></pre>
-<ul>
-<li><p><code>DataFrame</code> object with information on each variant.</p></li>
-<li><p>Table of common INFO fields (from <a href="https://en.wikipedia.org/wiki/Variant_Call_Format">Wikipedia</a>):</p></li>
-</ul>
-<table>
-<colgroup>
-<col width="7%" />
-<col width="92%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Brief description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>AA</td>
-<td>ancestral allele</td>
-</tr>
-<tr class="even">
-<td>AC</td>
-<td>allele count in genotypes, for each ALT allele, in the same order as listed</td>
-</tr>
-<tr class="odd">
-<td>AF</td>
-<td>allele frequency for each ALT allele in the same order as listed (use this when estimated from primary data, not called genotypes)</td>
-</tr>
-<tr class="even">
-<td>AN</td>
-<td>total number of alleles in called genotypes</td>
-</tr>
-<tr class="odd">
-<td>BQ</td>
-<td>RMS base quality at this position</td>
-</tr>
-<tr class="even">
-<td>CIGAR</td>
-<td>cigar string describing how to align an alternate allele to the reference allele</td>
-</tr>
-<tr class="odd">
-<td>DB</td>
-<td>dbSNP membership</td>
-</tr>
-<tr class="even">
-<td>DP</td>
-<td>combined depth across samples, e.g. DP=154</td>
-</tr>
-<tr class="odd">
-<td>END</td>
-<td>end position of the variant described in this record (for use with symbolic alleles)</td>
-</tr>
-<tr class="even">
-<td>H2</td>
-<td>membership in hapmap2</td>
-</tr>
-<tr class="odd">
-<td>H3</td>
-<td>membership in hapmap3</td>
-</tr>
-<tr class="even">
-<td>MQ</td>
-<td>RMS mapping quality, e.g. MQ=52</td>
-</tr>
-<tr class="odd">
-<td>MQ0</td>
-<td>Number of MAPQ == 0 reads covering this record</td>
-</tr>
-<tr class="even">
-<td>NS</td>
-<td>Number of samples with data</td>
-</tr>
-<tr class="odd">
-<td>SB</td>
-<td>strand bias at this position</td>
-</tr>
-<tr class="even">
-<td>SOMATIC</td>
-<td>indicates that the record is a somatic mutation, for cancer genomics</td>
-</tr>
-<tr class="odd">
-<td>VALIDATED</td>
-<td>validated by follow-up experiment</td>
-</tr>
-<tr class="even">
-<td>1000G</td>
-<td>membership in 1000 Genomes</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="metadata-slot" class="section level2">
-<h2><code>metadata</code> slot</h2>
-<ul>
-<li><p>A list having header information. This is mostly arbitrary information.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span>(vcf)</span></code></pre></div>
-<pre><code>## $header
-## class: VCFHeader 
-## samples(5): HG00096 HG00097 HG00099 HG00100 HG00101
-## meta(1): fileformat
-## fixed(2): FILTER ALT
-## info(22): LDAF AVGPOST ... VT SNPSOURCE
-## geno(3): GT DS GL</code></pre></li>
+## 10376              G                  C       100        PASS</code></pre></li>
+<li><p><code>REF</code>: <code>DNAStringSet</code> object. This contains the reference alleles at each locus.</p>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="#cb143-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixed</span>(vcf)<span class="sc">$</span>REF[[<span class="dv">1</span>]]</span></code></pre></div>
+<pre><code>## 1-letter DNAString object
+## seq: A</code></pre></li>
+<li><p><code>ALT</code>: <code>DNAStringSetList</code> object. Each element is a <code>DNAStringSet</code> containing the alternative alleles at each locus. In this case, there is only one alternative allele at every locus, but multiple alternative alleles are possible:</p>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(<span class="fu">lengths</span>(<span class="fu">fixed</span>(vcf)<span class="sc">$</span>ALT) <span class="sc">==</span> <span class="dv">1</span>)</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre></li>
+<li><p><code>QUAL</code>: Numeric vector. Again, this is <span class="math inline">\(-10\log_{10}\text{Pr(call in ALT is wrong)}\)</span>.</p></li>
+<li><p><code>FILTER</code>: Character vector. Again, this is either <code>"PASS"</code> or a code for why it failed the filter.</p></li>
 </ul>
 </div>
 <div id="rowranges-slot" class="section level2">
 <h2><code>rowRanges</code> slot</h2>
 <ul>
-<li>A <code>GRanges</code> object, describing genomic locations of variant allong with annotations.</li>
-</ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rowRanges</span>(vcf)</span></code></pre></div>
+<li><p>A <code>GRanges</code> object, describing genomic locations of variant allong with annotations.</p>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rowRanges</span>(vcf)</span></code></pre></div>
 <pre><code>## GRanges object with 10376 ranges and 5 metadata columns:
 ##               seqnames    ranges strand | paramRangeID            REF
 ##                  &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;
@@ -723,36 +1387,94 @@ $(document).ready(function () {
 ##   rs144055359                  A       100        PASS
 ##   rs114526001                  C       100        PASS
 ##   -------
-##   seqinfo: 1 sequence from hg19 genome; no seqlengths</code></pre>
+##   seqinfo: 1 sequence from hg19 genome; no seqlengths</code></pre></li>
+<li><p>Because these are all SNPs, all of the ranges are length 1.</p>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranges</span>(vcf)</span></code></pre></div>
+<pre><code>## IRanges object with 10376 ranges and 0 metadata columns:
+##                   start       end     width
+##               &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
+##     rs7410291  50300078  50300078         1
+##   rs147922003  50300086  50300086         1
+##   rs114143073  50300101  50300101         1
+##   rs141778433  50300113  50300113         1
+##   rs182170314  50300166  50300166         1
+##           ...       ...       ...       ...
+##   rs187302552  50999536  50999536         1
+##     rs9628178  50999538  50999538         1
+##     rs5770892  50999681  50999681         1
+##   rs144055359  50999830  50999830         1
+##   rs114526001  50999964  50999964         1</code></pre></li>
+<li><p>This information comes from the <code>POS</code> column of the VCF and the sequence of <code>REF</code>.</p></li>
+</ul>
+</div>
+<div id="info-slot" class="section level2">
+<h2><code>info</code> slot</h2>
+<ul>
+<li><p><code>DataFrame</code> object with information on each variant.</p>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span>(vcf)</span></code></pre></div></li>
+<li><p>Each of those columns are a different INFO field described above.</p></li>
+<li><p>You can get a description of the info fields by</p>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="#cb152-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
+<pre><code>## DataFrame with 22 rows and 3 columns
+##                Number        Type            Description
+##           &lt;character&gt; &lt;character&gt;            &lt;character&gt;
+## LDAF                1       Float MLE Allele Frequency..
+## AVGPOST             1       Float Average posterior pr..
+## RSQ                 1       Float Genotype imputation ..
+## ERATE               1       Float Per-marker Mutation ..
+## THETA               1       Float Per-marker Transitio..
+## ...               ...         ...                    ...
+## ASN_AF              1       Float Allele Frequency for..
+## AFR_AF              1       Float Allele Frequency for..
+## EUR_AF              1       Float Allele Frequency for..
+## VT                  1      String indicates what type ..
+## SNPSOURCE           .      String indicates if a snp w..</code></pre></li>
+</ul>
 </div>
 <div id="coldata-slot" class="section level2">
 <h2><code>colData</code> slot</h2>
 <ul>
-<li>A <code>DataFrame</code> object describing sample information.</li>
+<li><p>A <code>DataFrame</code> object describing sample information.</p>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="#cb154-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(vcf)</span></code></pre></div>
+<pre><code>## DataFrame with 5 rows and 1 column
+##           Samples
+##         &lt;integer&gt;
+## HG00096         1
+## HG00097         2
+## HG00099         3
+## HG00100         4
+## HG00101         5</code></pre></li>
+<li><p>Right now, this just has the sample number.</p></li>
 </ul>
 </div>
 <div id="geno-slot" class="section level2">
 <h2><code>geno</code> slot</h2>
 <ul>
 <li><p>A <code>SimpleList</code> of matrix-like objects, containing the genotype data</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(vcf)</span></code></pre></div>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(vcf)</span></code></pre></div>
 <pre><code>## List of length 3
-## names(3): GT DS GL</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(<span class="fu">geno</span>(vcf)<span class="sc">$</span>GT)</span></code></pre></div>
-<pre><code>## [1] &quot;matrix&quot; &quot;array&quot;</code></pre></li>
+## names(3): GT DS GL</code></pre></li>
+<li><p>The different genotype data possible are described above.</p></li>
+<li><p>In this example, we have fields GT (the genotype), DS (genotype dosage), and GL (genotype likelihoods).</p></li>
+<li><p>You can always get a description of the genotype fields with:</p>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="#cb158-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
+<pre><code>## DataFrame with 3 rows and 3 columns
+##         Number        Type            Description
+##    &lt;character&gt; &lt;character&gt;            &lt;character&gt;
+## GT           1      String               Genotype
+## DS           1       Float Genotype dosage from..
+## GL           G       Float   Genotype Likelihoods</code></pre></li>
+<li><p>You can access these different matrices by</p>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="#cb160-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(vcf)<span class="sc">$</span>GL</span></code></pre></div></li>
 </ul>
 </div>
 </div>
 <div id="practical-usage-of-variantannotation" class="section level1">
 <h1>Practical Usage of <code>{VariantAnnotation}</code></h1>
-</div>
-<div id="bioconductor-file-structure" class="section level1">
-<h1>Bioconductor File Structure</h1>
-<ul>
-<li>All class definitions in “R/AllClasses.R”</li>
-<li>All generic function definitions in “R/AllGenerics.R”</li>
-<li>Methods are defined in a file named by the generic function. For example, all <code>show</code> methods would go in “R/show-methods.R”.</li>
-</ul>
+<!-- # Bioconductor File Structure -->
+<!-- - All class definitions in "R/AllClasses.R" -->
+<!-- - All generic function definitions in "R/AllGenerics.R" -->
+<!-- - Methods are defined in a file named by the generic function. For example, all `show` methods would go in "R/show-methods.R". -->
 </div>
 
 <!DOCTYPE html>
