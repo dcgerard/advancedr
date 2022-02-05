@@ -593,28 +593,28 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_size</span>(pvec)</span></code></pre></div>
 <pre><code>## 4,000,048 B</code></pre>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_size</span>(rvec)</span></code></pre></div>
-<pre><code>## 1,205,656 B</code></pre></li>
+<pre><code>## 1,206,776 B</code></pre></li>
 <li><p>You can treat <code>Rle</code> objects just like regular vectors.</p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>rvec[<span class="dv">100</span>]</span></code></pre></div>
 <pre><code>## integer-Rle of length 1 with 1 run
 ##   Lengths: 1
 ##   Values : 0</code></pre>
 <div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>rvec <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
-<pre><code>## numeric-Rle of length 1000000 with 150561 runs
-##   Lengths:  739    1  313    1  289    1  112 ...    1  975    1 1442    1 1807
+<pre><code>## numeric-Rle of length 1000000 with 150702 runs
+##   Lengths: 1743    1   77    1  531    1  727 ...    1 1195    1   17    1  418
 ##   Values :    1    2    1    2    1    2    1 ...    2    1    2    1    2    1</code></pre>
 <div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(rvec)</span></code></pre></div>
 <pre><code>## [1] 1000000</code></pre>
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(rvec)</span></code></pre></div>
-<pre><code>## [1] 906664</code></pre></li>
+<pre><code>## [1] 905194</code></pre></li>
 <li><p><code>Rle</code> has more efficient ways to subset regions via the <code>window()</code> generic.</p>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">window</span>(rvec, <span class="dv">510445</span>, <span class="dv">788990</span>)</span></code></pre></div>
-<pre><code>## integer-Rle of length 278546 with 42389 runs
-##   Lengths:   69    1    5    1    1    1    2 ...    1    3    1    1    1 2499
-##   Values :    0    1    0    1    0    1    0 ...    1    0    1    0    1    0</code></pre></li>
+<pre><code>## integer-Rle of length 278546 with 42406 runs
+##   Lengths:   60    1   10    1    1    1    2 ...    1  331    1   62    1  672
+##   Values :    0    1    0    1    2    1    0 ...    1    0    1    0    1    0</code></pre></li>
 <li><p>Get the run lengths via <code>runLength()</code></p>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">runLength</span>(rvec))</span></code></pre></div>
-<pre><code>## [1] 739   1 313   1 289   1</code></pre></li>
+<pre><code>## [1] 1743    1   77    1  531    1</code></pre></li>
 <li><p>Get the values via <code>runValue()</code></p>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">runValue</span>(rvec))</span></code></pre></div>
 <pre><code>## [1] 0 1 0 1 0 1</code></pre></li>
@@ -663,14 +663,14 @@ $(document).ready(function () {
 <li><p>I ranges are often used to extract elements with regions of interest.</p></li>
 <li><p>E.g., remember the <code>Rle</code> object that we constructed:</p>
 <div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>rvec</span></code></pre></div>
-<pre><code>## integer-Rle of length 1000000 with 150561 runs
-##   Lengths:  739    1  313    1  289    1  112 ...    1  975    1 1442    1 1807
+<pre><code>## integer-Rle of length 1000000 with 150702 runs
+##   Lengths: 1743    1   77    1  531    1  727 ...    1 1195    1   17    1  418
 ##   Values :    0    1    0    1    0    1    0 ...    1    0    1    0    1    0</code></pre>
 <p>What if we want to get the values within the ranges that we constructed via the <code>IRanges</code> object? Then we just use regular bracket subsetting:</p>
 <div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>rvec[iobj]</span></code></pre></div>
-<pre><code>## integer-Rle of length 258 with 96 runs
-##   Lengths: 140   1  16   1   1   1   1   1 ...   1   1   1   2   1   1   1   1
-##   Values :   0   1   0   7  12   7  12  16 ...   7  12   9  11   5  12   4   9</code></pre></li>
+<pre><code>## integer-Rle of length 258 with 94 runs
+##   Lengths: 157   1   1   1   1   1   1   1 ...   1   1   1   1   1   1   1   2
+##   Values :   0   7  10   9   8  10  12   6 ...   7   9   8   6   7   8  11   9</code></pre></li>
 <li><p>There is lots more that <code>IRanges</code> implements. See the help file for more.</p>
 <div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">IRanges-class</span><span class="st">`</span></span></code></pre></div></li>
 </ul>
@@ -1377,30 +1377,37 @@ $(document).ready(function () {
 <li><p>The slots are</p>
 <ul>
 <li><code>@reference</code>: Arbitrary character vector with names of reference sequences.</li>
-<li><code>@samples</code>: A character vector with the sample names.</li>
+<li><code>@samples</code>: A character vector with the sample names. This should be the same as the <code>row.names</code> from the <code>@colData</code> slot of the <code>VCF</code> object.</li>
 <li><code>@header</code>: A <code>DataFrameList</code> with the following elements:
 <ul>
-<li><code>fixed</code>: An optional <code>DataFrameList</code> with elements
-<ul>
-<li><code>QUAL</code>: A <code>DataFrame</code> with a single column called <code>Description</code>.</li>
-<li><code>FILTER</code>: A <code>DataFrame</code> with a single column called <code>Description</code>.</li>
-<li><code>ALT</code>: A <code>DataFrame</code> with a single column called <code>Description</code>.</li>
-<li><code>REF</code>: A <code>DataFrame</code> with a single column called <code>Description</code>.</li>
-</ul></li>
-<li><code>info</code>: A <code>DataFrame</code> with <code>INFO</code> information. Must have three columns <code>Number</code>, <code>Type</code>, and <code>Description</code>.</li>
-<li><code>geno</code>: A <code>DataFrame</code> of <code>FORMAT</code> information. This has three columns, <code>Number</code>, <code>Type</code>, and <code>Description</code>.</li>
+<li><p><code>fileformat</code>: A <code>DataFrame</code> that looks like this:</p>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true" tabindex="-1"></a>fileformat <span class="ot">=</span> <span class="fu">DataFrame</span>(</span>
+<span id="cb147-2"><a href="#cb147-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Value =</span> <span class="st">&quot;VCFv4.3&quot;</span>,</span>
+<span id="cb147-3"><a href="#cb147-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="st">&quot;fileformat&quot;</span></span>
+<span id="cb147-4"><a href="#cb147-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p><code>INFO</code>: A <code>DataFrame</code> with three columns (<code>Number</code>, <code>Type</code>, and <code>Description</code>), and <code>row.names</code> corresponding to the available info fields. If there are no info fields, just put down</p>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a>INFO <span class="ot">=</span> <span class="fu">DataFrame</span>(</span>
+<span id="cb148-2"><a href="#cb148-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Number =</span> <span class="fu">character</span>(),</span>
+<span id="cb148-3"><a href="#cb148-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Type =</span> <span class="fu">character</span>(),</span>
+<span id="cb148-4"><a href="#cb148-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Description =</span> <span class="fu">character</span>()</span>
+<span id="cb148-5"><a href="#cb148-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p><code>FORMAT</code>: A <code>DataFrame</code> with three columns (<code>Number</code>, <code>Type</code>, and <code>Description</code>), and <code>row.names</code> corresponding to the available geno fields.</p></li>
+<li><p><code>QUAL</code>: An optional <code>DataFrame</code> with a single column called <code>Description</code>.</p></li>
+<li><p><code>FILTER</code>: An optional <code>DataFrame</code> with a single column called <code>Description</code>.</p></li>
+<li><p><code>ALT</code>: An optional <code>DataFrame</code> with a single column called <code>Description</code>.</p></li>
+<li><p><code>REF</code>: An optional <code>DataFrame</code> with a single column called <code>Description</code>.</p></li>
 </ul></li>
 </ul></li>
 <li><p>The constructor is <code>VCFHeader()</code>.</p></li>
 <li><p>You can get and set these values with <code>fixed()</code>, <code>info()</code>, <code>geno()</code>, <code>samples()</code>, and <code>reference()</code>.</p>
-<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true" tabindex="-1"></a><span class="fu">samples</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a><span class="fu">samples</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
 <pre><code>## [1] &quot;HG00096&quot; &quot;HG00097&quot; &quot;HG00099&quot; &quot;HG00100&quot; &quot;HG00101&quot;</code></pre>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reference</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reference</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
 <pre><code>## character(0)</code></pre>
-<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixed</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="#cb153-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixed</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
 <pre><code>## DataFrameList of length 2
 ## names(2): FILTER ALT</code></pre>
-<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="#cb153-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="#cb155-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
 <pre><code>## DataFrame with 22 rows and 3 columns
 ##                Number        Type            Description
 ##           &lt;character&gt; &lt;character&gt;            &lt;character&gt;
@@ -1415,20 +1422,28 @@ $(document).ready(function () {
 ## EUR_AF              1       Float Allele Frequency for..
 ## VT                  1      String indicates what type ..
 ## SNPSOURCE           .      String indicates if a snp w..</code></pre>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="#cb155-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
 <pre><code>## DataFrame with 3 rows and 3 columns
 ##         Number        Type            Description
 ##    &lt;character&gt; &lt;character&gt;            &lt;character&gt;
 ## GT           1      String               Genotype
 ## DS           1       Float Genotype dosage from..
 ## GL           G       Float   Genotype Likelihoods</code></pre></li>
+<li><p>NOTE: A <code>DataFrameList</code> is another S4 object from <code>{IRanges}</code> that acts as just a list of <code>DataFrame</code> objects. You can construct one with</p>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrameList</span>(</span>
+<span id="cb159-2"><a href="#cb159-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">DataFrame</span>(<span class="at">a =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)),</span>
+<span id="cb159-3"><a href="#cb159-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">DataFrame</span>(<span class="at">b =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>),</span>
+<span id="cb159-4"><a href="#cb159-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">d =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>)</span>
+<span id="cb159-5"><a href="#cb159-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## DataFrameList of length 2
+## names(2): x y</code></pre></li>
 </ul>
 </div>
 <div id="fixed-slot" class="section level2">
 <h2><code>fixed</code> slot:</h2>
 <ul>
 <li><p>This contains information from the <code>REF</code>, <code>ALT</code>, <code>QUAL</code>, and <code>FILTER</code> columns from the VCF file.</p>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixed</span>(vcf)</span></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixed</span>(vcf)</span></code></pre></div>
 <pre><code>## DataFrame with 10376 rows and 4 columns
 ##                  REF                ALT      QUAL      FILTER
 ##       &lt;DNAStringSet&gt; &lt;DNAStringSetList&gt; &lt;numeric&gt; &lt;character&gt;
@@ -1444,7 +1459,7 @@ $(document).ready(function () {
 ## 10375              G                  A       100        PASS
 ## 10376              G                  C       100        PASS</code></pre></li>
 <li><p><code>REF</code>: <code>DNAStringSet</code> object. This contains the reference alleles at each locus. You can access it with <code>ref()</code></p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ref</span>(vcf)</span></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ref</span>(vcf)</span></code></pre></div>
 <pre><code>## DNAStringSet object of length 10376:
 ##         width seq
 ##     [1]     1 A
@@ -1459,7 +1474,7 @@ $(document).ready(function () {
 ## [10375]     1 G
 ## [10376]     1 G</code></pre></li>
 <li><p><code>ALT</code>: <code>DNAStringSetList</code> object. Each element is a <code>DNAStringSet</code> containing the alternative alleles at each locus. In this case, there is only one alternative allele at every locus, but multiple alternative alleles are possible. You can access it with <code>alt()</code></p>
-<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true" tabindex="-1"></a><span class="fu">alt</span>(vcf)</span></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a><span class="fu">alt</span>(vcf)</span></code></pre></div>
 <pre><code>## DNAStringSetList of length 10376
 ## [[1]] G
 ## [[2]] T
@@ -1473,11 +1488,11 @@ $(document).ready(function () {
 ## [[10]] C
 ## ...
 ## &lt;10366 more elements&gt;</code></pre>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(<span class="fu">lengths</span>(<span class="fu">alt</span>(vcf)) <span class="sc">==</span> <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(<span class="fu">lengths</span>(<span class="fu">alt</span>(vcf)) <span class="sc">==</span> <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre></li>
 <li><p><code>QUAL</code>: Numeric vector. Again, this is <span class="math inline">\(-10\log_{10}\text{Pr(call in ALT is wrong)}\)</span>. You can access this with <code>qual()</code></p>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qual</span>(vcf) <span class="sc">|&gt;</span></span>
-<span id="cb165-2"><a href="#cb165-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qual</span>(vcf) <span class="sc">|&gt;</span></span>
+<span id="cb169-2"><a href="#cb169-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code></pre></div>
 <pre><code>## [1] 100 100 100 100 100 100</code></pre></li>
 <li><p><code>FILTER</code>: Character vector. Again, this is either <code>"PASS"</code> or a code for why it failed the filter.</p></li>
 </ul>
@@ -1486,7 +1501,7 @@ $(document).ready(function () {
 <h2><code>rowRanges</code> slot</h2>
 <ul>
 <li><p>A <code>GRanges</code> object, describing genomic locations of variant along with annotations.</p>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rowRanges</span>(vcf)</span></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rowRanges</span>(vcf)</span></code></pre></div>
 <pre><code>## GRanges object with 10376 ranges and 5 metadata columns:
 ##               seqnames    ranges strand | paramRangeID            REF
 ##                  &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;
@@ -1517,7 +1532,7 @@ $(document).ready(function () {
 ##   -------
 ##   seqinfo: 1 sequence from hg19 genome; no seqlengths</code></pre></li>
 <li><p>You can access the <code>IRanges</code> object with genomic locations by the <code>ranges()</code> method.</p>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranges</span>(vcf)</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranges</span>(vcf)</span></code></pre></div>
 <pre><code>## IRanges object with 10376 ranges and 0 metadata columns:
 ##                   start       end     width
 ##               &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
@@ -1540,10 +1555,10 @@ $(document).ready(function () {
 <h2><code>info</code> slot</h2>
 <ul>
 <li><p><code>DataFrame</code> object with information on each variant.</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span>(vcf)</span></code></pre></div></li>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span>(vcf)</span></code></pre></div></li>
 <li><p>Each of those columns are a different INFO field described above.</p></li>
 <li><p>You can get a description of the info fields by</p>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
 <pre><code>## DataFrame with 22 rows and 3 columns
 ##                Number        Type            Description
 ##           &lt;character&gt; &lt;character&gt;            &lt;character&gt;
@@ -1564,7 +1579,7 @@ $(document).ready(function () {
 <h2><code>colData</code> slot</h2>
 <ul>
 <li><p>A <code>DataFrame</code> object describing sample information.</p>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="#cb174-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(vcf)</span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(vcf)</span></code></pre></div>
 <pre><code>## DataFrame with 5 rows and 1 column
 ##           Samples
 ##         &lt;integer&gt;
@@ -1574,19 +1589,20 @@ $(document).ready(function () {
 ## HG00100         4
 ## HG00101         5</code></pre></li>
 <li><p>Right now, this just has the sample number.</p></li>
+<li><p>The <code>row.names</code> should be the names of the samples. These should be the same as the sample names from the <code>VCFHeader</code>.</p></li>
 </ul>
 </div>
 <div id="geno-slot" class="section level2">
 <h2><code>geno</code> slot</h2>
 <ul>
 <li><p>A <code>SimpleList</code> of matrix or array objects, containing the genotype data</p>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(vcf)</span></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="#cb180-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(vcf)</span></code></pre></div>
 <pre><code>## List of length 3
 ## names(3): GT DS GL</code></pre></li>
 <li><p>The different genotype data possible are described above.</p></li>
 <li><p>In this example, we have fields GT (the genotype), DS (genotype dosage, aka posterior mean genotype), and GL (genotype likelihoods).</p></li>
 <li><p>You can always get a description of the genotype fields with:</p>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="#cb182-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(<span class="fu">header</span>(vcf))</span></code></pre></div>
 <pre><code>## DataFrame with 3 rows and 3 columns
 ##         Number        Type            Description
 ##    &lt;character&gt; &lt;character&gt;            &lt;character&gt;
@@ -1594,7 +1610,7 @@ $(document).ready(function () {
 ## DS           1       Float Genotype dosage from..
 ## GL           G       Float   Genotype Likelihoods</code></pre></li>
 <li><p>You can access these different genotype fields by</p>
-<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="#cb180-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(vcf)<span class="sc">$</span>GL</span></code></pre></div></li>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="#cb184-1" aria-hidden="true" tabindex="-1"></a><span class="fu">geno</span>(vcf)<span class="sc">$</span>GL</span></code></pre></div></li>
 </ul>
 </div>
 <div id="filtering" class="section level2">
@@ -1602,8 +1618,8 @@ $(document).ready(function () {
 <ul>
 <li><p>There are many operations available to filer loci using the <code>VCF</code> class.</p></li>
 <li><p>Get first twenty rows:</p>
-<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="#cb181-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(vcf)</span>
-<span id="cb181-2"><a href="#cb181-2" aria-hidden="true" tabindex="-1"></a>vcf[<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, ]</span></code></pre></div></li>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="#cb185-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(vcf)</span>
+<span id="cb185-2"><a href="#cb185-2" aria-hidden="true" tabindex="-1"></a>vcf[<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, ]</span></code></pre></div></li>
 </ul>
 </div>
 </div>

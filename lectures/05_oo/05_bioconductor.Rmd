@@ -703,15 +703,29 @@ klippy::klippy()
 
 - The slots are
   - `@reference`: Arbitrary character vector with names of reference sequences.
-  - `@samples`: A character vector with the sample names.
+  - `@samples`: A character vector with the sample names. This should be the same as the `row.names` from the `@colData` slot of the `VCF` object.
   - `@header`: A `DataFrameList` with the following elements:
-      - `fixed`: An optional `DataFrameList` with elements
-          - `QUAL`: A `DataFrame` with a single column called `Description`.
-          - `FILTER`: A `DataFrame` with a single column called `Description`.
-          - `ALT`: A `DataFrame` with a single column called `Description`. 
-          - `REF`: A `DataFrame` with a single column called `Description`.
-      - `info`: A `DataFrame` with `INFO` information. Must have three columns `Number`, `Type`, and `Description`.
-      - `geno`: A `DataFrame` of `FORMAT` information. This has three columns, `Number`, `Type`, and `Description`.
+      - `fileformat`: A `DataFrame` that looks like this:
+      
+          ```{r}
+          fileformat = DataFrame(
+            Value = "VCFv4.3",
+            row.names = "fileformat"
+          )
+          ```
+      - `INFO`: A `DataFrame` with three columns (`Number`, `Type`, and `Description`), and `row.names` corresponding to the available info fields. If there are no info fields, just put down
+          ```{r}
+          INFO = DataFrame(
+            Number = character(),
+            Type = character(),
+            Description = character()
+          )
+          ```
+      - `FORMAT`: A `DataFrame` with three columns (`Number`, `Type`, and `Description`), and `row.names` corresponding to the available geno fields.
+      - `QUAL`: An optional `DataFrame` with a single column called `Description`.
+      - `FILTER`: An optional `DataFrame` with a single column called `Description`.
+      - `ALT`: An optional `DataFrame` with a single column called `Description`. 
+      - `REF`: An optional `DataFrame` with a single column called `Description`.
       
 - The constructor is `VCFHeader()`. 
 
@@ -724,6 +738,17 @@ klippy::klippy()
     info(header(vcf))
     geno(header(vcf))
     ```
+    
+- NOTE: A `DataFrameList` is another S4 object from `{IRanges}` that acts as just a list of `DataFrame` objects. You can construct one with
+
+    ```{r}
+    DataFrameList(
+      x = DataFrame(a = c(1,2,3)),
+      y = DataFrame(b = c("A", "B"),
+                    d = 4:5)
+      )
+    ```
+
 
 ## `fixed` slot:
 
@@ -794,6 +819,8 @@ klippy::klippy()
     ```
 
 - Right now, this just has the sample number.
+
+- The `row.names` should be the names of the samples. These should be the same as the sample names from the `VCFHeader`.
 
 ## `geno` slot
 
