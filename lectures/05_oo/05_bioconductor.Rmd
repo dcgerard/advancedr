@@ -40,9 +40,9 @@ klippy::klippy()
 
 # Motivation
 
-- The most common application of S4 objects is in the [Bioconductor](https://bioconductor.org/) project, so we will use some of those base classes as an example.
+- The most common application of S4 objects is in the [Bioconductor](https://bioconductor.org/) project, so we will use some of the classes from that project as an example.
 
-- Bioconductor also provides some of the best software to analyze genome-scale data. Being able to use it is vital for genomic researchers.
+- Bioconductor also provides some of the best software to analyze genomic data. Being able to use it is vital for genomic researchers.
 
 - Bioconductor is huge, and learning that ecosystem would take a semester. Here, we will just learn the basic data types used within the `{VariantAnnotation}` package.
 
@@ -50,7 +50,7 @@ klippy::klippy()
 
 - [Bioconductor](https://bioconductor.org/) is a repository for hosting R packages (just like CRAN).
 
-- But Bioconductor packages are focused on biological applications. They also share S4 objects that are designed to make analyzing biological data easier.
+- But Bioconductor packages are focused on biological applications. They also share S4 objects between packages that are designed to make analyzing biological data easier.
 
 - You do not use `install.packages()` to install packages from Bioconductor, you use `BiocManager::install()`. So first make sure you have `{BiocManager}` installed on your computer:
     ```{r, eval = FALSE}
@@ -63,7 +63,7 @@ klippy::klippy()
     BiocManager::install("VariantAnnotation")
     ```
     
-- One thing you will notice from Bioconductor is that all S4 classes and all packages are in `UpperCamelCase`, and S4 methods are in `lowerCamelCase`.
+- One thing you will notice from Bioconductor is that all S4 classes and most packages are in `UpperCamelCase`, and S4 methods are in `lowerCamelCase`.
     
 # Basic Objects
 
@@ -73,7 +73,7 @@ klippy::klippy()
     library(VariantAnnotation)
     ```
 
-- We will go through these base classes before discussing the `{VariantAnnotation}` package itself.
+- We will go through these classes before discussing the `{VariantAnnotation}` package itself.
 
 ## `SimpleList`
 
@@ -93,7 +93,7 @@ klippy::klippy()
     sval$b
     ```
 
-- Internally, the slots are
+- Internally (i.e. hidden from the user), the slots are
     - `@listData`: A list containing the data.
     - `@elementType`: A character of length 1 describing the subclass of the `SimpleList`.
     - `@elementMetadata`: Annotates individual elements of the `SimpleList`.
@@ -139,7 +139,7 @@ klippy::klippy()
 
 ## `CharacterList`, `NumericList`, `IntegerList`, `LogicalList`
 
-- These atomic lists are extentions of the S4 `List` object that only holds atomic vectors.
+- These atomic lists are extensions of the S4 `List` object that only holds atomic vectors.
 
 - These are defined in the `{IRanges}` package.
 
@@ -168,11 +168,11 @@ klippy::klippy()
 
 ## `Rle`
 
-- `Rle` class is a an atomic vector that can more efficiently store vectors with long repeats via [run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding).
+- The `Rle` class is a an atomic vector that can more efficiently store vectors with long repeats via [run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding).
 
 - It is defined in the `{S4Vectors}` package.
 
-- Instead of storing the entire vector when there are lots of repeats, run-length encoding just stores the value that is repeated ("values") along with the number of times it is repeated ("lengths").
+- Instead of storing the entire vector when there are lots of repeats, run-length encoding just stores the values that are repeated ("values") along with the number of times they are repeated ("lengths").
 
 - Consider this vector with lots of repeats
     ```{r}
@@ -181,10 +181,13 @@ klippy::klippy()
     ```
     
     We can instead store it as 
-        - "A" is copied once.
-        - "C" is copied twice.
-        - "T" is copied three times.
-        - "G" is copied four times.
+    
+    - "A" is copied once.
+    - "C" is copied twice.
+    - "T" is copied three times.
+    - "G" is copied four times.
+    
+    or
         
     ```{r}
     base::rle(x)
@@ -304,13 +307,13 @@ klippy::klippy()
 - Each element of a `GRanges` class contains (i) a sequence name, (ii) an interval of the sequence's location, (iii) the [strand](https://en.wikipedia.org/wiki/Sense_(molecular_biology)), (iv) optional sequence information, and (v) some optional metadata. 
 
 - Below are the slots:
-    - `@seqnames`: An `Rle` object containing the sequence names (like chromosome 1, or mitochondrial chromosome, etc...)
+    - `@seqnames`: An `Rle` object containing the sequence names (like chromosome 1, or mitochondrial chromosome, etc...). Multiple elements can have the same sequence name (e.g. many parts of the genome belong to chromosome 1).
     - `@ranges`: An `IRanges` object containing the location and ranges of the DNA sequence.
     - `@strand`: An `RLE` object containing the strand information.
     - `@seqinfo`: Optionally provided. This is a `Seqinfo` class object (which we haven't covered) which contains metainformation on each *sequence name*. Specifically, the sequence name, the sequence length, whether the chromosome is circular, and the genome that the sequence comes from (like a [specific assembly of the human genome](https://www.ncbi.nlm.nih.gov/assembly/GCF_000001405.39))
     - `@elementMetadata`: An optional `DataFrame` object containing metainformation for each *element*. The rows index the different locations on the genome and the columns index different types of metainformation.
 
-- *Warning: Biology Note*: Recall that DNA is a double helix with "A" paired with "T" and "G" paired with "C". So you can read the sequences going in one direction (ATTTG) or in the other direction (CAAAT). One direction, which is the same order in which RNA builds proteins, is called the "sense" strand, or the "+" strand, or the 5' to 3' strand. The other direction, which is not the same direction that RNA uses to build proteins, is called the "antisense" strand, or the "-" strand, or the 3' to 5' strand. Undetermined strand is represented by "*".
+- *Extreme Biology Note*: Recall that DNA is a double helix with "A" paired with "T" and "G" paired with "C". So you can read the sequences going in one direction (ATTTG) or in the other direction (CAAAT). One direction, which is the same order in which RNA builds proteins, is called the "sense" strand, or the "+" strand, or the 5' to 3' strand. The other direction, which is not the same direction that RNA uses to build proteins, is called the "antisense" strand, or the "-" strand, or the 3' to 5' strand. In Bioconductor, they use notations "`+`", "`-`", and "`*`" for when the strand is undetermined (or does not matter).
 
     ```{r}
     gr1 <- GRanges(seqnames = Rle(c("ch1", "chMT"), c(2, 4)),
@@ -352,14 +355,14 @@ klippy::klippy()
 
 - The `DNAString` class (from the `{Biostrings}` package) allows for efficient storage of a single DNA sequence.
 
-- The idea is that a `DNAString` is a single short sequence, or a whole chromosome, but only sequence.
+- The idea is that a `DNAString` is a single short sequence, or a whole chromosome, but only one contiguous sequence.
 
     ```{r}
     dna1 <- DNAString("ACGT-N")
     dna1
     ```
 
-- This is the same as a `character` except it can only be length 1, and there is alimit to the types of characters possible.
+- This is the same as a `character` except it can only be length 1, and there is a limit to the types of characters possible.
 
 - The different characters possible are found via
     ```{r}
@@ -368,7 +371,7 @@ klippy::klippy()
     
     - E.g. "B" means that the nucleotide could be C, G, or T, but not A.
 
-- In addition, "-" means a gap (because of an alignment, not a physical gap).
+- In addition, "-" means a gap (because of an alignment comparing sequences, not an actual physical gap).
 
 - Sequence length is found by `length()` or `ncar()` methods.
     ```{r}
@@ -406,7 +409,7 @@ klippy::klippy()
     length(ds)
     ```
   
-- You can operate on all DNA sequences at the same time with a few operations.
+- You can operate on all DNA sequences at the same time with a few operations. E.g.
     ```{r}
     subseq(ds, start = 2, end = 4)
     ```
@@ -452,22 +455,22 @@ klippy::klippy()
 - E.g., suppose this is small part of the genome.
 
     - Individual 1:
-        - ...AAATAA<span style="color: red">A</span>CAGGCCAAA<span style="color: orange">T</span>CCT...
-        - ...AAATAA<span style="color: orange">T</span>CAGGCCAAA<span style="color: green">G</span>CCT...
+        - ...AAATAA<b style="color: red">A</b>CAGGCCAAA<b style="color: orange">T</b>CCT...
+        - ...AAATAA<b style="color: orange">T</b>CAGGCCAAA<b style="color: green">G</b>CCT...
     - Individual 2:
-        - ...AAATAA<span style="color: orange">T</span>CAGGCCAAA<span style="color: orange">T</span>CCT...
-        - ...AAATAA<span style="color: orange">T</span>CAGGCCAAA<span style="color: green">G</span>CCT...
+        - ...AAATAA<b style="color: orange">T</b>CAGGCCAAA<b style="color: orange">T</b>CCT...
+        - ...AAATAA<b style="color: orange">T</b>CAGGCCAAA<b style="color: green">G</b>CCT...
     - Individual 3:
-        - ...AAATAA<span style="color: red">A</span>CAGGCCAAA<span style="color: green">G</span>CCT...
-        - ...AAATAA<span style="color: orange">T</span>CAGGCCAAA<span style="color: green">G</span>CCT...
+        - ...AAATAA<b style="color: red">A</b>CAGGCCAAA<b style="color: green">G</b>CCT...
+        - ...AAATAA<b style="color: orange">T</b>CAGGCCAAA<b style="color: green">G</b>CCT...
         
     - At this location on the genome, there are two variants on the left and right (where the nucleotides are color-coded). 
-    - At the first variant, we have two possible alleles --- an "A" allele and a "T" allele.
-    - At the other variant we also have two alleles --- a "T" allele and a "G" allele.
+    - At the left variant, we have two possible alleles --- an "A" allele and a "T" allele.
+    - At the right variant we also have two alleles --- a "T" allele and a "G" allele.
     
-- Each individual has two copies of their genome, and each copy is double-stranded. The above represents each copy, looking only at the sequence on one strand.
+- Each individual has two copies of their genome, and each copy is double-stranded. The above represents the two copies for each individual, where each copy is looking only at the sequence on one strand.
 
-- Most variants are like the two above, where there is only a single nucleotide that differs between individuals. These are callsed SNPs (Single Nucleotide Polymorphisms), pronounced "snips".
+- Most variants are like the two above, where there is only a single nucleotide that differs between individuals. These are called **SNPs** (Single Nucleotide Polymorphisms), pronounced "snips".
 
 - Because we only care about the differences, we could represent them concisely with something like
 
@@ -484,19 +487,19 @@ klippy::klippy()
 
 - E.g., if we choose "A" to be the reference at SNP1, and G to be the reference at SNP2, then we can represent the above genotype matrix by
     ```{r, echo = FALSE}
-    snpmat <- matrix(c(1, 0, 1, 1, 1, 2), ncol = 3, nrow = 2)
+    snpmat <- matrix(c(1, 0, 1, 1, 1, 2), ncol = 3, nrow = 2, byrow = TRUE)
     rownames(snpmat) <- c("SNP1", "SNP2")
     colnames(snpmat) <- c("Ind1", "Ind2", "Ind3")
     snpmat
     ```
 
-- But we would probably like to store which alleles are the references at which SNP's, so that we don't lose that information. If we were building an S4 class, we would probably include a slot for this.
+- But we would probably like to store which alleles are the references at which SNPs, so that we don't lose that information. If we were building an S4 class, we would probably include a slot for this.
 
 - This motivates the Variant Call Format (VCF) file for storing variant information.
 
 - The Variant Call Format (VCF) is a text-file format used to store variants between individuals at different locations (loci) on the genome.
 
-- The `{VariantAnnotation}` reads in the VCF file and converts its format to an S4 object, obviating much of the need to understand the specifics of the format.
+- The `{VariantAnnotation}` package reads in the VCF file and converts its format to an S4 object, obviating much of the need to understand the specifics of the format.
 
 - But if you work with genomic data, you need to know the format.
 
@@ -508,8 +511,8 @@ klippy::klippy()
     knitr::include_graphics(path = "./05_figs/vcf_fig.png")
     ```
 
-- The VCF file is proken down as follows:
-    - A header with metadata (begginning with `##`). These describe properties of other parts of the file.
+- The VCF file is broken down as follows:
+    - A header with metadata (all lines beginning with `##`). These describe properties of other parts of the file.
     - Below the header, each row corresponds to a different variant. The columns can be subdivided as follows:
     - A fixed field (columns `CHROM`, `POS`, `ID`, `REF`, `ALT`, `QUAL`, and `FILTER`). These contain information that are variant specific (i.e. are the same for all individuals).
     - An info field (column `INFO`) that contains additional variant specific information.
@@ -535,9 +538,11 @@ klippy::klippy()
 - There are some structured lines that must follow a certain format.
 
 - `##INFO` lines describe properties of the SNPs. You tell the VCF file the format of the INFO field through the metadata.
+
     ```
     ##INFO=<ID=ID,Number=number,Type=type,Description="description",Source="source",Version="version">
     ```
+    
     - `ID`: Should be the name of the INFO field.
     - `Number`: The number values for an INFO field.
     - `Type`: The base type of the field. 
@@ -559,10 +564,12 @@ klippy::klippy()
     - `Flag` No value. Either it shows up or doesn't.
 
 - `##FORMAT` lines describe the genotype fields that are possible.
+
     ```
     ##FORMAT=<ID=ID,Number=number,Type=type,Description="description">
     ```
-    - `number` and `Type` have the same possibilities as the `##INFO` line.
+    
+    - `Number` and `Type` have the same possibilities as the `##INFO` line.
     
 ## Fixed Field
 
@@ -592,7 +599,7 @@ klippy::klippy()
 
 - The INFO field is also a part of the fixed data, where each line is information on an entire variant. But it can contain a lot of different information, so I'll treat it as an additional field.
 
-- `INFO`: Semicolan separated additional information.
+- `INFO`: Semicolon separated additional information.
 
 - The different keys in the `INFO` column are described by the `##INFO` line in the metadata.
 
@@ -638,7 +645,7 @@ klippy::klippy()
 
     | Field | Number | Type | Description |
     |-------|--------|------|-------------|
-    | **AA** | 1 | Integer | Read depth for alternative allele |
+    | **AA** | A | Integer | Read depth for alternative allele |
     | **AD** | R | Integer | Read depth for each allele |
     | ADF | R | Integer | Read depth for each allele on the forward strand |
     | ADR | R | Integer | Read depth for each allele on the reverse strand |
@@ -660,7 +667,7 @@ klippy::klippy()
 
 # VariantAnnotation
 
-- The `{VariantAnnotation}` package provides an S4 object that has a slot for each field from a VCF file.
+- The `{VariantAnnotation}` package provides an S4 object that has a slot for each field from a VCF file.`
 
 - Let's load in an example VCF file that comes with the package (using `readVcf()`.
 
@@ -678,15 +685,21 @@ klippy::klippy()
 
 ## `metadata` slot
 
-- A list having header information. This is mostly arbitrary information.
+- A `list` having header information. This is mostly arbitrary information.
 
     ```{r}
     metadata(vcf)
     ```
+    
+- This VCF only has a metadata list of length 1, where that element is the header.
+
+    ```{r}
+    header(vcf)
+    ```
 
 ## `fixed` slot:
 
-- This contains information from the `REF`, `ALT`, `QUAL`, and `FILTER` columns from teh VCF file.
+- This contains information from the `REF`, `ALT`, `QUAL`, and `FILTER` columns from the VCF file.
 
     ```{r}
     fixed(vcf)
@@ -709,23 +722,23 @@ klippy::klippy()
       head()
     ```
 
-
 - `FILTER`: Character vector. Again, this is either `"PASS"` or a code for why it failed the filter. 
-
 
 ## `rowRanges` slot
 
-- A `GRanges` object, describing genomic locations of variant allong with annotations.
+- A `GRanges` object, describing genomic locations of variant along with annotations.
 
     ```{r}
     rowRanges(vcf)
     ```
     
-- Because these are all SNPs, all of the ranges are length 1.
+- You can access the `IRanges` object with genomic locations by the `ranges()` method.
 
     ```{r}
     ranges(vcf)
     ```
+    
+- Because these are all SNPs, all of the ranges are length 1.
     
 - This information comes from the `POS` column of the VCF and the sequence of `REF`.
 
