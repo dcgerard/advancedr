@@ -84,6 +84,10 @@ klippy::klippy()
   
 # Application: Capturing Argument Names
 
+# Application: Formulas
+
+# Application: Math Notation in Titles
+
 # Application: Using `dplyr` Style Code on New Classes.
 
 - Suppose we have 
@@ -91,4 +95,4 @@ klippy::klippy()
 # New Functions
 
 - `rlang::expr()`: Create an expression.
-- `base::eval()`: Evaluate an epxression.
+- `base::eval()`: Evaluate an expression.

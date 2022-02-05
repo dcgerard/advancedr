@@ -697,6 +697,34 @@ klippy::klippy()
     header(vcf)
     ```
 
+## `VCFHeader`
+
+- The header is actually a new S4 class called `VCFHeader` which contains all of the information from the metadata of the VCF file (everything that begins with `##`).
+
+- The slots are
+  - `@reference`: Arbitrary character vector with names of reference sequences.
+  - `@samples`: A character vector with the sample names.
+  - `@header`: A `DataFrameList` with the following elements:
+      - `fixed`: An optional `DataFrameList` with elements
+          - `QUAL`: A `DataFrame` with a single column called `Description`.
+          - `FILTER`: A `DataFrame` with a single column called `Description`.
+          - `ALT`: A `DataFrame` with a single column called `Description`. 
+          - `REF`: A `DataFrame` with a single column called `Description`.
+      - `info`: A `DataFrame` with `INFO` information. Must have three columns `Number`, `Type`, and `Description`.
+      - `geno`: A `DataFrame` of `FORMAT` information. This has three columns, `Number`, `Type`, and `Description`.
+      
+- The constructor is `VCFHeader()`. 
+
+- You can get and set these values with `fixed()`, `info()`, `geno()`, `samples()`, and `reference()`.
+
+    ```{r}
+    samples(header(vcf))
+    reference(header(vcf))
+    fixed(header(vcf))
+    info(header(vcf))
+    geno(header(vcf))
+    ```
+
 ## `fixed` slot:
 
 - This contains information from the `REF`, `ALT`, `QUAL`, and `FILTER` columns from the VCF file.
