@@ -960,7 +960,7 @@ klippy::klippy()
 
 ## `{VariantAnnotation}` Exercises
 
-The data in the VCF file XYZ contain a very subset of the data from @euclide2020attack, downloaded from \<[doi:10.5061/dryad.3mq4631](https://doi.org/10.5061/dryad.3mq4631)\>. Let's use the `{VariantAnnotation}` package to play around with it.
+The data in the VCF file <https://dcgerard.github.io/advancedr/data/wal_CF.vcf> contain a very small subset of the data from @euclide2020attack, downloaded from \<[doi:10.5061/dryad.3mq4631](https://doi.org/10.5061/dryad.3mq4631)\>. Let's use the `{VariantAnnotation}` package to play around with it.
 
 1. Read these data into R.
 

@@ -620,28 +620,28 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_size</span>(pvec)</span></code></pre></div>
 <pre><code>## 4,000,048 B</code></pre>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_size</span>(rvec)</span></code></pre></div>
-<pre><code>## 1,204,632 B</code></pre></li>
+<pre><code>## 1,203,112 B</code></pre></li>
 <li><p>You can treat <code>Rle</code> objects just like regular vectors.</p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>rvec[<span class="dv">100</span>]</span></code></pre></div>
 <pre><code>## integer-Rle of length 1 with 1 run
 ##   Lengths: 1
 ##   Values : 0</code></pre>
 <div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>rvec <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
-<pre><code>## numeric-Rle of length 1000000 with 150433 runs
-##   Lengths:  120    1  186    1  598    1 1230 ...    1  649    1 1941    1  737
+<pre><code>## numeric-Rle of length 1000000 with 150243 runs
+##   Lengths:  692    1  359    1  226    1 1198 ...    1  130    1 1730    1   25
 ##   Values :    1    2    1    2    1    2    1 ...    2    1    2    1    2    1</code></pre>
 <div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(rvec)</span></code></pre></div>
 <pre><code>## [1] 1000000</code></pre>
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(rvec)</span></code></pre></div>
-<pre><code>## [1] 905788</code></pre></li>
+<pre><code>## [1] 904622</code></pre></li>
 <li><p><code>Rle</code> has more efficient ways to subset regions via the <code>window()</code> generic.</p>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">window</span>(rvec, <span class="dv">510445</span>, <span class="dv">788990</span>)</span></code></pre></div>
-<pre><code>## integer-Rle of length 278546 with 42480 runs
-##   Lengths:   59    1    2    2    2    1    1 ...    3  500    1 1606    1  393
+<pre><code>## integer-Rle of length 278546 with 42216 runs
+##   Lengths:    9    1   53    1    6    2   10 ...    1 1435    1  110    1  960
 ##   Values :    0    1    0    1    0    1    0 ...    1    0    1    0    1    0</code></pre></li>
 <li><p>Get the run lengths via <code>runLength()</code></p>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">runLength</span>(rvec))</span></code></pre></div>
-<pre><code>## [1] 120   1 186   1 598   1</code></pre></li>
+<pre><code>## [1] 692   1 359   1 226   1</code></pre></li>
 <li><p>Get the values via <code>runValue()</code></p>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">runValue</span>(rvec))</span></code></pre></div>
 <pre><code>## [1] 0 1 0 1 0 1</code></pre></li>
@@ -690,14 +690,14 @@ $(document).ready(function () {
 <li><p>I ranges are often used to extract elements with regions of interest.</p></li>
 <li><p>E.g., remember the <code>Rle</code> object that we constructed:</p>
 <div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>rvec</span></code></pre></div>
-<pre><code>## integer-Rle of length 1000000 with 150433 runs
-##   Lengths:  120    1  186    1  598    1 1230 ...    1  649    1 1941    1  737
+<pre><code>## integer-Rle of length 1000000 with 150243 runs
+##   Lengths:  692    1  359    1  226    1 1198 ...    1  130    1 1730    1   25
 ##   Values :    0    1    0    1    0    1    0 ...    1    0    1    0    1    0</code></pre>
 <p>What if we want to get the values within the ranges that we constructed via the <code>IRanges</code> object? Then we just use regular bracket subsetting:</p>
 <div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>rvec[iobj]</span></code></pre></div>
 <pre><code>## integer-Rle of length 258 with 89 runs
-##   Lengths: 157   1   1   1   1   2   1   1 ...   3   2   1   1   2   1   1   1
-##   Values :   0  10   9  14  15   9  10  11 ...  11  10   4  10   9   8   6   9</code></pre></li>
+##   Lengths: 139   1  17   1   1   1   1   1 ...   1   1   1   3   1   1   2   1
+##   Values :   0   1   0  15  10  13  12   7 ...  14  12  14  10   9   5   8   6</code></pre></li>
 <li><p>There is lots more that <code>IRanges</code> implements. See the help file for more.</p>
 <div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>?<span class="st">`</span><span class="at">IRanges-class</span><span class="st">`</span></span></code></pre></div></li>
 </ul>
@@ -1764,7 +1764,7 @@ un      2837  21_35  T    C    .     PASS    NS=132;AF=0.273;locori=p  GT:DP:AD 
 </div>
 <div id="variantannotation-exercises" class="section level2">
 <h2><code>{VariantAnnotation}</code> Exercises</h2>
-<p>The data in the VCF file XYZ contain a very subset of the data from <span class="citation">Euclide et al. (2020)</span>, downloaded from &lt;<a href="https://doi.org/10.5061/dryad.3mq4631">doi:10.5061/dryad.3mq4631</a>&gt;. Let’s use the <code>{VariantAnnotation}</code> package to play around with it.</p>
+<p>The data in the VCF file <a href="https://dcgerard.github.io/advancedr/data/wal_CF.vcf" class="uri">https://dcgerard.github.io/advancedr/data/wal_CF.vcf</a> contain a very small subset of the data from <span class="citation">Euclide et al. (2020)</span>, downloaded from &lt;<a href="https://doi.org/10.5061/dryad.3mq4631">doi:10.5061/dryad.3mq4631</a>&gt;. Let’s use the <code>{VariantAnnotation}</code> package to play around with it.</p>
 <ol style="list-style-type: decimal">
 <li><p>Read these data into R.</p></li>
 <li><p>Are all loci biallelic?</p></li>
