@@ -402,3 +402,38 @@ klippy::klippy()
     
     df_samp <- df[ind, ]
     ```
+    
+# Exercises
+
+These are just meant to buff up your Base R skills. Consider the data from the `{Sleuth3}` package that contains information on sex and salary at a bank.
+
+```{r}
+library(Sleuth3)
+data("case0102")
+sal <- case0102
+```
+
+1. What is the salary of the person in the 51st row? Use two different subsetting strategies to get this.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    sal$Salary[51]
+    sal[51, 1]
+    ```
+
+2. What is the mean salary of Male's?
+
+    ```{r, eval = FALSE, echo = FALSE}
+    mean(sal$Salary[sal$Sex == "Male"])
+    ```
+
+3. How many Females are in the data?
+    ```{r, eval = FALSE, echo = FALSE}
+    sum(sal$Sex == "Female")
+    ```
+
+4. How many Females make over \$6000?
+
+    ```{r, eval = FALSE, echo = FALSE}
+    sum(sal$Salary[sal$Sex == "Female"] > 6000)
+    ```
+

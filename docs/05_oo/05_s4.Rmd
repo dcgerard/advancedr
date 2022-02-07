@@ -72,7 +72,9 @@ klippy::klippy()
     - The `Class` argument is the name of the new class.
     - The `slots` argument contains a *named* character vector with the name of the fields in the class and the type for each field. 
         - Note that it supports `"numeric"` and not `"double"`.
-    - The `prototype` argument contains a list of default values for each slot. You should always include a prototype.
+    - The `prototype` argument contains the default values for each slot. This is typically either
+        1. A names list object, or
+        2. If inheriting from a basetype vector, you use `structure`, where the base type is in an implicit slot called `.Data` and the rest of the elements are the other slots. See below for example usage.
 
     ```{r}
     setClass(
@@ -352,6 +354,68 @@ klippy::klippy()
 - The `age()` method is called an **accessor** or, more informally, a **getter**.
 
 - The `age()<-` method is called a **replacement function** or, more informally, a **setter**.
+
+# Getting Help
+
+- To read the help file of an S4 class, put `class?` before the name of the class. E.g. the following will open up the help file of the `GRanges` class from the `{GenomicRanges}` package from Bioconductor.
+
+    ```{r}
+    library(stats4)
+    ```
+
+    ```{r, eval = FALSE}
+    class?mle
+    ```
+    
+- This is equivalent to
+    ```{r, eval = FALSE}
+    ?`mle-class`
+    ```
+    
+- You can see the code of a generic function with `getGeneric()`
+    ```{r}
+    getGeneric(f = "show")
+    ```
+
+- You can obtain the method of a generic with `getMethod()`
+    ```{r}
+    getMethod(f = "show", signature = "mle")
+    ```
+    
+- You can use `args()` on both of these to get their arguments
+    ```{r}
+    args(getGeneric("show"))
+    args(getMethod("show", "mle"))
+    ```
+
+- To read the help file of method, put a question mark before the call of a generic. E.g., to see the help file for the `coverage()` method of a `GRanges` object, run
+
+    ```{r, eval = FALSE}
+    ## Create mle object
+    x <- c(1, 2, 3, 4)
+    gobj <- mle(minuslogl = function(mu) -sum(dnorm(x = x, mean = mu, log = TRUE)), start = 0) 
+    
+    ## opens help file for show method of mle
+    ?show(gobj) 
+    ```
+
+- `{sloop}` is useful for seeing 
+    1. If an object is an S4 object
+        ```{r}
+        sloop::otype(david)
+        ```
+    2. If a function is an S4 generic
+        ```{r}
+        sloop::ftype(age)
+        ```
+    3. A list of all methods associated with an S4 class
+        ```{r}
+        sloop::s4_methods_class("Person")
+        ```
+    4. A list of all methods associated with an S4 generic
+        ```{r, warning = FALSE}
+        sloop::s4_methods_generic("age")
+        ```
 
 ## `show()` method
 
@@ -794,48 +858,7 @@ klippy::klippy()
     2L * x
     ```
 
-- Above, `.Generic` is a variable defined inside the evaluation environment of the `setMethod()` definition.
-
-- To define 
-
-# Getting Help
-
-- To read the help file of an S4 class, put `class?` before the name of the class. E.g. the following will open up the help file of the `GRanges` class from the `{GenomicRanges}` package from Bioconductor.
-
-    ```{r, eval = FALSE}
-    library(GenomicRanges)
-    class?GRanges
-    ```
-    
-- This is equivalent to
-    ```{r, eval = FALSE}
-    ?`GRanges-class`
-    ```
-
-- To read the help file of method, put a question mark before the call of a generic. E.g., to see the help file for the `coverage()` method of a `GRanges` object, run
-
-    ```{r, eval = FALSE}
-    gobj <- GRanges() ## creates empty GRanges object
-    ?coverage(gobj) ## opens help file
-    ```
-
-- `{sloop}` is useful for seeing 
-    1. If an object is an S4 object
-        ```{r}
-        sloop::otype(david)
-        ```
-    2. If a function is an S4 generic
-        ```{r}
-        sloop::ftype(age)
-        ```
-    3. A list of all methods associated with an S4 class
-        ```{r}
-        sloop::s4_methods_class("Person")
-        ```
-    4. A list of all methods associated with an S4 generic
-        ```{r, warning = FALSE}
-        sloop::s4_methods_generic("age")
-        ```
+- Above, `.Generic` is a variable defined inside the evaluation environment of the `setMethod()` definition. It contains the arithmetic operation applied by the user.
 
 # Documenting S4 objects
 
@@ -1081,3 +1104,8 @@ klippy::klippy()
 - `methods::setOldClass()`: Register an S3 class to be an S4 class.
 - `methods::setAs()`: Define a coercion method.
 - `methods::as()`: Apply a coercion method.
+- `methods::getGeneric()`: Get generic function definition.
+- `methods::getMethod()`: Get method function definition.
+- `base::args()`: Show arguments of a function.
+- `sloop::s4_methods_class()`: Show methods of an S4 class.
+- `sloop::s4_methods_generic()`: Show methods of an S4 generic.

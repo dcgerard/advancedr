@@ -9,6 +9,7 @@ output:
     toc_float: false
     highlight: pygments
 urlcolor: "blue"
+bibliography: "05_bib.bib"
 ---
 
 ```{r setup, include=FALSE}
@@ -24,20 +25,998 @@ klippy::klippy()
 
 # Learning Objectives
 
-- [Common Bioconductor Methods and Classes](https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/)
-- [BiocGenerics](https://bioconductor.org/packages/3.14/bioc/html/BiocGenerics.html)
-- [S4Vectors](https://bioconductor.org/packages/3.14/bioc/html/S4Vectors.html)
-- [IRanges](https://bioconductor.org/packages/3.14/bioc/html/IRanges.html)
-- [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html)
+<!-- - Chapter 11 of [Biomedical Data Science](http://genomicsclass.github.io/book/pages/dataman2019.html#managing-information-on-large-numbers-of-dna-variants) starting at the VCF background. -->
+
+- Required Reading:
+    - [Wikipedia page on VCF Files](https://en.wikipedia.org/wiki/Variant_Call_Format)
+    - [GATK Description of VCF Files](https://gatk.broadinstitute.org/hc/en-us/articles/360035531692-VCF-Variant-Call-Format)
+    - [Introduction to VariantAnnotation](https://bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.pdf)
+- More resources:
+    - [Common Bioconductor Methods and Classes](https://www.bioconductor.org/developers/how-to/commonMethodsAndClasses/)
+    - [S4Vectors](https://doi.org/doi:10.18129/B9.bioc.S4Vectors)
+    - [IRanges](https://doi.org/doi:10.18129/B9.bioc.IRanges)
+    - [Biostrings](https://doi.org/doi:10.18129/B9.bioc.Biostrings)
+    - [VariantAnnotation](https://doi.org/doi:10.18129/B9.bioc.VariantAnnotation)
+    - [VCF Specifications](http://samtools.github.io/hts-specs/VCFv4.3.pdf)
 
 # Motivation
 
-- The most common application of S4 objects is in the [Bioconductor](https://bioconductor.org/) project, so we will use some of those base classes as an example.
+- The most common application of S4 objects is in the [Bioconductor](https://bioconductor.org/) project, so we will use some of the classes from that project as an example.
 
-# Bioconductor File Structure
+- Bioconductor also provides some of the best software to analyze genomic data. Being able to use it is vital for genomic researchers.
 
-- All class definitions in "R/AllClasses.R"
-- All generic function definitions in "R/AllGenerics.R"
-- Methods are defined in a file named by the generic function. For example, all `show` methods would go in "R/show-methods.R".
+- Bioconductor is huge, and learning that ecosystem would take a semester. Here, we will just learn the basic data types used within the `{VariantAnnotation}` package.
+
+# Bioconductor Setup
+
+- [Bioconductor](https://bioconductor.org/) is a repository for hosting R packages (just like CRAN).
+
+- But Bioconductor packages are focused on biological applications. They also share S4 objects between packages that are designed to make analyzing biological data easier.
+
+- You do not use `install.packages()` to install packages from Bioconductor, you use `BiocManager::install()`. So first make sure you have `{BiocManager}` installed on your computer:
+    ```{r, eval = FALSE}
+    install.packages("BiocManager")
+    ```
+    
+- Now install the `{VariantAnnotation}` package, which is used for storing and manipulating genomic variants.
+
+    ```{r, eval = FALSE}
+    BiocManager::install("VariantAnnotation")
+    ```
+    
+- One thing you will notice from Bioconductor is that all S4 classes and most packages are in `UpperCamelCase`, and S4 methods are in `lowerCamelCase`.
+
+- For anything Bioconductor related, you can get help by searching the support site: <https://support.bioconductor.org/>
+    
+# Basic Objects
+
+- The `{VariantAnnotation}` package uses a lot of S4 objects which are common in the Bioconductor ecosystem. 
+
+    ```{r, message = FALSE}
+    library(VariantAnnotation)
+    ```
+
+- We will go through these classes before discussing the `{VariantAnnotation}` package itself.
+
+## `SimpleList`
+
+- The `SimpleList` class is the S4 version of the basetype `list`.
+
+- The `SimpleList` is defined in the `{S4Vectors}` package.
+
+- Wherever you used a `list`, you can also use a `SimpleList`.
+
+    ```{r}
+    sval <- SimpleList(a = 1:4,
+                       b = c("A", "B", "C"))
+    sloop::otype(sval)
+    class(sval)
+    sval
+    sval$a
+    sval$b
+    ```
+
+- Internally (i.e. hidden from the user), the slots are
+    - `@listData`: A list containing the data.
+    - `@elementType`: A character of length 1 describing the subclass of the `SimpleList`.
+    - `@elementMetadata`: Annotates individual elements of the `SimpleList`.
+    - `@metadata`: Annotates the `SimpleList` as a whole.
+
+## `DataFrame`
+
+- The `DataFrame` is an S4 version of a `data.frame` (which is an S3 class).
+
+- The `DataFrame` class is from the `{S4Vectors}` package.
+
+- Most of the operations you are used to for `data.frame`s can be used for `DataFrame`s.
+
+    ```{r}
+    df <- DataFrame(a = 1:3,
+                    b = c("A", "B", "C"))
+    sloop::otype(df)
+    df
+    df$a
+    df[, 2]
+    ```
 
 
+- Two differences:
+    1. The `row.names` attribute is optional in `DataFrame`s, but is required in `data.frame`s.
+    2. The `DataFrame` object can have an slot called `elementMetadata`, which is a another `DataFrame` where each row indexes one of the columns of the original `DataFrame`. So each row of the metadata contains information on each column of the data. You set and get this metadata with `mcols()`.
+    
+    ```{r}
+    row.names(df) ## no row.names
+    
+    mcols(df) <- DataFrame(DataFrame(info = c("1st", "2nd"),
+                                     description = c("random", "stuff")))
+    mcols(df)
+    ```
+
+- There are other methods for `DataFrame` objects that do not exist for `data.frame` objects. See
+
+    ```{r, eval = FALSE}
+    ?`DataFrame-class`
+    ?`DataFrame-combine`
+    ?`DataFrame-utils`
+    ```
+
+## `CharacterList`, `NumericList`, `IntegerList`, `LogicalList`
+
+- These atomic lists are extensions of the S4 `List` object that only holds atomic vectors.
+
+- These are defined in the `{IRanges}` package.
+
+- E.g. an `IntegerList` can have many elements, but each one has to be an integer vector.
+
+    ```{r}
+    il <- IntegerList(a = c(1L, 2L, 3L),
+                      b = c(4L, 5L, 6L, 7L, 8L))
+    il
+    ```
+
+- The reason to define lists in this way, is that you can perform operations simultaneously on all vectors in these atomic lists.
+
+    ```{r}
+    il + 1L
+    il == 2
+    max(il)
+    sum(il)
+    ```
+
+- See the following for more information
+    ```{r, eval = FALSE}
+    ?`AtomicList`
+    ?`AtomicList-utils`
+    ```
+
+## `Rle`
+
+- The `Rle` class is a an atomic vector that can more efficiently store vectors with long repeats via [run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding).
+
+- It is defined in the `{S4Vectors}` package.
+
+- Instead of storing the entire vector when there are lots of repeats, run-length encoding just stores the values that are repeated ("values") along with the number of times they are repeated ("lengths").
+
+- Consider this vector with lots of repeats
+    ```{r}
+    x <- rep(c("A", "C", "T", "G"), 1:4)
+    x
+    ```
+    
+    We can instead store it as 
+    
+    - "A" is copied once.
+    - "C" is copied twice.
+    - "T" is copied three times.
+    - "G" is copied four times.
+    
+    or
+        
+    ```{r}
+    base::rle(x)
+    ```
+
+- The `Rle` class does this run-length encoding behind-the-scenes.
+
+- Let's generate some very long data with lots of repeats:
+    ```{r}
+    lambda <- c(rep(0.001, 4500), 
+                seq(0.001, 10, length=500), 
+                seq(10, 0.001, length=500))
+    pvec <- rpois(1e6, lambda)
+    head(pvec)
+    rvec <- Rle(pvec)
+    ```
+
+- The size of the objects is dramatically different.
+
+    ```{r}
+    lobstr::obj_size(pvec)
+    lobstr::obj_size(rvec)
+    ```
+
+- You can treat `Rle` objects just like regular vectors.
+
+    ```{r}
+    rvec[100]
+    rvec + 1
+    length(rvec)
+    sum(rvec)
+    ```
+
+- `Rle` has more efficient ways to subset regions via the `window()` generic.
+
+    ```{r}
+    window(rvec, 510445, 788990)
+    ```
+
+- Get the run lengths via `runLength()`
+    ```{r}
+    head(runLength(rvec))
+    ```
+
+- Get the values via `runValue()`
+    ```{r}
+    head(runValue(rvec))
+    ```
+
+- This class is really beneficial for genomic data, where DNA often has sequences of long repeats.
+
+- See the following for more operations available on `Rle` objects.
+
+    ```{r, eval = FALSE}
+    ?`Rle-class`
+    ?`Rle-utils`
+    ?`Rle-runstat`
+    ```
+
+## `IRanges`
+
+- The `IRanges` class contains two integer vectors. The first specifies "start" positions, the second specifies "width" of the position.
+
+- You should consider an `IRanges` object like a vector, where each element has a start position and a width.
+
+- The idea is that you might want to describe what part of the genome you are considering (e.g. from base pair 107889 of width 2000 base pairs) without having to describe the sequence in that range.
+
+    ```{r}
+    iobj <- IRanges(start = c(5, 1001, 59999), width = c(87, 70, 101))
+    iobj
+    ```
+
+- The "end" positions is not an internal slot. It is just printed via the `show()` method of the `IRanges` class.
+
+- You can access the start, end, and widths of the ranges via
+    ```{r}
+    start(iobj)
+    end(iobj)
+    width(iobj)
+    ```
+
+- You can subset like a regular vector
+
+    ```{r}
+    iobj[1]
+    ```
+
+- You can choose to only include regions that begin or end at some position
+    ```{r}
+    iobj[start(iobj) > 100]
+    ```
+
+- I ranges are often used to extract elements with regions of interest.
+
+- E.g., remember the `Rle` object that we constructed:
+    ```{r}
+    rvec
+    ```
+
+    What if we want to get the values within the ranges that we constructed via the `IRanges` object? Then we just use regular bracket subsetting:
+    ```{r}
+    rvec[iobj]
+    ```
+ 
+- There is lots more that `IRanges` implements. See the help file for more.
+
+    ```{r, eval = FALSE}
+    ?`IRanges-class`
+    ```
+
+## `GRanges`
+
+- The `GRanges` S4 class is a vector-like class that represents genomic locations and their annotations.
+
+- This class is defined in the `{GenomicRanges}` package.
+
+- Each element of a `GRanges` class contains (i) a sequence name, (ii) an interval of the sequence's location, (iii) the [strand](https://en.wikipedia.org/wiki/Sense_(molecular_biology)), (iv) optional sequence information, and (v) some optional metadata. 
+
+- Below are the slots:
+    - `@seqnames`: An `Rle` object containing the sequence names (like chromosome 1, or mitochondrial chromosome, etc...). Multiple elements can have the same sequence name (e.g. many parts of the genome belong to chromosome 1).
+    - `@ranges`: An `IRanges` object containing the location and ranges of the DNA sequence.
+    - `@strand`: An `RLE` object containing the strand information.
+    - `@seqinfo`: Optionally provided. This is a `Seqinfo` class object (which we haven't covered) which contains metainformation on each *sequence name*. Specifically, the sequence name, the sequence length, whether the chromosome is circular, and the genome that the sequence comes from (like a [specific assembly of the human genome](https://www.ncbi.nlm.nih.gov/assembly/GCF_000001405.39))
+    - `@elementMetadata`: An optional `DataFrame` object containing metainformation for each *element*. The rows index the different locations on the genome and the columns index different types of metainformation.
+
+- *Extreme Biology Note*: Recall that DNA is a double helix with "A" paired with "T" and "G" paired with "C". So you can read the sequences going in one direction (ATTTG) or in the other direction (CAAAT). One direction, which is the same order in which RNA builds proteins, is called the "sense" strand, or the "+" strand, or the 5' to 3' strand. The other direction, which is not the same direction that RNA uses to build proteins, is called the "antisense" strand, or the "-" strand, or the 3' to 5' strand. In Bioconductor, they use notations "`+`", "`-`", and "`*`" for when the strand is undetermined (or does not matter).
+
+    ```{r}
+    gr1 <- GRanges(seqnames = Rle(c("ch1", "chMT"), c(2, 4)),
+                   ranges = IRanges(16:21, 20),
+                   strand = rep(c("+", "-", "*"), 2))
+    gr1
+    ```
+
+- These are the various getters for the slots:
+    ```{r}
+    seqnames(gr1)
+    ranges(gr1)
+    strand(gr1)
+    seqinfo(gr1)
+    mcols(gr1)
+    ```
+    
+- You can access start, end, and width directions directly without first extracting the `@ranges` slot.
+    ```{r}
+    start(gr1)
+    end(gr1)
+    width(gr1)
+    ```
+
+- You should think of a `GRanges` object as a vector where each element is a location on the genome.
+    ```{r}
+    gr1[1]
+    length(gr1)
+    gr1[start(gr1) > 18]
+    ```
+
+- See more by
+    ```{r, eval = FALSE}
+    ?`GRanges-class`
+    ```
+
+
+## `DNAString`
+
+- The `DNAString` class (from the `{Biostrings}` package) allows for efficient storage of a single DNA sequence.
+
+- The idea is that a `DNAString` is a single short sequence, or a whole chromosome, but only one contiguous sequence.
+
+    ```{r}
+    dna1 <- DNAString("ACGT-N")
+    dna1
+    ```
+
+- This is the same as a `character` except it can only be length 1, and there is a limit to the types of characters possible.
+
+- The different characters possible are found via
+    ```{r}
+    IUPAC_CODE_MAP
+    ```
+    
+    - E.g. "B" means that the nucleotide could be C, G, or T, but not A.
+
+- In addition, "-" means a gap (because of an alignment comparing sequences, not an actual physical gap).
+
+- Sequence length is found by `length()` or `ncar()` methods.
+    ```{r}
+    length(dna1)
+    nchar(dna1)
+    ```
+    
+- You can access a subsequence by bracket subsetting
+
+    ```{r}
+    dna1[2:4]
+    ```
+
+- See more by
+    ```{r, eval = FALSE}
+    ?`DNAString-class`
+    ```
+
+
+## `DNAStringSet`
+
+- The `DNAStringSet` is a like a `character` vector, except each element is a `DNAString` instead of a `string`. 
+
+- This class is also from the `{Biostrings}` package.
+
+    ```{r}
+    ds <- DNAStringSet(x = c("AAAGCC", "ACTATC", "TGCNNAA-CCTT"))
+    ds
+    ```
+
+- It operates like a character vector
+    ```{r}
+    ds[[1]]
+    ds[1:2]
+    length(ds)
+    ```
+  
+- You can operate on all DNA sequences at the same time with a few operations. E.g.
+    ```{r}
+    subseq(ds, start = 2, end = 4)
+    ```
+
+- See more by
+    ```{r, eval = FALSE}
+    ?`DNAStringSet-class`
+    ```
+
+## `DNAStringSetList`
+
+- The `DNAStringSetList` class (also from `{Biostrings}`) is a list-like class where each element is a `DNAStringSet`.
+
+    ```{r}
+    dna1 <- c("AAA", "AC", "", "T", "GGATA")
+    dna2 <- c("G", "TT", "C")
+    x <- DNAStringSetList(dna1, dna2)
+    x
+    ```
+
+- This is useful for storing multiple possible alleles that are varying in the population. E.g. below indicates that the first location is an A, the second is either an A or G, and the third is either an A or a T or a G.
+
+    ```{r}
+    dna_ex <- DNAStringSetList("A", c("A", "G"), c("A", "T", "G"))
+    dna_ex
+    ```
+
+- See more by
+    ```{r, eval = FALSE}
+    ?`DNAStringSetList-class`
+    ```
+
+
+## Basic Data Exercises
+
+1. Create a `DNAStringSet` object of length 100 that contains just `A`'s. That is
+
+    ```{r, eval = TRUE, echo = FALSE}
+    ref <- DNAStringSet(rep("A", length.out = 100))
+    ref
+    ```
+
+2. Create a `DNAStringSetList` object of length 100 that contains just `c(C, G)`'s. That is:
+
+    ```{r, eval = TRUE, echo = FALSE}
+    alt <- DNAStringSetList(lapply(X = 1:100, FUN = function(x) c("C", "G")))
+    alt
+    ```
+
+3. Create an `IRanges` object of where the start positions are `100`, `200`, ..., `10000`, and the widths are `1`, `2`, `3`, ..., `100`. That is,
+
+    ```{r, eval = TRUE, echo = FALSE}
+    iout <- IRanges(start = 1:100 * 100, width = 1:100)
+    iout
+    ```
+
+4. Create a `GRanges` object using your results from exercise 3 where the `seqname` is `"chr1"` for all loci, and the strand is `"*"` for all loci. That is,
+
+    ```{r, eval = TRUE, echo = FALSE}
+    gr <- GRanges(seqnames = "chr1", ranges = iout, strand = "*")
+    gr
+    ```
+
+5. Create a `DataFrame` object that has one column called `"ir"` that contains your output from part 4, a second column called `seq1` that contains your output from part 1, and a third column called `seq2` that contains your output from part 2. That is,
+
+    ```{r, eval = TRUE, echo = FALSE}
+    DataFrame(ir = gr, seq1 = ref, seq2 = alt)
+    ```
+
+# VCF Files
+
+- Most DNA between two individuals of the same species is **the exact same**.
+
+- The differences are the interesting parts.
+
+- A location on the genome where there is a difference is called a **variant**.
+
+- The type of difference is called an **allele**.
+
+- E.g., suppose this is small part of the genome.
+
+    - Individual 1:
+        - ...AAATAA<b style="color: red">A</b>CAGGCCAAA<b style="color: orange">T</b>CCT...
+        - ...AAATAA<b style="color: orange">T</b>CAGGCCAAA<b style="color: green">G</b>CCT...
+    - Individual 2:
+        - ...AAATAA<b style="color: orange">T</b>CAGGCCAAA<b style="color: orange">T</b>CCT...
+        - ...AAATAA<b style="color: orange">T</b>CAGGCCAAA<b style="color: green">G</b>CCT...
+    - Individual 3:
+        - ...AAATAA<b style="color: red">A</b>CAGGCCAAA<b style="color: green">G</b>CCT...
+        - ...AAATAA<b style="color: orange">T</b>CAGGCCAAA<b style="color: green">G</b>CCT...
+        
+    - At this location on the genome, there are two variants on the left and right (where the nucleotides are color-coded). 
+    - At the left variant, we have two possible alleles --- an "A" allele and a "T" allele.
+    - At the right variant we also have two alleles --- a "T" allele and a "G" allele.
+    
+- Each individual has two copies of their genome, and each copy is double-stranded. The above represents the two copies for each individual, where each copy is looking only at the sequence on one strand.
+
+- Most variants are like the two above, where there is only a single nucleotide that differs between individuals. These are called **SNPs** (Single Nucleotide Polymorphisms), pronounced "snips".
+
+- Because we only care about the differences, we could represent them concisely with something like
+
+    ```{r, echo = FALSE}
+    snpmat <- matrix(c("A/T", "T/G", "T/T", "T/G", "A/T", "G/G"), ncol = 3, nrow = 2)
+    rownames(snpmat) <- c("SNP1", "SNP2")
+    colnames(snpmat) <- c("Ind1", "Ind2", "Ind3")
+    snpmat
+    ```
+
+- The combination of alleles that an individual has a single locus is called its **genotype**. E.g. individual 1 has a genotype of "A/T" at SNP1, and individual 3 has genotype "G/G" at locus 2.
+
+- We often want to perform numerical operations on the genotypes, so we often choose one allele to act as the **reference** and the other as the **alternative** at each variant. The choice is usually arbitrary. We can then count the number of "alternative" alleles at each variant for each individual.
+
+- E.g., if we choose "A" to be the reference at SNP1, and G to be the reference at SNP2, then we can represent the above genotype matrix by
+    ```{r, echo = FALSE}
+    snpmat <- matrix(c(1, 0, 1, 1, 1, 2), ncol = 3, nrow = 2, byrow = TRUE)
+    rownames(snpmat) <- c("SNP1", "SNP2")
+    colnames(snpmat) <- c("Ind1", "Ind2", "Ind3")
+    snpmat
+    ```
+
+- But we would probably like to store which alleles are the references at which SNPs, so that we don't lose that information. If we were building an S4 class, we would probably include a slot for this.
+
+- This motivates the Variant Call Format (VCF) file for storing variant information.
+
+- The Variant Call Format (VCF) is a text-file format used to store variants between individuals at different locations (loci) on the genome.
+
+- The `{VariantAnnotation}` package reads in the VCF file and converts its format to an S4 object, obviating much of the need to understand the specifics of the format.
+
+- But if you work with genomic data, you need to know the format.
+
+## VCF Diagram
+
+- Below is a sample VCF file (from the VCF spec) with 5 variants and 3 individuals.
+
+    ```{r}
+    knitr::include_graphics(path = "./05_figs/vcf_fig.png")
+    ```
+
+- The VCF file is broken down as follows:
+    - A header with metadata (all lines beginning with `##`). These describe properties of other parts of the file.
+    - Below the header, each row corresponds to a different variant. The columns can be subdivided as follows:
+    - A fixed field (columns `CHROM`, `POS`, `ID`, `REF`, `ALT`, `QUAL`, and `FILTER`). These contain information that are variant specific (i.e. are the same for all individuals).
+    - An info field (column `INFO`) that contains additional variant specific information.
+    - A genotype field, where the column names are the names of the individuals. In the above example, `NA00001`, `NA00002`, and `NA00003`, but these names may vary. The genotype field contains information that is specific for that individual at that locus.
+
+- The above file has five variants (five rows):
+    1. A SNP with one reference allele "G" and one alternative allele "A",
+    2. Another SNP that did not pass quality checks, and so was filtered out.
+    3. A SNP with one reference allele "A" and two alternative alleles "G" and "T".
+    4. A locus that is not a variant, because all individuals have a "T" there (this is called a monomorphic location)
+    5. A more complicated variant (called a "microsattelite") where the reference allele is "GTC" and the two alternative alleles are "G" and "GTCT".
+    
+- VCF files can get really complicated, since they have to be able to store complicated differences between genomes. Here, we will just talk about basic information, which is what most people use it for anyway.
+
+- See the spec for more information: <http://samtools.github.io/hts-specs/VCFv4.3.pdf>
+    
+## Metadata
+
+- The Metadata field is at the top of the VCF file and begins with `##`.
+
+- The first line should say the version of VCF file format used (this is version 4.3).
+
+- There are some structured lines that must follow a certain format.
+
+- `##INFO` lines describe properties of the SNPs. You tell the VCF file the format of the INFO field through the metadata.
+
+    ```
+    ##INFO=<ID=ID,Number=number,Type=type,Description="description",Source="source",Version="version">
+    ```
+    
+    - `ID`: Should be the name of the INFO field.
+    - `Number`: The number values for an INFO field.
+    - `Type`: The base type of the field. 
+    - The other arguments (`Description`, `Source`, `Version`) are just strings that don't matter, and are optional.
+
+
+- The possible values of `Number`
+
+    | Value | Descriptions |
+    |-------|--------------|
+    | An integer, like `1` or `2` | The exact number of values |
+    | `A` | One value per alternate allele |
+    | `R` | One value for each allele |
+    | `G` | One value per genotype |
+    | `.` | Any number of possible values |
+
+- The possible values of `Type`: `Integer`, `Float`, `Flag`, `Character`, or `String`. 
+    - `Float` means decimal (kind of like doubles in R)
+    - `Flag` No value. Either it shows up or doesn't.
+
+- `##FORMAT` lines describe the genotype fields that are possible.
+
+    ```
+    ##FORMAT=<ID=ID,Number=number,Type=type,Description="description">
+    ```
+    
+    - `Number` and `Type` have the same possibilities as the `##INFO` line.
+    
+## Fixed Field
+
+- Under the metadata, you have the the "fixed" field, where each line is a specific property of the variant.
+
+- The header looks like this (with one `#`)
+
+    ```
+    #CHROM POS ID REF ALT QUAL FILTER INFO
+    ```
+
+- `CHROM`: An identifier from the reference genome used to build the VCF file.
+
+- `POS`: Reference position on the chromosome.
+
+- `ID`: Name of the variant.
+
+- `REF`: Reference allele.
+
+- `ALT`: Alternative allele.
+
+- `QUAL`: Quality of the SNP. Officially, this is an estimate of $-10\log_{10}\text{Pr(call in ALT is wrong)}$. This is usually output by genotyping software.
+
+- `FILTER`: `PASS` if the variant passed filters placed on it by the genotyping software. Otherwise a code for why it failed to the filter.
+
+## INFO field
+
+- The INFO field is also a part of the fixed data, where each line is information on an entire variant. But it can contain a lot of different information, so I'll treat it as an additional field.
+
+- `INFO`: Semicolon separated additional information.
+
+- The different keys in the `INFO` column are described by the `##INFO` line in the metadata.
+
+- Table of common INFO keys (from VCF spec).
+
+    | Key | Number | Type | Description |
+    |-----|--------|------|-------------|
+    | AA | 1 | String | Ancestral allele |
+    | AC | A | Integer | Allele count in genotypes, for each ALT allele, in the same order as listed |
+    | AD | R | Integer | Total read depth for each allele |
+    | ADF | R | Integer | Read depth for each allele on the forward strand |
+    | ADR | R | Integer | Read depth for each allele on the reverse strand |
+    | AF | A | Float | Allele frequency for each ALT allele in the same  order as listed (estimated from primary data, not called genotypes) |
+    | AN | 1 | Integer | Total number of alleles in called genotypes |
+    | BQ | 1 | Float | RMS base quality |
+    | CIGAR | A | String | Cigar string describing how to align an alternate allele to the reference allele |
+    | DB | 0 | Flag | dbSNP membership |
+    | DP | 1 | Integer | Combined depth across samples |
+    | END | 1 | Integer | End position on CHROM (used with symbolic alleles; see below) |
+    | H2 | 0 | Flag | HapMap2 membership |
+    | H3 | 0 | Flag | HapMap3 membership |
+    | MQ | 1 | Float | RMS mapping quality |
+    | MQ0 | 1 | Integer | Number of MAPQ == 0 reads |
+    | NS | 1 | Integer | Number of samples with data |
+    | SB | 4 | Integer | Strand bias |
+    | SOMATIC | 0 | Flag | Somatic mutation (for cancer genomics) |
+    | VALIDATED | 0 | Flag | Validated by follow-up experiment |
+    | 1000G | 0 | Flag | 1000 Genomes membership |
+
+## Genotype Fields
+
+- Genotype information according to a VCF file is a property of an individual at a locus.
+
+- This is different from the Fixed field. The Fixed field has information on variants (same across individuals). The Genotype field has information that differs based on both variants and individuals.
+
+- The genotype field for each sample is colon separated.
+
+- The `FORMAT` column provides the order of the genotypes.
+
+- The `##FORMAT` line in the metadata provides information on what the genotypes are.
+
+- Common genotype keys (from VCF spec), with bold for the ones I see most often:
+
+    | Field | Number | Type | Description |
+    |-------|--------|------|-------------|
+    | **AA** | A | Integer | Read depth for alternative allele |
+    | **AD** | R | Integer | Read depth for each allele |
+    | ADF | R | Integer | Read depth for each allele on the forward strand |
+    | ADR | R | Integer | Read depth for each allele on the reverse strand |
+    | **DP** | 1 | Integer | Read depth |
+    | **DS** | 1 | Float | Posterior mean genotype |
+    | EC | A | Integer | Expected alternate allele counts |
+    | FT | 1 | String | Filter indicating if this genotype was "called" |
+    | **GL** | G | Float Genotype likelihoods |
+    | **GP** | G | Float Genotype posterior probabilities |
+    | GQ | 1 | Integer | Conditional genotype quality |
+    | **GT** | 1 | String | Genotype, with"`/`" meaning unphased and "`|`" meaning phased |
+    | HQ | 2 | Integer | Haplotype quality |
+    | MQ | 1 | Integer | RMS mapping quality |
+    | **PL** | G | Integer | Phred-scaled genotype likelihoods rounded to the closest integer |
+    | **PP** | G | Integer | Phred-scaled genotype posterior probabilities rounded to the closest integer |
+    | PQ | 1 | Integer | Phasing quality |
+    | PS | 1 | Integer | Phase set |
+    | **RA** | 1 | Integer | Read depth for reference allele |
+    
+    
+## VCF File Exercises
+
+- The following is a small part of a VCF file from @euclide2020attack, downloaded from \<[doi:10.5061/dryad.3mq4631](https://doi.org/10.5061/dryad.3mq4631)\>.
+
+    ```
+    ##fileformat=VCFv4.2
+    ##fileDate=20180809
+    ##source="Stacks v1.46"
+    ##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of Samples With Data">
+    ##INFO=<ID=AF,Number=.,Type=Float,Description="Allele Frequency">
+    ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+    ##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+    ##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allele Depth">
+    ##INFO=<ID=locori,Number=1,Type=Character,Description="Orientation the corresponding Stacks locus aligns in">
+    #CHROM  POS   ID     REF  ALT  QUAL  FILTER  INFO                      FORMAT    LakeW_17-03702.1  Medici_17-13201.1  Medici_17-13202.1  Medici_17-13203.1  Medici_17-13204.1  
+    un      1358  10_96  A    G    .     PASS    NS=148;AF=0.057;locori=p  GT:DP:AD  0/0:12:12,0       0/0:30:30,0        0/0:17:17,0        0/0:16:16,0        0/0:20:20,0
+    un      2167  16_65  G    A    .     PASS    NS=122;AF=0.307;locori=p  GT:DP:AD  0/0:7:7,0         0/1:22:11,11       0/1:11:4,7         0/0:15:15,0        1/1:15:0,15 
+    un      2837  21_35  T    C    .     PASS    NS=132;AF=0.273;locori=p  GT:DP:AD  0/0:5:5,0         0/1:22:12,10       0/0:10:10,0        1/1:12:0,12        0/1:17:8,9
+    ```
+    
+1. What are the reference alleles for the three loci?
+
+    ```{block, eval = FALSE, echo = FALSE}
+    "A" for the first locus, "G" for the second, and "T" for the third.
+    ```
+
+2. What are the alternative alleles for the three loci?
+
+    ```{block, eval = FALSE, echo = FALSE}
+    "G" for the first locus, "A" for the second, and "C" for the third.
+    ```
+
+
+3. What are the estimated genotypes at the three loci for Medici_17-13204.1?
+
+    ```{block, eval = FALSE, echo = FALSE}
+    "A/A" for the first locus, "A/A" for the second locus, and "T/C" for the third locus.
+    ```
+
+4. What fraction of Medici_17-13202.1's reads were "A" at locus 16_65?
+
+    ```{block, eval = FALSE, echo = FALSE}
+    7/11
+    ```
+
+5. What is the estimated allele frequency at locus 16_65?
+
+    ```{block, eval = FALSE, echo = FALSE}
+    0.307
+    ```
+
+6. When were these data created?
+
+    ```{block, eval = FALSE, echo = FALSE}
+    August 9, 2018.
+    ```
+
+# VariantAnnotation
+
+- The `{VariantAnnotation}` package provides an S4 object that has a slot for each field from a VCF file.`
+
+- Let's load in an example VCF file that comes with the package (using `readVcf()`.
+
+    ```{r, message=FALSE}
+    fl <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
+    vcf <- readVcf(fl, "hg19")
+    vcf
+    ```
+    
+
+- A quick view of the different slots can be seen with `header()`    
+    ```{r}
+    header(vcf)
+    ```
+
+## `metadata` slot
+
+- A `list` having header information. This is mostly arbitrary information.
+
+    ```{r}
+    metadata(vcf)
+    ```
+    
+- This VCF only has a metadata list of length 1, where that element is the header.
+
+    ```{r}
+    header(vcf)
+    ```
+
+## `VCFHeader`
+
+- The header is actually a new S4 class called `VCFHeader` which contains all of the information from the metadata of the VCF file (everything that begins with `##`).
+
+- The slots are
+  - `@reference`: Arbitrary character vector with names of reference sequences.
+  - `@samples`: A character vector with the sample names. This should be the same as the `row.names` from the `@colData` slot of the `VCF` object.
+  - `@header`: A `DataFrameList` with the following elements:
+      - `fileformat`: A `DataFrame` that looks like this:
+      
+          ```{r}
+          fileformat = DataFrame(
+            Value = "VCFv4.3",
+            row.names = "fileformat"
+          )
+          ```
+      - `INFO`: A `DataFrame` with three columns (`Number`, `Type`, and `Description`), and `row.names` corresponding to the available info fields. If there are no info fields, just put down
+          ```{r}
+          INFO = DataFrame(
+            Number = character(),
+            Type = character(),
+            Description = character()
+          )
+          ```
+      - `FORMAT`: A `DataFrame` with three columns (`Number`, `Type`, and `Description`), and `row.names` corresponding to the available geno fields.
+      - `QUAL`: An optional `DataFrame` with a single column called `Description`.
+      - `FILTER`: An optional `DataFrame` with a single column called `Description`.
+      - `ALT`: An optional `DataFrame` with a single column called `Description`. 
+      - `REF`: An optional `DataFrame` with a single column called `Description`.
+      
+- The constructor is `VCFHeader()`. 
+
+- You can get and set these values with `fixed()`, `info()`, `geno()`, `samples()`, and `reference()`.
+
+    ```{r}
+    samples(header(vcf))
+    reference(header(vcf))
+    fixed(header(vcf))
+    info(header(vcf))
+    geno(header(vcf))
+    ```
+    
+- NOTE: A `DataFrameList` is another S4 object from `{IRanges}` that acts as just a list of `DataFrame` objects. You can construct one with
+
+    ```{r}
+    DataFrameList(
+      x = DataFrame(a = c(1,2,3)),
+      y = DataFrame(b = c("A", "B"),
+                    d = 4:5)
+      )
+    ```
+
+
+## `fixed` slot:
+
+- This contains information from the `REF`, `ALT`, `QUAL`, and `FILTER` columns from the VCF file.
+
+    ```{r}
+    fixed(vcf)
+    ```
+
+- `REF`: `DNAStringSet` object. This contains the reference alleles at each locus. You can access it with `ref()`
+    ```{r}
+    ref(vcf)
+    ```
+
+- `ALT`: `DNAStringSetList` object. Each element is a `DNAStringSet` containing the alternative alleles at each locus. In this case, there is only one alternative allele at every locus, but multiple alternative alleles are possible. You can access it with `alt()`
+    ```{r}
+    alt(vcf)
+    all(lengths(alt(vcf)) == 1)
+    ```
+
+- `QUAL`: Numeric vector. Again, this is $-10\log_{10}\text{Pr(call in ALT is wrong)}$. You can access this with `qual()`
+    ```{r}
+    qual(vcf) |>
+      head()
+    ```
+
+- `FILTER`: Character vector. Again, this is either `"PASS"` or a code for why it failed the filter. 
+
+## `rowRanges` slot
+
+- A `GRanges` object, describing genomic locations of variant along with annotations.
+
+    ```{r}
+    rowRanges(vcf)
+    ```
+    
+- You can access the `IRanges` object with genomic locations by the `ranges()` method.
+
+    ```{r}
+    ranges(vcf)
+    ```
+    
+- Because these are all SNPs, all of the ranges are length 1.
+    
+- This information comes from the `POS` column of the VCF and the sequence of `REF`.
+
+## `info` slot
+
+- `DataFrame` object with information on each variant.
+
+    ```{r, eval = FALSE}
+    info(vcf)
+    ```
+
+- Each of those columns are a different INFO field described above.
+
+- You can get a description of the info fields by
+    ```{r}
+    info(header(vcf))
+    ```
+
+## `colData` slot
+
+- A `DataFrame` object describing sample information.
+
+    ```{r}
+    colData(vcf)
+    ```
+
+- Right now, this just has the sample number.
+
+- The `row.names` should be the names of the samples. These should be the same as the sample names from the `VCFHeader`.
+
+## `geno` slot
+
+- A `SimpleList` of matrix or array objects, containing the genotype data
+
+    ```{r}
+    geno(vcf)
+    ```
+
+- The different genotype data possible are described above.
+
+- In this example, we have fields GT (the genotype), DS (genotype dosage, aka posterior mean genotype), and GL (genotype likelihoods).
+
+- You can always get a description of the genotype fields with:
+
+    ```{r}
+    geno(header(vcf))
+    ```
+
+- You can access these different genotype fields by
+    ```{r, eval = FALSE}
+    geno(vcf)$GL
+    ```
+
+
+## Filtering
+
+- There are many operations available to filer loci using the `VCF` class.
+
+- Get first twenty rows:
+    ```{r, eval = FALSE}
+    dim(vcf)
+    vcf[1:20, ]
+    ```
+
+## Saving
+
+- Use `writeVcf()` to save a VCF file.
+
+## `{VariantAnnotation}` Exercises
+
+The data in the VCF file XYZ contain a very subset of the data from @euclide2020attack, downloaded from \<[doi:10.5061/dryad.3mq4631](https://doi.org/10.5061/dryad.3mq4631)\>. Let's use the `{VariantAnnotation}` package to play around with it.
+
+1. Read these data into R.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    vout <- readVcf("../data/wal_CF.vcf")
+    ```
+    
+2. Are all loci biallelic?
+
+    ```{r, eval = FALSE, echo = FALSE}
+    # yes
+    all(lengths(fixed(vout)$ALT) == 1)
+    ```
+
+3. It is common to filter out loci that have too low or too high an allele frequency. What proportion of loci have allele frequencies between 0.05 and 0.95. 
+
+    ```{r, eval = FALSE, echo = FALSE}
+    good_loc <- any(info(vout)$AF > 0.05 & info(vout)$AF < 0.95)
+    mean(good_loc) ## 0.996
+    ```
+
+4. Filter the loci so that you only have loci with allele frequencies between 0.05 and 0.95.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    vout2 <- vout[good_loc, ]
+    ```
+
+5. Recall that `AD` is a matrix list, where each element is a numeric vector containing the read depth for each allele for that individual at that locus. Create an integer matrix called `AA` that contains the read depth for just the alternative allele. Make sure column and row names match those of the other `geno` elements.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    AA <- sapply(geno(vout2)$AD, function(x) x[[2]])
+    dim(AA) <- dim(vout2)
+    rownames(AA) <- rownames(vout2)
+    colnames(AA) <- colnames(vout2)
+    ```
+
+6. If your `VCF` object is called `vcf_obj`, modify `geno(header(vcf_obj))` so that your genotype field now contains an `AA` element.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    # geno(header(vout2)) <- temp <- rbind(geno(header(vout2)), 
+    #                              DataFrame(Number = 1, 
+    #                                        Type = "Integer", 
+    #                                        Description = "Alternative Allele Depth"))
+    geno(vout2)$AA <- AA
+    ```
+
+7. Write your VCF object to a file called "vcf_new.vcf".
+
+    ```{r, eval = FALSE, echo = FALSE}
+    # writeVcf(obj = vout2, filename = "./vcf_new.vcf")
+    ```
+
+# References
+
+<!-- # Bioconductor File Structure -->
+
+<!-- - All class definitions in "R/AllClasses.R" -->
+<!-- - All generic function definitions in "R/AllGenerics.R" -->
+<!-- - Methods are defined in a file named by the generic function. For example, all `show` methods would go in "R/show-methods.R". -->

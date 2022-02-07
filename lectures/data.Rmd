@@ -8,6 +8,7 @@ output:
     toc_depth: 4
     toc_float: true
 urlcolor: "blue"
+bibliography: "./data/data_bib.bib"
 ---
 
 ```{r setup, include=FALSE}
@@ -17,5 +18,7 @@ knitr::opts_chunk$set(echo       = TRUE,
                       fig.align  = "center")
 ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
 ```
+
+- [wal_CF.vcf](./data/wal_CF.vcf): A small subset of the data from @euclide2020attack, downloaded from \<[doi:10.5061/dryad.3mq4631](https://doi.org/10.5061/dryad.3mq4631)\>. This is used in [S4 and Bioconductor](./05_bioconductor.html) to demonstrate the `{VariantAnnotation}` package.
 
 # References
