@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-02" />
+<meta name="date" content="2022-02-07" />
 
 <title>A Brief Overview of Metaprogramming</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">A Brief Overview of Metaprogramming</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-02</h4>
+<h4 class="date">2022-02-07</h4>
 
 </div>
 
@@ -367,7 +367,15 @@ $(document).ready(function () {
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#overview">Overview</a></li>
 <li><a href="#types-of-expressions">Types of Expressions</a></li>
+<li><a href="#capturing-code">Capturing Code</a>
+<ul>
+<li><a href="#evaluated-versus-quoted-arguments">Evaluated versus Quoted Arguments</a></li>
+<li><a href="#quosures">Quosures</a></li>
+</ul></li>
+<li><a href="#application-formulas">Application: Formulas</a></li>
 <li><a href="#application-capturing-argument-names">Application: Capturing Argument Names</a></li>
+<li><a href="#application-math-notation-in-plots">Application: Math Notation in Plots</a></li>
+<li><a href="#application-using-the-tidyverse-in-a-function">Application: Using the tidyverse in a function</a></li>
 <li><a href="#application-using-dplyr-style-code-on-new-classes.">Application: Using <code>dplyr</code> Style Code on New Classes.</a></li>
 <li><a href="#new-functions">New Functions</a></li>
 </ul>
@@ -393,7 +401,7 @@ $(document).ready(function () {
 <ul>
 <li><p>Metaprogramming refers to treating code as data. You can save code as a variable, modify the code with other code, then evaluate the code.</p></li>
 <li><p>In R, we call saved code <strong>expressions</strong>.</p></li>
-<li><p>You can use <code>rlang::expr()</code> to save an expression.</p>
+<li><p>You can use <code>rlang::expr()</code> to create an expression.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>my_exp <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(x <span class="sc">+</span> y)</span></code></pre></div></li>
 <li><p>The result is an expression of type <code>language</code></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(my_exp)</span></code></pre></div>
@@ -408,44 +416,419 @@ $(document).ready(function () {
 <pre><code>## [1] 21</code></pre></li>
 <li><p>The main ideas of metaprogramming:</p>
 <ol style="list-style-type: decimal">
-<li>Save source code as data</li>
+<li>Treat source code as data</li>
 <li>Possibly modify source code programattically,</li>
 <li>Evaluate source code in a given environment.</li>
 </ol></li>
+<li><p>R is one of the few popular languages that provides extensive support for metaprogramming, another one being <a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a> (and its children).</p></li>
+<li><p>We will use <code>{rlang}</code> for manipulating expressions.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rlang)</span></code></pre></div></li>
 </ul>
 </div>
 <div id="types-of-expressions" class="section level1">
 <h1>Types of Expressions</h1>
 <ul>
+<li><p>When <strong>constants</strong> are captured, they are just returned as the constant that they are.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="dv">2</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(x)</span></code></pre></div>
+<pre><code>## [1] &quot;double&quot;</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="st">&quot;two&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(y)</span></code></pre></div>
+<pre><code>## [1] &quot;character&quot;</code></pre></li>
 <li><p><strong>Symbols</strong> are names of objects.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(x)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">22</span>, <span class="dv">11</span>, <span class="dv">13</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>(y)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(x)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">22</span>, <span class="dv">11</span>, <span class="dv">13</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>(y)</span></code></pre></div>
 <pre><code>## [1] 22 11 13</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(y)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(y)</span></code></pre></div>
 <pre><code>## [1] &quot;symbol&quot;</code></pre></li>
 <li><p><strong>Calls</strong> are function calls. Base R calls these <strong>languages</strong>.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">sum</span>(x))</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>(y)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">sum</span>(x))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">22</span>, <span class="dv">11</span>, <span class="dv">13</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>(y)</span></code></pre></div>
 <pre><code>## [1] 46</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(y)</span></code></pre></div>
-<pre><code>## [1] &quot;language&quot;</code></pre></li>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(y)</span></code></pre></div>
+<pre><code>## [1] &quot;language&quot;</code></pre>
+<ul>
+<li><p>Calls act a lot like lists, where you can access arguments with list-like operators.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">f</span>(x, y))</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>fun</span></code></pre></div>
+<pre><code>## f(x, y)</code></pre></li>
+<li><p>The first element of a call is the function argument.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>fun[[<span class="dv">1</span>]]</span></code></pre></div>
+<pre><code>## f</code></pre></li>
+<li><p>Each additional element of a call is an argument.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>fun[[<span class="dv">2</span>]]</span></code></pre></div>
+<pre><code>## x</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>fun[[<span class="dv">3</span>]]</span></code></pre></div>
+<pre><code>## y</code></pre></li>
+<li><p>You can add new arguments by inserting <em>symbols</em>.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>fun[[<span class="dv">4</span>]] <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(z)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>fun</span></code></pre></div>
+<pre><code>## f(x, y, z)</code></pre></li>
+<li><p>You can make arguments have default values.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>fun<span class="sc">$</span>w <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>fun</span></code></pre></div>
+<pre><code>## f(x, y, z, w = 1)</code></pre></li>
+</ul></li>
+</ul>
+</div>
+<div id="capturing-code" class="section level1">
+<h1>Capturing Code</h1>
+<ul>
+<li><p>As we’ve seen, to capture code, use <code>rlang::expr()</code>.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>myexp <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(x <span class="sc">+</span> y)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>myexp</span></code></pre></div>
+<pre><code>## x + y</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>(<span class="at">expr =</span> myexp)</span></code></pre></div>
+<pre><code>## [1] 21</code></pre></li>
+<li><p>Capturing an expression directly from code is called <strong>quoting</strong> (e.g. from <code>rlang::expr()</code>).</p></li>
+<li><p>Converting a string to an expression is called <strong>parsing</strong> and can be done with <code>rlang::parse_expr()</code>.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>my_exp2 <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">parse_expr</span>(<span class="st">&quot;x + y&quot;</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>(my_exp2)</span></code></pre></div>
+<pre><code>## [1] 21</code></pre></li>
+<li><p>Converting code to a string is called <strong>deparsing</strong>. You do this with <code>rlang::expr_text()</code></p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr_text</span>(my_exp2)</span></code></pre></div>
+<pre><code>## [1] &quot;x + y&quot;</code></pre></li>
+<li><p>There is <strong>unquoting</strong>, where you selectively evaluate part of the expression. You use <code>!!</code> (pronounced “bang-bang”) to unquote. So below, <code>x</code> is unquoted.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(y <span class="sc">+</span> <span class="sc">!!</span>x)</span></code></pre></div>
+<pre><code>## y + 10</code></pre>
+<ul>
+<li>Though, <code>!!</code> is an invention of <code>{rlang}</code>, so if you use base R expression methods it won’t work.</li>
+</ul></li>
+<li><p>To capture function arguments as an expression, you have to use <code>rlang::enexpr()</code> (for “enrich expr()”).</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>capture_exp <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  newexp <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(<span class="at">arg =</span> x)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(newexp)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>abc <span class="ot">&lt;-</span> <span class="fu">capture_exp</span>(a <span class="sc">+</span> b <span class="sc">+</span> c)</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>abc</span></code></pre></div>
+<pre><code>## a + b + c</code></pre>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>(abc)</span></code></pre></div>
+<pre><code>## [1] 6</code></pre></li>
+<li><p>The reason is that if you use <code>rlang::expr(x)</code> it will just return the expression with <code>x</code>, not with the values of the argument that you pass it.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>capture_bad <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  newexp <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="at">expr =</span> x)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(newexp)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="fu">capture_bad</span>(a <span class="sc">+</span> b <span class="sc">+</span> c)</span></code></pre></div>
+<pre><code>## x</code></pre></li>
+<li><p>Use <code>rlang::enxprs()</code> to capture a list of all arguments in <code>...</code></p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>capall <span class="ot">&lt;-</span> <span class="cf">function</span>(...) {</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  all_args <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexprs</span>(...)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(all_args)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="fu">capall</span>(x <span class="sc">+</span> y, y <span class="sc">*</span> <span class="dv">2</span>)</span></code></pre></div>
+<pre><code>## [[1]]
+## x + y
+## 
+## [[2]]
+## y * 2</code></pre></li>
+</ul>
+<div id="evaluated-versus-quoted-arguments" class="section level2">
+<h2>Evaluated versus Quoted Arguments</h2>
+<ul>
+<li><p>Evaluated arguments are those whose values are used. E.g. in <code>sum(x)</code>, the <code>x</code> values are being used, but the variable name <code>x</code> is not.</p></li>
+<li><p>Quoted arguments are those where the code is used. E.g. in <code>library(rlang)</code> we use the code <code>rlang</code> and not the value that rlang binds to.</p></li>
+<li><p>Lots of dplyr functions use quoted arguments (where they use expressions in terms of variable names).</p></li>
+<li><p><strong>Exercise</strong>: Which are evaluated arguments and which are quoted arguments in the below function calls</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">filter</span>(mtcars, mpg <span class="sc">&gt;</span> <span class="dv">20</span>, wt <span class="sc">&gt;</span> <span class="dv">3</span>)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mtcars, <span class="fu">aes</span>(<span class="at">x =</span> wt, <span class="at">y =</span> mpg)) <span class="sc">+</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">col =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>mtcars<span class="sc">$</span>mpg</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>mtcars[[<span class="st">&quot;mpg&quot;</span>]]</span></code></pre></div></li>
+</ul>
+</div>
+<div id="quosures" class="section level2">
+<h2>Quosures</h2>
+<ul>
+<li><p>The <code>{rlang}</code> team made a new data object called a <strong>quosure</strong> (quoting closure) that bundles an expression with an environment. This makes it so that you do not have ambiguity when you evaluate an expression in a different environment where you have variable bindings.</p></li>
+<li><p>E.g. the following is presents an issue of the user wanting <code>a</code> to be 10 but we have <code>a</code> being 1000.</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(x)</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">eval</span>(x)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>(a <span class="sc">+</span> <span class="dv">1</span>)</span></code></pre></div>
+<pre><code>## [1] 1001</code></pre></li>
+<li><p>Using <code>rlang::enquo()</code> will create a “quosure” which also includes the function environment. You cannot use <code>base::eval()</code> with a quosure, so <code>{rlang}</code> provies <code>rlang::eval_tidy()</code>.</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enquo</span>(x)</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  rlang<span class="sc">::</span><span class="fu">eval_tidy</span>(x)</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>(a <span class="sc">+</span> <span class="dv">1</span>)</span></code></pre></div>
+<pre><code>## [1] 11</code></pre></li>
+</ul>
+</div>
+</div>
+<div id="application-formulas" class="section level1">
+<h1>Application: Formulas</h1>
+<ul>
+<li><p>Formulas are S3 objects built on expressions (specifically calls) that are used for data analysis.</p></li>
+<li><p>You can create a formula with <code>formula</code></p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>myform <span class="ot">&lt;-</span> <span class="fu">formula</span>(x <span class="sc">~</span> y)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(myform)</span></code></pre></div>
+<pre><code>## [1] &quot;language&quot;</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(myform)</span></code></pre></div>
+<pre><code>## [1] &quot;formula&quot;</code></pre>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">otype</span>(myform)</span></code></pre></div>
+<pre><code>## [1] &quot;S3&quot;</code></pre></li>
 </ul>
 </div>
 <div id="application-capturing-argument-names" class="section level1">
 <h1>Application: Capturing Argument Names</h1>
+<ul>
+<li><p>If we come up with a cool new plotting function, we might want to have the axis names match the variable names. But this does not occur with the naive approach.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>plot_red <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(x, y, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_red</span>(<span class="at">x =</span> mtcars<span class="sc">$</span>wt, <span class="at">y =</span> mtcars<span class="sc">$</span>mpg)</span></code></pre></div>
+<p><img src="06_meta_files/figure-html/unnamed-chunk-26-1.png" width="384" style="display: block; margin: auto;" /></p></li>
+<li><p>We can do better by using quoted arguments, instead of evaluated arguments.</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>plot_red <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  xexpr <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(x)</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  yexpr <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(y)</span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(x, y, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, </span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> rlang<span class="sc">::</span><span class="fu">expr_text</span>(xexpr), </span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab =</span> rlang<span class="sc">::</span><span class="fu">expr_text</span>(yexpr))</span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_red</span>(<span class="at">x =</span> mtcars<span class="sc">$</span>wt, <span class="at">y =</span> mtcars<span class="sc">$</span>mpg)</span></code></pre></div>
+<p><img src="06_meta_files/figure-html/unnamed-chunk-27-1.png" width="384" style="display: block; margin: auto;" /></p></li>
+<li><p>But we can do even better than that by also having the user provide the data</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>plot_red <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, data) {</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  xexpr <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(x)</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  yexpr <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(y)</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="at">x =</span> data[[xexpr]], </span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> data[[yexpr]], </span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, </span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> rlang<span class="sc">::</span><span class="fu">expr_text</span>(xexpr), </span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab =</span> rlang<span class="sc">::</span><span class="fu">expr_text</span>(yexpr))</span>
+<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb64-10"><a href="#cb64-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_red</span>(<span class="at">x =</span> wt, <span class="at">y =</span> mpg, <span class="at">data =</span> mtcars)</span></code></pre></div>
+<p><img src="06_meta_files/figure-html/unnamed-chunk-28-1.png" width="384" style="display: block; margin: auto;" /></p></li>
+<li><p>This works because you can subset by an expression as well</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>mtcars[[rlang<span class="sc">::</span><span class="fu">expr</span>(mpg)]]</span></code></pre></div>
+<pre><code>##  [1] 21.0 21.0 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 17.8 16.4 17.3 15.2 10.4
+## [16] 10.4 14.7 32.4 30.4 33.9 21.5 15.5 15.2 13.3 19.2 27.3 26.0 30.4 15.8 19.7
+## [31] 15.0 21.4</code></pre></li>
+</ul>
+</div>
+<div id="application-math-notation-in-plots" class="section level1">
+<h1>Application: Math Notation in Plots</h1>
+<ul>
+<li><p>R has its own weird syntax for plotting mathematical equations.</p></li>
+<li><p>See the following help file for a full description:</p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>?plotmath</span></code></pre></div></li>
+<li><p>R uses <code>expression</code>s to implement mathematical notation in R.</p></li>
+<li><p>E.g. to write the following in R math</p>
+<p><span class="math display">\[
+  \sum_{i=1}^\infty x_i^2 + \beta_1
+  \]</span></p>
+<p>we would first create an expression using the R math notation:</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>mathexp <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">sum</span>(x[i]<span class="sc">^</span><span class="dv">2</span>, i <span class="sc">==</span> <span class="dv">1</span>, infinity) <span class="sc">+</span> beta[<span class="dv">1</span>])</span></code></pre></div></li>
+<li><p>You can then use that expression in <code>geom_text()</code> or <code>xlab()</code> or whatever.</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.new</span>()</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="at">x =</span> <span class="fl">0.5</span>, <span class="at">y =</span> <span class="fl">0.5</span>, <span class="at">labels =</span> mathexp, <span class="at">cex =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="06_meta_files/figure-html/unnamed-chunk-32-1.png" width="384" style="display: block; margin: auto;" /></p></li>
+<li><p>What if you want to place the estimated slope of a regression on a graph?</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>pl <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mtcars, <span class="fu">aes</span>(<span class="at">x =</span> wt, <span class="at">y =</span> mpg)) <span class="sc">+</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>)</span></code></pre></div></li>
+<li><p>First, we calculate the OLS estimates:</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>lmout <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>coefvec <span class="ot">&lt;-</span> <span class="fu">coef</span>(lmout)</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>coefvec</span></code></pre></div>
+<pre><code>## (Intercept)          wt 
+##      37.285      -5.344</code></pre></li>
+<li><p>We could add the equation manually</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>mathexp <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">hat</span>(y)[i] <span class="sc">==</span> <span class="fl">37.2</span> <span class="sc">-</span> <span class="fl">5.3</span> <span class="sc">*</span> x[i])</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>pl <span class="sc">+</span> <span class="fu">annotate</span>(<span class="at">geom =</span> <span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="fl">4.5</span>, <span class="at">y =</span> <span class="dv">30</span>, <span class="at">label =</span> mathexp)</span></code></pre></div>
+<p><img src="06_meta_files/figure-html/unnamed-chunk-35-1.png" width="384" style="display: block; margin: auto;" /></p></li>
+<li><p>However, this is prone to error (e.g., did you notice that I incorrectly rounded down to 37.2?)</p></li>
+<li><p>Just including the coefficient vectors won’t work.</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>mathexp <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">hat</span>(y)[i] <span class="sc">==</span> coefvec[[<span class="dv">1</span>]] <span class="sc">-</span> coefvec[[<span class="dv">2</span>]] <span class="sc">*</span> x[i])</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>pl <span class="sc">+</span> <span class="fu">annotate</span>(<span class="at">geom =</span> <span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="fl">4.5</span>, <span class="at">y =</span> <span class="dv">30</span>, <span class="at">label =</span> mathexp)</span></code></pre></div>
+<p><img src="06_meta_files/figure-html/unnamed-chunk-36-1.png" width="384" style="display: block; margin: auto;" /></p></li>
+<li><p>Unquoting to the rescue! Just use <code>!!</code>.</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>mathexp <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">hat</span>(y)[i] <span class="sc">==</span> <span class="sc">!!</span>coefvec[[<span class="dv">1</span>]] <span class="sc">-</span> <span class="sc">!!</span>coefvec[[<span class="dv">2</span>]] <span class="sc">*</span> x[i])</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>pl <span class="sc">+</span> <span class="fu">annotate</span>(<span class="at">geom =</span> <span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="fl">4.5</span>, <span class="at">y =</span> <span class="dv">30</span>, <span class="at">label =</span> mathexp)</span></code></pre></div>
+<p><img src="06_meta_files/figure-html/unnamed-chunk-37-1.png" width="384" style="display: block; margin: auto;" /></p></li>
+</ul>
+</div>
+<div id="application-using-the-tidyverse-in-a-function" class="section level1">
+<h1>Application: Using the tidyverse in a function</h1>
+<ul>
+<li><p>What if you want to create an awesome <code>{ggplot2}</code> function that allows the user to insert a data frame and output a simple scatterplot with red points. We will fill in the skeleton below.</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>plot_red <span class="ot">&lt;-</span> <span class="cf">function</span>(.data, var1, var2) {</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>If we want the user to not have to use strings for the variable names, then we need to capture those arguments</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>plot_red <span class="ot">&lt;-</span> <span class="cf">function</span>(.data, var1, var2) {</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  var1 <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(var1)</span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>  var2 <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(var2)</span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>But if we were to just put <code>var1</code> and <code>var2</code> into <code>{ggplot}</code>, then <code>{ggplot}</code> would interpret that as trying to find a variable litterally called <code>var1</code> and <code>var2</code> in <code>.data</code>. So we need to then unquote <code>var1</code> and <code>var2</code> in <code>ggplot()</code>.</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>plot_red <span class="ot">&lt;-</span> <span class="cf">function</span>(.data, var1, var2) {</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>  var1 <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(var1)</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>  var2 <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(var2)</span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(.data, <span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">!!</span>var1, <span class="at">y =</span> <span class="sc">!!</span>var2)) <span class="sc">+</span></span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">col =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
+<li><p>This works now</p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_red</span>(<span class="at">.data =</span> mtcars, <span class="at">var1 =</span> wt, <span class="at">var2 =</span> mpg)</span></code></pre></div>
+<p><img src="06_meta_files/figure-html/unnamed-chunk-41-1.png" width="384" style="display: block; margin: auto;" /></p></li>
+<li><p>Remember that the tidyverse mostly uses quoted arguments, not evaluated arguments, when choosing variable names. So this way of quoting and unquoting is common when coding using tidyverse functions.</p></li>
+<li><p>This also shows up in Shiny apps when you use <code>varSelectInput()</code>.</p></li>
+</ul>
 </div>
 <div id="application-using-dplyr-style-code-on-new-classes." class="section level1">
 <h1>Application: Using <code>dplyr</code> Style Code on New Classes.</h1>
 <ul>
-<li>Suppose we have</li>
+<li><p>In <code>eval()</code>, you can use a <code>data.frame</code> as the environment instead of an <code>environment</code> object. This is called <strong>data masking</strong></p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>(<span class="at">expr =</span> rlang<span class="sc">::</span><span class="fu">expr</span>(mpg <span class="sc">/</span> wt), <span class="at">envir =</span> mtcars)</span></code></pre></div>
+<pre><code>##  [1]  8.015  7.304  9.828  6.656  5.436  5.231  4.006  7.649  7.238  5.581
+## [11]  5.174  4.029  4.638  4.021  1.981  1.917  2.750 14.727 18.824 18.474
+## [21]  8.722  4.403  4.425  3.464  4.993 14.109 12.150 20.093  4.984  7.112
+## [31]  4.202  7.698</code></pre></li>
+<li><p>This allows you to make tidyverse style functions without dependencies on the tidyverse.</p></li>
+<li><p>Some folks have explored this <a href="https://github.com/yonicd/bplyr">to the extreme</a>.</p></li>
+<li><p>E.g. here is a variation of <code>dplyr::filter()</code> that only has a dependency on <code>{rlang}</code> (though, maybe not as safe as <code>dplyr::filter()</code> for some corner cases)</p>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param .data A data.frame.</span></span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param e An expression.</span></span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>my_filter <span class="ot">&lt;-</span> <span class="cf">function</span>(.data, e) {</span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>  e <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(<span class="at">arg =</span> e)</span>
+<span id="cb82-5"><a href="#cb82-5" aria-hidden="true" tabindex="-1"></a>  .data[<span class="fu">eval</span>(<span class="at">expr =</span> e, <span class="at">envir =</span> .data), , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb82-6"><a href="#cb82-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb82-7"><a href="#cb82-7" aria-hidden="true" tabindex="-1"></a><span class="fu">my_filter</span>(mtcars, mpg <span class="sc">&gt;</span> <span class="dv">30</span>)</span></code></pre></div>
+<pre><code>##                 mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Fiat 128       32.4   4 78.7  66 4.08 2.200 19.47  1  1    4    1
+## Honda Civic    30.4   4 75.7  52 4.93 1.615 18.52  1  1    4    2
+## Toyota Corolla 33.9   4 71.1  65 4.22 1.835 19.90  1  1    4    1
+## Lotus Europa   30.4   4 95.1 113 3.77 1.513 16.90  1  1    5    2</code></pre></li>
+<li><p>Your aren’t going to be using this filter function in real data analysis. But this style of metaprogramming is useful if you have an S3/S4 object and you want to provide <code>{dplyr}</code> style functionality.</p></li>
+<li><p>E.g., let’s create a class of two data frames where they are connected by a common key</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setClass</span>(</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;cdf&quot;</span>, </span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">slots =</span> <span class="fu">c</span>(</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">df1 =</span> <span class="st">&quot;data.frame&quot;</span>, </span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">df2 =</span> <span class="st">&quot;data.frame&quot;</span>, </span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">key =</span> <span class="st">&quot;character&quot;</span></span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb84-8"><a href="#cb84-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">prototype =</span> <span class="fu">list</span>(</span>
+<span id="cb84-9"><a href="#cb84-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">df1 =</span> <span class="fu">data.frame</span>(),</span>
+<span id="cb84-10"><a href="#cb84-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">df2 =</span> <span class="fu">data.frame</span>(),</span>
+<span id="cb84-11"><a href="#cb84-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">key =</span> <span class="fu">character</span>()</span>
+<span id="cb84-12"><a href="#cb84-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb84-13"><a href="#cb84-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb84-14"><a href="#cb84-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-15"><a href="#cb84-15" aria-hidden="true" tabindex="-1"></a><span class="fu">setValidity</span>(</span>
+<span id="cb84-16"><a href="#cb84-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">Class =</span> <span class="st">&quot;cdf&quot;</span>, </span>
+<span id="cb84-17"><a href="#cb84-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="cf">function</span>(object) {</span>
+<span id="cb84-18"><a href="#cb84-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">length</span>(object<span class="sc">@</span>key) <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> <span class="fu">ncol</span>(object<span class="sc">@</span>df1) <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> <span class="fu">ncol</span>(object<span class="sc">@</span>df2) <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb84-19"><a href="#cb84-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="cn">TRUE</span>)</span>
+<span id="cb84-20"><a href="#cb84-20" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> <span class="cf">if</span> (<span class="fu">length</span>(object<span class="sc">@</span>key) <span class="sc">&gt;</span> <span class="dv">1</span>) {</span>
+<span id="cb84-21"><a href="#cb84-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="st">&quot;key needs to be length 1&quot;</span>)</span>
+<span id="cb84-22"><a href="#cb84-22" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> <span class="cf">if</span> (<span class="sc">!</span>(object<span class="sc">@</span>key <span class="sc">%in%</span> <span class="fu">names</span>(object<span class="sc">@</span>df1))) {</span>
+<span id="cb84-23"><a href="#cb84-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="st">&quot;key needs to be a column in df1&quot;</span>)</span>
+<span id="cb84-24"><a href="#cb84-24" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> <span class="cf">if</span> (<span class="sc">!</span>(object<span class="sc">@</span>key <span class="sc">%in%</span> <span class="fu">names</span>(object<span class="sc">@</span>df1))) {</span>
+<span id="cb84-25"><a href="#cb84-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="st">&quot;key needs to be a column in df2&quot;</span>)</span>
+<span id="cb84-26"><a href="#cb84-26" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb84-27"><a href="#cb84-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="cn">TRUE</span>)</span>
+<span id="cb84-28"><a href="#cb84-28" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb84-29"><a href="#cb84-29" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb84-30"><a href="#cb84-30" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## Class &quot;cdf&quot; [in &quot;.GlobalEnv&quot;]
+## 
+## Slots:
+##                                        
+## Name:         df1        df2        key
+## Class: data.frame data.frame  character</code></pre>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;show&quot;</span>, </span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(object) {</span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str</span>(object<span class="sc">@</span>key)</span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str</span>(object<span class="sc">@</span>df1)</span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str</span>(object<span class="sc">@</span>df2)</span>
+<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb86-10"><a href="#cb86-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p>We can try this out on the <code>nycflights13</code> dataset.</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nycflights13)</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>mydf2 <span class="ot">&lt;-</span> <span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;cdf&quot;</span>, <span class="at">df1 =</span> flights, <span class="at">df2 =</span> planes, <span class="at">key =</span> <span class="st">&quot;tailnum&quot;</span>)</span></code></pre></div></li>
+<li><p>Let’s create a <code>filter_df2()</code> method that, when applied, will also remove all rows from <code>df1</code> that have the keys that were removed from <code>df2</code></p>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setGeneric</span>(<span class="at">name =</span> <span class="st">&quot;filter_df2&quot;</span>, <span class="at">def =</span> <span class="cf">function</span>(obj, expr) <span class="fu">standardGeneric</span>(<span class="st">&quot;filter_df2&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] &quot;filter_df2&quot;</code></pre>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setMethod</span>(</span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;filter_df2&quot;</span>, </span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;cdf&quot;</span>, </span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(obj, expr) {</span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>    expr <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">enexpr</span>(expr)</span>
+<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>    logvec_df2 <span class="ot">&lt;-</span> <span class="fu">eval</span>(<span class="at">expr =</span> expr, <span class="at">envir =</span> obj<span class="sc">@</span>df2)</span>
+<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>    which_key <span class="ot">&lt;-</span> obj<span class="sc">@</span>df2[[obj<span class="sc">@</span>key]][logvec_df2]</span>
+<span id="cb90-8"><a href="#cb90-8" aria-hidden="true" tabindex="-1"></a>    logvec_df1 <span class="ot">&lt;-</span> obj<span class="sc">@</span>df1[[obj<span class="sc">@</span>key]] <span class="sc">%in%</span> which_key</span>
+<span id="cb90-9"><a href="#cb90-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-10"><a href="#cb90-10" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">@</span>df1 <span class="ot">&lt;-</span> obj<span class="sc">@</span>df1[logvec_df1, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb90-11"><a href="#cb90-11" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">@</span>df2 <span class="ot">&lt;-</span> obj<span class="sc">@</span>df2[logvec_df2, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb90-12"><a href="#cb90-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(obj)</span>
+<span id="cb90-13"><a href="#cb90-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb90-14"><a href="#cb90-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+<li><p>Let’s try it out</p>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter_df2</span>(<span class="at">obj =</span> mydf2, tailnum <span class="sc">==</span> <span class="st">&quot;N105UW&quot;</span>)</span></code></pre></div>
+<pre><code>##  chr &quot;tailnum&quot;
+## 
+## tibble [45 × 19] (S3: tbl_df/tbl/data.frame)
+##  $ year          : int [1:45] 2013 2013 2013 2013 2013 2013 2013 2013 2013 2013 ...
+##  $ month         : int [1:45] 10 10 10 11 11 11 11 12 12 12 ...
+##  $ day           : int [1:45] 22 25 27 14 21 23 24 9 11 17 ...
+##  $ dep_time      : int [1:45] 1312 1311 1543 1228 1549 1457 827 1159 1602 1152 ...
+##  $ sched_dep_time: int [1:45] 1315 1315 1545 1200 1544 1500 825 1200 1544 1200 ...
+##  $ dep_delay     : num [1:45] -3 -4 -2 28 5 -3 2 -1 18 -8 ...
+##  $ arr_time      : int [1:45] 1458 1459 1747 1408 1752 1647 1029 1439 1848 1408 ...
+##  $ sched_arr_time: int [1:45] 1505 1505 1751 1359 1750 1656 1029 1400 1750 1400 ...
+##  $ arr_delay     : num [1:45] -7 -6 -4 9 2 -9 0 39 58 8 ...
+##  $ carrier       : chr [1:45] &quot;US&quot; &quot;US&quot; &quot;US&quot; &quot;US&quot; ...
+##  $ flight        : int [1:45] 2095 2095 1767 2069 1767 1834 2053 2069 1767 2069 ...
+##  $ tailnum       : chr [1:45] &quot;N105UW&quot; &quot;N105UW&quot; &quot;N105UW&quot; &quot;N105UW&quot; ...
+##  $ origin        : chr [1:45] &quot;EWR&quot; &quot;EWR&quot; &quot;LGA&quot; &quot;JFK&quot; ...
+##  $ dest          : chr [1:45] &quot;CLT&quot; &quot;CLT&quot; &quot;CLT&quot; &quot;CLT&quot; ...
+##  $ air_time      : num [1:45] 88 82 80 80 86 95 99 102 100 93 ...
+##  $ distance      : num [1:45] 529 529 544 541 544 529 541 541 544 541 ...
+##  $ hour          : num [1:45] 13 13 15 12 15 15 8 12 15 12 ...
+##  $ minute        : num [1:45] 15 15 45 0 44 0 25 0 44 0 ...
+##  $ time_hour     : POSIXct[1:45], format: &quot;2013-10-22 13:00:00&quot; &quot;2013-10-25 13:00:00&quot; ...
+## 
+## tibble [1 × 9] (S3: tbl_df/tbl/data.frame)
+##  $ tailnum     : chr &quot;N105UW&quot;
+##  $ year        : int 1999
+##  $ type        : chr &quot;Fixed wing multi engine&quot;
+##  $ manufacturer: chr &quot;AIRBUS INDUSTRIE&quot;
+##  $ model       : chr &quot;A320-214&quot;
+##  $ engines     : int 2
+##  $ seats       : int 182
+##  $ speed       : int NA
+##  $ engine      : chr &quot;Turbo-fan&quot;</code></pre></li>
 </ul>
 </div>
 <div id="new-functions" class="section level1">
 <h1>New Functions</h1>
 <ul>
 <li><code>rlang::expr()</code>: Create an expression.</li>
-<li><code>base::eval()</code>: Evaluate an epxression.</li>
+<li><code>base::eval()</code>: Evaluate an expression.</li>
 </ul>
 </div>
 

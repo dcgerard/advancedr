@@ -35,12 +35,12 @@ klippy::klippy()
 
 - In R, we call saved code **expressions**.
 
-- You can use `rlang::expr()` to save an expression.
+- You can use `rlang::expr()` to create an expression.
 
     ```{r}
     my_exp <- rlang::expr(x + y)
     ```
-
+    
 - The result is an expression of type `language`
     ```{r}
     typeof(my_exp)
@@ -50,7 +50,6 @@ klippy::klippy()
     ```{r}
     my_exp
     ```
-
 - We can **evaluate** it (make the code run and provide a result) with `base::eval()`
 
     ```{r}
@@ -60,11 +59,28 @@ klippy::klippy()
     ```
 
 - The main ideas of metaprogramming:
-  1. Save source code as data
+  1. Treat source code as data
   2. Possibly modify source code programattically,
   3. Evaluate source code in a given environment.
   
+- R is one of the few popular languages that provides extensive support for metaprogramming, another one being [Lisp](https://en.wikipedia.org/wiki/Lisp_(programming_language)) (and its children).
+
+- We will use `{rlang}` for manipulating expressions.
+    
+    ```{r}
+    library(rlang)
+    ```
+  
 # Types of Expressions
+
+- When **constants** are captured, they are just returned as the constant that they are.
+
+    ```{r}
+    x <- rlang::expr(2)
+    typeof(x)
+    y <- rlang::expr("two")
+    typeof(y)
+    ```
 
 - **Symbols** are names of objects.
 
@@ -78,19 +94,439 @@ klippy::klippy()
 - **Calls** are function calls. Base R calls these **languages**.
     ```{r}
     y <- rlang::expr(sum(x))
+    x <- c(22, 11, 13)
     eval(y)
     typeof(y)
     ```
+    - Calls act a lot like lists, where you can access arguments with list-like operators.
+        ```{r}
+        fun <- rlang::expr(f(x, y))
+        fun
+        ```
+    - The first element of a call is the function argument.
+        ```{r}
+        fun[[1]]
+        ```
+    - Each additional element of a call is an argument.
+        ```{r}
+        fun[[2]]
+        fun[[3]]
+        ```
+    - You can add new arguments by inserting *symbols*.
+        ```{r}
+        fun[[4]] <- rlang::expr(z)
+        fun
+        ```
+    - You can make arguments have default values.
+        ```{r}
+        fun$w <- 1
+        fun
+        ```
+  
+# Capturing Code
+
+- As we've seen, to capture code, use `rlang::expr()`.
+
+    ```{r}
+    x <- 10
+    y <- 11
+    myexp <- rlang::expr(x + y)
+    myexp
+    eval(expr = myexp)
+    ```
+    
+- Capturing an expression directly from code is called **quoting** (e.g. from `rlang::expr()`).
+
+- Converting a string to an expression is called **parsing** and can be done with `rlang::parse_expr()`.
+
+    ```{r}
+    my_exp2 <- rlang::parse_expr("x + y")
+    eval(my_exp2)
+    ```
+    
+- Converting code to a string is called **deparsing**. You do this with `rlang::expr_text()`
+    ```{r}
+    rlang::expr_text(my_exp2)
+    ```
+    
+- There is **unquoting**, where you selectively evaluate part of the expression. You use `!!` (pronounced "bang-bang") to unquote. So below, `x` is unquoted.
+
+    ```{r}
+    x <- 10
+    y <- 11
+    rlang::expr(y + !!x)
+    ```
+    
+    - Though, `!!` is an invention of `{rlang}`, so if you use base R expression methods it won't work.
+
+- To capture function arguments as an expression, you have to use `rlang::enexpr()` (for "enrich expr()").
+
+    ```{r}
+    capture_exp <- function(x) {
+      newexp <- rlang::enexpr(arg = x)
+      return(newexp)
+    }
+    abc <- capture_exp(a + b + c)
+    abc
+    
+    a <- 1
+    b <- 2
+    c <- 3
+    eval(abc)
+    ```
+
+- The reason is that if you use `rlang::expr(x)` it will just return the expression with `x`, not with the values of the argument that you pass it.
+
+    ```{r}
+    capture_bad <- function(x) {
+      newexp <- rlang::expr(expr = x)
+      return(newexp)
+    }
+    capture_bad(a + b + c)
+    ```
+    
+- Use `rlang::enxprs()` to capture a list of all arguments in `...`
+    ```{r}
+    capall <- function(...) {
+      all_args <- rlang::enexprs(...)
+      return(all_args)
+    }
+    capall(x + y, y * 2)
+    ```
+
+## Evaluated versus Quoted Arguments
+
+- Evaluated arguments are those whose values are used. E.g. in `sum(x)`, the `x` values are being used, but the variable name `x` is not.
+
+- Quoted arguments are those where the code is used. E.g. in `library(rlang)` we use the code `rlang` and not the value that rlang binds to.
+
+- Lots of dplyr functions use quoted arguments (where they use expressions in terms of variable names).
+
+- **Exercise**: Which are evaluated arguments and which are quoted arguments in the below function calls
+    ```{r, eval = FALSE}
+    dplyr::filter(mtcars, mpg > 20, wt > 3)
+    
+    ggplot(mtcars, aes(x = wt, y = mpg)) +
+      geom_point(col = "red")
+    
+    mtcars$mpg
+    
+    mtcars[["mpg"]]
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    1. `mtcars` is evaluated. `mpg > 20` and `wt > 3` are both quoted.
+    
+    2. `mtcars` is evaluated. `wt` and `mpg` are quoted. I think `aes(x = wt, y = mpg)` is evaluated since it works outside of the function call.
+    
+    3. `mtcars` is evaluated, `mpg` is quoted. To see this, consider `` `$`(mtcars, mpg) ``.
+    
+    4. Both `mtcars` and `"mpg"` are evaluated. To see this, consider `` `[[`(mtcars, "mpg") ``.
+    ```
+  
+
+## Quosures
+
+- The `{rlang}` team made a new data object called a **quosure** (quoting closure) that bundles an expression with an environment. This makes it so that you do not have ambiguity when you evaluate an expression in a different environment where you have variable bindings. 
+
+- E.g. the following is presents an issue of the user wanting `a` to be 10 but we have `a` being 1000.
+
+    ```{r}
+    fun <- function(x) {
+      a <- 1000
+      x <- rlang::enexpr(x)
+      eval(x)
+    }
+    a <- 10
+    fun(a + 1)
+    ```
+
+- Using `rlang::enquo()` will create a "quosure" which also includes the function environment. You cannot use `base::eval()` with a quosure, so `{rlang}` provies `rlang::eval_tidy()`.
+    ```{r}
+    fun <- function(x) {
+      a <- 1000
+      x <- rlang::enquo(x)
+      rlang::eval_tidy(x)
+    }
+    a <- 10
+    fun(a + 1)
+    ```
+
+  
+# Application: Formulas
+
+- Formulas are S3 objects built on expressions (specifically calls) that are used for data analysis.
+
+- You can create a formula with `formula`
+
+    ```{r}
+    myform <- formula(x ~ y)
+    typeof(myform)
+    class(myform)
+    sloop::otype(myform)
+    ```
+
   
 # Application: Capturing Argument Names
 
-# Application: Formulas
+- If we come up with a cool new plotting function, we might want to have the axis names match the variable names. But this does not occur with the naive approach.
 
-# Application: Math Notation in Titles
+    ```{r}
+    plot_red <- function(x, y) {
+      plot(x, y, col = "red")
+    }
+    plot_red(x = mtcars$wt, y = mtcars$mpg)
+    ```
+
+
+- We can do better by using quoted arguments, instead of evaluated arguments.
+
+    ```{r}
+    plot_red <- function(x, y) {
+      xexpr <- rlang::enexpr(x)
+      yexpr <- rlang::enexpr(y)
+      plot(x, y, col = "red", 
+           xlab = rlang::expr_text(xexpr), 
+           ylab = rlang::expr_text(yexpr))
+    }
+    plot_red(x = mtcars$wt, y = mtcars$mpg)
+    ```
+
+- But we can do even better than that by also having the user provide the data
+
+    ```{r}
+    plot_red <- function(x, y, data) {
+      xexpr <- rlang::enexpr(x)
+      yexpr <- rlang::enexpr(y)
+      plot(x = data[[xexpr]], 
+           y = data[[yexpr]], 
+           col = "red", 
+           xlab = rlang::expr_text(xexpr), 
+           ylab = rlang::expr_text(yexpr))
+    }
+    plot_red(x = wt, y = mpg, data = mtcars)
+    ```
+
+- This works because you can subset by an expression as well
+    ```{r}
+    mtcars[[rlang::expr(mpg)]]
+    ```
+
+# Application: Math Notation in Plots
+
+- R has its own weird syntax for plotting mathematical equations. 
+
+- See the following help file for a full description:
+
+    ```{r, eval = FALSE}
+    ?plotmath
+    ```
+    
+- R uses `expression`s to implement mathematical notation in R.
+    
+- E.g. to write the following in R math
+
+    $$
+    \sum_{i=1}^\infty x_i^2 + \beta_1
+    $$
+
+    we would first create an expression using the R math notation:
+    ```{r}
+    mathexp <- rlang::expr(sum(x[i]^2, i == 1, infinity) + beta[1])
+    ```
+
+- You can then use that expression in `geom_text()` or `xlab()` or whatever.
+    ```{r}
+    plot.new()
+    text(x = 0.5, y = 0.5, labels = mathexp, cex = 2)
+    ```
+    
+
+- What if you want to place the estimated slope of a regression on a graph?
+
+    ```{r}
+    library(ggplot2)
+    pl <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+      geom_point() +
+      geom_smooth(method = "lm", se = FALSE)
+    ```
+
+- First, we calculate the OLS estimates:
+    ```{r}
+    lmout <- lm(mpg ~ wt, data = mtcars)
+    coefvec <- coef(lmout)
+    coefvec
+    ```
+
+- We could add the equation manually
+    ```{r, warning=FALSE, message=FALSE}
+    mathexp <- rlang::expr(hat(y)[i] == 37.2 - 5.3 * x[i])
+    pl + annotate(geom = "text", x = 4.5, y = 30, label = mathexp)
+    ```
+
+- However, this is prone to error (e.g., did you notice that I incorrectly rounded down to 37.2?)
+
+- Just including the coefficient vectors won't work.
+    ```{r, warning = FALSE, message = FALSE}
+    mathexp <- rlang::expr(hat(y)[i] == coefvec[[1]] - coefvec[[2]] * x[i])
+    pl + annotate(geom = "text", x = 4.5, y = 30, label = mathexp)
+    ```
+
+- Unquoting to the rescue! Just use `!!`.
+
+    ```{r, warning = FALSE, message = FALSE}
+    mathexp <- rlang::expr(hat(y)[i] == !!coefvec[[1]] - !!coefvec[[2]] * x[i])
+    pl + annotate(geom = "text", x = 4.5, y = 30, label = mathexp)
+    ```
+    
+# Application: Using the tidyverse in a function
+
+- What if you want to create an awesome `{ggplot2}` function that allows the user to insert a data frame and output a simple scatterplot with red points. We will fill in the skeleton below.
+
+    ```{r}
+    plot_red <- function(.data, var1, var2) {
+
+    }
+    ```
+
+- If we want the user to not have to use strings for the variable names, then we need to capture those arguments
+
+    ```{r}
+    plot_red <- function(.data, var1, var2) {
+      var1 <- rlang::enexpr(var1)
+      var2 <- rlang::enexpr(var2)
+    }
+    ```
+
+- But if we were to just put `var1` and `var2` into `{ggplot}`, then `{ggplot}` would interpret that as trying to find a variable litterally called `var1` and `var2` in `.data`. So we need to then unquote `var1` and `var2` in `ggplot()`.
+
+    ```{r}
+    plot_red <- function(.data, var1, var2) {
+      var1 <- rlang::enexpr(var1)
+      var2 <- rlang::enexpr(var2)
+      ggplot(.data, aes(x = !!var1, y = !!var2)) +
+        geom_point(col = "red")
+    }
+    ```
+
+- This works now
+
+    ```{r, erro = TRUE}
+    plot_red(.data = mtcars, var1 = wt, var2 = mpg)
+    ```
+
+- Remember that the tidyverse mostly uses quoted arguments, not evaluated arguments, when choosing variable names. So this way of quoting and unquoting is common when coding using tidyverse functions.
+
+- This also shows up in Shiny apps when you use `varSelectInput()`.
 
 # Application: Using `dplyr` Style Code on New Classes.
 
-- Suppose we have 
+- In `eval()`, you can use a `data.frame` as the environment instead of an `environment` object. This is called **data masking**
+
+    ```{r}
+    eval(expr = rlang::expr(mpg / wt), envir = mtcars)
+    ```
+
+- This allows you to make tidyverse style functions without dependencies on the tidyverse.
+
+- Some folks have explored this [to the extreme](https://github.com/yonicd/bplyr).
+
+- E.g. here is a variation of `dplyr::filter()` that only has a dependency on `{rlang}` (though, maybe not as safe as `dplyr::filter()` for some corner cases)
+
+    ```{r}
+    #' @param .data A data.frame.
+    #' @param e An expression.
+    my_filter <- function(.data, e) {
+      e <- rlang::enexpr(arg = e)
+      .data[eval(expr = e, envir = .data), , drop = FALSE]
+    }
+    my_filter(mtcars, mpg > 30)
+    ```
+
+- Your aren't going to be using this filter function in real data analysis. But this style of metaprogramming is useful if you have an S3/S4 object and you want to provide `{dplyr}` style functionality.
+
+- E.g., let's create a class of two data frames where they are connected by a common key
+
+    ```{r}
+    setClass(
+      Class = "cdf", 
+      slots = c(
+        df1 = "data.frame", 
+        df2 = "data.frame", 
+        key = "character"
+      ),
+      prototype = list(
+        df1 = data.frame(),
+        df2 = data.frame(),
+        key = character()
+      )
+    )
+    
+    setValidity(
+      Class = "cdf", 
+      method = function(object) {
+        if (length(object@key) == 0 & ncol(object@df1) == 0 & ncol(object@df2) == 0) {
+          return(TRUE)
+        } else if (length(object@key) > 1) {
+          return("key needs to be length 1")
+        } else if (!(object@key %in% names(object@df1))) {
+          return("key needs to be a column in df1")
+        } else if (!(object@key %in% names(object@df1))) {
+          return("key needs to be a column in df2")
+        } else {
+          return(TRUE)
+        }
+      }
+    )
+    
+    setMethod(
+      f = "show", 
+      definition = function(object) {
+        str(object@key)
+        cat("\n")
+        str(object@df1)
+        cat("\n")
+        str(object@df2)
+      }
+    )
+    ```
+
+- We can try this out on the `nycflights13` dataset.
+    ```{r}
+    library(nycflights13)
+    mydf2 <- new(Class = "cdf", df1 = flights, df2 = planes, key = "tailnum")
+    ```
+
+- Let's create a `filter_df2()` method that, when applied, will also remove all rows from `df1` that have the keys that were removed from `df2`
+
+    ```{r}
+    setGeneric(name = "filter_df2", def = function(obj, expr) standardGeneric("filter_df2"))
+    ```
+    
+    ```{r}
+    setMethod(
+      f = "filter_df2", 
+      signature = "cdf", 
+      definition = function(obj, expr) {
+        expr <- rlang::enexpr(expr)
+        logvec_df2 <- eval(expr = expr, envir = obj@df2)
+        which_key <- obj@df2[[obj@key]][logvec_df2]
+        logvec_df1 <- obj@df1[[obj@key]] %in% which_key
+        
+        obj@df1 <- obj@df1[logvec_df1, , drop = FALSE]
+        obj@df2 <- obj@df2[logvec_df2, , drop = FALSE]
+        return(obj)
+      }
+    )
+    ```
+
+
+- Let's try it out
+
+    ```{r}
+    filter_df2(obj = mydf2, tailnum == "N105UW")
+    ```
+
 
 # New Functions
 
