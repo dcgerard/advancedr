@@ -447,6 +447,14 @@ klippy::klippy()
 
 - `POSIXlt` is a named list of vectors with elements representing seconds, minutes, hours, days of the month, months, years, weekdays, etc...
 
+    ```{r}
+    ltvec <- as.POSIXlt(x = c("1980-10-10 01:11:01", 
+                              "1970-01-11 10:15:22",
+                              "2010-05-30 20:01:18"))
+    typeof(ltvec)
+    unclass(ltvec)
+    ```
+
 - You mostly interact with these date-time objects through the `{lubridate}` package, but base R has their own interfaces (which I think are more difficult to use).
 
 - Learn more about dates and date-times [here](https://data-science-master.github.io/lectures/02_dates/02_dates.html).
@@ -552,7 +560,7 @@ klippy::klippy()
     str(lobj)
     ```
     
-- `c()` will combine a lists into a single list. If you use `c()` with a list and a vector, then it will first coerce the vector into a list where each element is a list.
+- `c()` will combine lists into a single list. If you use `c()` with a list and a vector, then it will first coerce the vector into a list where each element is a list.
 
     ```{r}
     l1 <- list(1:2,
@@ -704,6 +712,58 @@ klippy::klippy()
       }
     }
     ```
+    
+- E.g., let's create a function `wmean` that calculates a weighted mean if weights are provided, an the sample mean otherwise.
+
+    ```{r}
+    wmean <- function(x, w = NULL) {
+      if (is.null(w)) {
+        w <- rep(1 / length(x), length.out = length(x))
+      } else {
+        w <- w / sum(w)
+      }
+      return(sum(x * w))
+    }
+    
+    x <- c(1, 2, 3)
+    wmean(x)
+    wmean(x, w = c(5, 1, 1))
+    ```
+
+- There are two alternative strategies to this. First, use `missingArg()` to test if an argument is missing.
+    ```{r}
+    wmean <- function(x, w) {
+      if (missingArg(w)) {
+        w <- rep(1 / length(x), length.out = length(x))
+      } else {
+        w <- w / sum(w)
+      }
+      return(sum(x * w))
+    }
+    
+    x <- c(1, 2, 3)
+    wmean(x)
+    wmean(x, w = c(5, 1, 1))
+    ```
+    
+    This works because of lazy evaluation (which we will learn about later).
+    
+    I don't like this because it is confusing to the user, who thinks `w` is a required argument.
+    
+- Second, you can include more complicated defaults.
+
+    ```{r}
+    wmean <- function(x, w = rep(1, length(x))) {
+      w <- w / sum(w)
+      return(sum(x * w))
+    }
+    
+    x <- c(1, 2, 3)
+    wmean(x)
+    wmean(x, w = c(5, 1, 1))
+    ```
+    
+    I don't like this because default arguments are evaluated inside the function, but user-provided arguments are evaluated outside the function (more on this later). This can lead to strange results.
 
 - `NULL` is one of the ways R handle's missingness. The others are `NA` and `NaN`.
     - `NULL`: An empty object. Can be thought of as a zero-length vector.
