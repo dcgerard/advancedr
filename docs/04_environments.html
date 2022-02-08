@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-20" />
+<meta name="date" content="2022-02-08" />
 
 <title>Environments</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Environments</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-20</h4>
+<h4 class="date">2022-02-08</h4>
 
 </div>
 
@@ -453,16 +453,16 @@ $(document).ready(function () {
 <p><img src="04_figs_env/loop.png" alt="Environment containing itself" width="40%"/></p></li>
 <li><p>Printing an environment just shows its address in memory.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>e1</span></code></pre></div>
-<pre><code>## &lt;environment: 0x5602495b8408&gt;</code></pre></li>
+<pre><code>## &lt;environment: 0x5620fb4d5e08&gt;</code></pre></li>
 <li><p>To print the objects of an environment, use <code>rlang::env_print()</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_print</span>(e1)</span></code></pre></div>
-<pre><code>## &lt;environment: 0x5602495b8408&gt;
-## parent: &lt;environment: global&gt;
-## bindings:
-##  * a: &lt;lgl&gt;
-##  * b: &lt;chr&gt;
-##  * c: &lt;dbl&gt;
-##  * d: &lt;env&gt;</code></pre></li>
+<pre><code>## &lt;environment: 0x5620fb4d5e08&gt;
+## Parent: &lt;environment: global&gt;
+## Bindings:
+## • a: &lt;lgl&gt;
+## • b: &lt;chr&gt;
+## • c: &lt;dbl&gt;
+## • d: &lt;env&gt;</code></pre></li>
 <li><p>Use <code>rlang::env_names()</code> to get a character vector with names.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_names</span>(e1)</span></code></pre></div>
 <pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot;</code></pre></li>
@@ -476,13 +476,12 @@ $(document).ready(function () {
 <pre><code>## [1] &quot;environment&quot;</code></pre>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env_print</span>(gl)</span></code></pre></div>
 <pre><code>## &lt;environment: global&gt;
-## parent: &lt;environment: package:rlang&gt;
-## bindings:
-##  * ce: &lt;env&gt;
-##  * e1: &lt;env&gt;
-##  * e2: &lt;env&gt;
-##  * gl: &lt;env&gt;
-##  * q: &lt;fn&gt;</code></pre></li>
+## Parent: &lt;environment: package:rlang&gt;
+## Bindings:
+## • ce: &lt;env&gt;
+## • e1: &lt;env&gt;
+## • e2: &lt;env&gt;
+## • gl: &lt;env&gt;</code></pre></li>
 <li><p>We can see that the current environment is the global environment with <code>identical()</code></p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(gl, ce)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre></li>
@@ -500,16 +499,16 @@ $(document).ready(function () {
 <li><p>In the above diagram, the pale blue dot represents a pointer to the parent. The left box is the child and the right box is the parent.</p></li>
 <li><p><code>rlang::env_parent()</code> gives you the parent.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env_parent</span>(e2b)</span></code></pre></div>
-<pre><code>## &lt;environment: 0x56024bef5860&gt;</code></pre>
+<pre><code>## &lt;environment: 0x5620fdc3ce30&gt;</code></pre>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>e2a</span></code></pre></div>
-<pre><code>## &lt;environment: 0x56024bef5860&gt;</code></pre>
+<pre><code>## &lt;environment: 0x5620fdc3ce30&gt;</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env_parent</span>(e2a)</span></code></pre></div>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre></li>
 <li><p>Every environment has as an ancestor the empty environment, which has no parent. You can access it with <code>rlang::empty_env()</code></p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>em <span class="ot">&lt;-</span> <span class="fu">empty_env</span>()</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_print</span>(em)</span></code></pre></div>
 <pre><code>## &lt;environment: empty&gt;
-## parent: NULL</code></pre>
+## Parent: NULL</code></pre>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_parents</span>(em)</span></code></pre></div>
 <pre><code>## list()</code></pre></li>
 <li><p>We can make children of the empty environment with <code>rlang::env()</code> by including the empty environment as the first argument.</p>
@@ -625,7 +624,7 @@ $(document).ready(function () {
 <span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a><span class="fu">count_env</span>()</span></code></pre></div>
 <pre><code>##            global     package:rlang     package:stats  package:graphics 
-##                15               478               456                88 
+##                14               434               456                88 
 ## package:grDevices     package:utils  package:datasets   package:methods 
 ##               119               221               104               371 
 ##         Autoloads      package:base 
@@ -712,16 +711,16 @@ $(document).ready(function () {
 <pre><code>## function (x, na.rm = FALSE) 
 ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
 ##     na.rm = na.rm))
-## &lt;bytecode: 0x56024af70788&gt;
+## &lt;bytecode: 0x5620fcd2cbf0&gt;
 ## &lt;environment: namespace:stats&gt;</code></pre>
 <div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">10</span>)</span>
 <span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(x)</span></code></pre></div>
-<pre><code>## [1] 0.6107</code></pre>
+<pre><code>## [1] 0.6993</code></pre>
 <div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>var <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="dv">0</span></span>
 <span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>(x)</span></code></pre></div>
 <pre><code>## [1] 0</code></pre>
 <div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(x)</span></code></pre></div>
-<pre><code>## [1] 0.6107</code></pre></li>
+<pre><code>## [1] 0.6993</code></pre></li>
 <li><p>The namespace environment acts as the function environment for all functions in a package.</p></li>
 <li><p>An exported function has a binding both in the namespace environment and the package environment.</p>
 <p><img src="04_figs_env/namespace-bind.png" alt="namespace vs packge environments" width="40%"/></p></li>
@@ -739,7 +738,7 @@ $(document).ready(function () {
 ## [[2]] $ &lt;env: namespace:base&gt;
 ## [[3]] $ &lt;env: global&gt;</code></pre>
 <p><img src="04_figs_env/namespace-env.png" alt="ancestors of namespace environment" width="40%"/></p></li>
-<li><p>Below, let the yellow object be the <code>sd()</code> function defined in the package <code>{stats}</code>. Then whenever another function in <code>{stats}</code> uses <code>sd()</code> it finds it in the <code>namespace:stats</code> environment. Right now, the <code>package:stats</code> environment also points to that function, so when the user uses <code>sd()</code> they can use the version created by the <code>{stats}</code> authors. However, if we change the definition of <code>sd()</code>, we only change the binding in the <code>package:stats</code> environment, not in the <code>namespace:stats</code> environment. This means that <code>{stats}</code> functions will work even if we change the binding.</p>
+<li><p>Below, let the yellow object be the <code>sd()</code> function defined in the package <code>{stats}</code>. Then whenever another function in <code>{stats}</code> uses <code>sd()</code> or <code>var()</code> it finds them in the <code>namespace:stats</code> environment. Right now, the <code>package:stats</code> environment also points to that function, so when the user uses <code>sd()</code> they can use the version created by the <code>{stats}</code> authors. However, if we change the definition of <code>var()</code>, we only change the binding in the <code>package:stats</code> environment, not in the <code>namespace:stats</code> environment. This means that <code>{stats}</code> functions will work even if we change the binding. In particular, <code>sd()</code>, which uses <code>var()</code>, will still work.</p>
 <p><img src="04_figs_env/namespace.png" alt="namespace and package" width="40%"/></p></li>
 </ul>
 </div>
@@ -777,11 +776,11 @@ $(document).ready(function () {
 <span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">h2</span>(<span class="at">x =</span> <span class="dv">10</span>)</span>
 <span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_print</span>(e)</span></code></pre></div>
-<pre><code>## &lt;environment: 0x560249bb2a68&gt;
-## parent: &lt;environment: global&gt;
-## bindings:
-##  * a: &lt;dbl&gt;
-##  * x: &lt;dbl&gt;</code></pre></li>
+<pre><code>## &lt;environment: 0x5620fe0b73d8&gt;
+## Parent: &lt;environment: global&gt;
+## Bindings:
+## • a: &lt;dbl&gt;
+## • x: &lt;dbl&gt;</code></pre></li>
 <li><p>More frequently, the execution environment is maintained because it is a function environment of a returned function.</p>
 <div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>plus <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
 <span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(y) x <span class="sc">+</span> y</span>
@@ -790,11 +789,11 @@ $(document).ready(function () {
 <span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>plus_one <span class="ot">&lt;-</span> <span class="fu">plus</span>(<span class="dv">1</span>)</span>
 <span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>plus_one</span></code></pre></div>
 <pre><code>## function(y) x + y
-## &lt;environment: 0x560248f09438&gt;</code></pre>
+## &lt;environment: 0x5620fef39740&gt;</code></pre>
 <p><img src="04_figs_env/closure.png" alt="execution environment is function environment" width="40%"/></p></li>
-<li><p>Above figure: the global environment is the bottom box. The execution environment is the top box. The plus function is the right yellow object. Its function environment and binding environment is the global environment. When <code>plus()</code> is called with <code>x = 1</code>, it creates the execution environment where <code>x</code> is bound to <code>1</code>. When <code>plus_one()</code> is defined, its function environment is the execution environment (since that is where it was created), but its binding environment is the global environment (where the name is bound). Note that the parent environment of the <code>plus()</code>’s execution environment is the global environment.</p>
+<li><p>Above figure: the global environment is the bottom box. The execution environment is the top box. The <code>plus()</code> function is the right yellow object. Its function environment and binding environment is the global environment. When <code>plus()</code> is called with <code>x = 1</code>, it creates the execution environment where <code>x</code> is bound to <code>1</code>. When <code>plus_one()</code> is defined, its function environment is the execution environment (since that is where it was created), but its binding environment is the global environment (where the name is bound). Note that the parent environment of the <code>plus()</code>’s execution environment is the global environment.</p>
 <div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">fn_env</span>(plus_one)</span></code></pre></div>
-<pre><code>## &lt;environment: 0x560248f09438&gt;</code></pre>
+<pre><code>## &lt;environment: 0x5620fef39740&gt;</code></pre>
 <div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">env_parent</span>(rlang<span class="sc">::</span><span class="fu">fn_env</span>(plus_one))</span></code></pre></div>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre></li>
 <li><p>When we call <code>plus_one()</code>, its execution environment will have the execution environment of <code>plus()</code> as its parent.</p>
@@ -802,18 +801,21 @@ $(document).ready(function () {
 <span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plus_one</span>(<span class="dv">2</span>)</span></code></pre></div>
 <pre><code>## [1] 3</code></pre>
 <p><img src="04_figs_env/closure-call.png" alt="execution environment of plus_one()" width="40%"/></p></li>
-<li><p>When we call <code>plus_one()</code> with <code>y</code> bound to 2 (execution environment top left), when it tries to find <code>x</code> it first searches in <code>r</code>rlang::fn_env(plus_one)` (execution environment top right) before going to the global environment (bottom).</p></li>
+<li><p>When we call <code>plus_one()</code> with <code>y</code> bound to 2 (execution environment top left), when it tries to find <code>x</code> it first searches in</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">fn_env</span>(plus_one)</span></code></pre></div>
+<pre><code>## &lt;environment: 0x5620fef39740&gt;</code></pre>
+<p>(execution environment top right) before going to the global environment (bottom).</p></li>
 <li><p><strong>Exercise</strong> (Advanced R): Draw a diagram that shows the function environments of this function, along with all bindings for the given execution.</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x1) {</span>
-<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>  f2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x2) {</span>
-<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>    f3 <span class="ot">&lt;-</span> <span class="cf">function</span>(x3) {</span>
-<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>      x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3</span>
-<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">f3</span>(<span class="dv">3</span>)</span>
-<span id="cb103-7"><a href="#cb103-7" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb103-8"><a href="#cb103-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">f2</span>(<span class="dv">2</span>)</span>
-<span id="cb103-9"><a href="#cb103-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb103-10"><a href="#cb103-10" aria-hidden="true" tabindex="-1"></a><span class="fu">f1</span>(<span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x1) {</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  f2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x2) {</span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>    f3 <span class="ot">&lt;-</span> <span class="cf">function</span>(x3) {</span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>      x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3</span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">f3</span>(<span class="dv">3</span>)</span>
+<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">f2</span>(<span class="dv">2</span>)</span>
+<span id="cb105-9"><a href="#cb105-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb105-10"><a href="#cb105-10" aria-hidden="true" tabindex="-1"></a><span class="fu">f1</span>(<span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## [1] 6</code></pre></li>
 </ul>
 </div>
@@ -823,21 +825,21 @@ $(document).ready(function () {
 <li><p>Recall, the <strong>function environment</strong> is the environment in which the function was created.</p></li>
 <li><p>The <strong>caller environment</strong> is the environment in which the function was called (aka “used”)</p></li>
 <li><p>You can get this environment inside a function via <code>rlang::caller_env()</code>.</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>fn1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  fn2 <span class="ot">&lt;-</span> <span class="cf">function</span>(y) {</span>
-<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>    rlang<span class="sc">::</span><span class="fu">caller_env</span>()</span>
-<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>  e0 <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">current_env</span>() <span class="do">## The execution environment of fn1()</span></span>
-<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>  e1 <span class="ot">&lt;-</span> <span class="fu">fn2</span>() <span class="do">## The caller environment of fn2()</span></span>
-<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a>  e2 <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">caller_env</span>() <span class="do">## The caller environment of fn1()</span></span>
-<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(e0, e1, e2))</span>
-<span id="cb105-9"><a href="#cb105-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb105-10"><a href="#cb105-10" aria-hidden="true" tabindex="-1"></a><span class="fu">fn1</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>fn1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>  fn2 <span class="ot">&lt;-</span> <span class="cf">function</span>(y) {</span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>    rlang<span class="sc">::</span><span class="fu">caller_env</span>()</span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>  e0 <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">current_env</span>() <span class="do">## The execution environment of fn1()</span></span>
+<span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a>  e1 <span class="ot">&lt;-</span> <span class="fu">fn2</span>() <span class="do">## The caller environment of fn2()</span></span>
+<span id="cb107-7"><a href="#cb107-7" aria-hidden="true" tabindex="-1"></a>  e2 <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">caller_env</span>() <span class="do">## The caller environment of fn1()</span></span>
+<span id="cb107-8"><a href="#cb107-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(e0, e1, e2))</span>
+<span id="cb107-9"><a href="#cb107-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb107-10"><a href="#cb107-10" aria-hidden="true" tabindex="-1"></a><span class="fu">fn1</span>()</span></code></pre></div>
 <pre><code>## [[1]]
-## &lt;environment: 0x56024c07e940&gt;
+## &lt;environment: 0x5620fd497fe0&gt;
 ## 
 ## [[2]]
-## &lt;environment: 0x56024c07e940&gt;
+## &lt;environment: 0x5620fd497fe0&gt;
 ## 
 ## [[3]]
 ## &lt;environment: R_GlobalEnv&gt;</code></pre></li>
@@ -851,21 +853,21 @@ $(document).ready(function () {
 <ul>
 <li><p><code>stats::numericDeriv()</code> numerically evaluates the gradient of an expression at some value. It assumes that the evaluation occurs within some environment you provide.</p></li>
 <li><p>Let’s calculate the gradient of <span class="math inline">\(x^y\)</span> evaluated at <span class="math inline">\(x = 3\)</span>.</p>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>myenv <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env</span>(<span class="at">x =</span> <span class="dv">3</span>, <span class="at">y =</span> <span class="dv">2</span>)</span>
-<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a><span class="fu">numericDeriv</span>(<span class="at">expr =</span> rlang<span class="sc">::</span><span class="fu">expr</span>(x <span class="sc">^</span> y), <span class="at">theta =</span> <span class="st">&quot;x&quot;</span>, <span class="at">rho =</span> myenv)</span></code></pre></div>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>myenv <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env</span>(<span class="at">x =</span> <span class="dv">3</span>, <span class="at">y =</span> <span class="dv">2</span>)</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a><span class="fu">numericDeriv</span>(<span class="at">expr =</span> rlang<span class="sc">::</span><span class="fu">expr</span>(x <span class="sc">^</span> y), <span class="at">theta =</span> <span class="st">&quot;x&quot;</span>, <span class="at">rho =</span> myenv)</span></code></pre></div>
 <pre><code>## [1] 9
 ## attr(,&quot;gradient&quot;)
 ##      [,1]
 ## [1,]    6</code></pre></li>
 <li><p>From calculus, we know that the derivative of <span class="math inline">\(x^2\)</span> is <span class="math inline">\(2x\)</span>, and so the gradient evaluated at <span class="math inline">\(x = 3\)</span> should be <span class="math inline">\(2\times 3 = 6\)</span>.</p></li>
 <li><p><code>rlang::expr()</code> is discussed in Chapter 19. Basically, it captures an expression without evaluating it. This is called “quoting”. We can then evaluate that expression with <code>eval()</code>.</p>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(x<span class="sc">^</span><span class="dv">2</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(x<span class="sc">^</span><span class="dv">2</span>) </span></code></pre></div>
 <pre><code>## x^2</code></pre>
-<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(x<span class="sc">^</span><span class="dv">2</span>) <span class="sc">|&gt;</span> <span class="fu">eval</span>(<span class="at">envir =</span> myenv)</span></code></pre></div>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(x<span class="sc">^</span><span class="dv">2</span>) <span class="sc">|&gt;</span> <span class="fu">eval</span>(<span class="at">envir =</span> myenv)</span></code></pre></div>
 <pre><code>## [1] 9</code></pre>
-<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">sum</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">sum</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)))</span></code></pre></div>
 <pre><code>## sum(c(1, 2, 3))</code></pre>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">sum</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))) <span class="sc">|&gt;</span> <span class="fu">eval</span>(<span class="at">envir =</span> rlang<span class="sc">::</span><span class="fu">global_env</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">expr</span>(<span class="fu">sum</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))) <span class="sc">|&gt;</span> <span class="fu">eval</span>(<span class="at">envir =</span> rlang<span class="sc">::</span><span class="fu">global_env</span>())</span></code></pre></div>
 <pre><code>## [1] 6</code></pre></li>
 </ul>
 </div>
@@ -876,36 +878,44 @@ $(document).ready(function () {
 <li><p>Objects in packages are locked, so cannot be changed.</p></li>
 <li><p>Say you want to keep track of whether or not a function was run (e.g. to write a message on first use). I have done this to (i) say that a function is defunct or (ii) list out special licenses that cover a method.</p></li>
 <li><p>One way you could keep track of this is to use super assign in a function that will change the value of a logical in the package environment.</p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a>ran_fun <span class="ot">&lt;-</span> <span class="cn">FALSE</span> <span class="do">## Global variable</span></span>
-<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
-<span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>ran_fun) {</span>
-<span id="cb117-4"><a href="#cb117-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">&quot;Here is a message&quot;</span>)</span>
-<span id="cb117-5"><a href="#cb117-5" aria-hidden="true" tabindex="-1"></a>    ran_fun <span class="ot">&lt;&lt;-</span> <span class="cn">FALSE</span> <span class="do">## this alters package environment</span></span>
-<span id="cb117-6"><a href="#cb117-6" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb117-7"><a href="#cb117-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb117-8"><a href="#cb117-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>ran_fun <span class="ot">&lt;-</span> <span class="cn">FALSE</span> <span class="do">## Global variable</span></span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>ran_fun) {</span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">&quot;Here is a message&quot;</span>)</span>
+<span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a>    ran_fun <span class="ot">&lt;&lt;-</span> <span class="cn">FALSE</span> <span class="do">## this alters package environment</span></span>
+<span id="cb119-6"><a href="#cb119-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb119-7"><a href="#cb119-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb119-8"><a href="#cb119-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
 <pre><code>## Here is a message</code></pre>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
 <pre><code>## Here is a message</code></pre></li>
 <li><p>What I think is better is having an environment specific to messages, that way you have to worry less about global variables.</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>menv <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env</span>(<span class="at">ran_fun =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
-<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>menv<span class="sc">$</span>ran_fun) {</span>
-<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">&quot;Here is a message&quot;</span>)</span>
-<span id="cb121-5"><a href="#cb121-5" aria-hidden="true" tabindex="-1"></a>    menv<span class="sc">$</span>ran_fun <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb121-6"><a href="#cb121-6" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb121-7"><a href="#cb121-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb121-8"><a href="#cb121-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a>menv <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env</span>(<span class="at">ran_fun =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb123-2"><a href="#cb123-2" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb123-3"><a href="#cb123-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>menv<span class="sc">$</span>ran_fun) {</span>
+<span id="cb123-4"><a href="#cb123-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">&quot;Here is a message&quot;</span>)</span>
+<span id="cb123-5"><a href="#cb123-5" aria-hidden="true" tabindex="-1"></a>    menv<span class="sc">$</span>ran_fun <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb123-6"><a href="#cb123-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb123-7"><a href="#cb123-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb123-8"><a href="#cb123-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
 <pre><code>## Here is a message</code></pre>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div></li>
 <li><p>This functionality is very popular, so <code>{rlang}</code> has a function dedicated to it.</p>
-<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
-<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>  rlang<span class="sc">::</span><span class="fu">warn</span>(<span class="st">&quot;Here is a message&quot;</span>, <span class="at">.frequency =</span> <span class="st">&quot;once&quot;</span>, <span class="at">.frequency_id =</span> <span class="st">&quot;ran_fun&quot;</span>)</span>
-<span id="cb124-3"><a href="#cb124-3" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb124-4"><a href="#cb124-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>fun <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a>  rlang<span class="sc">::</span><span class="fu">warn</span>(<span class="st">&quot;Here is a message&quot;</span>, <span class="at">.frequency =</span> <span class="st">&quot;once&quot;</span>, <span class="at">.frequency_id =</span> <span class="st">&quot;ran_fun&quot;</span>)</span>
+<span id="cb126-3"><a href="#cb126-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb126-4"><a href="#cb126-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div>
 <pre><code>## Warning: Here is a message
 ## This warning is displayed once per session.</code></pre>
-<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div></li>
+<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fun</span>()</span></code></pre></div></li>
+<li><p><strong>Exercise</strong>: Use environments to keep a tally for how many times a function called <code>foo()</code> is run. Create another function called <code>foo_count()</code> that returns that number. E.g.</p>
+<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a><span class="fu">foo_count</span>()</span></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true" tabindex="-1"></a><span class="fu">foo</span>()</span>
+<span id="cb131-2"><a href="#cb131-2" aria-hidden="true" tabindex="-1"></a><span class="fu">foo</span>()</span>
+<span id="cb131-3"><a href="#cb131-3" aria-hidden="true" tabindex="-1"></a><span class="fu">foo</span>()</span>
+<span id="cb131-4"><a href="#cb131-4" aria-hidden="true" tabindex="-1"></a><span class="fu">foo_count</span>()</span></code></pre></div>
+<pre><code>## [1] 3</code></pre></li>
 </ul>
 </div>
 </div>
@@ -922,20 +932,20 @@ $(document).ready(function () {
 <li><p>Hashing in R was done through the <code>{hash}</code> package using environments.</p></li>
 <li><p>Hashing is way quicker than using a list or a vector.</p></li>
 <li><p>In the below example, using hashing is about 1000 times faster than using native R vectors.</p>
-<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hash)</span>
-<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>words <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;https://data-science-master.github.io/lectures/data/words.txt&quot;</span>,</span>
-<span id="cb127-3"><a href="#cb127-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">header =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb127-4"><a href="#cb127-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">na.strings =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb127-5"><a href="#cb127-5" aria-hidden="true" tabindex="-1"></a>h <span class="ot">&lt;-</span> <span class="fu">hash</span>(<span class="at">keys =</span> words<span class="sc">$</span>word, <span class="at">values =</span> <span class="fu">seq_along</span>(words<span class="sc">$</span>word))</span>
-<span id="cb127-6"><a href="#cb127-6" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">seq_along</span>(words<span class="sc">$</span>word)</span>
-<span id="cb127-7"><a href="#cb127-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(l) <span class="ot">&lt;-</span> words<span class="sc">$</span>word</span>
-<span id="cb127-8"><a href="#cb127-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-9"><a href="#cb127-9" aria-hidden="true" tabindex="-1"></a>bench<span class="sc">::</span><span class="fu">mark</span>(</span>
-<span id="cb127-10"><a href="#cb127-10" aria-hidden="true" tabindex="-1"></a>  h<span class="sc">$</span>MOTIVITIES,</span>
-<span id="cb127-11"><a href="#cb127-11" aria-hidden="true" tabindex="-1"></a>  l[[<span class="st">&quot;MOTIVITIES&quot;</span>]],</span>
-<span id="cb127-12"><a href="#cb127-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb127-13"><a href="#cb127-13" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(expression<span class="sc">:</span>result) <span class="sc">|&gt;</span></span>
-<span id="cb127-14"><a href="#cb127-14" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hash)</span>
+<span id="cb133-2"><a href="#cb133-2" aria-hidden="true" tabindex="-1"></a>words <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;https://data-science-master.github.io/lectures/data/words.txt&quot;</span>,</span>
+<span id="cb133-3"><a href="#cb133-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">header =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb133-4"><a href="#cb133-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">na.strings =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb133-5"><a href="#cb133-5" aria-hidden="true" tabindex="-1"></a>h <span class="ot">&lt;-</span> <span class="fu">hash</span>(<span class="at">keys =</span> words<span class="sc">$</span>word, <span class="at">values =</span> <span class="fu">seq_along</span>(words<span class="sc">$</span>word))</span>
+<span id="cb133-6"><a href="#cb133-6" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">seq_along</span>(words<span class="sc">$</span>word)</span>
+<span id="cb133-7"><a href="#cb133-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(l) <span class="ot">&lt;-</span> words<span class="sc">$</span>word</span>
+<span id="cb133-8"><a href="#cb133-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb133-9"><a href="#cb133-9" aria-hidden="true" tabindex="-1"></a>bench<span class="sc">::</span><span class="fu">mark</span>(</span>
+<span id="cb133-10"><a href="#cb133-10" aria-hidden="true" tabindex="-1"></a>  h<span class="sc">$</span>MOTIVITIES,</span>
+<span id="cb133-11"><a href="#cb133-11" aria-hidden="true" tabindex="-1"></a>  l[[<span class="st">&quot;MOTIVITIES&quot;</span>]],</span>
+<span id="cb133-12"><a href="#cb133-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb133-13"><a href="#cb133-13" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(expression<span class="sc">:</span>result) <span class="sc">|&gt;</span></span>
+<span id="cb133-14"><a href="#cb133-14" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -954,26 +964,26 @@ $(document).ready(function () {
 <tbody>
 <tr class="odd">
 <td align="left">h$MOTIVITIES</td>
-<td align="right">1.14µs</td>
-<td align="right">1.52µs</td>
-<td align="right">641160.4</td>
+<td align="right">1.39µs</td>
+<td align="right">1.49µs</td>
+<td align="right">465899.2</td>
 <td align="right">0B</td>
 <td align="right">0</td>
 <td align="right">10000</td>
 <td align="right">0</td>
-<td align="right">15.6ms</td>
+<td align="right">21.5ms</td>
 <td align="left">150000</td>
 </tr>
 <tr class="even">
 <td align="left">l[[“MOTIVITIES”]]</td>
+<td align="right">1.8ms</td>
 <td align="right">1.93ms</td>
-<td align="right">2.12ms</td>
-<td align="right">464.7</td>
+<td align="right">503.9</td>
 <td align="right">0B</td>
 <td align="right">0</td>
-<td align="right">233</td>
+<td align="right">252</td>
 <td align="right">0</td>
-<td align="right">501.4ms</td>
+<td align="right">500.1ms</td>
 <td align="left">150000</td>
 </tr>
 </tbody>

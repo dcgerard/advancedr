@@ -423,7 +423,7 @@ klippy::klippy()
 
     <img src="./04_figs_env/namespace-env.png" alt="ancestors of namespace environment" width="40%"/>
     
-- Below, let the yellow object be the `sd()` function defined in the package `{stats}`. Then whenever another function in `{stats}` uses `sd()` it finds it in the `namespace:stats` environment. Right now, the `package:stats` environment also points to that function, so when the user uses `sd()` they can use the version created by the `{stats}` authors. However, if we change the definition of `sd()`, we only change the binding in the `package:stats` environment, not in the `namespace:stats` environment. This means that `{stats}` functions will work even if we change the binding.
+- Below, let the yellow object be the `sd()` function defined in the package `{stats}`. Then whenever another function in `{stats}` uses `sd()` or `var()` it finds them in the `namespace:stats` environment. Right now, the `package:stats` environment also points to that function, so when the user uses `sd()` they can use the version created by the `{stats}` authors. However, if we change the definition of `var()`, we only change the binding in the `package:stats` environment, not in the `namespace:stats` environment. This means that `{stats}` functions will work even if we change the binding. In particular, `sd()`, which uses `var()`, will still work.
 
     <img src="./04_figs_env/namespace.png" alt="namespace and package" width="40%"/>
 
@@ -486,7 +486,7 @@ klippy::klippy()
     
     <img src="./04_figs_env/closure.png" alt="execution environment is function environment" width="40%"/>
 
-- Above figure: the global environment is the bottom box. The execution environment is the top box. The plus function is the right yellow object. Its function environment and binding environment is the global environment. When `plus()` is called with `x = 1`, it creates the execution environment where `x` is bound to `1`. When `plus_one()` is defined, its function environment is the execution environment (since that is where it was created), but its binding environment is the global environment (where the name is bound). Note that the parent environment of the `plus()`'s execution environment is the global environment.
+- Above figure: the global environment is the bottom box. The execution environment is the top box. The `plus()` function is the right yellow object. Its function environment and binding environment is the global environment. When `plus()` is called with `x = 1`, it creates the execution environment where `x` is bound to `1`. When `plus_one()` is defined, its function environment is the execution environment (since that is where it was created), but its binding environment is the global environment (where the name is bound). Note that the parent environment of the `plus()`'s execution environment is the global environment.
 
     ```{r}
     rlang::fn_env(plus_one)
@@ -502,7 +502,11 @@ klippy::klippy()
 
     <img src="./04_figs_env/closure-call.png" alt="execution environment of plus_one()" width="40%"/>
 
-- When we call `plus_one()` with `y` bound to 2 (execution environment top left), when it tries to find `x` it first searches in `r `rlang::fn_env(plus_one)` (execution environment top right) before going to the global environment (bottom).
+- When we call `plus_one()` with `y` bound to 2 (execution environment top left), when it tries to find `x` it first searches in 
+    ```{r}
+    rlang::fn_env(plus_one)
+    ```
+    (execution environment top right) before going to the global environment (bottom).
 
 - **Exercise** (Advanced R): Draw a diagram that shows the function environments of this function, along with all bindings for the given execution.
 
@@ -619,6 +623,27 @@ klippy::klippy()
     }
     fun()
     fun()
+    ```
+    
+- **Exercise**: Use environments to keep a tally for how many times a function called `foo()` is run. Create another function called `foo_count()` that returns that number. E.g.
+
+    ```{r, eval = TRUE, echo = FALSE}
+    fooenv <- rlang::env(numtimes = 0)
+    foo <- function() {
+      fooenv$numtimes <- fooenv$numtimes + 1
+    }
+    
+    foo_count <- function() {
+      return(fooenv$numtimes)
+    }
+    ```
+
+    ```{r}
+    foo_count()
+    foo()
+    foo()
+    foo()
+    foo_count()
     ```
     
 # R6 Objects
