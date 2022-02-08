@@ -109,7 +109,7 @@ klippy::klippy()
 
     - Make sure the last item is a `stop()` call, otherwise `switch()` will return `NULL`.
     
-- **Exercise** (From Advanced R):
+- **Exercise** (From Advanced R): Explain the following results:
     ```{r}
     x <- 1:10
     if (length(x)) "not empty" else "empty"
@@ -122,6 +122,29 @@ klippy::klippy()
     ```
     ```{r, eval = FALSE, echo = FALSE}
     as.logical(c(-1, 0, 1))
+    ```
+    
+- **Exercise**: Explain the following results. What do you think the having an empty right-hand-side does in `switch()`?
+
+    ```{r}
+    switch_a <- function(a) {
+      switch(a,
+             b = ,
+             c = ,
+             d = 3,
+             e = ,
+             f = 4,
+             stop("a not 1, 2, or 3"))
+    }
+    switch_a("b")
+    switch_a("c")
+    switch_a("d")
+    switch_a("e")
+    switch_a("f")
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    Having an empty RHS gives says move provide the same result as the first provided below.
     ```
 
 # For-loops
@@ -235,7 +258,7 @@ klippy::klippy()
     ```
     
     ```{block, eval = FALSE, echo = FALSE}
-    R will use evaluate the indexing vector only once.
+    R will evaluate the indexing vector only once.
     ```
     
 
