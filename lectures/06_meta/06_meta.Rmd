@@ -194,6 +194,22 @@ klippy::klippy()
     }
     capall(x + y, y * 2)
     ```
+    
+- Typically, when you use `enexprs()`, you get a list of expressions. You can then work with each individually through a for-loop. E.g.
+
+    ```{r}
+    evalall <- function(...) {
+      dots <- rlang::enexprs(...)
+      lval <- list()
+      for (i in seq_along(dots)) {
+        lval[[i]] <- eval(dots[[i]])
+      }
+      return(lval)
+    }
+    a <- 3
+    b <- 2
+    evalall(a + b, b^2)
+    ```
 
 ## Evaluated versus Quoted Arguments
 
