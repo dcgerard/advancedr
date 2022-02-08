@@ -241,7 +241,7 @@ klippy::klippy()
     fun(a + 1)
     ```
 
-- Using `rlang::enquo()` will create a "quosure" which also includes the function environment. You cannot use `base::eval()` with a quosure, so `{rlang}` provies `rlang::eval_tidy()`.
+- Using `rlang::enquo()` will create a "quosure" which also includes the function environment. You cannot use `base::eval()` with a quosure, so `{rlang}` proves `rlang::eval_tidy()`.
     ```{r}
     fun <- function(x) {
       a <- 1000
@@ -251,21 +251,12 @@ klippy::klippy()
     a <- 10
     fun(a + 1)
     ```
-
-  
-# Application: Formulas
-
-- Formulas are S3 objects built on expressions (specifically calls) that are used for data analysis.
-
-- You can create a formula with `formula`
+    
+- Quosures are mostly used when you use dots `...` in a function argument and want to use that in conjunction with data masking (where you use a data frame like an environment). This is what most `{dplyr}` functions do. E.g. `dplyr::filer()` uses data masking with the `.data` like an environment and different predicates as the expressions. See the following help file for more information
 
     ```{r}
-    myform <- formula(x ~ y)
-    typeof(myform)
-    class(myform)
-    sloop::otype(myform)
+    ?`topic-quosure`
     ```
-
   
 # Application: Capturing Argument Names
 
@@ -398,7 +389,7 @@ klippy::klippy()
     }
     ```
 
-- But if we were to just put `var1` and `var2` into `{ggplot}`, then `{ggplot}` would interpret that as trying to find a variable litterally called `var1` and `var2` in `.data`. So we need to then unquote `var1` and `var2` in `ggplot()`.
+- But if we were to just put `var1` and `var2` into `{ggplot}`, then `{ggplot}` would interpret that as trying to find a variable literally called `var1` and `var2` in `.data`. So we need to then unquote `var1` and `var2` in `ggplot()`.
 
     ```{r}
     plot_red <- function(.data, var1, var2) {
@@ -419,7 +410,7 @@ klippy::klippy()
 
 - This also shows up in Shiny apps when you use `varSelectInput()`.
 
-# Application: Using `dplyr` Style Code on New Classes.
+# Application: Using `dplyr`-Style Code on New Classes.
 
 - In `eval()`, you can use a `data.frame` as the environment instead of an `environment` object. This is called **data masking**
 
@@ -443,7 +434,19 @@ klippy::klippy()
     my_filter(mtcars, mpg > 30)
     ```
 
-- Your aren't going to be using this filter function in real data analysis. But this style of metaprogramming is useful if you have an S3/S4 object and you want to provide `{dplyr}` style functionality.
+- Though, the `{rlang}` folks recommend you use quosures, not environments when doing data masking.
+
+    ```{r}
+    #' @param .data A data.frame.
+    #' @param e An expression.
+    my_filter <- function(.data, e) {
+      e <- rlang::enquo(arg = e)
+      .data[rlang::eval_tidy(expr = e, data = .data), , drop = FALSE]
+    }
+    my_filter(mtcars, mpg > 30)
+    ```
+
+- You aren't going to be using this filter function in real data analysis. But this style of metaprogramming is useful if you have an S3/S4 object and you want to provide `{dplyr}` style functionality.
 
 - E.g., let's create a class of two data frames where they are connected by a common key
 
@@ -526,7 +529,6 @@ klippy::klippy()
     ```{r}
     filter_df2(obj = mydf2, tailnum == "N105UW")
     ```
-
 
 # New Functions
 
