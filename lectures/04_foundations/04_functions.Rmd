@@ -35,7 +35,7 @@ A function has three parts:
 
 1. The `formals()`, the list of arguments that control how you call the function.
 2. The `body()`, the code inside the function.
-3. The `environment()`, the data structure that determines how the function finds the values associated with the names.
+3. The function `environment()` (sometimes called "enclosing environment"), the data structure that determines how the function finds the values associated with the names.
 
 ```{r}
 square <- function(x) {
@@ -194,7 +194,7 @@ environment(square)
 
 ## A fresh start
 
-- Each time a function is called, it creates a new environment to execute in.
+- Each time a function is called, it creates a new environment to execute in (called the "execution environment").
 
 - This means it does not remember what happened last time.
 
@@ -347,7 +347,7 @@ g11()
     ```
 
     ```{block, eval = FALSE, echo = FALSE}
-    `f1()` returns `c(2, 1)` because when `x` is evaluated that is one `y <- 1` is evaluated. Note that `x` has a default argument of `2` because it is the last thing returned in that expression.
+    `f1()` returns `c(2, 1)` because when `x` is evaluated that is when `y <- 1` is evaluated. Note that `x` has a default argument of `2` because it is the last thing returned in that expression.
     
     Note that `y` is only assigned inside the function, so `y <- 10` is not overwritten.
     ```
@@ -358,7 +358,7 @@ g11()
 
 - This is used all over the place in R. See `seq()`, `optim()`, `plot()`, `print()`, etc...
 
-- In computer science, this type of argument is called a "varargs"
+- In computer science, this type of argument is called a "varargs" (for variable arguments).
 
 - Typically, you either do one of two things with `...` in a function:
     1. Assign arguments to a list.
@@ -569,7 +569,7 @@ g11()
     - They must have arguments `x` and `value` and
     - They must return the modified argument.
 
-- The following will replace the second 
+- The following will replace the second element
 ```{r}
 `second<-` <- function(x, value) {
   x[2] <- value
