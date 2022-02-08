@@ -26,7 +26,8 @@ klippy::klippy()
 
 - Overview of Metaprogramming.
 - Learn a couple tricks.
-- Hadley goes into a lot of depth in Chapters 17--21 of [Advanced R](https://adv-r.hadley.nz/). But we'll just learn some common and simple use-cases. 
+- Required: Chapter 17 of [Advanced R](https://adv-r.hadley.nz/)
+- Optional: Hadley goes into a lot of depth in Chapters 18--21 of [Advanced R](https://adv-r.hadley.nz/). But we'll just learn some common and simple use-cases. 
     - Those chapters only need to be understood in great depth if you actually want to help contribute to the tidyverse.
 
 # Overview
