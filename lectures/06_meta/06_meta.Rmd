@@ -532,5 +532,11 @@ klippy::klippy()
 
 # New Functions
 
-- `rlang::expr()`: Create an expression.
+- `rlang::expr()`: Create an expression (quote).
+- `rlang::enexpr()`: Create an expression of an argument within a function (quote).
 - `base::eval()`: Evaluate an expression.
+- `rlang::expr_text()`: Convert an expression to text (deparse).
+- `!!`: Unquote by evaluating single symbol.
+- `rlang::quo()`: Create a quosure.
+- `rlang::enquo()`: Create a quosure of an argument in within a function.
+- `rlang::eval_tidy()`: Evaluate a quosure.

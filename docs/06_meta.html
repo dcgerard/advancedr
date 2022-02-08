@@ -827,8 +827,14 @@ $(document).ready(function () {
 <div id="new-functions" class="section level1">
 <h1>New Functions</h1>
 <ul>
-<li><code>rlang::expr()</code>: Create an expression.</li>
+<li><code>rlang::expr()</code>: Create an expression (quote).</li>
+<li><code>rlang::enexpr()</code>: Create an expression of an argument within a function (quote).</li>
 <li><code>base::eval()</code>: Evaluate an expression.</li>
+<li><code>rlang::expr_text()</code>: Convert an expression to text (deparse).</li>
+<li><code>!!</code>: Unquote by evaluating single symbol.</li>
+<li><code>rlang::quo()</code>: Create a quosure.</li>
+<li><code>rlang::enquo()</code>: Create a quosure of an argument in within a function.</li>
+<li><code>rlang::eval_tidy()</code>: Evaluate a quosure.</li>
 </ul>
 </div>
 
