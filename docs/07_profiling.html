@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-07" />
+<meta name="date" content="2022-02-10" />
 
 <title>Profiling Performance</title>
 
@@ -50,6 +50,101 @@
     </style>
 
 
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -263,13 +358,19 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Profiling Performance</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-07</h4>
+<h4 class="date">2022-02-10</h4>
 
 </div>
 
 <div id="TOC">
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#profiling-a-function">Profiling a Function</a>
+<ul>
+<li><a href="#notes">Notes</a></li>
+</ul></li>
+<li><a href="#microbenchmarking">Microbenchmarking</a></li>
 <li><a href="#new-functions">New Functions</a></li>
 </ul>
 </div>
@@ -281,10 +382,126 @@ $(document).ready(function () {
 <div id="learning-objectives" class="section level1">
 <h1>Learning Objectives</h1>
 <ul>
-<li>Overview of Metaprogramming.</li>
-<li>Learn a couple tricks.</li>
 <li>Chapter 23 of <a href="https://adv-r.hadley.nz/">Advanced R</a>.</li>
 <li>Profiling and microbenchmarking.</li>
+</ul>
+</div>
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
+<ul>
+<li><p>It is hard to tell what code is fast versus slow.</p></li>
+<li><p><strong>Profiling</strong> is measuring the run-time on each line of code.</p></li>
+<li><p>Use <code>{profvis}</code> for profiling:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(profvis)</span></code></pre></div></li>
+<li><p><strong>Microbenchmarking</strong> is comparing performance between different pieces of code.</p></li>
+<li><p>Use <code>{bench}</code> for microbenchmarking:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bench)</span></code></pre></div></li>
+<li><p>Don’t worry about optimization while you are programming. Just try to get things to work.</p>
+<ul>
+<li>If you try to optimize too soon, you will usually end up wasting more time that you save.</li>
+</ul></li>
+<li><p>When you go back to optimize, only work on the slowest parts.</p></li>
+</ul>
+</div>
+<div id="profiling-a-function" class="section level1">
+<h1>Profiling a Function</h1>
+<ul>
+<li><p>Place a function call inside <code>profvis::profvis()</code> to profile the function.</p></li>
+<li><p>It is better for the profiler if you source the code first (it gives you better graphics). So I place the following code in “07_example.R”.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pause</span>(<span class="fl">0.1</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">g</span>()</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">h</span>()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pause</span>(<span class="fl">0.1</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">h</span>()</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>h <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pause</span>(<span class="fl">0.1</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">profvis</span>(<span class="fu">f</span>())</span></code></pre></div>
+<p>Then use <code>source()</code> on it before placing the function in <code>profvis()</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;./07_example.R&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">profvis</span>(<span class="fu">f</span>())</span></code></pre></div></li>
+<li><p>The pane that pops up looks like this:</p>
+<p><img src="07_figs/profvis_view.png" width="925" style="display: block; margin: auto;" /></p></li>
+<li><p>The top pane is a bar-graph for the execution time for each line of code.</p></li>
+<li><p>This doesn’t tell you why some lines are slower, e.g. <code>h()</code> is called twice, so that’s why it is twice as long as other lines.</p></li>
+<li><p>The bottom pane is called a <strong>flame graph</strong>.</p>
+<ul>
+<li><span class="math inline">\(x\)</span> axis is total time.</li>
+<li>Top of <span class="math inline">\(y\)</span> axis is what is currently being run.</li>
+<li>The bars beneath the top are the ancestry.</li>
+<li>From left to right we have
+<ol style="list-style-type: lower-roman">
+<li><code>pause()</code> running in <code>f()</code>.</li>
+<li><code>pause()</code> running in <code>g()</code> running in <code>f()</code>.</li>
+<li><code>pause()</code> running in <code>h()</code> running in <code>g()</code> running in <code>f()</code>.</li>
+<li><code>pause()</code> running in <code>h()</code> running <code>f()</code>.</li>
+</ol></li>
+</ul></li>
+<li><p>So if we saw this, we would try speeding up <code>h()</code> since it takes up half the amount of total time, so we can probably have the most speed improvements by working on that.</p></li>
+<li><p>The <strong>data tab</strong> has the same information as the flame graph, but vertically, and it let’s you collapse parts of it.</p>
+<p><img src="07_figs/profvis_data.png" width="925" style="display: block; margin: auto;" /></p></li>
+<li><p>If you see <code>&lt;GC&gt;</code> in in the profile, then this stands for “Garbage Collection” and is a sign that you are making lots and lots of copies that are being garbage collected. E.g.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">integer</span>()</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fl">1e4</span>) {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">c</span>(x, i)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">profvis</span>(<span class="fu">f</span>())</span></code></pre></div>
+<p><img src="07_figs/profvis_gc.png" width="925" style="display: block; margin: auto;" /></p></li>
+<li><p>The line where the issue occurs can be seen in the memory column.</p></li>
+</ul>
+<div id="notes" class="section level2">
+<h2>Notes</h2>
+<ul>
+<li><p>You cannot profile C/C++ code using <code>{profvis}</code>.</p></li>
+<li><p>Using anonymous functions will make the results of <code>{profvis}</code> confusing.</p></li>
+<li><p>The resuls are are a statistical sample of your call stack (what is being run and its ancestors), so your results will differ. But this only matters for really fast functions, which aren’t the ones you care about.</p></li>
+</ul>
+</div>
+</div>
+<div id="microbenchmarking" class="section level1">
+<h1>Microbenchmarking</h1>
+<ul>
+<li><p>Benchmarking will compare small pieces of code.</p></li>
+<li><p>This is only useful if you are using this code thousands of times a second.</p></li>
+<li><p>Don’t try to generalize small fast code with slower versions (i.g. knowing what’s faster when <span class="math inline">\(n=1\)</span> tells you nothing about what’s faster when <span class="math inline">\(n = 10000000\)</span>).</p></li>
+<li><p>Use <code>bench::mark()</code> to do microbenchmarking.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rsum <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  sval <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(x)) {</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    sval <span class="ot">&lt;-</span> x[[i]] <span class="sc">+</span> sval</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(sval)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>lb <span class="ot">&lt;-</span> bench<span class="sc">::</span><span class="fu">mark</span>(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(x),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rsum</span>(x)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>lb</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 6
+##   expression      min   median `itr/sec` mem_alloc `gc/sec`
+##   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
+## 1 sum(x)     208.03ns 231.08ns  3041808.        0B        0
+## 2 rsum(x)      4.63µs   4.96µs   190483.     152KB        0</code></pre>
+<p>So running <code>sum()</code> a million times would take about 0.2 seconds. Running <code>rsum()</code> a million times would take about 5 seconds.</p>
+<p>But rarly do you need to run <code>sum()</code> a million times, so typically either one is OK in real life.</p></li>
+<li><p>Always pay attention to the units. 1 ms <span class="math inline">\(&gt;\)</span> 1 µs <span class="math inline">\(&gt;\)</span> 1 ns.</p>
+<ul>
+<li>1 ms, then one thousand calls take a second.</li>
+<li>1 µs, then one million calls take a second.</li>
+<li>1 ns, then one billion calls take a second.</li>
+</ul></li>
+<li><p>There is a nice plot method for <code>bench_mark</code> objects.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lb)</span></code></pre></div>
+<pre><code>## Loading required namespace: tidyr</code></pre>
+<p><img src="07_profiling_files/figure-html/unnamed-chunk-10-1.png" width="384" style="display: block; margin: auto;" /></p></li>
 </ul>
 </div>
 <div id="new-functions" class="section level1">

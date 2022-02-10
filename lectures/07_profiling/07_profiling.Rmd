@@ -24,10 +24,158 @@ klippy::klippy()
 
 # Learning Objectives
 
-- Overview of Metaprogramming.
-- Learn a couple tricks.
 - Chapter 23 of [Advanced R](https://adv-r.hadley.nz/).
 - Profiling and microbenchmarking.
+
+# Motivation
+
+- It is hard to tell what code is fast versus slow.
+
+- **Profiling** is measuring the run-time on each line of code.
+
+- Use `{profvis}` for profiling:
+
+    ```{r}
+    library(profvis)
+    ```
+
+- **Microbenchmarking** is comparing performance between different pieces of code.
+
+- Use `{bench}` for microbenchmarking:
+
+    ```{r}
+    library(bench)
+    ```
+
+- Don't worry about optimization while you are programming. Just try to get things to work.
+    - If you try to optimize too soon, you will usually end up wasting more time that you save.
+
+- When you go back to optimize, only work on the slowest parts.
+
+# Profiling a Function
+
+- Place a function call inside `profvis::profvis()` to profile the function.
+
+- It is better for the profiler if you source the code first (it gives you better graphics). So I place the following code in "07_example.R". 
+
+    ```{r, eval = FALSE}
+    f <- function() {
+      pause(0.1)
+      g()
+      h()
+    }
+    g <- function() {
+      pause(0.1)
+      h()
+    }
+    h <- function() {
+      pause(0.1)
+    }
+    profvis(f())
+    ```
+    
+    Then use `source()` on it before placing the function in `profvis()`.
+    
+    ```{r, eval = FALSE}
+    source("./07_example.R")
+    profvis(f())
+    ```
+
+- The pane that pops up looks like this:    
+
+    ```{r, echo = FALSE}
+    knitr::include_graphics(path = "./07_figs/profvis_view.png")
+    ```
+
+- The top pane is a bar-graph for the execution time for each line of code. 
+
+- This doesn't tell you why some lines are slower, e.g. `h()` is called twice, so that's why it is twice as long as other lines.
+
+- The bottom pane is called a **flame graph**.
+    - $x$ axis is total time.
+    - Top of $y$ axis is what is currently being run.
+    - The bars beneath the top are the ancestry.
+    - From left to right we have 
+        i. `pause()` running in `f()`.
+        ii. `pause()` running in `g()` running in `f()`.
+        iii. `pause()` running in `h()` running in `g()` running in `f()`.
+        iv. `pause()` running in `h()` running `f()`.
+
+- So if we saw this, we would try speeding up `h()` since it takes up half the amount of total time, so we can probably have the most speed improvements by working on that.
+
+- The **data tab** has the same information as the flame graph, but vertically, and it let's you collapse parts of it.
+
+    ```{r, echo = FALSE}
+    knitr::include_graphics(path = "./07_figs/profvis_data.png")
+    ```
+    
+- If you see `<GC>` in in the profile, then this stands for "Garbage Collection" and is a sign that you are making lots and lots of copies that are being garbage collected. E.g.
+
+    ```{r, eval = FALSE}
+    f <- function() {
+      x <- integer()
+      for (i in 1:1e4) {
+        x <- c(x, i)
+      }
+    }
+    profvis(f())
+    ```
+
+    ```{r, echo = FALSE}
+    knitr::include_graphics(path = "./07_figs/profvis_gc.png")
+    ```
+
+- The line where the issue occurs can be seen in the memory column.
+
+## Notes
+
+- You cannot profile C/C++ code using `{profvis}`.
+
+- Using anonymous functions will make the results of `{profvis}` confusing.
+
+- The resuls are are a statistical sample of your call stack (what is being run and its ancestors), so your results will differ. But this only matters for really fast functions, which aren't the ones you care about.
+
+# Microbenchmarking
+
+- Benchmarking will compare small pieces of code.
+
+- This is only useful if you are using this code thousands of times a second.
+
+- Don't try to generalize small fast code with slower versions (i.g. knowing what's faster when $n=1$ tells you nothing about what's faster when $n = 10000000$).
+
+- Use `bench::mark()` to do microbenchmarking.
+
+    ```{r}
+    rsum <- function(x) {
+      sval <- 0
+      for (i in seq_along(x)) {
+        sval <- x[[i]] + sval
+      }
+      return(sval)
+    }
+    
+    x <- 1:100
+    lb <- bench::mark(
+      sum(x),
+      rsum(x)
+    )
+    lb
+    ```
+
+    So running `sum()` a million times would take about 0.2 seconds. Running `rsum()` a million times would take about 5 seconds.
+    
+    But rarly do you need to run `sum()` a million times, so typically either one is OK in real life.
+
+- Always pay attention to the units. 1 ms $>$ 1 µs $>$ 1 ns.
+    - 1 ms, then one thousand calls take a second.
+    - 1 µs, then one million calls take a second.
+    - 1 ns, then one billion calls take a second.
+
+- There is a nice plot method for `bench_mark` objects.
+
+    ```{r}
+    plot(lb)
+    ```
 
 # New Functions
 
