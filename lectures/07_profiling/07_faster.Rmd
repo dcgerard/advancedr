@@ -9,6 +9,7 @@ output:
     toc_float: false
     highlight: pygments
 urlcolor: "blue"
+bibliography: "07_bib.bib"
 ---
 
 ```{r setup, include=FALSE}

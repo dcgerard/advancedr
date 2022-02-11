@@ -148,6 +148,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 
 
@@ -391,7 +413,7 @@ $(document).ready(function () {
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
 <ul>
-<li>Before you get started, the <strong>two rules of software optimization</strong> are <span class="citation">[@jackson1975principles]</span>:
+<li>Before you get started, the <strong>two rules of software optimization</strong> are <span class="citation">(Jackson 1975)</span>:
 <ol style="list-style-type: decimal">
 <li>Don’t do it.</li>
 <li>Don’t do it yet (for experts only).</li>
@@ -438,8 +460,8 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">a =</span> <span class="st">&quot;alive&quot;</span>, <span class="at">d =</span> <span class="st">&quot;dead&quot;</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;d&quot;</span>), <span class="dv">10</span>, <span class="cn">TRUE</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>x[y]</span></code></pre></div>
-<pre><code>##       d       a       a       d       a       a       d       d       a       a 
-##  &quot;dead&quot; &quot;alive&quot; &quot;alive&quot;  &quot;dead&quot; &quot;alive&quot; &quot;alive&quot;  &quot;dead&quot;  &quot;dead&quot; &quot;alive&quot; &quot;alive&quot;</code></pre></li>
+<pre><code>##       d       d       a       d       d       d       a       a       d       a 
+##  &quot;dead&quot;  &quot;dead&quot; &quot;alive&quot;  &quot;dead&quot;  &quot;dead&quot;  &quot;dead&quot; &quot;alive&quot; &quot;alive&quot;  &quot;dead&quot; &quot;alive&quot;</code></pre></li>
 <li><p>Use R’s linear algebra operations. Whenever you can convert operations to linear algebra, it tends to run super fast since there are lots of optimizations that occur in the C libraries R uses.</p></li>
 </ul>
 </div>
@@ -457,8 +479,13 @@ $(document).ready(function () {
 <li>If you need to use a for-loop, and you cannot vectorize, that is when you shift to C.</li>
 </ul>
 </div>
-<div id="references" class="section level1">
-<h1>References</h1>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-jackson1975principles" class="csl-entry">
+Jackson, M. A. 1975. <em>Principles of Program Design</em>. <span>A.P.I.C.</span> Studies in Data Processing. Academic Press. <a href="https://books.google.com/books?id=QdImAAAAMAAJ">https://books.google.com/books?id=QdImAAAAMAAJ</a>.
+</div>
+</div>
 </div>
 
 <!DOCTYPE html>
