@@ -556,8 +556,8 @@ $(document).ready(function () {
 <pre><code>## # A tibble: 2 × 6
 ##   expression      min   median `itr/sec` mem_alloc `gc/sec`
 ##   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-## 1 sum(x)     149.01ns 164.03ns  4685866.        0B        0
-## 2 rsum(x)      3.26µs   3.44µs   272821.    68.4KB        0</code></pre>
+## 1 sum(x)     138.07ns 189.06ns  4482724.        0B        0
+## 2 rsum(x)      3.31µs   3.86µs   201372.    68.4KB        0</code></pre>
 <p>So running <code>sum()</code> a million times would take about 0.2 seconds. Running <code>rsum()</code> a million times would take about 5 seconds.</p>
 <p>But rarly do you need to run <code>sum()</code> a million times, so typically either one is OK in real life.</p></li>
 <li><p>Always pay attention to the units. 1 ms <span class="math inline">\(&gt;\)</span> 1 µs <span class="math inline">\(&gt;\)</span> 1 ns.</p>
@@ -572,13 +572,14 @@ $(document).ready(function () {
 </ul>
 <div id="exercise-1" class="section level2">
 <h2>Exercise</h2>
-<p>For summing up the columns of a matrix, I can think of at least three ways</p>
+<p>For summing up the columns of a matrix, I can think of at least four ways</p>
 <ol style="list-style-type: decimal">
 <li><code>colSums()</code></li>
 <li>Matrix multiplication on the left by a vector of <code>1</code>’s</li>
 <li>Using a for-loop on the columns, calculating the sum each time.</li>
+<li>Using functional programming with <code>apply()</code>.</li>
 </ol>
-<p>Create functions that implements all three of these approaches and tell me which one is the fastest for <span class="math inline">\(100\times 100\)</span>, <span class="math inline">\(1000\times 100\)</span>, and <span class="math inline">\(100\times 1000\)</span> matrices.</p>
+<p>Create functions that implements all four of these approaches and tell me which one is the fastest for <span class="math inline">\(100\times 100\)</span>, <span class="math inline">\(1000\times 100\)</span>, and <span class="math inline">\(100\times 1000\)</span> matrices.</p>
 </div>
 </div>
 <div id="new-functions" class="section level1">
