@@ -26,7 +26,8 @@ klippy::klippy()
 
 - Overview of Metaprogramming.
 - Learn a couple tricks.
-- Hadley goes into a lot of depth in Chapters 17--21 of [Advanced R](https://adv-r.hadley.nz/). But we'll just learn some common and simple use-cases. 
+- Required: Chapter 17 of [Advanced R](https://adv-r.hadley.nz/)
+- Optional: Hadley goes into a lot of depth in Chapters 18--21 of [Advanced R](https://adv-r.hadley.nz/). But we'll just learn some common and simple use-cases. 
     - Those chapters only need to be understood in great depth if you actually want to help contribute to the tidyverse.
 
 # Overview
@@ -98,31 +99,41 @@ klippy::klippy()
     eval(y)
     typeof(y)
     ```
-    - Calls act a lot like lists, where you can access arguments with list-like operators.
-        ```{r}
-        fun <- rlang::expr(f(x, y))
-        fun
-        ```
-    - The first element of a call is the function argument.
-        ```{r}
-        fun[[1]]
-        ```
-    - Each additional element of a call is an argument.
-        ```{r}
-        fun[[2]]
-        fun[[3]]
-        ```
-    - You can add new arguments by inserting *symbols*.
-        ```{r}
-        fun[[4]] <- rlang::expr(z)
-        fun
-        ```
-    - You can make arguments have default values.
-        ```{r}
-        fun$w <- 1
-        fun
-        ```
-  
+- Calls act a lot like lists, where you can access arguments with list-like operators.
+    ```{r}
+    fun <- rlang::expr(f(x, y))
+    fun
+    ```
+- The first element of a call is the function argument.
+    ```{r}
+    fun[[1]]
+    ```
+- Each additional element of a call is an argument.
+    ```{r}
+    fun[[2]]
+    fun[[3]]
+    ```
+- You can add new arguments by inserting *symbols*.
+    ```{r}
+    fun[[4]] <- rlang::expr(z)
+    fun
+    ```
+- You can make arguments have default values.
+    ```{r}
+    fun$w <- 1
+    fun
+    ```
+    
+- To create a call from expressions, use `rlang::call2()`. The first argument is the function name (in quotes, or as an expression), and subsequent arguments are expressions of arguments.
+
+    ```{r}
+    x <- c(1, 2, 3)
+    y <- rlang::expr(x)
+    z <- rlang::call2("sum", y)
+    z
+    eval(z)
+    ```
+
 # Capturing Code
 
 - As we've seen, to capture code, use `rlang::expr()`.
@@ -193,6 +204,22 @@ klippy::klippy()
     }
     capall(x + y, y * 2)
     ```
+    
+- Typically, when you use `enexprs()`, you get a list of expressions. You can then work with each individually through a for-loop. E.g.
+
+    ```{r}
+    evalall <- function(...) {
+      dots <- rlang::enexprs(...)
+      lval <- list()
+      for (i in seq_along(dots)) {
+        lval[[i]] <- eval(dots[[i]])
+      }
+      return(lval)
+    }
+    a <- 3
+    b <- 2
+    evalall(a + b, b^2)
+    ```
 
 ## Evaluated versus Quoted Arguments
 
@@ -223,7 +250,6 @@ klippy::klippy()
     
     4. Both `mtcars` and `"mpg"` are evaluated. To see this, consider `` `[[`(mtcars, "mpg") ``.
     ```
-  
 
 ## Quosures
 
@@ -264,6 +290,9 @@ klippy::klippy()
 
     ```{r}
     plot_red <- function(x, y) {
+      oldpar <- par(mar = c(2.4, 2.8, 1, 0) + 0.5, mgp = c(1.8, 0.6, 0), las = 1)
+      on.exit(par(oldpar), add = TRUE)
+        
       plot(x, y, col = "red")
     }
     plot_red(x = mtcars$wt, y = mtcars$mpg)
@@ -274,6 +303,9 @@ klippy::klippy()
 
     ```{r}
     plot_red <- function(x, y) {
+      oldpar <- par(mar = c(2.4, 2.8, 1, 0) + 0.5, mgp = c(1.8, 0.6, 0), las = 1)
+      on.exit(par(oldpar), add = TRUE)
+      
       xexpr <- rlang::enexpr(x)
       yexpr <- rlang::enexpr(y)
       plot(x, y, col = "red", 
@@ -287,6 +319,9 @@ klippy::klippy()
 
     ```{r}
     plot_red <- function(x, y, data) {
+      oldpar <- par(mar = c(2.4, 2.8, 1, 0) + 0.5, mgp = c(1.8, 0.6, 0), las = 1)
+      on.exit(par(oldpar), add = TRUE)
+      
       xexpr <- rlang::enexpr(x)
       yexpr <- rlang::enexpr(y)
       plot(x = data[[xexpr]], 
@@ -368,6 +403,31 @@ klippy::klippy()
     ```{r, warning = FALSE, message = FALSE}
     mathexp <- rlang::expr(hat(y)[i] == !!coefvec[[1]] - !!coefvec[[2]] * x[i])
     pl + annotate(geom = "text", x = 4.5, y = 30, label = mathexp)
+    ```
+    
+- If you want to plot more than one math equation, you need to use an **expression vector**, which is an object output by `base::expression()`
+
+    ```{r}
+    evec <- expression(x^2, sqrt(y))
+    plot(x = c(1, 2), y = c(1, 2), type = "n", xlim = c(0, 3), ylim = c(0, 3))
+    text(x = c(1, 2), y = c(1, 2), labels = evec)
+    ```
+
+- It won't work if you try to use a list of expressions:
+
+    ```{r}
+    evec <- rlang::exprs(x^2, sqrt(y))
+    plot(x = c(1, 2), y = c(1, 2), type = "n", xlim = c(0, 3), ylim = c(0, 3))
+    text(x = c(1, 2), y = c(1, 2), labels = evec)
+    ```
+    
+- For a `{ggplot2}` solution, I've found that I have to create a string that I then parse to an expression using `parse = TRUE` in `geom_text()`:
+
+    ```{r}
+    df <- data.frame(x = 1:2, y = 1:2, label = c("x^2", "sqrt(y)"))
+    ggplot(data = df, mapping = aes(x = x, y = y, label = label)) +
+      geom_text(parse = TRUE) +
+      theme_bw()
     ```
     
 # Application: Using the tidyverse in a function
@@ -522,13 +582,76 @@ klippy::klippy()
       }
     )
     ```
-
-
+    
 - Let's try it out
 
     ```{r}
     filter_df2(obj = mydf2, tailnum == "N105UW")
     ```
+
+# Exercises
+
+1. Use `rlang::call2()` to create a call for `table(x, y)`. Then remove the `y` component from that call to get `table(x)`.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    xexp <- rlang::expr(x)
+    yexp <- rlang::expr(y)
+    cout <- rlang::call2("table", xexp, yexp)
+    cout
+    cout[1:2]
+    ```
+    
+2. `stats::numericDeriv()` requires an expression and an environment. Calculate the derivative of `log(x) / sin(x)` evaluated at `x = 2`
+
+    ```{r, eval = FALSE, echo = FALSE}
+    myenv <- rlang::env(x = 2)
+    myexp <- rlang::expr(log(x) / sin(x))
+    stats::numericDeriv(expr = myexp, theta = "x", rho = myenv)
+    
+    ## It's the attribute. The value is the value at x = 2
+    x <- 2
+    eval(myexp)
+    ```
+
+3. You can calculate symbolic derivatives in R with `D()`, but you have to use expressions. Calculate the derivative of $\sin(\cos(x + 1)^2)$. Then use that returned expression to evaluate the derivative at $x =$ 1, 2, and 3.
+
+    ```{r, eval = FALSE, echo = FALSE}
+    myexp <- rlang::expr(sin(cos(x + 1)^2))
+    dout <- D(myexp, "x")
+    dout
+    x <- c(1, 2, 3)
+    eval(dout)
+    ```
+    
+4. Create your own version of `stopifnot()` called `stop_if_not()`. E.g.:
+
+    ```{r, eval = TRUE, echo = FALSE}
+    stop_if_not <- function(...) {
+      quolist <- rlang::enquos(...)
+      
+      for (i in seq_along(quolist)) {
+        eout <- rlang::eval_tidy(quolist[[i]])
+        quotext <- rlang::expr_text(quolist[[i]])
+        if (!is.logical(eout)) {
+          stop(paste0(quotext, " is not a predicate"))
+        } else if (length(eout) != 1) {
+          stop(paste0(quotext, " is not length 1"), call. = FALSE)
+        } else if (!eout) {
+          stop(paste0(quotext, " is not TRUE"), call. = FALSE)
+        }
+      }
+      
+    }
+    ```
+    
+    ```{r, error = TRUE}
+    stop_if_not(1 == 1, 2 > 1)
+    stop_if_not(1 == 0)
+    stop_if_not(c(1,2,3) == 2)
+    stop_if_not("potato")
+    ```
+
+    - *Note*: The `{assertthat}` package explores this idea to the extreme.
 
 # New Functions
 
@@ -536,6 +659,7 @@ klippy::klippy()
 - `rlang::enexpr()`: Create an expression of an argument within a function (quote).
 - `base::eval()`: Evaluate an expression.
 - `rlang::expr_text()`: Convert an expression to text (deparse).
+- `rlang::call2()`: Create a call from a function name and some expression arguments.
 - `!!`: Unquote by evaluating single symbol.
 - `rlang::quo()`: Create a quosure.
 - `rlang::enquo()`: Create a quosure of an argument in within a function.

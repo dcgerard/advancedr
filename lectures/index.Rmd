@@ -50,7 +50,7 @@ This repository contains material based upon work supported by the National Scie
 - 06 Metaprogramming
   - [Brief Overview of Metaprogramming](./06_meta.html)
 - 07 Performance/Profiling/Memory
-  - [Profiling / Microbenchmarking](./07_profiling.html)
+  - [Profiling and Microbenchmarking](./07_profiling.html)
   - [Performant R Code](./07_faster.html)
 - 08 C++ and Rcpp
   - [Integrating C++ and R](./08_cpp.html)
