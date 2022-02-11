@@ -421,7 +421,7 @@ $(document).ready(function () {
 <li>Don’t do it.</li>
 <li>Don’t do it yet (for experts only).</li>
 </ol></li>
-<li><p>If you try to optimize too soon, you will usually end up wasting more time that you save. Your code will usually become clunky and harder to maintain.</p></li>
+<li><p>If you try to optimize too soon, you will usually end up wasting more time than you save. Your code will usually become clunky and harder to maintain.</p></li>
 <li><p>You should only start optimizing your code after:</p>
 <ol style="list-style-type: decimal">
 <li>You have a perfectly clear and unoptimized solution.</li>
@@ -556,8 +556,8 @@ $(document).ready(function () {
 <pre><code>## # A tibble: 2 × 6
 ##   expression      min   median `itr/sec` mem_alloc `gc/sec`
 ##   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-## 1 sum(x)      141.9ns 166.94ns  4675373.        0B        0
-## 2 rsum(x)       3.3µs   3.45µs   272005.    68.4KB        0</code></pre>
+## 1 sum(x)     149.01ns 164.03ns  4685866.        0B        0
+## 2 rsum(x)      3.26µs   3.44µs   272821.    68.4KB        0</code></pre>
 <p>So running <code>sum()</code> a million times would take about 0.2 seconds. Running <code>rsum()</code> a million times would take about 5 seconds.</p>
 <p>But rarly do you need to run <code>sum()</code> a million times, so typically either one is OK in real life.</p></li>
 <li><p>Always pay attention to the units. 1 ms <span class="math inline">\(&gt;\)</span> 1 µs <span class="math inline">\(&gt;\)</span> 1 ns.</p>

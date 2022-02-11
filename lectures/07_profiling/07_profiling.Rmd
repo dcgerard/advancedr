@@ -34,7 +34,7 @@ klippy::klippy()
     1. Don't do it.
     2. Don’t do it yet (for experts only).
 
-- If you try to optimize too soon, you will usually end up wasting more time that you save. Your code will usually become clunky and harder to maintain.
+- If you try to optimize too soon, you will usually end up wasting more time than you save. Your code will usually become clunky and harder to maintain.
 
 - You should only start optimizing your code after:
     1. You have a perfectly clear and unoptimized solution.
