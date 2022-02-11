@@ -227,7 +227,7 @@ profvis::profvis(lmsuck(x = x, y = y))
     - 1 µs, then one million calls take a second.
     - 1 ns, then one billion calls take a second.
 
-- There is a nice plot method for `bench_mark` objects.
+- There is a nice plot method for `bench_mark` objects (multimodality comes from other processes running in the background).
 
     ```{r, message = FALSE}
     plot(lb)
