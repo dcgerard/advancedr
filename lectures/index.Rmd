@@ -49,6 +49,7 @@ This repository contains material based upon work supported by the National Scie
   - [S4 and Bioconductor](./05_bioconductor.html)
 - 06 Metaprogramming
   - [Brief Overview of Metaprogramming](./06_meta.html)
+  - [Formulas](./06_formulas.html)
 - 07 Performance/Profiling/Memory
   - [Profiling and Microbenchmarking](./07_profiling.html)
   - [Performant R Code](./07_faster.html)

@@ -34,7 +34,7 @@ klippy::klippy()
     1. Don't do it.
     2. Don’t do it yet (for experts only).
 
-- If you try to optimize too soon, you will usually end up wasting more time that you save. Your code will usually become clunky and harder to maintain.
+- If you try to optimize too soon, you will usually end up wasting more time than you save. Your code will usually become clunky and harder to maintain.
 
 - You should only start optimizing your code after:
     1. You have a perfectly clear and unoptimized solution.
@@ -143,7 +143,53 @@ klippy::klippy()
 
 - Using anonymous functions will make the results of `{profvis}` confusing.
 
-- The resuls are are a statistical sample of your call stack (what is being run and its ancestors), so your results will differ. But this only matters for really fast functions, which aren't the ones you care about.
+- The results are are a statistical sample of your call stack (what is being run and its ancestors), so your results will differ. But this only matters for really fast functions, which aren't the ones you care about.
+
+## Exercise
+
+Here is a crappy implementation of fitting a linear model:
+
+```{r}
+lmsuck <- function(x, y) {
+  x <- cbind(1, x)
+  betahat <- c(solve(t(x) %*% x) %*% t(x) %*% y)
+  names(betahat) <- c("beta0", "beta1")
+  fits <- c(x %*% betahat)
+  resids <- y - fits
+  sigma <- sqrt(sum(resids^2) / (nrow(x) - ncol(x)))
+  return(list(betahat = betahat, 
+              sigma = sigma, 
+              fits = fits, 
+              resids = resids, 
+              x = x, 
+              y = y))
+}
+```
+
+It seems to give similar results:
+
+```{r}
+lm_sout <- lmsuck(x = mtcars$wt, y = mtcars$mpg)
+lm_g <- lm(mpg ~ wt, data = mtcars)
+
+lm_sout$betahat
+coef(lm_g)
+
+lm_sout$sigma
+sigma(lm_g)
+```
+
+Profile `lmsuck()` on a large ($n \geq 100000$) simulated dataset and tell me what takes the longest.
+
+```{r, eval = FALSE, echo = FALSE}
+n <- 1000000
+x <- runif(n)
+beta0 <- 0
+beta1 <- 2
+y <- beta0 + beta1 * x + rnorm(n)
+profvis::profvis(lmsuck(x = x, y = y)) 
+## Matrix multiplication takes the longest
+```
 
 # Microbenchmarking
 
@@ -181,11 +227,80 @@ klippy::klippy()
     - 1 µs, then one million calls take a second.
     - 1 ns, then one billion calls take a second.
 
-- There is a nice plot method for `bench_mark` objects.
+- There is a nice plot method for `bench_mark` objects (multimodality comes from other processes running in the background).
 
-    ```{r}
+    ```{r, message = FALSE}
     plot(lb)
     ```
+    
+## Exercise
+
+For summing up the columns of a matrix, I can think of at least four ways
+
+1. `colSums()`
+2. Matrix multiplication on the left by a vector of `1`'s
+3. Using a for-loop on the columns, calculating the sum each time.
+4. Using functional programming with `apply()`.
+
+Create functions that implements all four of these approaches and tell me which one is the fastest for $100\times 100$, $1000\times 100$, and $100\times 1000$ matrices.
+
+```{r, eval = FALSE, echo = FALSE}
+f_colsum <- function(A) {
+  return(colSums(A))
+}
+
+f_mult <- function(A) {
+  return(c(matrix(1, nrow = 1, ncol = nrow(A)) %*% A))
+}
+
+f_loop <- function(A) {
+  svec <- rep(NA_real_, length.out = ncol(A))
+  for (i in seq_len(ncol(A))) {
+    svec[[i]] <- sum(A[, i])
+  }
+  return(svec)
+}
+
+f_apply <- function(A) {
+  return(apply(X = A, MARGIN = 2, FUN = sum))
+}
+
+A <- matrix(runif(25), ncol = 5, nrow = 5)
+s1 <- f_colsum(A)
+s2 <- f_mult(A)
+s3 <- f_loop(A)
+s4 <- f_apply(A)
+stopifnot(s1 == s2, s1 == s3, s1 == s4)
+
+A <- matrix(runif(10000), nrow = 100, ncol = 100)
+bench::mark(
+  f_colsum(A),
+  f_mult(A),
+  f_loop(A),
+  f_apply(A)
+)
+
+A <- matrix(runif(10000), nrow = 100, ncol = 1000)
+bench::mark(
+  f_colsum(A),
+  f_mult(A),
+  f_loop(A),
+  f_apply(A)
+)
+
+A <- matrix(runif(10000), nrow = 1000, ncol = 100)
+bench::mark(
+  f_colsum(A),
+  f_mult(A),
+  f_loop(A),
+  f_apply(A)
+)
+## 100x100: matrix mult and colSum work about the same in terms of speed
+## 100x1000: Again, mult and colSum work about the same in terms of speed
+## 1000x100: Matrix multiplication works a little better
+## For loops and apply are always the worst
+## matrix mult uses more memory in all scenarios than colSums
+```
 
 # New Functions
 

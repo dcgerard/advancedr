@@ -9,6 +9,7 @@ output:
     toc_float: false
     highlight: pygments
 urlcolor: "blue"
+bibliography: "07_bib.bib"
 ---
 
 ```{r setup, include=FALSE}
@@ -29,5 +30,82 @@ klippy::klippy()
 - Chapter 24 of [Advanced R](https://adv-r.hadley.nz/).
 - Strategies for faster R code.
 
-# New Functions
+# Motivation
 
+- Before you get started, the **two rules of software optimization** are [@jackson1975principles]:
+    1. Don't do it.
+    2. Don’t do it yet (for experts only).
+
+# Keep Multiple Approaches
+
+- Your first goal should be clarity and robustness, not speed.
+
+- Write code in an unoptimized but clear.
+
+- Once you have it working and you want to optimize, do not delete that approach. 
+
+- Rather, write a new function with the new approach, and compare the old and new approaches in a unit test.
+
+# Use Less General Functions
+
+- Using functions that are specific to a problem is almost always faster than using functions that are general.
+
+- Using `rowSums()` (very specific) is faster than `apply()` (very general).
+- Using `vapply()` (prespecifies output so more specific) is faster than `sapply()` (does not prespecify output).
+- `any(x == 10)` is faster than `10 %in% x` because testing for equality is more specific than testing for inclusion.
+
+# Vectorize
+
+- Vectorization means operating on whole vectors instead of individual elements of a vectors.
+
+- E.g., doing
+
+    ```{r}
+    x <- 1:100
+    x <- x + 1
+    ```
+   
+   instead of 
+   
+    ```{r}
+    x <- 1:100
+    for (i in seq_along(x)) {
+      x[[i]] <- x[[i]] + 1
+    }
+    ```
+   
+- It is almost always faster to vectorize because a lot of those underlying implementations are written in C (which is faster).
+
+- Whenever you use a for-loop, first think if there is another way that you can do it without the for-loop. 
+
+- I don't mean try using `map()` or `lapply()`, since those aren't much faster than for-loops.
+
+- I mean try to use base operations where possible.
+
+- Use subassignment:
+    ```{r, eval = FALSE}
+    x[is.na(x)] <- 0
+    ```
+
+- Use look-up tables
+    ```{r}
+    x <- c(a = "alive", d = "dead")
+    y <- sample(c("a", "d"), 10, TRUE)
+    x[y]
+    ```
+
+- Use R's linear algebra operations. Whenever you can convert operations to linear algebra, it tends to run super fast since there are lots of optimizations that occur in the C libraries R uses.
+
+# Avoid Copies
+
+- Pre-define your outputs before you fill them up in a for-loop.
+
+- Copy-on-modify is very expensive. You can only avoid it if you pre-define your outputs.
+
+- If you cannot pre-define your outputs, use a list, since lists just make shallow copies when they copy-on-modify.
+
+# Write in C++
+
+- If you need to use a for-loop, and you cannot vectorize, that is when you shift to C.
+
+# References
