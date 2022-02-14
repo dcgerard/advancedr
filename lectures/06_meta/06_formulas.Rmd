@@ -48,7 +48,7 @@ klippy::klippy()
     3. An environment.
     
 - So they are two calls with an environment attached (like a quosure).
-  - Formally, they are expression vectors of length 3, where the first element is the function call `~`, the second element is the LHS, and the third element is the RHS.
+  - Formally, they are expressions of length 3, where the first element is the function call `~`, the second element is the LHS, and the third element is the RHS. They have a `.Environment` attribute.
 
 - You commonly create a formula with a tilde `~`.
 
@@ -88,7 +88,7 @@ klippy::klippy()
 
 - In modeling contexts, the LHS contains the name of the response variable. 
 
-- The RHS contains the predictor variables that are linearly related the response (up to some link function).
+- The RHS contains the predictor variables that are linearly related to the response (up to some link function).
 
 - Terms separated by a `+` indicate main effects.
 
@@ -170,7 +170,7 @@ klippy::klippy()
     
 - Lots of folks prefer treating effects as random (as opposed to fixed) when they are interested as the population as a whole more than specific values of a covariate.
 
-- E.g. in a study on sleep deprivation, Researchers measured reaction times $y$ for individuals $z$ after so many days of sleep deprivation $x$.
+- E.g. in a study on sleep deprivation, Researchers measured reaction times for individuals after so many days of sleep deprivation.
     
     ```{r, fig.width = 6, fig.height = 6, message = FALSE}
     library(ggplot2)
@@ -281,7 +281,7 @@ klippy::klippy()
     
 - You can do manipulations on `terms` objects with `delete.response()`, `drop.terms()`, and `reformulate()`. 
 
-- `model.matrix()` is can be used to create the predictor variable matrix (the $X$ matrix from regression).
+- `model.matrix()` can be used to create the design matrix (the $X$ matrix from regression).
 
     ```{r}
     X <- model.matrix(object = f, data = mtcars)

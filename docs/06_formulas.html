@@ -413,7 +413,7 @@ $(document).ready(function () {
 </ol></li>
 <li><p>So they are two calls with an environment attached (like a quosure).</p>
 <ul>
-<li>Formally, they are expression vectors of length 3, where the first element is the function call <code>~</code>, the second element is the LHS, and the third element is the RHS.</li>
+<li>Formally, they are expressions of length 3, where the first element is the function call <code>~</code>, the second element is the LHS, and the third element is the RHS. They have a <code>.Environment</code> attribute.</li>
 </ul></li>
 <li><p>You commonly create a formula with a tilde <code>~</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> y <span class="sc">~</span> x <span class="sc">+</span> z</span>
@@ -442,7 +442,7 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">env</span>()</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">new_formula</span>(<span class="at">lhs =</span> rlang<span class="sc">::</span><span class="fu">expr</span>(y), <span class="at">rhs =</span> rlang<span class="sc">::</span><span class="fu">expr</span>(x), <span class="at">env =</span> e)</span></code></pre></div>
 <pre><code>## y ~ x
-## &lt;environment: 0x55570c0afcd8&gt;</code></pre></li>
+## &lt;environment: 0x56386ed41db8&gt;</code></pre></li>
 <li><p>You can have one-sided formulas with only a RHS, in which case they have length 2.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> <span class="er">~</span> x <span class="sc">+</span> y</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>f2</span></code></pre></div>
@@ -455,7 +455,7 @@ $(document).ready(function () {
 <h1>Formula Syntax</h1>
 <ul>
 <li><p>In modeling contexts, the LHS contains the name of the response variable.</p></li>
-<li><p>The RHS contains the predictor variables that are linearly related the response (up to some link function).</p></li>
+<li><p>The RHS contains the predictor variables that are linearly related to the response (up to some link function).</p></li>
 <li><p>Terms separated by a <code>+</code> indicate main effects.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>mpg <span class="sc">~</span> wt <span class="sc">+</span> drat <span class="sc">+</span> hp</span></code></pre></div>
 <pre><code>## mpg ~ wt + drat + hp</code></pre>
@@ -515,7 +515,7 @@ $(document).ready(function () {
 <li>Observations are a part of a hierarchy. E.g. data collected on students who belong to schools who belong to districts.</li>
 </ul></li>
 <li><p>Lots of folks prefer treating effects as random (as opposed to fixed) when they are interested as the population as a whole more than specific values of a covariate.</p></li>
-<li><p>E.g. in a study on sleep deprivation, Researchers measured reaction times <span class="math inline">\(y\)</span> for individuals <span class="math inline">\(z\)</span> after so many days of sleep deprivation <span class="math inline">\(x\)</span>.</p>
+<li><p>E.g. in a study on sleep deprivation, Researchers measured reaction times for individuals after so many days of sleep deprivation.</p>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;sleepstudy&quot;</span>, <span class="at">package =</span> <span class="st">&quot;lme4&quot;</span>)</span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sleepstudy, <span class="fu">aes</span>(<span class="at">x =</span> Days, <span class="at">y =</span> Reaction)) <span class="sc">+</span></span>
@@ -690,7 +690,7 @@ $(document).ready(function () {
 <li><p>The <code>terms</code> object can be read about via</p>
 <div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>?terms.object</span></code></pre></div></li>
 <li><p>You can do manipulations on <code>terms</code> objects with <code>delete.response()</code>, <code>drop.terms()</code>, and <code>reformulate()</code>.</p></li>
-<li><p><code>model.matrix()</code> is can be used to create the predictor variable matrix (the <span class="math inline">\(X\)</span> matrix from regression).</p>
+<li><p><code>model.matrix()</code> can be used to create the design matrix (the <span class="math inline">\(X\)</span> matrix from regression).</p>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="at">object =</span> f, <span class="at">data =</span> mtcars)</span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(X)</span></code></pre></div>
 <pre><code>##                   (Intercept)  hp wt:drat
