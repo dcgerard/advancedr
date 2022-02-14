@@ -139,7 +139,7 @@ klippy::klippy()
 
 ## Notes
 
-- You cannot profile C/C++ code using `{profvis}`. You would have to use a C++ profiler like [gperftools](https://github.com/gperftools/gperftools).
+- You cannot profile C/C++ code using `{profvis}`. You would have to use a C++ profiler like [gperftools](https://github.com/gperftools/gperftools). More information can be found in [Section 3.4 of Writing R Extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Profiling-compiled-code).
 
 - Using anonymous functions will make the results of `{profvis}` confusing.
 

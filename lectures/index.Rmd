@@ -54,7 +54,8 @@ This repository contains material based upon work supported by the National Scie
   - [Profiling and Microbenchmarking](./07_profiling.html)
   - [Performant R Code](./07_faster.html)
 - 08 C++ and Rcpp
-  - [Integrating C++ and R](./08_cpp.html)
+  - [Integrating C++ and R](./08_cpp_setup.html)
+  - [C++ Basics](./08_cpp_basics.html)
   - Data Types
   - Vectors / Vector Operations
   - Control Flow

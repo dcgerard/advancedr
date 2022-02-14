@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-11" />
+<meta name="date" content="2022-02-14" />
 
 <title>Profiling and Benchmarking Performance</title>
 
@@ -380,7 +380,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Profiling and Benchmarking Performance</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-11</h4>
+<h4 class="date">2022-02-14</h4>
 
 </div>
 
@@ -493,7 +493,7 @@ $(document).ready(function () {
 <div id="notes" class="section level2">
 <h2>Notes</h2>
 <ul>
-<li><p>You cannot profile C/C++ code using <code>{profvis}</code>. You would have to use a C++ profiler like <a href="https://github.com/gperftools/gperftools">gperftools</a>.</p></li>
+<li><p>You cannot profile C/C++ code using <code>{profvis}</code>. You would have to use a C++ profiler like <a href="https://github.com/gperftools/gperftools">gperftools</a>. More information can be found in <a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Profiling-compiled-code">Section 3.4 of Writing R Extensions</a>.</p></li>
 <li><p>Using anonymous functions will make the results of <code>{profvis}</code> confusing.</p></li>
 <li><p>The results are are a statistical sample of your call stack (what is being run and its ancestors), so your results will differ. But this only matters for really fast functions, which aren’t the ones you care about.</p></li>
 </ul>
@@ -556,8 +556,8 @@ $(document).ready(function () {
 <pre><code>## # A tibble: 2 × 6
 ##   expression      min   median `itr/sec` mem_alloc `gc/sec`
 ##   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-## 1 sum(x)     157.98ns  168.1ns  4557299.        0B        0
-## 2 rsum(x)      3.26µs   3.45µs   271093.    68.4KB        0</code></pre>
+## 1 sum(x)     135.97ns 156.11ns  4903545.        0B        0
+## 2 rsum(x)      3.27µs   3.44µs   266521.    68.4KB        0</code></pre>
 <p>So running <code>sum()</code> a million times would take about 0.2 seconds. Running <code>rsum()</code> a million times would take about 5 seconds.</p>
 <p>But rarly do you need to run <code>sum()</code> a million times, so typically either one is OK in real life.</p></li>
 <li><p>Always pay attention to the units. 1 ms <span class="math inline">\(&gt;\)</span> 1 µs <span class="math inline">\(&gt;\)</span> 1 ns.</p>

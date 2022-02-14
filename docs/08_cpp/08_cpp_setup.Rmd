@@ -1,0 +1,181 @@
+---
+title: "Rcpp Setup"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output:  
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    highlight: pygments
+urlcolor: "blue"
+bibliography: "08_bib.bib"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo       = TRUE, 
+                      fig.align  = "center",
+                      fig.height = 3, fig.width = 4)
+ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
+
+# Learning Objectives
+
+- Setting up Rcpp
+- [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
+- Chapter 25 of [Advanced R](https://adv-r.hadley.nz/rcpp.html)
+- [R's C internals](https://github.com/hadley/r-internals)
+
+# When to Go to C++
+
+- Before you get started, the **two rules of software optimization** are [@jackson1975principles]:
+    1. Don't do it.
+    2. Don’t do it yet (for experts only).
+
+- You are all expert R programmers. So you should always begin in R.
+
+- When you move to C++, only do so in cases where it will help.
+
+- It helps when *all* three of the following occur:
+    1. You use a for-loop over a long vector or a large matrix/array
+    2. This for-loop cannot be vectorized (because each iteration depends on previous iterations), and 
+    3. Each iteration of the for-loop is relatively fast.
+
+- The above is typically the only reason why you should switch. But as you get more advanced computational skills, you might switch to use data structures implemented in C++ like [heaps](https://en.wikipedia.org/wiki/Heap_(data_structure)) or [binary trees](https://en.wikipedia.org/wiki/Binary_tree) etc...
+    - A lot of nice ones are in the [STL](https://en.wikipedia.org/wiki/Standard_Template_Library) or [Boost](https://en.wikipedia.org/wiki/Boost_(C%2B%2B_libraries)) libraries.
+
+# Rcpp
+
+- `{Rcpp}` is a fantastic R package that makes integrating R and C++ almost painless.
+
+- In interactive mode, you can write a C++ function by using `Rcpp::cppFunction()`. You put the source code in quotes.
+
+    ```{r}
+    Rcpp::cppFunction(
+      '
+      void hello_world() {
+        Rcpp::Rcout << "Hello World";
+      }
+      '
+    )
+    ```
+
+- You can then use that funciton like you would any usual R function.
+
+    ```{r}
+    hello_world()
+    ```
+
+- People almost never do that in practice. If you are using `{Rcpp}`, it is almost always in an R package.
+
+- `usethis::use_rcpp()` will automatically format an R package to have the appropriate structure for interfacing with `{Rcpp}`.
+
+- You will have to include these lines in your documentation somewhere. I typically include them in the documentation for the package. Make sure you replace `package_name` with the name of the package. Follow instructions from `{usethis}`
+    ```{r, eval = FALSE}
+    #' @useDynLib package_name, .registration = TRUE
+    #' @importFrom Rcpp sourceCpp
+    NULL
+    ```
+
+- After running `usethis::use_rcpp()`, it will
+    1. Add the following lines to your DESCRIPTION file:
+    
+        ```
+        LinkingTo: 
+            Rcpp
+        Imports: 
+            Rcpp
+        ```
+        
+    2. Create a `src` directory.
+    
+- You place all C++ files in the `src` directory.
+
+- All C++ files end in ".cpp".
+
+- Every file should generally begin with
+    ```{Rcpp, eval = FALSE}
+    #include <Rcpp.h>
+    using namespace Rcpp;
+    ```
+
+- The `#include <Rcpp.h>` line basically makes Rcpp available to us in C++. 
+    - An R analogy would be including the `{Rcpp}` package in the Imports field of the DESCRIPTION folder. We now have access to the functions in from Rcpp.
+    
+- The `using namespace Rcpp;` line brings the Rcpp namespace into scope so that we can use functions without declaring that they come from Rcpp. E.g., we can use `Rcout` instead of `Rcpp::Rcout` (just like importing a function in R).
+
+- C++ files should be entirely composed of functions (just like R scripts in packages).
+
+- A C++ function is of the form
+
+    ```
+    ftype fname(arg1Type arg1, arg2Type arg2) {
+      // code goes here
+      return retval;
+    }
+    ```
+
+- `ftype` is the type that is returned, such as `int` or `double` or `Rcpp::NumericVector`, etc...
+
+- `fname` is the function name that you choose.
+
+- `arg1Type` and `arg2Type` are the types of the arguments for the function.
+
+- All C++ functions end with `return` followed by the object that is being returned.
+
+- Notice that you don't use assignment for creating C++ functions.
+
+- For example, here I return the sum of two integers:
+
+    ```{Rcpp}
+    // [[Rcpp::export]]
+    int add2(int x, int y) {
+      int sum = x + y;
+      return sum;
+    }
+    ```
+    
+    ```{r}
+    add2(1, 2)
+    ```
+
+- Comments in C++ are `//`, not `#`.
+
+- If you want R to have access to an C++ function, you must include the exact line right above the function:
+
+    ```
+    // [[Rcpp::export]]
+    ```
+
+- If you don't include this, it will still be available to your other C++ functions, but not to R.
+
+- You document C++ functions exactly like R code, except you begin `{roxygen2}` lines with `//'`.
+
+    ```{Rcpp, eval = FALSE}
+    //' @title Add two integers
+    //' 
+    //' @param x Integer 1
+    //' @param y Integer 2
+    //' 
+    //' @return Their sum
+    //' 
+    //' @author David Gerard
+    // [[Rcpp::export]]
+    int add2(int x, int y) {
+      int sum = x + y;
+      return sum;
+    }
+    ```
+
+- The workflow for working with Rcpp is:
+    1. Work on a C++ function.
+    2. Run `devtools::load_all()` to compile the function and load it into memory.
+        - Or run `devtools::document()` if you changed the documentation.
+    3. Test the function.
+    4. Rinse and repeat.
+    
+# References
