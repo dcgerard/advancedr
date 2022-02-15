@@ -213,10 +213,10 @@ environment(square)
 
 - Functions and variables can share names (though, this is not a good idea).
 
-```{r}
-sum <- c(10, 11)
-sum(sum)
-```
+    ```{r}
+    sum <- c(10, 11)
+    sum(sum)
+    ```
 
 - This is allowed since the function and the variable are in different environments. The `sum` object is in the global environment while the `sum()` function is in the `package:base` environment. More on this in Chapter 7.
 
@@ -229,19 +229,19 @@ sum(sum)
 
 - R determines *where* to look at function creation time (e.g. one level up), but it determines *what* is there at evaluation time.
 
-```{r}
-a <- 1
-g11()
-
-a <- 12
-g11()
-```
+    ```{r}
+    a <- 1
+    g11()
+    
+    a <- 12
+    g11()
+    ```
 
 ## Advanced R Exercises
 
 1. What does the following code return? Why? Describe how each of the three c’s is interpreted.
 
-    ```{r}
+    ```{r, eval = FALSE}
     c <- 10
     c(c = c)
     ```
@@ -305,7 +305,9 @@ g11()
 
 - I've used this property before, e.g., for choosing initial values of an optimization approach based on the input data.
 
-- Note that default arguments are evaluated inside the function, while user supplied arguments are evaluated outside the function.
+- *Default arguments* are evaluated inside the function the first time the argument is used.
+
+- *User supplied arguments* are evaluated outside the function.
 
 - This example from Advanced R blew my mind:
     ```{r}
@@ -321,7 +323,7 @@ g11()
     h05(ls()) ## ls() is user supplied
     ```
 
-- **Exercise** (Advanced R): What does this function return? Why?
+- **Exercise** (Advanced R): What does this function return? Why? Try to guess before evaluating them.
 
     ```{r, eval = FALSE}
     f2 <- function(x = z) {
@@ -335,7 +337,7 @@ g11()
     It returns 100. It does so because `x` is only lazily evaluated when it is used, after which `z` is defined.
     ```
 
-- **Exercise** (Advanced R): What does this function return? Why?
+- **Exercise** (Advanced R): What does this function return? Why? Try to guess before evaluating them.
 
     ```{r, eval = FALSE}
     y <- 10
@@ -351,6 +353,24 @@ g11()
     
     Note that `y` is only assigned inside the function, so `y <- 10` is not overwritten.
     ```
+    
+- **Exercise**: What does this function return on these calls? Why? Try to guess before evaluating them.
+
+    ```{r, eval = FALSE}
+    f1 <- function(x, y = x^2) {
+      x <- x + 1
+      return(y)
+    }
+    f1(1)
+    x <- 1
+    f1(x, x^2)
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    The first call returns 4, since `y=x^2` is evaluated after `x = 2`.
+    The second call returns 1, since `y=x^2` is evaluated before the function call.
+    ```
+
 
 # `...` (dot-dot-dot)
 
@@ -570,16 +590,16 @@ g11()
     - They must return the modified argument.
 
 - The following will replace the second element
-```{r}
-`second<-` <- function(x, value) {
-  x[2] <- value
-  x
-}
-
-x <- 1:10
-second(x) <- 12
-x
-```
+    ```{r}
+    `second<-` <- function(x, value) {
+      x[2] <- value
+      x
+    }
+    
+    x <- 1:10
+    second(x) <- 12
+    x
+    ```
 
 - You can include additional arguments by placing them between `x` and `value` and including them on the left-hand size.
 
