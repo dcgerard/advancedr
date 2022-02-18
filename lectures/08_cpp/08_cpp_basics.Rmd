@@ -163,6 +163,44 @@ using namespace Rcpp;
 
 - Arithmetic operations are similar
     - `+`, `-`, `*`, `/`
+
+- C++ gives us modify-in-place operators.
+    - `x++`: Add 1 to `x`.
+    - `x--`: Subtract 1 from `x`.
+    - `x += a`: Add `a` to `x`.
+    - `x -= a`: Subtract `a` from `x`.
+    - `x *= a`: Multiply x by `a`.
+    - `x /= a`: Divide `x` by `a`.
+    
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void arith_example() {
+      double x = 1.0;
+      Rcpp::Rcout << "x     : " << x << std::endl;
+      
+      x++;
+      Rcpp::Rcout << "x++   : " << x << std::endl;
+      
+      x--;
+      Rcpp::Rcout << "x--   : " << x << std::endl;
+      
+      x += 9;
+      Rcpp::Rcout << "x += 9: " << x << std::endl;
+      
+      x -= 6;
+      Rcpp::Rcout << "x -= 6: " << x << std::endl;
+      
+      x *= 3;
+      Rcpp::Rcout << "x *= 3: " << x << std::endl;
+      
+      x /= 2;
+      Rcpp::Rcout << "x /= 2: " << x << std::endl;
+    }
+    ```
+    
+    ```{r}
+    arith_example()
+    ```
     
 - In C++, you do powers with `pow()` from the `std` namespace.
 
