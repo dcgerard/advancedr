@@ -554,9 +554,9 @@ $(document).ready(function () {
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">100</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(x)</span></code></pre></div>
-<pre><code>## [1] 45.56</code></pre>
+<pre><code>## [1] 49.36</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum2</span>(x)</span></code></pre></div>
-<pre><code>## [1] 45.56</code></pre></li>
+<pre><code>## [1] 49.36</code></pre></li>
 <li><p>Here is are the microbenchmarks:</p>
 <table>
 <thead>
@@ -576,24 +576,24 @@ $(document).ready(function () {
 <tr class="odd">
 <td align="left">sum(x)</td>
 <td align="right">239ns</td>
-<td align="right">272.06ns</td>
-<td align="right">3242619</td>
+<td align="right">275.09ns</td>
+<td align="right">2884146</td>
 <td align="right">0B</td>
-<td align="right">324.3</td>
+<td align="right">288.4</td>
 <td align="right">9999</td>
 <td align="right">1</td>
-<td align="right">3.08ms</td>
+<td align="right">3.47ms</td>
 </tr>
 <tr class="even">
 <td align="left">sum2(x)</td>
-<td align="right">1.27µs</td>
-<td align="right">2.12µs</td>
-<td align="right">501894</td>
+<td align="right">1.31µs</td>
+<td align="right">2.29µs</td>
+<td align="right">424783</td>
 <td align="right">18.2KB</td>
 <td align="right">0.0</td>
 <td align="right">10000</td>
 <td align="right">0</td>
-<td align="right">19.93ms</td>
+<td align="right">23.54ms</td>
 </tr>
 </tbody>
 </table></li>
@@ -662,7 +662,14 @@ $(document).ready(function () {
 <span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out<span class="op">;</span></span>
 <span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
-<li><p>Create a function in C++ call <code>fib()</code> that will take as input <code>n</code> and return the first <code>n</code> <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci numbers</a>, where the sequence begins with 0, 1, 1, 2, 3, 5, 8, 13, …</p></li>
+<li><p>Create a function in C++ call <code>fib()</code> that will take as input <code>n</code> and return the first <code>n</code> <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci numbers</a>, where the sequence begins with 0, 1, 1, 2, 3, 5, 8, 13, …</p>
+<p>E.g.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fib</span>(<span class="dv">1</span>)</span></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fib</span>(<span class="dv">2</span>)</span></code></pre></div>
+<pre><code>## [1] 0 1</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fib</span>(<span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##  [1]  0  1  1  2  3  5  8 13 21 34</code></pre></li>
 <li><p>(from Advanced R) Convert the following functions into C++. For now, assume the inputs have no missing values.</p>
 <ol style="list-style-type: decimal">
 <li><code>all()</code>.</li>
@@ -670,7 +677,18 @@ $(document).ready(function () {
 <li><code>diff()</code>. Start by assuming lag 1, and then generalize for lag n.</li>
 <li><code>range()</code>.</li>
 <li><code>var()</code>. Read about the approaches you can take on Wikipedia. Whenever implementing a numerical algorithm, it’s always good to check what is already known about the problem.</li>
-</ol></li>
+</ol>
+<ul>
+<li><p><code>allC()</code> output examples:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">allC</span>(<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span></code></pre></div>
+<pre><code>## [1] FALSE</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">allC</span>(<span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">allC</span>(<span class="cn">FALSE</span>)</span></code></pre></div>
+<pre><code>## [1] FALSE</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">allC</span>(<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>))</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre></li>
+</ul></li>
 </ol>
 </div>
 

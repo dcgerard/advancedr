@@ -364,9 +364,64 @@ XYZ Do chapter 24 of Rcpp for Everyone
 
 2. Create a function in C++ call `fib()` that will take as input `n` and return the first `n` [Fibonacci numbers](https://en.wikipedia.org/wiki/Fibonacci_number), where the sequence begins with 0, 1, 1, 2, 3, 5, 8, 13, ...
 
+    E.g.
+
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    IntegerVector fib(int n) {
+      IntegerVector out(n);
+      
+      out[0] = 0;
+      if (n == 1) {
+        return out;
+      }
+      
+      out[1] = 1;
+      if (n == 2) {
+        return out;
+      }
+      
+      for (int i = 2; i < n; i++) {
+        out[i] = out[i - 1] + out[i - 2];
+      }
+      
+      return out;
+    }
+    ```
+    
+    ```{r}
+    fib(1)
+    fib(2)
+    fib(10)
+    ```
+
+
 3. (from Advanced R) Convert the following functions into C++. For now, assume the inputs have no missing values.
     1. `all()`.
     2. `cumprod()`, `cummin()`, `cummax()`.
     3. `diff()`. Start by assuming lag 1, and then generalize for lag n.
     4. `range()`.
     5. `var()`. Read about the approaches you can take on Wikipedia. Whenever implementing a numerical algorithm, it’s always good to check what is already known about the problem.
+    
+    - `allC()` output examples:
+    
+        ```{Rcpp, eval = FALSE, echo = FALSE}
+        // [[Rcpp::export]]
+        bool allC(LogicalVector x) {
+          int n = x.length();
+          for (int i = 0; i < n; i++) {
+            if (!x[i]) {
+              return false;
+            }
+          }
+          return true;
+        }
+        ```
+            
+        ```{r}
+        allC(c(TRUE, TRUE, FALSE))
+        allC(TRUE)
+        allC(FALSE)
+        allC(c(TRUE, TRUE))
+        ```
+    
