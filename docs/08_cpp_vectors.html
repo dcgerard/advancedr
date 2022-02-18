@@ -370,6 +370,8 @@ $(document).ready(function () {
 <li><a href="#accessing-elements">Accessing Elements</a></li>
 <li><a href="#rcpp-vector-methods">Rcpp Vector Methods</a></li>
 <li><a href="#for-loops">For-loops</a></li>
+<li><a href="#cautions">Cautions</a></li>
+<li><a href="#missing-values">Missing Values</a></li>
 <li><a href="#exercises">Exercises</a></li>
 </ul>
 </div>
@@ -381,7 +383,7 @@ $(document).ready(function () {
 <div id="learning-objectives" class="section level1">
 <h1>Learning Objectives</h1>
 <ul>
-<li>Chapters 8 and 10 of <a href="https://teuder.github.io/rcpp4everyone_en/">Rcpp for Everyone</a></li>
+<li>Chapters 8, 10, 19, and 24 of <a href="https://teuder.github.io/rcpp4everyone_en/">Rcpp for Everyone</a></li>
 <li>Chapter 25 of <a href="https://adv-r.hadley.nz/rcpp.html">Advanced R</a></li>
 <li><a href="https://dirk.eddelbuettel.com/code/rcpp/Rcpp-quickref.pdf">Rcpp Quick Reference Guide</a></li>
 <li>Learning Objectives:
@@ -487,95 +489,180 @@ $(document).ready(function () {
 <ul>
 <li><p>A <strong>method</strong> is a function that is attached to an object. In C++, methods are accessed with a <code>.</code> (just like python).</p></li>
 <li><p>Rcpp vectors have a lot of useful methods.</p></li>
-<li><p><code>length()</code></p></li>
-<li><p><code>fill()</code></p></li>
-<li><p><code>sort()</code></p></li>
-<li><p><code>push_back()</code></p></li>
-<li><p><code>push_front()</code></p></li>
+<li><p><code>length()</code> or <code>size()</code>: Get total number of elements in the vector. These are equivalent.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x<span class="op">.</span>length<span class="op">();</span></span></code></pre></div></li>
+<li><p><code>fill()</code>: Fill all elements of a vector with scalar value.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>x<span class="op">.</span>fill<span class="op">(</span><span class="fl">2.0</span><span class="op">);</span></span></code></pre></div></li>
+<li><p><code>sort()</code>: Return a vector that sorts the object.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>x<span class="op">.</span>sort<span class="op">(</span><span class="kw">false</span><span class="op">);</span> <span class="co">// ascending order</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>x<span class="op">.</span>sort<span class="op">(</span><span class="kw">true</span><span class="op">);</span> <span class="co">// descending order</span></span></code></pre></div></li>
 <li><p><code>begin()</code> and <code>end()</code> returns iterators pointing to the first and last elements of the vector (we’ll talk about this later)</p></li>
+<li><p>Let’s demonstrate these.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> method_example<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  NumericVector x <span class="op">=</span> <span class="op">{</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">3.0</span><span class="op">,</span> <span class="fl">5.0</span><span class="op">};</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;x            : &quot;</span> <span class="op">&lt;&lt;</span> x <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;x.length()   : &quot;</span> <span class="op">&lt;&lt;</span> x<span class="op">.</span>length<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;x.sort(false): &quot;</span> <span class="op">&lt;&lt;</span> x<span class="op">.</span>sort<span class="op">(</span><span class="kw">false</span><span class="op">)</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;x.sort(true) : &quot;</span> <span class="op">&lt;&lt;</span> x<span class="op">.</span>sort<span class="op">(</span><span class="kw">true</span><span class="op">)</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  x<span class="op">.</span>fill<span class="op">(</span><span class="fl">2.0</span><span class="op">);</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;x.fill(2.0)  : &quot;</span> <span class="op">&lt;&lt;</span> x <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">method_example</span>()</span></code></pre></div>
+<pre><code>## x            : 1 3 5
+## x.length()   : 3
+## x.sort(false): 1 3 5
+## x.sort(true) : 5 3 1
+## x.fill(2.0)  : 2 2 2</code></pre></li>
+<li><p><code>NumericVector</code>s have methods to remove and add values, but <a href="https://stackoverflow.com/questions/19472211/how-to-remove-an-element-in-numericvector-for-a-recursion-using-r-and-rcpp">Dirk says</a> this is not a good idea. So you should use <code>std::vector&lt;double&gt;</code> objects to do this efficiently.</p></li>
 </ul>
 </div>
 <div id="for-loops" class="section level1">
 <h1>For-loops</h1>
 <ul>
 <li><p>All for-loops in C++ are of the form</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span>s1<span class="op">;</span> s2<span class="op">;</span> s3<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code executed each iteration</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span>s1<span class="op">;</span> s2<span class="op">;</span> s3<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code executed each iteration</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <ul>
 <li><code>s1</code> is code that is executed once before the for-loop.</li>
 <li><code>s2</code> is a predicate that, when <code>true</code>, allows the for-loop to execute another iteration.</li>
 <li><code>s3</code> is code that is evaluated at the end of each for-loop.</li>
 </ul></li>
 <li><p>Almost all for-loops you write will look like this</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <ul>
 <li>We define <code>i</code> as an integer, initializing it to be <code>0</code>.</li>
 <li>We only exit the for-loop if <code>i &gt;= n</code>.</li>
 <li>At the end of each iteration we add <code>1</code> to <code>i</code>.</li>
 </ul></li>
 <li><p><strong>Exercise</strong>: In the above for-loop, if <code>n = 10</code>, how many iterations will of the for-loop will run, 9 or 10?</p></li>
+<li><p>Let’s recreate <code>sum()</code> using Rcpp.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum2<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>length<span class="op">();</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> sval <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    sval <span class="op">+=</span> x<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> sval<span class="op">;</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">100</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(x)</span></code></pre></div>
+<pre><code>## [1] 45.56</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum2</span>(x)</span></code></pre></div>
+<pre><code>## [1] 45.56</code></pre></li>
+<li><p>Here is are the microbenchmarks:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">expression</th>
+<th align="right">min</th>
+<th align="right">median</th>
+<th align="right">itr/sec</th>
+<th align="right">mem_alloc</th>
+<th align="right">gc/sec</th>
+<th align="right">n_itr</th>
+<th align="right">n_gc</th>
+<th align="right">total_time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">sum(x)</td>
+<td align="right">239ns</td>
+<td align="right">272.06ns</td>
+<td align="right">3242619</td>
+<td align="right">0B</td>
+<td align="right">324.3</td>
+<td align="right">9999</td>
+<td align="right">1</td>
+<td align="right">3.08ms</td>
+</tr>
+<tr class="even">
+<td align="left">sum2(x)</td>
+<td align="right">1.27µs</td>
+<td align="right">2.12µs</td>
+<td align="right">501894</td>
+<td align="right">18.2KB</td>
+<td align="right">0.0</td>
+<td align="right">10000</td>
+<td align="right">0</td>
+<td align="right">19.93ms</td>
+</tr>
+</tbody>
+</table></li>
+<li><p>In R for-loops, you specify the vector you iterate over. In C++, you specify the exit condition and the code to run at the end of each iteration.</p></li>
+<li><p>In effect, this makes <code>for(i in 1:n)</code> in R the same as <code>for(int i = 0; i &lt; n; i++)</code> in C++.</p></li>
 </ul>
+</div>
+<div id="cautions" class="section level1">
+<h1>Cautions</h1>
+<p>XYZ Do chapter 19 of Rcpp for Everyone</p>
+</div>
+<div id="missing-values" class="section level1">
+<h1>Missing Values</h1>
+<p>XYZ Do chapter 24 of Rcpp for Everyone</p>
 </div>
 <div id="exercises" class="section level1">
 <h1>Exercises</h1>
 <ol style="list-style-type: decimal">
 <li><p>(from Advanced R) For each of the following functions, read the code and figure out what the corresponding base R function is. You might not understand every part of the code yet, but you should be able to figure out the basics of what the function does.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> f1<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> y <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    y <span class="op">+=</span> x<span class="op">[</span>i<span class="op">]</span> <span class="op">/</span> n<span class="op">;</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> y<span class="op">;</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>NumericVector f2<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  NumericVector out<span class="op">(</span>n<span class="op">);</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  out<span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> x<span class="op">[</span><span class="dv">0</span><span class="op">];</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    out<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> out<span class="op">[</span>i <span class="op">-</span> <span class="dv">1</span><span class="op">]</span> <span class="op">+</span> x<span class="op">[</span>i<span class="op">];</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out<span class="op">;</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> f3<span class="op">(</span>LogicalVector x<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>x<span class="op">[</span>i<span class="op">])</span> <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> f4<span class="op">(</span>Function pred<span class="op">,</span> List x<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>    LogicalVector res <span class="op">=</span> pred<span class="op">(</span>x<span class="op">[</span>i<span class="op">]);</span></span>
-<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>res<span class="op">[</span><span class="dv">0</span><span class="op">])</span> <span class="cf">return</span> i <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>NumericVector f5<span class="op">(</span>NumericVector x<span class="op">,</span> NumericVector y<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> <span class="bu">std::</span>max<span class="op">(</span>x<span class="op">.</span>size<span class="op">(),</span> y<span class="op">.</span>size<span class="op">());</span></span>
-<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>  NumericVector x1 <span class="op">=</span> rep_len<span class="op">(</span>x<span class="op">,</span> n<span class="op">);</span></span>
-<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>  NumericVector y1 <span class="op">=</span> rep_len<span class="op">(</span>y<span class="op">,</span> n<span class="op">);</span></span>
-<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>  NumericVector out<span class="op">(</span>n<span class="op">);</span></span>
-<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a>    out<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="bu">std::</span>min<span class="op">(</span>x1<span class="op">[</span>i<span class="op">],</span> y1<span class="op">[</span>i<span class="op">]);</span></span>
-<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out<span class="op">;</span></span>
-<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb26"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> f1<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> y <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    y <span class="op">+=</span> x<span class="op">[</span>i<span class="op">]</span> <span class="op">/</span> n<span class="op">;</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> y<span class="op">;</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>NumericVector f2<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  NumericVector out<span class="op">(</span>n<span class="op">);</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  out<span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> x<span class="op">[</span><span class="dv">0</span><span class="op">];</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    out<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> out<span class="op">[</span>i <span class="op">-</span> <span class="dv">1</span><span class="op">]</span> <span class="op">+</span> x<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out<span class="op">;</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> f3<span class="op">(</span>LogicalVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>x<span class="op">[</span>i<span class="op">])</span> <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> f4<span class="op">(</span>Function pred<span class="op">,</span> List x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    LogicalVector res <span class="op">=</span> pred<span class="op">(</span>x<span class="op">[</span>i<span class="op">]);</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>res<span class="op">[</span><span class="dv">0</span><span class="op">])</span> <span class="cf">return</span> i <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>NumericVector f5<span class="op">(</span>NumericVector x<span class="op">,</span> NumericVector y<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> <span class="bu">std::</span>max<span class="op">(</span>x<span class="op">.</span>size<span class="op">(),</span> y<span class="op">.</span>size<span class="op">());</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  NumericVector x1 <span class="op">=</span> rep_len<span class="op">(</span>x<span class="op">,</span> n<span class="op">);</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  NumericVector y1 <span class="op">=</span> rep_len<span class="op">(</span>y<span class="op">,</span> n<span class="op">);</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  NumericVector out<span class="op">(</span>n<span class="op">);</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    out<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="bu">std::</span>min<span class="op">(</span>x1<span class="op">[</span>i<span class="op">],</span> y1<span class="op">[</span>i<span class="op">]);</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out<span class="op">;</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
+<li><p>Create a function in C++ call <code>fib()</code> that will take as input <code>n</code> and return the first <code>n</code> <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci numbers</a>, where the sequence begins with 0, 1, 1, 2, 3, 5, 8, 13, …</p></li>
 <li><p>(from Advanced R) Convert the following functions into C++. For now, assume the inputs have no missing values.</p>
 <ol style="list-style-type: decimal">
 <li><code>all()</code>.</li>
@@ -584,7 +671,6 @@ $(document).ready(function () {
 <li><code>range()</code>.</li>
 <li><code>var()</code>. Read about the approaches you can take on Wikipedia. Whenever implementing a numerical algorithm, it’s always good to check what is already known about the problem.</li>
 </ol></li>
-<li><p>Create a function in C++ call <code>fib()</code> that will take as input <code>n</code> and return the first <code>n</code> <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci numbers</a>, where the sequence begins with 0, 1, 1, 2, 3, 5, 8, 13, …</p></li>
 </ol>
 </div>
 

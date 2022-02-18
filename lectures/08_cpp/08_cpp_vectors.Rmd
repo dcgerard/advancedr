@@ -33,7 +33,7 @@ using namespace Rcpp;
 
 # Learning Objectives
 
-- Chapters 8 and 10 of [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
+- Chapters 8, 10, 19, and 24 of [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
 - Chapter 25 of [Advanced R](https://adv-r.hadley.nz/rcpp.html)
 - [Rcpp Quick Reference Guide](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-quickref.pdf)
 - Learning Objectives:
@@ -158,18 +158,50 @@ using namespace Rcpp;
 
 - Rcpp vectors have a lot of useful methods.
 
-- `length()`
+- `length()` or `size()`: Get total number of elements in the vector. These are equivalent.
 
-- `fill()`
+    ``` cpp
+    x.length();
+    ```
 
-- `sort()`
+- `fill()`: Fill all elements of a vector with scalar value.
 
-- `push_back()`
+    ``` cpp
+    x.fill(2.0);
+    ```
 
-- `push_front()`
+- `sort()`: Return a vector that sorts the object.
+
+    ``` cpp
+    x.sort(false); // ascending order
+    x.sort(true); // descending order
+    ```
 
 - `begin()` and `end()` returns iterators pointing to the first and last elements of the vector (we'll talk about this later)
 
+- Let's demonstrate these.
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void method_example() {
+      NumericVector x = {1.0, 3.0, 5.0};
+      Rcpp::Rcout << "x            : " << x << std::endl;
+      
+      Rcpp::Rcout << "x.length()   : " << x.length() << std::endl;
+      
+      Rcpp::Rcout << "x.sort(false): " << x.sort(false) << std::endl;
+      Rcpp::Rcout << "x.sort(true) : " << x.sort(true) << std::endl;
+      
+      x.fill(2.0);
+      Rcpp::Rcout << "x.fill(2.0)  : " << x << std::endl;
+    }
+    ```
+    
+    ```{r}
+    method_example()
+    ```
+
+- `NumericVector`s have methods to remove and add values, but [Dirk says](https://stackoverflow.com/questions/19472211/how-to-remove-an-element-in-numericvector-for-a-recursion-using-r-and-rcpp) this is not a good idea. So you should use `std::vector<double>` objects to do this efficiently.
 
 # For-loops
 
@@ -201,6 +233,44 @@ using namespace Rcpp;
     ```{block, eval = FALSE, echo = FALSE}
     10, because we start at 0.
     ```
+    
+- Let's recreate `sum()` using Rcpp.
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    double sum2(NumericVector x) {
+      int n = x.length();
+      double sval = 0.0;
+      for (int i = 0; i < n; i++) {
+        sval += x[i];
+      }
+      return sval;
+    }
+    ```
+
+    ```{r}
+    x <- runif(100)
+    sum(x)
+    sum2(x)
+    ```
+    
+- Here is are the microbenchmarks:
+
+    ```{r, echo = FALSE}
+    knitr::kable(bench::mark(sum(x), sum2(x))[1:9])
+    ```
+
+- In R for-loops, you specify the vector you iterate over. In C++, you specify the exit condition and the code to run at the end of each iteration.
+
+- In effect, this makes `for(i in 1:n)` in R the same as `for(int i = 0; i < n; i++)` in C++.
+
+# Cautions
+
+XYZ Do chapter 19 of Rcpp for Everyone
+
+# Missing Values
+
+XYZ Do chapter 24 of Rcpp for Everyone
 
 # Exercises
 
@@ -216,7 +286,13 @@ using namespace Rcpp;
       }
       return y;
     }
+    ```
     
+    ```{block, eval = FALSE, echo = FALSE}
+    Calculates the mean of `x`. Same as `mean()` in R.
+    ```
+    
+    ``` cpp
     NumericVector f2(NumericVector x) {
       int n = x.size();
       NumericVector out(n);
@@ -227,7 +303,13 @@ using namespace Rcpp;
       }
       return out;
     }
+    ```
     
+    ```{block, eval = FALSE, echo = FALSE}
+    This calculates the cumulative summation of `x`. Same as `cumsum()` in R.
+    ```
+    
+    ``` cpp
     bool f3(LogicalVector x) {
       int n = x.size();
     
@@ -236,7 +318,13 @@ using namespace Rcpp;
       }
       return false;
     }
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    This returns `true` if any value in `x` is `true`, and returns `false` otherwise. Same as `any()` in R.
+    ```
     
+    ``` cpp
     int f4(Function pred, List x) {
       int n = x.size();
     
@@ -246,7 +334,13 @@ using namespace Rcpp;
       }
       return 0;
     }
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    Takes a predicate function `pred` and a list of elements `x` to apply that function to and returns the first position of `x` that a `true` is returned. Same as `Position()` in R.
+    ```
     
+    ``` cpp
     NumericVector f5(NumericVector x, NumericVector y) {
       int n = std::max(x.size(), y.size());
       NumericVector x1 = rep_len(x, n);
@@ -262,19 +356,17 @@ using namespace Rcpp;
     }
     ```
 
-2. (from Advanced R) Convert the following functions into C++. For now, assume the inputs have no missing values.
+    ```{block, eval = FALSE, echo = FALSE}
+    Returns element-wise minimum of `x` and `y`. This is the same as `pmin()` in R.
+    
+    `rep_len()` is an Rcpp sugar function that repeats a vector until it is a certain length.
+    ```
+
+2. Create a function in C++ call `fib()` that will take as input `n` and return the first `n` [Fibonacci numbers](https://en.wikipedia.org/wiki/Fibonacci_number), where the sequence begins with 0, 1, 1, 2, 3, 5, 8, 13, ...
+
+3. (from Advanced R) Convert the following functions into C++. For now, assume the inputs have no missing values.
     1. `all()`.
     2. `cumprod()`, `cummin()`, `cummax()`.
     3. `diff()`. Start by assuming lag 1, and then generalize for lag n.
     4. `range()`.
     5. `var()`. Read about the approaches you can take on Wikipedia. Whenever implementing a numerical algorithm, it’s always good to check what is already known about the problem.
-
-3. Create a function in C++ call `fib()` that will take as input `n` and return the first `n` [Fibonacci numbers](https://en.wikipedia.org/wiki/Fibonacci_number), where the sequence begins with 0, 1, 1, 2, 3, 5, 8, 13, ...
-
-
-
-
-
-
-
-

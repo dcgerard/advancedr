@@ -133,7 +133,7 @@ klippy::klippy()
 - A C++ function is of the form
 
     ```
-    ftype fname(arg1Type arg1, arg2Type arg2) {
+    ftype fname(arg1Type arg1, arg2Type arg2 = default2) {
       // code goes here
       return retval;
     }
@@ -144,6 +144,8 @@ klippy::klippy()
 - `fname` is the function name that you choose.
 
 - `arg1Type` and `arg2Type` are the types of the arguments for the function.
+
+- One of these arguments, `arg2` has a default value, `default2`.
 
 - All C++ functions end with `return` followed by the object that is being returned.
 

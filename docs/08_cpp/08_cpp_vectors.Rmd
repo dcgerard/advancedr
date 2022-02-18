@@ -33,12 +33,340 @@ using namespace Rcpp;
 
 # Learning Objectives
 
-- Chapters 8 and 10 of [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
+- Chapters 8, 10, 19, and 24 of [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
 - Chapter 25 of [Advanced R](https://adv-r.hadley.nz/rcpp.html)
+- [Rcpp Quick Reference Guide](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-quickref.pdf)
 - Learning Objectives:
     - Rcpp Vectors
     - For-loops
     - Basic Vector Operations
 
+# Rcpp Vectors
 
+- `{Rcpp}` provides classes of C++ vectors which make programming easier for folks used to R.
 
+- The classes are called `LogicalVector`, `IntegerVector`, `NumericVector`, and `CharacterVector`.
+
+- Note, in non Rcpp C++, you typically use `std::vector` objects, like `std::vector<double>`.
+
+- If you have a function that accepts and returns vectors, then you use those types.
+
+    ``` cpp
+    NumericVector fn(IntegerVector x, bool y) {
+      // code to create z
+      return z;
+    }
+    ```
+
+# Creating Vectors
+
+- You create an empty vector of length `n` with
+
+    ``` cpp
+    NumericVector x(n);
+    ```
+
+- You can add default values by including a second argument via
+
+    ``` cpp
+    NumericVector x(n, 2.0);
+    ```
+    
+- If you want an `IntegerVector` from `0` to `n - 1`, probably the best way is through `std::iota()`
+
+    ``` cpp
+    IntegerVector x(n);
+    std::iota(x.begin(), x.end(), 0);
+    ```
+
+- If you have specific elements you want to create the vector with, use curly braces (requires C++11):
+
+    ``` cpp
+    NumericVector x = {9.0, 1.2, 4.9};
+    ```
+    
+- For older versions of C++, use `NumericVector::create()`.
+
+    ``` cpp
+    NumericVector x = NumericVector::create(9.0, 1.2, 4.9);
+    ```
+
+- Let's demonstrate these methods
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void vec_create() {
+      int n = 5;
+      
+      NumericVector x1(n);
+      
+      NumericVector x2(n, 2.0);
+      
+      CharacterVector x3(n, "A");
+      
+      IntegerVector x4(n);
+      std::iota(x4.begin(), x4.end(), 0);
+      
+      NumericVector x5 = {9.0, 1.2, 4.9};
+      
+      NumericVector x6 = NumericVector::create(9.0, 1.2, 4.9);
+      
+      Rcpp::Rcout << "x1: " << x1 << std::endl
+                  << "x2: " << x2 << std::endl
+                  << "x3: " << x3 << std::endl
+                  << "x4: " << x4 << std::endl
+                  << "x5: " << x5 << std::endl
+                  << "x6: " << x6 << std::endl;
+    }
+    ```
+    
+    ```{r}
+    vec_create()
+    ```
+
+# Accessing Elements
+
+- You get and set individual elements of a vector using brackets `[]`, just like in R.
+
+- Note that in C++, **indexing starts at 0**.
+
+- One more time for emphasis, in **C++ indexing starts at 0**.
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void subset_example(NumericVector x) {
+      Rcpp::Rcout << "x[0]:" << x[0] << std::endl
+                  << "x[1]:" << x[1] << std::endl
+                  << "x[2]:" << x[2] << std::endl;
+                  
+      x[0] = 21;
+      x[1] = 22;
+      x[2] = 23;
+      
+      Rcpp::Rcout << "x[0]:" << x[0] << std::endl
+                  << "x[1]:" << x[1] << std::endl
+                  << "x[2]:" << x[2] << std::endl;
+    }
+    ```
+    
+    ```{r}
+    subset_example(c(14, 38, 29))
+    ```
+
+# Rcpp Vector Methods
+
+- A **method** is a function that is attached to an object. In C++, methods are accessed with a `.` (just like python).
+
+- Rcpp vectors have a lot of useful methods.
+
+- `length()` or `size()`: Get total number of elements in the vector. These are equivalent.
+
+    ``` cpp
+    x.length();
+    ```
+
+- `fill()`: Fill all elements of a vector with scalar value.
+
+    ``` cpp
+    x.fill(2.0);
+    ```
+
+- `sort()`: Return a vector that sorts the object.
+
+    ``` cpp
+    x.sort(false); // ascending order
+    x.sort(true); // descending order
+    ```
+
+- `begin()` and `end()` returns iterators pointing to the first and last elements of the vector (we'll talk about this later)
+
+- Let's demonstrate these.
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void method_example() {
+      NumericVector x = {1.0, 3.0, 5.0};
+      Rcpp::Rcout << "x            : " << x << std::endl;
+      
+      Rcpp::Rcout << "x.length()   : " << x.length() << std::endl;
+      
+      Rcpp::Rcout << "x.sort(false): " << x.sort(false) << std::endl;
+      Rcpp::Rcout << "x.sort(true) : " << x.sort(true) << std::endl;
+      
+      x.fill(2.0);
+      Rcpp::Rcout << "x.fill(2.0)  : " << x << std::endl;
+    }
+    ```
+    
+    ```{r}
+    method_example()
+    ```
+
+- `NumericVector`s have methods to remove and add values, but [Dirk says](https://stackoverflow.com/questions/19472211/how-to-remove-an-element-in-numericvector-for-a-recursion-using-r-and-rcpp) this is not a good idea. So you should use `std::vector<double>` objects to do this efficiently.
+
+# For-loops
+
+- All for-loops in C++ are of the form
+
+    ``` cpp
+    for (s1; s2; s3) {
+      // code executed each iteration
+    }
+    ```
+
+    - `s1` is code that is executed once before the for-loop.
+    - `s2` is a predicate that, when `true`, allows the for-loop to execute another iteration.
+    - `s3` is code that is evaluated at the end of each for-loop.
+    
+- Almost all for-loops you write will look like this
+
+    ``` cpp
+    for (int i = 0; i < n; i++) {
+    
+    }
+    ```
+
+    - We define `i` as an integer, initializing it to be `0`.
+    - We only exit the for-loop if `i >= n`.
+    - At the end of each iteration we add `1` to `i`.
+    
+- **Exercise**: In the above for-loop, if `n = 10`, how many iterations will of the for-loop will run, 9 or 10?
+    ```{block, eval = FALSE, echo = FALSE}
+    10, because we start at 0.
+    ```
+    
+- Let's recreate `sum()` using Rcpp.
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    double sum2(NumericVector x) {
+      int n = x.length();
+      double sval = 0.0;
+      for (int i = 0; i < n; i++) {
+        sval += x[i];
+      }
+      return sval;
+    }
+    ```
+
+    ```{r}
+    x <- runif(100)
+    sum(x)
+    sum2(x)
+    ```
+    
+- Here is are the microbenchmarks:
+
+    ```{r, echo = FALSE}
+    knitr::kable(bench::mark(sum(x), sum2(x))[1:9])
+    ```
+
+- In R for-loops, you specify the vector you iterate over. In C++, you specify the exit condition and the code to run at the end of each iteration.
+
+- In effect, this makes `for(i in 1:n)` in R the same as `for(int i = 0; i < n; i++)` in C++.
+
+# Cautions
+
+XYZ Do chapter 19 of Rcpp for Everyone
+
+# Missing Values
+
+XYZ Do chapter 24 of Rcpp for Everyone
+
+# Exercises
+
+1. (from Advanced R) For each of the following functions, read the code and figure out what the corresponding base R function is. You might not understand every part of the code yet, but you should be able to figure out the basics of what the function does.
+
+    ``` cpp
+    double f1(NumericVector x) {
+      int n = x.size();
+      double y = 0;
+    
+      for(int i = 0; i < n; ++i) {
+        y += x[i] / n;
+      }
+      return y;
+    }
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    Calculates the mean of `x`. Same as `mean()` in R.
+    ```
+    
+    ``` cpp
+    NumericVector f2(NumericVector x) {
+      int n = x.size();
+      NumericVector out(n);
+    
+      out[0] = x[0];
+      for(int i = 1; i < n; ++i) {
+        out[i] = out[i - 1] + x[i];
+      }
+      return out;
+    }
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    This calculates the cumulative summation of `x`. Same as `cumsum()` in R.
+    ```
+    
+    ``` cpp
+    bool f3(LogicalVector x) {
+      int n = x.size();
+    
+      for(int i = 0; i < n; ++i) {
+        if (x[i]) return true;
+      }
+      return false;
+    }
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    This returns `true` if any value in `x` is `true`, and returns `false` otherwise. Same as `any()` in R.
+    ```
+    
+    ``` cpp
+    int f4(Function pred, List x) {
+      int n = x.size();
+    
+      for(int i = 0; i < n; ++i) {
+        LogicalVector res = pred(x[i]);
+        if (res[0]) return i + 1;
+      }
+      return 0;
+    }
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    Takes a predicate function `pred` and a list of elements `x` to apply that function to and returns the first position of `x` that a `true` is returned. Same as `Position()` in R.
+    ```
+    
+    ``` cpp
+    NumericVector f5(NumericVector x, NumericVector y) {
+      int n = std::max(x.size(), y.size());
+      NumericVector x1 = rep_len(x, n);
+      NumericVector y1 = rep_len(y, n);
+    
+      NumericVector out(n);
+    
+      for (int i = 0; i < n; ++i) {
+        out[i] = std::min(x1[i], y1[i]);
+      }
+    
+      return out;
+    }
+    ```
+
+    ```{block, eval = FALSE, echo = FALSE}
+    Returns element-wise minimum of `x` and `y`. This is the same as `pmin()` in R.
+    
+    `rep_len()` is an Rcpp sugar function that repeats a vector until it is a certain length.
+    ```
+
+2. Create a function in C++ call `fib()` that will take as input `n` and return the first `n` [Fibonacci numbers](https://en.wikipedia.org/wiki/Fibonacci_number), where the sequence begins with 0, 1, 1, 2, 3, 5, 8, 13, ...
+
+3. (from Advanced R) Convert the following functions into C++. For now, assume the inputs have no missing values.
+    1. `all()`.
+    2. `cumprod()`, `cummin()`, `cummax()`.
+    3. `diff()`. Start by assuming lag 1, and then generalize for lag n.
+    4. `range()`.
+    5. `var()`. Read about the approaches you can take on Wikipedia. Whenever implementing a numerical algorithm, it’s always good to check what is already known about the problem.

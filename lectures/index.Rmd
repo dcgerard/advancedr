@@ -57,8 +57,8 @@ This repository contains material based upon work supported by the National Scie
   - [Integrating C++ and R](./08_cpp_setup.html)
   - [C++ Basics and Scalars](./08_cpp_basics.html)
   - [Vectors / Vector Operations](./08_cpp_vectors.html)
-  - Rcpp Sugar
-  - Matrices / Matrix Operations
+  - [Rcpp Sugar](./08_cpp_sugar.html)
+  - [Matrices / Matrix Operations](./08_cpp_armadillo.html)
 - 09 Parallel Processing
   - Futures and Running R in Batch
   - Schedulers and LSF
