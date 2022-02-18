@@ -55,10 +55,10 @@ This repository contains material based upon work supported by the National Scie
   - [Performant R Code](./07_faster.html)
 - 08 C++ and Rcpp
   - [Integrating C++ and R](./08_cpp_setup.html)
-  - [C++ Basics](./08_cpp_basics.html)
+  - [C++ Basics and Scalars](./08_cpp_basics.html)
   - [Vectors / Vector Operations](./08_cpp_vectors.html)
-  - Control Flow
   - Rcpp Sugar
+  - Matrices / Matrix Operations
 - 09 Parallel Processing
   - Futures and Running R in Batch
   - Schedulers and LSF

@@ -15,6 +15,7 @@ bibliography: "08_bib.bib"
 ```{r setup, include=FALSE, message = FALSE}
 library(ggplot2)
 library(ggthemes)
+library(patchwork)
 knitr::opts_chunk$set(echo       = TRUE, 
                       fig.align  = "center",
                       fig.height = 3, fig.width = 4)
@@ -54,6 +55,8 @@ using namespace Rcpp;
 - Comments start with `//`.
 
 - Scalars are different from vectors.
+
+- Function arguments are called by position, not by name.
 
 - Counting begins at 0 (like in python), not 1. This is the most common source of headaches for R programmers migrating to C++.
 
@@ -216,23 +219,6 @@ using namespace Rcpp;
     signC(0)
     signC(11)
     ```
-    
-- **Exercise**: Write a function called `square2()` that squares a number, but does not use `std::pow()`. Which one is faster?
-
-    ```{block, eval = FALSE, echo = FALSE}
-    // [[Rcpp::export]]
-    double square2(double x) {
-      return x*x;
-    }
-    ```
-    
-    ```{r, eval = FALSE, echo = FALSE}
-    bench::mark(square(9), square2(9))
-    ```
-    
-    ```{block, eval = FALSE, echo = FALSE}
-    `square2()` is just a tiny bit faster.
-    ```
 
 # Useful Math Functions for Scalars
 
@@ -298,13 +284,13 @@ using namespace Rcpp;
 
 - Functions that begin with `d` return the [density](https://en.wikipedia.org/wiki/Probability_density_function) (for continuous distributions) or the [probability mass](https://en.wikipedia.org/wiki/Probability_mass_function) (for discrete distributions).
 
-    ```{r, echo = FALSE, fig.show='hold', out.width="40%"}
+    ```{r, echo = FALSE, fig.width = 7}
     x <- seq(-2, 4, length = 500)
     y <- dnorm(x, mean = 1, sd = 1)
     qplot(x, y, geom = "line", ylab = "f(x)") +
       geom_segment(dat = data.frame(x = 2, xend = 2, y = 0, 
                                     yend = dnorm(x = 2, mean = 1, sd = 1)), 
-                   aes(x = x, y = y, xend = xend, yend = yend), lty = 2, col = 2)
+                   aes(x = x, y = y, xend = xend, yend = yend), lty = 2, col = 2) -> pl1
     
     xb <- 0:6
     yb <- dbinom(x = xb, size = 6, prob = 0.4)
@@ -315,17 +301,19 @@ using namespace Rcpp;
       scale_x_continuous(breaks = 0:6) +
       xlab("x") +
       ylab("Pr(x)") +
-      theme(legend.position = "none")
+      theme(legend.position = "none") -> pl2
+    
+    pl1 + pl2
     ```
     
 - Functions that begin with `p` return the probability for being less than or equal to some value. This is called the [cumulative distribution function](https://en.wikipedia.org/wiki/Cumulative_distribution_function).
 
-    ```{r, echo = FALSE, fig.show='hold', out.width="40%"}
+    ```{r, echo = FALSE, fig.width = 7}
     polydf <- data.frame(x = c(min(x), x[x < 2], 2, 0), 
                          y = c(0, y[x < 2], 0, 0))
     qplot(x, y, geom = "line", ylab = "f(x)") +
       geom_polygon(data = polydf, mapping = aes(x = x, y = y), 
-                   fill = "blue", alpha = 1/4)
+                   fill = "blue", alpha = 1/4) -> pl1
 
     color <- rep("A", 7)
     color[1:4] <- "B"
@@ -334,16 +322,20 @@ using namespace Rcpp;
       scale_x_continuous(breaks = 0:6) +
       xlab("x") +
       ylab("Pr(x)") +
-      theme(legend.position = "none")
+      theme(legend.position = "none") ->
+      pl2
+    
+    pl1 + pl2
     ```
 
 - Functions that begin with `q` return the [quantile](https://en.wikipedia.org/wiki/Quantile). That is, you tell me a probability and I will tell you the value such that the probability of being less than that value is the provided probability.
 
-    ```{r, echo = FALSE, fig.show='hold', out.width="40%"}
+    ```{r, echo = FALSE, fig.width = 7}
     qplot(x, y, geom = "line", ylab = "f(x)") +
       geom_polygon(data = polydf, mapping = aes(x = x, y = y), 
                    fill = "blue", alpha = 1/4) +
-      annotate(geom = "text", x = 0.5, y = 0.1, label = "0.8413", color = "black")
+      annotate(geom = "text", x = 0.5, y = 0.1, label = "0.8413", color = "black") ->
+      pl1
     
     qplot(x = xb, xend = xb, y = 0, yend = yb, color = color, geom = "segment", lwd = I(2)) +
       scale_color_colorblind() +
@@ -351,7 +343,10 @@ using namespace Rcpp;
       xlab("x") +
       ylab("Pr(x)") +
       theme(legend.position = "none") +
-      annotate(geom = "text", x = 0.75, y = 0.25, label = "0.8208")
+      annotate(geom = "text", x = 0.75, y = 0.25, label = "0.8208") ->
+      pl2
+    
+    pl1 + pl2
     ```
 
 - Functions that begin with `r` provide random draws from a given distribution.
@@ -500,4 +495,100 @@ using namespace Rcpp;
     double R::ppois(double x, double lb, int lt, int lg)
     double R::qpois(double p, double lb, int lt, int lg)
     double R::rpois(double mu)  
+    ```
+
+# Exercises
+
+1. Write a function called `square2()` that squares a number, but does not use `std::pow()`. Which one is faster?
+
+    ```{block, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    double square2(double x) {
+      return x*x;
+    }
+    ```
+    
+    ```{r, eval = FALSE, echo = FALSE}
+    bench::mark(square(9), square2(9))
+    ```
+    
+    ```{block, eval = FALSE, echo = FALSE}
+    `square2()` is just a tiny bit faster.
+    ```
+    
+2. Write a function called `quadform()` in C++ that prints the output (usine `Rcpp::Rcout`) of the [quadratic formula](https://en.wikipedia.org/wiki/Quadratic_formula). That is
+    $$
+    x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+    $$
+    It should print two numbers to the console if $b^2 - 4ac > 0$, one number if $b^2 - 4ac = 0$, and should print `"No Solution"` if $b^2 - 4ac < 0$.
+    
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    void quadform(double a, double b, double c, double tol = 1e-8) {
+      double d = b * b - 4.0 * a * c;
+      if (std::abs(d) < tol) {
+        Rcpp::Rcout << "Solution: " 
+                    << -b / (2.0 * a) 
+                    << std::endl;
+      } else if (d < 0) {
+        Rcpp::Rcout << "No Solution" << std::endl;
+      } else {
+        Rcpp::Rcout << "Solution 1: " 
+                    << (-b - std::sqrt(d)) / (2 * a)
+                    << std::endl
+                    << "Solution 2: "
+                    << (-b + std::sqrt(d)) / (2 * a)
+                    << std::endl;
+      }
+    }
+    ```
+    
+    ```{r}
+    quadform(1, 2, 1)
+    quadform(2, 2, 1)
+    quadform(1, 4, 1)
+    ```
+    
+3. The [beta function](https://en.wikipedia.org/wiki/Beta_function) is defined in terms of [gamma functions](https://en.wikipedia.org/wiki/Gamma_function) as follows
+    $$
+    \mathrm{B}(x, y) = \frac{\Gamma(x)\Gamma(y)}{\Gamma(x + y)}
+    $$
+
+    R has its own version
+    
+    ```{r}
+    beta(1.5, 2.2)
+    ```
+
+    Use just `std::lgamma()` and `std::exp()` to write your own beta function, called `beta2()`. You should include an argument `lg` which is a flag for returning either the log-beta or the beta. `lg` should default to `false`. E.g.
+    
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    double beta2(double x, double y, double lg = false) {
+      double res;
+      res = std::lgamma(x) + std::lgamma(y) - std::lgamma(x + y);
+      if (!lg) {
+        res = std::exp(res);
+      }
+      return res;
+    }
+    ```
+    
+    ```{r}
+    beta2(1.5, 2.2)
+    beta2(1.5, 2.2, TRUE)
+    ```
+
+4. Instead of shape and scale, some parameterizations of the [gamma distribution](https://en.wikipedia.org/wiki/Gamma_distribution) use shape and rate (1 over the scale). `stats::dgamma()` implements both of these in R, but `R::dgamma()` in C++ only implements the scale parameterization. Implement a density function for the gamma that uses shape and rate parameterization. E.g.
+
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    double dgamma_r(double x, double shp, double rt, int lg) {
+      return R::dgamma(x, shp, 1.0 / rt, lg);
+    }
+    ```
+
+    ```{r}
+    dgamma_r(x = 1, shp = 2, rt = 3, lg = 0)
+    dgamma(x = 1, shape = 2, rate = 3, log = FALSE)
     ```
