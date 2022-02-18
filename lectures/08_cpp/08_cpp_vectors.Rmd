@@ -1,0 +1,44 @@
+---
+title: "C++ Vectors"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output:  
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    highlight: pygments
+urlcolor: "blue"
+bibliography: "08_bib.bib"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo       = TRUE, 
+                      fig.align  = "center",
+                      fig.height = 3, fig.width = 4)
+ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
+
+```{Rcpp, ref.label=knitr::all_rcpp_labels(), include=FALSE}
+```
+
+```{Rcpp, eval = FALSE, echo = FALSE}
+#include <Rcpp.h>
+using namespace Rcpp;
+```
+
+# Learning Objectives
+
+- Chapters 8 and 10 of [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
+- Chapter 25 of [Advanced R](https://adv-r.hadley.nz/rcpp.html)
+- Learning Objectives:
+    - Rcpp Vectors
+    - For-loops
+    - Basic Vector Operations
+
+
+

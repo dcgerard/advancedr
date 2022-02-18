@@ -26,11 +26,19 @@ klippy::klippy()
 ```{Rcpp, ref.label=knitr::all_rcpp_labels(), include=FALSE}
 ```
 
+```{Rcpp, eval = FALSE, echo = FALSE}
+#include <Rcpp.h>
+using namespace Rcpp;
+```
+
+
 # Learning Objectives
 
-- [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
+- Chapters 1--7 of [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
 - Chapter 25 of [Advanced R](https://adv-r.hadley.nz/rcpp.html)
-- [R's C internals](https://github.com/hadley/r-internals)
+- Learning Objectives:
+    - Scalars and scalar operations.
+    - Printing output.
 
 
 # Basic Differences with R
@@ -43,13 +51,76 @@ klippy::klippy()
 
 - Comments start with `//`.
 
+- Scalars are different from vectors.
+
 - Counting begins at 0 (like in python), not 1. This is the most common source of headaches for R programmers migrating to C++.
 
 - Order of function definitions matter.
     - A function is only available if you have defined it earlier in the file.
     - You can declare functions at the top of a file so that you can use them before the function definition.
 
+# Declaration and Scalar Types
 
+- Let's go through a basic example of this.
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    double add2(double x, double y) {
+      double z; // declare z to be an double
+      z = x + y;
+      return z;
+    }
+    ```
+
+- In the above function, we
+  1. Declare that `add2()` will return a double.
+  2. Declare that the arguments `x` and `y` must be doubles.
+  3. Declare that `z` is a double.
+  4. Assign `z` as `x` plus `y`. This uses `=`.
+  5. Return `z`.
+
+- Notice how there is a semicolon after each line (except where curly braces are concerned).
+
+- C++ will error if you forget declarations:
+
+    ``` cpp
+    // This will not compile
+    // [[Rcpp::export]]
+    double add2(double x, double y) {
+      z = x + y;
+      return z;
+    }
+    ```
+
+- In C++, **scalars** (elements of length 1) are different from vectors (wich contain scalars). 
+
+- The different basic scalars are
+    - `bool`: This is either `True` or `False`. Same as a length 1 R `logical`.
+    - `int`: Same as a length 1 R `integer`.
+    - `double`: Same as a length 1 R `double`.
+    - `string`: Same as a length 1 R `character`.
+
+- Arithmetic operations are similar
+    - `+`, `-`, `*`, `/`
+    
+- In C++, you do powers with `pow()` from the `std` library.
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    double square(double x) {
+      return std::pow(x, 2.0);
+    }
+    ```
+
+    ```{r}
+    square(3)
+    ```
+
+# Useful functions for Scalars
+    
+  
+
+    
 
 
 

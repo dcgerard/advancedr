@@ -339,6 +339,40 @@ klippy::klippy()
     head(X1)
     head(X2)
     ```
+    
+# `{rlang}` Formula Manipulation
+
+- `{rlang}` has a lot of `formula` manipulation tools that aren't useful for working with datasets, but are useful if you want to use `formula`'s as data structures in their own right.
+
+- Create a new formula with `rlang::new_formula()`.
+    ```{r}
+    fnew <- rlang::new_formula(lhs = rlang::expr(y + w), rhs = rlang::expr(x + z))
+    ```
+
+- Test for formula with `rlang::is_formula()`.
+    ```{r}
+    rlang::is_formula(fnew)
+    ```
+
+- Get or set the formula environment with `rlang::f_env()`
+    ```{r}
+    rlang::f_env(fnew)
+    ```
+    
+- Get or set the LHS with `rlang::f_lhs()`
+    ```{r}
+    rlang::f_lhs(fnew)
+    ```
+    
+- Get or set the RHS with `rlang::f_rhs()`
+    ```{r}
+    rlang::f_rhs(fnew)
+    ```
+    
+- Convert RHS to text with `rlang::f_text()`
+    ```{r}
+    rlang::f_text(fnew)
+    ```
 
 # New Functions
 

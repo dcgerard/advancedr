@@ -358,13 +358,25 @@ klippy::klippy()
 
 - In many cases, the function environment is the same as the binding environment. Below, the name `f` in the global environment is bound to the function (arrow moving from f to the yellow object), so the binding environment is the global environment. Also below, the function is bound to the global environment (arrow moving from the black dot to the global environment), so the global environment has the objects that the function has access to, so the function environment is also the global environment.
 
+    
+    ```{r}
+    y <- 1
+    f <- function(x) {
+      return(x)
+    }
+    ```
+
+
     <img src="./04_figs_env/binding.png" alt="recursive" width="40%"/>
 
 - Below, the name `g` in the `e` environment was created in the global environment. So the function environment is the global environment. But the name `g` is in the `e` environment, so the binding environment is `e`.
 
     ```{r}
+    y <- 1
     e <- rlang::env()
-    e$g <- function() 1
+    e$g <- function(x) {
+      return(x)
+    }
     ```
 
     <img src="./04_figs_env/binding-2.png" alt="recursive" width="40%"/>

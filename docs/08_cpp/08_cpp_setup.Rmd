@@ -70,7 +70,27 @@ klippy::klippy()
     hello_world()
     ```
 
-- People almost never do that in practice. If you are using `{Rcpp}`, it is almost always in an R package.
+- More frequently, you have a C++ file (ending in ".cpp") that contains the following:
+
+    ```{Rcpp, eval = FALSE}
+    #include <Rcpp.h>
+    using namespace Rcpp;
+    
+    // [[Rcpp::export]]
+    void hello_world() {
+      Rcpp::Rcout << "Hello World";
+    }
+    ```
+    
+    Suppose this file is called "hello.cpp", then you can load it into R using
+    
+    ```{r, eval = FALSE}
+    Rcpp::sourceCpp(file = "hello.cpp")
+    ```
+    
+    and then use `hello_world()` as you would any R function.
+
+- People almost never do either of these in practice. If you are using `{Rcpp}`, it is almost always in an R package.
 
 - `usethis::use_rcpp()` will automatically format an R package to have the appropriate structure for interfacing with `{Rcpp}`.
 

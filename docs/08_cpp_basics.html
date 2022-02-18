@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-14" />
+<meta name="date" content="2022-02-18" />
 
 <title>C++ Basics</title>
 
@@ -50,6 +50,101 @@
     </style>
 
 
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -263,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">C++ Basics</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-14</h4>
+<h4 class="date">2022-02-18</h4>
 
 </div>
 
@@ -271,6 +366,16 @@ $(document).ready(function () {
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#basic-differences-with-r">Basic Differences with R</a></li>
+<li><a href="#hello-world">Hello World</a></li>
+<li><a href="#declaration-and-scalar-types">Declaration and Scalar Types</a></li>
+<li><a href="#useful-math-functions-for-scalars">Useful Math Functions for Scalars</a>
+<ul>
+<li><a href="#rmath-from-r"><code>&lt;Rmath&gt;</code> from <code>R</code></a>
+<ul>
+<li><a href="#math-functions">Math Functions</a></li>
+<li><a href="#distributions">Distributions</a></li>
+</ul></li>
+</ul></li>
 </ul>
 </div>
 
@@ -281,9 +386,13 @@ $(document).ready(function () {
 <div id="learning-objectives" class="section level1">
 <h1>Learning Objectives</h1>
 <ul>
-<li><a href="https://teuder.github.io/rcpp4everyone_en/">Rcpp for Everyone</a></li>
+<li>Chapters 1–7 and 30 of <a href="https://teuder.github.io/rcpp4everyone_en/">Rcpp for Everyone</a></li>
 <li>Chapter 25 of <a href="https://adv-r.hadley.nz/rcpp.html">Advanced R</a></li>
-<li><a href="https://github.com/hadley/r-internals">R’s C internals</a></li>
+<li>Learning Objectives:
+<ul>
+<li>Scalars and scalar operations.</li>
+<li>Printing output.</li>
+</ul></li>
 </ul>
 </div>
 <div id="basic-differences-with-r" class="section level1">
@@ -293,6 +402,7 @@ $(document).ready(function () {
 <li><p>Assignment is with <code>=</code>, not <code>&lt;-</code>.</p></li>
 <li><p>Every variable needs to be <strong>declared</strong> ahead of time.</p></li>
 <li><p>Comments start with <code>//</code>.</p></li>
+<li><p>Scalars are different from vectors.</p></li>
 <li><p>Counting begins at 0 (like in python), not 1. This is the most common source of headaches for R programmers migrating to C++.</p></li>
 <li><p>Order of function definitions matter.</p>
 <ul>
@@ -300,6 +410,294 @@ $(document).ready(function () {
 <li>You can declare functions at the top of a file so that you can use them before the function definition.</li>
 </ul></li>
 </ul>
+</div>
+<div id="hello-world" class="section level1">
+<h1>Hello World</h1>
+<ul>
+<li><p>You can print out to the console using Rcpp with <code>Rcpp::Rcout</code> and the <code>&lt;&lt;</code> operator.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> hello_world_1<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;Hello World&quot;</span><span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hello_world_1</span>()</span></code></pre></div>
+<pre><code>## Hello World</code></pre></li>
+<li><p>The <code>void</code> means that our function is not returning anything.</p></li>
+<li><p>You can chain multiple outputs together.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> hello_world_2<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;Hello&quot;</span> <span class="op">&lt;&lt;</span> <span class="st">&quot; World&quot;</span><span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hello_world_2</span>()</span></code></pre></div>
+<pre><code>## Hello World</code></pre></li>
+<li><p>If you want a new line, use <code>endl</code> from the <code>std</code> namespace.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> hello_world_3<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;Hello&quot;</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>              <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;World&quot;</span><span class="op">;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hello_world_3</span>()</span></code></pre></div>
+<pre><code>## Hello
+## World</code></pre></li>
+<li><p>Notice that we use <code>::</code> to state the library, just like in R.</p></li>
+<li><p>Notice how putting <code>&lt;&lt;</code> on different lines did not affect things. This is because the end of the command is wherever the semicolon <code>;</code> is.</p></li>
+<li><p>In non Rcpp C++, you would use <code>std::cout</code> instead of <code>Rcpp::Rcout</code>.</p></li>
+<li><p>Since C++ is a compiled language, and you cannot use it interactively, you often debug by printing lots of output to the console and seeing if the output is consistent with what you expect. You will use <code>Rcpp::Rcout</code> a lot.</p></li>
+</ul>
+</div>
+<div id="declaration-and-scalar-types" class="section level1">
+<h1>Declaration and Scalar Types</h1>
+<ul>
+<li><p>Let’s go through a basic example of the differences between R and C++.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> add2<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> y<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> z<span class="op">;</span> <span class="co">// declare z to be an double</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  z <span class="op">=</span> x <span class="op">+</span> y<span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> z<span class="op">;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
+<li><p>In the above function, we</p>
+<ol style="list-style-type: decimal">
+<li>Declare that <code>add2()</code> will return a double.</li>
+<li>Declare that the arguments <code>x</code> and <code>y</code> must be doubles.</li>
+<li>Declare that <code>z</code> is a double.</li>
+<li>Assign <code>z</code> as <code>x</code> plus <code>y</code>. This uses <code>=</code>.</li>
+<li>Return <code>z</code>.</li>
+</ol></li>
+<li><p>Notice how there is a semicolon after each line (except where curly braces are concerned).</p></li>
+<li><p>C++ will error if you forget declarations:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">// This will not compile</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> add2<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> y<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  z <span class="op">=</span> x <span class="op">+</span> y<span class="op">;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> z<span class="op">;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
+<li><p>In C++, <strong>scalars</strong> (elements of length 1) are different from vectors (which contain scalars).</p></li>
+<li><p>The different basic scalars are</p>
+<ul>
+<li><code>bool</code>: This is either <code>true</code> or <code>false</code> (all lower case). Same as a length 1 R <code>logical</code>.</li>
+<li><code>int</code>: Same as a length 1 R <code>integer</code>.</li>
+<li><code>double</code>: Same as a length 1 R <code>double</code>.</li>
+<li><code>string</code>: Same as a length 1 R <code>character</code>.</li>
+</ul></li>
+<li><p>Note that in C++, <code>1</code> is and <code>int</code> and <code>1.0</code> is a double.</p></li>
+<li><p>Arithmetic operations are similar</p>
+<ul>
+<li><code>+</code>, <code>-</code>, <code>*</code>, <code>/</code></li>
+</ul></li>
+<li><p>In C++, you do powers with <code>pow()</code> from the <code>std</code> namespace.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> square<span class="op">(</span><span class="dt">double</span> x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">std::</span>pow<span class="op">(</span>x<span class="op">,</span> <span class="fl">2.0</span><span class="op">);</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">square</span>(<span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## [1] 9</code></pre></li>
+<li><p>Logical operations are the same, but no <code>&amp;</code> and <code>|</code></p>
+<ul>
+<li><code>&amp;&amp;</code> is and</li>
+<li><code>||</code> is or</li>
+<li><code>!</code> is not</li>
+</ul></li>
+<li><p>The comparison between doubles and ints are the same</p>
+<ul>
+<li><code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code></li>
+</ul></li>
+<li><p>You can use these in <code>if-else</code> statements, which are exactly the same as R:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>condition<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> <span class="op">{</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> <span class="op">{</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
+<li><p>Let’s demonstrate this by creating a C++ version of <code>sign()</code>.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> signC<span class="op">(</span><span class="dt">int</span> x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>x <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>x <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">signC</span>(<span class="sc">-</span><span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## [1] -1</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">signC</span>(<span class="dv">0</span>)</span></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">signC</span>(<span class="dv">11</span>)</span></code></pre></div>
+<pre><code>## [1] 1</code></pre></li>
+<li><p><strong>Exercise</strong>: Write a function called <code>square2()</code> that squares a number, but does not use <code>std::pow()</code>. Which one is faster?</p></li>
+</ul>
+</div>
+<div id="useful-math-functions-for-scalars" class="section level1">
+<h1>Useful Math Functions for Scalars</h1>
+<ul>
+<li><p>Here are a bunch of the math scalar functions I use pretty regularly.</p></li>
+<li><p>Most of these are from the <code>&lt;cmath&gt;</code> library from the <code>std</code> namespace, or from the <code>&lt;Rmath&gt;</code> library from the <code>R</code> namespace.</p></li>
+<li><p>If you want to check out those R header files where the functions are declared, type in R:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">R.home</span>(<span class="st">&quot;include&quot;</span>)</span></code></pre></div></li>
+<li><p>You can read about the <code>&lt;cmath&gt;</code> library at <a href="https://en.cppreference.com" class="uri">https://en.cppreference.com</a></p></li>
+<li><p>Below, I will write out the return value and arguments like so</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>type lib<span class="op">::</span>name<span class="op">(</span>type<span class="op">,</span> type<span class="op">)</span></span></code></pre></div>
+<h2 id="cmath-from-std"><code>&lt;cmath&gt;</code> from <code>std</code></h2></li>
+<li><p><code>double std::min(double a, double b)</code>: Minimum of two objects (usually scalars) of same type.</p></li>
+<li><p><code>double std::max(double a, double b)</code>: Maximum of two objects (usually scalars) of same type.</p></li>
+<li><p><code>double std::ceil(double x)</code>: Round a double up.</p></li>
+<li><p><code>double double std::floor(double x)</code>: Round a double down.</p></li>
+<li><p><code>double std::trunc(double x)</code>: Round a double closer to zero. So negative numbers up and positive numbers down.</p></li>
+<li><p><code>double std::round(double x)</code>: Rounds double to nearest integer. Returns a double.</p></li>
+<li><p><code>double std::abs(double x)</code>: Absolute value of a double or int.</p></li>
+<li><p><code>double std::sqrt(double x)</code>: Computes <span class="math inline">\(\sqrt{x}\)</span></p></li>
+<li><p><code>double std::exp(double x)</code>: Computes <span class="math inline">\(e^x\)</span>.</p></li>
+<li><p><code>double std::exp2(double x)</code>: Computes <span class="math inline">\(2^x\)</span></p></li>
+<li><p><code>double std::pow(double x, double y)</code>: Computes <span class="math inline">\(x^y\)</span>.</p></li>
+<li><p><code>double std::log(double x)</code>, <code>double std::log10(double x)</code>, <code>double std::log2(double x)</code>, logs a double with base <span class="math inline">\(e\)</span>, <span class="math inline">\(10\)</span>, or <span class="math inline">\(2\)</span> (respectively).</p></li>
+<li><p><code>double std::lgamma(double arg)</code>: Computes natural log of the <a href="https://en.wikipedia.org/wiki/Gamma_function">gamma function</a>. Note that <code>std::lgamma(x)</code> is <span class="math inline">\(\log[(x-1)!]\)</span> for any integer <span class="math inline">\(x\)</span>, so this can be used to calculate log-factorials.</p></li>
+</ul>
+<div id="rmath-from-r" class="section level2">
+<h2><code>&lt;Rmath&gt;</code> from <code>R</code></h2>
+<div id="math-functions" class="section level3">
+<h3>Math Functions</h3>
+<ul>
+<li><p><code>double R::beta(double a, double b)</code>: Compute the <a href="https://en.wikipedia.org/wiki/Beta_function">beta function</a></p></li>
+<li><p><code>double R::lbeta(double a, double b)</code>: Compute the log of the <a href="https://en.wikipedia.org/wiki/Beta_function">beta function</a></p></li>
+<li><p><code>double R::choose(double n, double k)</code>: Compute the <a href="https://en.wikipedia.org/wiki/Combination">combination</a>, <span class="math inline">\(\binom{n}{k}\)</span></p></li>
+<li><p><code>double R::lchoose(double n, double k)</code>: Compute the log of the combination, <span class="math inline">\(\log\left[\binom{n}{k}\right]\)</span>.</p></li>
+</ul>
+</div>
+<div id="distributions" class="section level3">
+<h3>Distributions</h3>
+<ul>
+<li><p>There are many distributions available from <code>&lt;Rmath&gt;</code>, each is parameterized in standard ways (read about them in <a href="https://en.wikipedia.org/wiki/Probability_distribution#Common_probability_distributions_and_their_applications">Wikipedia</a>).</p></li>
+<li><p>Functions that begin with <code>d</code> return the <a href="https://en.wikipedia.org/wiki/Probability_density_function">density</a> (for continuous distributions) or the <a href="https://en.wikipedia.org/wiki/Probability_mass_function">probability mass</a> (for discrete distributions).</p>
+<p><img src="08_cpp_basics_files/figure-html/unnamed-chunk-18-1.png" width="40%" style="display: block; margin: auto;" /><img src="08_cpp_basics_files/figure-html/unnamed-chunk-18-2.png" width="40%" style="display: block; margin: auto;" /></p></li>
+<li><p>Functions that begin with <code>p</code> return the probability for being less than or equal to some value. This is called the <a href="https://en.wikipedia.org/wiki/Cumulative_distribution_function">cumulative distribution function</a>.</p>
+<p><img src="08_cpp_basics_files/figure-html/unnamed-chunk-19-1.png" width="40%" style="display: block; margin: auto;" /><img src="08_cpp_basics_files/figure-html/unnamed-chunk-19-2.png" width="40%" style="display: block; margin: auto;" /></p></li>
+<li><p>Functions that begin with <code>q</code> return the <a href="https://en.wikipedia.org/wiki/Quantile">quantile</a>. That is, you tell me a probability and I will tell you the value such that the probability of being less than that value is the provided probability.</p>
+<p><img src="08_cpp_basics_files/figure-html/unnamed-chunk-20-1.png" width="40%" style="display: block; margin: auto;" /><img src="08_cpp_basics_files/figure-html/unnamed-chunk-20-2.png" width="40%" style="display: block; margin: auto;" /></p></li>
+<li><p>Functions that begin with <code>r</code> provide random draws from a given distribution.</p></li>
+<li><p>The common arguments between functions are:</p>
+<ul>
+<li><code>x</code> an observation of that distribution.</li>
+<li><code>p</code> a probability.</li>
+<li><code>lt</code>: <code>lt = 0</code> means that <code>p</code> is the upper tail probability while <code>lt = 1</code> means that <code>p</code> is the lower tail probability.</li>
+<li><code>lg</code>: <code>lg = 0</code> means that <code>p</code> is the probability while <code>lg = 1</code> means that <code>lg</code> is the log-probability.</li>
+</ul></li>
+<li><p>Below are the most common distributions.</p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Normal_distribution">Normal Distribution</a> with mean and standard deviation (<em>not</em> variance).</p>
+<ul>
+<li>In Wikipedia: <code>mu</code> = <span class="math inline">\(\mu\)</span>, <code>sigma</code> = <span class="math inline">\(\sigma\)</span>.</li>
+</ul>
+<div class="sourceCode" id="cb25"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dnorm<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> mu<span class="op">,</span> <span class="dt">double</span> sigma<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>              </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pnorm<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> mu<span class="op">,</span> <span class="dt">double</span> sigma<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>      </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qnorm<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> mu<span class="op">,</span> <span class="dt">double</span> sigma<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>      </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rnorm<span class="op">(</span><span class="dt">double</span> mu<span class="op">,</span> <span class="dt">double</span> sigma<span class="op">)</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Gamma_distribution">Gamma Distribution</a> with shape and scale parameters.</p>
+<ul>
+<li>In Wikipedia: <code>shp</code> = <span class="math inline">\(k\)</span>, <code>scl</code> = <span class="math inline">\(\theta\)</span>.</li>
+</ul>
+<div class="sourceCode" id="cb26"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dgamma<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> shp<span class="op">,</span> <span class="dt">double</span> scl<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>     </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pgamma<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> alp<span class="op">,</span> <span class="dt">double</span> scl<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qgamma<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> alp<span class="op">,</span> <span class="dt">double</span> scl<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rgamma<span class="op">(</span><span class="dt">double</span> a<span class="op">,</span> <span class="dt">double</span> scl<span class="op">)</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Beta_distribution">Beta Distribution</a> with left and right shape parameters.</p>
+<ul>
+<li>In Wikipedia: <code>a</code> = <span class="math inline">\(\alpha\)</span>, <code>b</code> = <span class="math inline">\(\beta\)</span>.</li>
+</ul>
+<div class="sourceCode" id="cb27"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dbeta<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> a<span class="op">,</span> <span class="dt">double</span> b<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>         </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pbeta<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> q<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qbeta<span class="op">(</span><span class="dt">double</span> a<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> q<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rbeta<span class="op">(</span><span class="dt">double</span> a<span class="op">,</span> <span class="dt">double</span> b<span class="op">)</span>   </span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Chi-squared_distribution">Chi-squared Distribution</a>.</p>
+<ul>
+<li>In Wikipedia: <code>df</code> = <span class="math inline">\(k\)</span>.</li>
+</ul>
+<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dchisq<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> df<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>          </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pchisq<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> df<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>  </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qchisq<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> df<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>  </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rchisq<span class="op">(</span><span class="dt">double</span> df<span class="op">)</span>   </span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/F-distribution"><span class="math inline">\(F\)</span>-distribution</a> with numerator and denominator degrees of freedom.</p>
+<ul>
+<li>In Wikipedia: <code>df1</code> = <span class="math inline">\(d_1\)</span>, <code>df2</code> = <span class="math inline">\(d_2\)</span>.</li>
+</ul>
+<div class="sourceCode" id="cb29"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>df<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> df1<span class="op">,</span> <span class="dt">double</span> df2<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>      </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pf<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> df1<span class="op">,</span> <span class="dt">double</span> df2<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qf<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> df1<span class="op">,</span> <span class="dt">double</span> df2<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rf<span class="op">(</span><span class="dt">double</span> df1<span class="op">,</span> <span class="dt">double</span> df2<span class="op">)</span>                </span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Student%27s_t-distribution"><span class="math inline">\(t\)</span>-distribution</a> with degrees of freedom.</p>
+<ul>
+<li>In Wikipedia: <code>n</code> = <span class="math inline">\(\nu\)</span>.</li>
+</ul>
+<div class="sourceCode" id="cb30"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dt<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>            </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pt<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>        </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qt<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>        </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rt<span class="op">(</span><span class="dt">double</span> n<span class="op">)</span>                      </span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Binomial_distribution">Binomial Distribution</a> with size and success probability parameters.</p>
+<ul>
+<li>In Wikipedia: <code>n</code> = <span class="math inline">\(n\)</span>, <code>p</code> = <span class="math inline">\(p\)</span></li>
+</ul>
+<div class="sourceCode" id="cb31"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dbinom<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>      </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pbinom<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>  </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qbinom<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">double</span> m<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>  </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rbinom<span class="op">(</span><span class="dt">double</span> n<span class="op">,</span> <span class="dt">double</span> p<span class="op">)</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Exponential_distribution">Exponential Distribution</a> with scale parameter.</p>
+<ul>
+<li>In Wikipedia: <code>sl</code> = <span class="math inline">\(1 / \lambda\)</span> (<strong>not</strong> <span class="math inline">\(\lambda\)</span>).</li>
+</ul>
+<div class="sourceCode" id="cb32"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dexp<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> sl<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>     </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pexp<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> sl<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qexp<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> sl<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rexp<span class="op">(</span><span class="dt">double</span> sl<span class="op">)</span>               </span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> exp_demo<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> R<span class="op">::</span>dexp<span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp_demo</span>() <span class="do">## uses scale</span></span></code></pre></div>
+<pre><code>## [1] 0.3033</code></pre>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dexp</span>(<span class="at">x =</span> <span class="dv">1</span>, <span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>, <span class="at">log =</span> <span class="cn">FALSE</span>) <span class="do">## uses rate</span></span></code></pre></div>
+<pre><code>## [1] 0.3033</code></pre></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Geometric_distribution">Geometric Distribution</a> with success probability <span class="math inline">\(p\)</span>. This uses the model formulation that counts the number of failures before a success.</p>
+<ul>
+<li>In Wikipedia: <code>p</code> = <span class="math inline">\(p\)</span>.</li>
+</ul>
+<div class="sourceCode" id="cb38"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dgeom<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>     </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pgeom<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qgeom<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> pb<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rgeom<span class="op">(</span><span class="dt">double</span> p<span class="op">)</span>               </span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> <span class="va">g_demo</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> R<span class="op">::</span>dgeom<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="fl">0.7</span><span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">g_demo</span>() <span class="do">## 70% prob of a success on the first trial, so 0 failures.</span></span></code></pre></div>
+<pre><code>## [1] 0.7</code></pre></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Hypergeometric_distribution">Hypergeometric Distribution</a></p>
+<ul>
+<li>In Wikipedia:
+<ul>
+<li><code>x</code> = <span class="math inline">\(k\)</span> = Number of white balls drawn.</li>
+<li><code>r</code> = <span class="math inline">\(K\)</span> = number of white balls in urn.</li>
+<li><code>b</code> = <span class="math inline">\(N - K\)</span> = number of black balls in urn.</li>
+<li><code>n</code> = <span class="math inline">\(n\)</span> = number of balls drawn.</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb42"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dhyper<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> r<span class="op">,</span> <span class="dt">double</span> b<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>phyper<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> r<span class="op">,</span> <span class="dt">double</span> b<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qhyper<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> r<span class="op">,</span> <span class="dt">double</span> b<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rhyper<span class="op">(</span><span class="dt">double</span> r<span class="op">,</span> <span class="dt">double</span> b<span class="op">,</span> <span class="dt">double</span> n<span class="op">)</span>   </span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Poisson_distribution">Poisson Distribution</a> with mean parameter.</p>
+<ul>
+<li>In Wikipedia: <code>lb</code> = <span class="math inline">\(\lambda\)</span>.</li>
+</ul>
+<div class="sourceCode" id="cb43"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dpois<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> lb<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>        </span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>ppois<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> lb<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qpois<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> lb<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rpois<span class="op">(</span><span class="dt">double</span> mu<span class="op">)</span>  </span></code></pre></div></li>
+</ul>
+</div>
+</div>
 </div>
 
 <!DOCTYPE html>

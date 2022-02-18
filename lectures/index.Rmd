@@ -56,8 +56,7 @@ This repository contains material based upon work supported by the National Scie
 - 08 C++ and Rcpp
   - [Integrating C++ and R](./08_cpp_setup.html)
   - [C++ Basics](./08_cpp_basics.html)
-  - Data Types
-  - Vectors / Vector Operations
+  - [Vectors / Vector Operations](./08_cpp_vectors.html)
   - Control Flow
   - Rcpp Sugar
 - 09 Parallel Processing
