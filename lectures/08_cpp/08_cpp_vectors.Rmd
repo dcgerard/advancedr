@@ -396,18 +396,17 @@ XYZ Do chapter 24 of Rcpp for Everyone
     ```
 
 
-3. (from Advanced R) Convert the following functions into C++. For now, assume the inputs have no missing values.
+3. (from Advanced R) Convert the following functions into C++. For now, assume the inputs have no missing values. Try not to use Rcpp Sugar (e.g. `Rcpp::min()`).
     1. `all()`.
     2. `cumprod()`, `cummin()`, `cummax()`.
     3. `diff()`. Start by assuming lag 1, and then generalize for lag n.
     4. `range()`.
-    5. `var()`. Read about the approaches you can take on Wikipedia. Whenever implementing a numerical algorithm, it’s always good to check what is already known about the problem.
     
-    - `allC()` output examples:
+    - `all_cpp()` output examples:
     
         ```{Rcpp, eval = FALSE, echo = FALSE}
         // [[Rcpp::export]]
-        bool allC(LogicalVector x) {
+        bool all_cpp(LogicalVector x) {
           int n = x.length();
           for (int i = 0; i < n; i++) {
             if (!x[i]) {
@@ -419,9 +418,153 @@ XYZ Do chapter 24 of Rcpp for Everyone
         ```
             
         ```{r}
-        allC(c(TRUE, TRUE, FALSE))
-        allC(TRUE)
-        allC(FALSE)
-        allC(c(TRUE, TRUE))
+        all_cpp(c(TRUE, TRUE, FALSE))
+        all_cpp(TRUE)
+        all_cpp(FALSE)
+        all_cpp(c(TRUE, TRUE))
         ```
+
+    - `cumprod_cpp()` output examples
     
+        ```{Rcpp, eval = FALSE, echo = FALSE}
+        // [[Rcpp::export]]
+        NumericVector cumprod_cpp(NumericVector x) {
+          int n = x.length();
+          if (n == 0 || n == 1) {
+            return x;
+          }
+          
+          NumericVector out(n);
+          out[0] = x[0];
+    
+          for (int i = 1; i < n; i++) {
+            out[i] = out[i - 1] * x[i];
+          }
+          
+          return out;
+        }
+        ```
+            
+        ```{r}
+        x <- 1:4
+        cumprod_cpp(x)
+        x <- double()
+        cumprod_cpp(x)
+        x <- 3
+        cumprod_cpp(x)
+        ```
+       
+    - `cummin_cpp()` output examples:
+
+        ```{Rcpp, eval = FALSE, echo = FALSE}
+        // [[Rcpp::export]]
+        NumericVector cummin_cpp(NumericVector x) {
+          int n = x.length();
+          if (n == 0 || n == 1) {
+            return x;
+          }
+          
+          NumericVector out(n);
+          out[0] = x[0];
+          
+          for (int i = 1; i < n; i++) {
+            out[i] = std::min(out[i - 1], x[i]);
+          }
+          
+          return out;
+        }
+        ```
+                
+        ```{r}
+        cummin_cpp(double())
+        cummin_cpp(3)
+        cummin_cpp(c(10, 11, 3, 4, 5, 1, 2))
+        ```
+
+    - `cummax_cpp()` output examples:
+
+        ```{Rcpp, eval = FALSE, echo = FALSE}
+        // [[Rcpp::export]]
+        NumericVector cummax_cpp(NumericVector x) {
+          int n = x.length();
+          if (n == 0 || n == 1) {
+            return x;
+          }
+          
+          NumericVector out(n);
+          out[0] = x[0];
+          
+          for (int i = 1; i < n; i++) {
+            out[i] = std::max(out[i - 1], x[i]);
+          }
+          
+          return out;
+        }
+        ```
+                
+        ```{r}
+        cummax_cpp(double())
+        cummax_cpp(3)
+        cummax_cpp(c(10, 11, 3, 4, 5, 22, 2))
+        ```
+
+    - `diff_cpp()` output examples:
+
+        ```{Rcpp, eval = FALSE, echo = FALSE}
+        // [[Rcpp::export]]
+        NumericVector diff_cpp(NumericVector x, int lag = 1) {
+          int n = x.length();
+          if (lag >= n) {
+            NumericVector out(0);
+            return out;
+          }
+          
+          NumericVector out(n - lag);
+          for (int i = 0; i < (n - lag); i++) {
+            out[i] = x[i + lag] - x[i];
+          }
+          return out;
+        }
+        ```
+        
+        ```{r}
+        diff_cpp(x = c(1, 5, 10, 20), lag = 1)
+        diff_cpp(x = c(1, 5, 10, 20), lag = 2)
+        diff_cpp(x = c(1, 5, 10, 20), lag = 3)
+        diff_cpp(x = c(1, 5, 10, 20), lag = 4)
+        ```
+    - `range_cpp()` output examples:
+    
+        ```{Rcpp, eval = FALSE, echo = FALSE}
+        // [[Rcpp::export]]
+        NumericVector range_cpp(NumericVector x) {
+          int n = x.length();
+          NumericVector out(2);
+          if (n == 0) {
+            out[0] = R_NegInf;
+            out[1] = R_PosInf;
+            return out;
+          } else if (n == 1) {
+            out[0] = x[0];
+            out[1] = x[0];
+            return out;
+          }
+        
+          out[0] = x[0];
+          out[1] = x[1];
+          
+          // do for-loop to get max and min, since avoiding sugar
+          for (int i = 0; i < n; i++) {
+            out[0] = std::min(out[0], x[i]);
+            out[1] = std::max(out[1], x[i]);
+          }
+          
+          return out;
+        }
+        ```
+        
+        ```{r}
+        range_cpp(c(9, 11, 22, 12, 1))
+        range_cpp(8)
+        range_cpp(double())
+        ```

@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-18" />
+<meta name="date" content="2022-02-19" />
 
 <title>C++ Vectors</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">C++ Vectors</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-18</h4>
+<h4 class="date">2022-02-19</h4>
 
 </div>
 
@@ -554,9 +554,9 @@ $(document).ready(function () {
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">100</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(x)</span></code></pre></div>
-<pre><code>## [1] 49.36</code></pre>
+<pre><code>## [1] 49.71</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum2</span>(x)</span></code></pre></div>
-<pre><code>## [1] 49.36</code></pre></li>
+<pre><code>## [1] 49.71</code></pre></li>
 <li><p>Here is are the microbenchmarks:</p>
 <table>
 <thead>
@@ -575,25 +575,25 @@ $(document).ready(function () {
 <tbody>
 <tr class="odd">
 <td align="left">sum(x)</td>
-<td align="right">239ns</td>
-<td align="right">275.09ns</td>
-<td align="right">2884146</td>
+<td align="right">259ns</td>
+<td align="right">302ns</td>
+<td align="right">3084338</td>
 <td align="right">0B</td>
-<td align="right">288.4</td>
-<td align="right">9999</td>
-<td align="right">1</td>
-<td align="right">3.47ms</td>
+<td align="right">0</td>
+<td align="right">10000</td>
+<td align="right">0</td>
+<td align="right">3.24ms</td>
 </tr>
 <tr class="even">
 <td align="left">sum2(x)</td>
-<td align="right">1.31µs</td>
-<td align="right">2.29µs</td>
-<td align="right">424783</td>
+<td align="right">1.2µs</td>
+<td align="right">2.1µs</td>
+<td align="right">504009</td>
 <td align="right">18.2KB</td>
-<td align="right">0.0</td>
+<td align="right">0</td>
 <td align="right">10000</td>
 <td align="right">0</td>
-<td align="right">23.54ms</td>
+<td align="right">19.84ms</td>
 </tr>
 </tbody>
 </table></li>
@@ -670,24 +670,63 @@ $(document).ready(function () {
 <pre><code>## [1] 0 1</code></pre>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fib</span>(<span class="dv">10</span>)</span></code></pre></div>
 <pre><code>##  [1]  0  1  1  2  3  5  8 13 21 34</code></pre></li>
-<li><p>(from Advanced R) Convert the following functions into C++. For now, assume the inputs have no missing values.</p>
+<li><p>(from Advanced R) Convert the following functions into C++. For now, assume the inputs have no missing values. Try not to use Rcpp Sugar (e.g. <code>Rcpp::min()</code>).</p>
 <ol style="list-style-type: decimal">
 <li><code>all()</code>.</li>
 <li><code>cumprod()</code>, <code>cummin()</code>, <code>cummax()</code>.</li>
 <li><code>diff()</code>. Start by assuming lag 1, and then generalize for lag n.</li>
 <li><code>range()</code>.</li>
-<li><code>var()</code>. Read about the approaches you can take on Wikipedia. Whenever implementing a numerical algorithm, it’s always good to check what is already known about the problem.</li>
 </ol>
 <ul>
-<li><p><code>allC()</code> output examples:</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">allC</span>(<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span></code></pre></div>
+<li><p><code>all_cpp()</code> output examples:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all_cpp</span>(<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span></code></pre></div>
 <pre><code>## [1] FALSE</code></pre>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">allC</span>(<span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all_cpp</span>(<span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">allC</span>(<span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all_cpp</span>(<span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## [1] FALSE</code></pre>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">allC</span>(<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all_cpp</span>(<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>))</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre></li>
+<li><p><code>cumprod_cpp()</code> output examples</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cumprod_cpp</span>(x)</span></code></pre></div>
+<pre><code>## [1]  1  2  6 24</code></pre>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">double</span>()</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cumprod_cpp</span>(x)</span></code></pre></div>
+<pre><code>## numeric(0)</code></pre>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cumprod_cpp</span>(x)</span></code></pre></div>
+<pre><code>## [1] 3</code></pre></li>
+<li><p><code>cummin_cpp()</code> output examples:</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cummin_cpp</span>(<span class="fu">double</span>())</span></code></pre></div>
+<pre><code>## numeric(0)</code></pre>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cummin_cpp</span>(<span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## [1] 3</code></pre>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cummin_cpp</span>(<span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">11</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">2</span>))</span></code></pre></div>
+<pre><code>## [1] 10 10  3  3  3  1  1</code></pre></li>
+<li><p><code>cummax_cpp()</code> output examples:</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cummax_cpp</span>(<span class="fu">double</span>())</span></code></pre></div>
+<pre><code>## numeric(0)</code></pre>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cummax_cpp</span>(<span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## [1] 3</code></pre>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cummax_cpp</span>(<span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">11</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">22</span>, <span class="dv">2</span>))</span></code></pre></div>
+<pre><code>## [1] 10 11 11 11 11 22 22</code></pre></li>
+<li><p><code>diff_cpp()</code> output examples:</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diff_cpp</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>), <span class="at">lag =</span> <span class="dv">1</span>)</span></code></pre></div>
+<pre><code>## [1]  4  5 10</code></pre>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diff_cpp</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>), <span class="at">lag =</span> <span class="dv">2</span>)</span></code></pre></div>
+<pre><code>## [1]  9 15</code></pre>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diff_cpp</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>), <span class="at">lag =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## [1] 19</code></pre>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diff_cpp</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>), <span class="at">lag =</span> <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>## numeric(0)</code></pre></li>
+<li><p><code>range_cpp()</code> output examples:</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range_cpp</span>(<span class="fu">c</span>(<span class="dv">9</span>, <span class="dv">11</span>, <span class="dv">22</span>, <span class="dv">12</span>, <span class="dv">1</span>))</span></code></pre></div>
+<pre><code>## [1]  1 22</code></pre>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range_cpp</span>(<span class="dv">8</span>)</span></code></pre></div>
+<pre><code>## [1] 8 8</code></pre>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range_cpp</span>(<span class="fu">double</span>())</span></code></pre></div>
+<pre><code>## [1] -Inf  Inf</code></pre></li>
 </ul></li>
 </ol>
 </div>
