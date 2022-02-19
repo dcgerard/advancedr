@@ -254,7 +254,7 @@ using namespace Rcpp;
     sum2(x)
     ```
     
-- Here is are the microbenchmarks:
+- Here are the microbenchmarks:
 
     ```{r, echo = FALSE}
     knitr::kable(bench::mark(sum(x), sum2(x))[1:9])
@@ -264,13 +264,66 @@ using namespace Rcpp;
 
 - In effect, this makes `for(i in 1:n)` in R the same as `for(int i = 0; i < n; i++)` in C++.
 
-# Cautions
+# Aliasing
 
-XYZ Do chapter 19 of Rcpp for Everyone
+- If you assign an Rcpp vector `x` to another object `y` using `=`, then the value of `x` is **not** copied to `y`. Rather, `x` becomes an **alias** for `y`. 
 
-# Missing Values
+- This means that if you edit `x`, then that will edit `y`. And if you edit `y` then that will edit `x`.
 
-XYZ Do chapter 24 of Rcpp for Everyone
+- You can use `Rcpp::clone()` to make a copy.
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void copy_example() {
+      NumericVector x = {1, 2, 3};
+      Rcpp::Rcout << x << std::endl;
+      
+      // cloning
+      NumericVector z = Rcpp::clone(x);
+      z[0] = 13;
+      Rcpp::Rcout << x << std::endl;
+      
+      // aliasing
+      NumericVector y = x;
+      y[1] = 10;
+      Rcpp::Rcout << x << std::endl;
+    }
+    ```
+    
+    ```{r}
+    copy_example()
+    ```
+
+- This is since `x` is binding to a pointer for the vector, not for the vector itself. So copying `x` to `y` just copies the pointer.
+
+# Missing Values and Infinity
+
+- Infinity is encoded using `R_PosInf` and `R_NegInf`.
+
+- Missing values are encoded using `NA_REAL`, `NA_INTEGER`, `NA_LOGICAL`, and `NA_STRING`.
+
+- You can include these in Rcpp vectors without worrying too much.
+
+    ``` cpp
+    Rcpp::NumericVector x(10, NA_REAL)
+    ```
+    
+- E.g. if you use Rcpp Sugar then Rcpp will understand how to propagate missing values appropriately.
+
+- But if you try to use these missing values as scalars, you have to be very scared.
+
+- `NA_INTEGER` is  the smallest integer allowed in C++, so `NA_INTEGER + 1` would not longer be considered missing data, e.g.
+
+    ```{r}
+    Rcpp::evalCpp("NA_INTEGER")
+    Rcpp::evalCpp("NA_INTEGER + 1")
+    ```
+
+- Coercing `NA_LOGICAL` to a `bool` will evaluate to `true`, since `bool` does not allow for anything except `true` and `false`.
+
+    ```{r}
+    Rcpp::evalCpp("(bool)NA_LOGICAL")
+    ```
 
 # Exercises
 
