@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-01-25" />
+<meta name="date" content="2022-02-19" />
 
 <title>Assertions and Unit Tests</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Assertions and Unit Tests</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-01-25</h4>
+<h4 class="date">2022-02-19</h4>
 
 </div>
 
@@ -542,7 +542,7 @@ $(document).ready(function () {
 <li>If your code changes in a breaking way, your unit tests will alert you. This makes you more confident to make robust changes to your code.</li>
 <li>I often find bugs while I create unit tests. Describing what I expect and testing out corner cases formally lowers the chance of a bug ending up in your final product.</li>
 </ol></li>
-<li><p><code>{testthat}</code> is one of the R package that implements unit tests in R. The second most popular one is probably <code>{RUnit}</code>.</p>
+<li><p><code>{testthat}</code> is one of the R package that implements unit tests in R. The other popular ones are probably <a href="https://cran.r-project.org/package=RUnit"><code>{RUnit}</code></a> and <a href="https://cran.r-project.org/package=tinytest"><code>{tinytest}</code></a>.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(testthat)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">local_edition</span>(<span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## Setting deferred event(s) on global environment.
