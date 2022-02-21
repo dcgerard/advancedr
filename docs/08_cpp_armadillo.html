@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-18" />
+<meta name="date" content="2022-02-21" />
 
 <title>Armadillo</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Armadillo</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-18</h4>
+<h4 class="date">2022-02-21</h4>
 
 </div>
 
@@ -388,7 +388,18 @@ $(document).ready(function () {
 </div>
 <div id="integration-with-r" class="section level1">
 <h1>Integration with R</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_rcpp_armadillo</span>()</span></code></pre></div>
+<ul>
+<li><p>If you need to use matrices or arrays in C++, you should use the Armadillo C++ library.</p></li>
+<li><p>It contains fast linear algebra algorithms, as well as a nice interface for working with matrices.</p></li>
+<li><p>You can set up an R package to use Armadillo by running the following R:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_rcpp_armadillo</span>()</span></code></pre></div></li>
+<li><p>This will add <code>RcppArmadillo</code> to the <code>LinkingTo</code> field in the <code>DESCRIPTION</code> file. It will also create <code>Makevars</code> files to set compilation settings.</p></li>
+<li><p>At the top of each C++ file, you now include the following (instead of just including Rcpp):</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppArmadillo.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppArmadillo)]]</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> arma<span class="op">;</span></span></code></pre></div></li>
+</ul>
 </div>
 <div id="armadillo-vectors" class="section level1">
 <h1>Armadillo Vectors</h1>

@@ -27,8 +27,10 @@ klippy::klippy()
 ```
 
 ```{Rcpp, eval = FALSE, echo = FALSE}
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
+// [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
+using namespace arma;
 ```
 
 # Learning Objectives
@@ -39,9 +41,25 @@ using namespace Rcpp;
     
 # Integration with R
 
-```{r, eval = FALSE}
-usethis::use_rcpp_armadillo()
-```
+- If you need to use matrices or arrays in C++, you should use the Armadillo C++ library.
+
+- It contains fast linear algebra algorithms, as well as a nice interface for working with matrices.
+
+- You can set up an R package to use Armadillo by running the following R:
+    ```{r, eval = FALSE}
+    usethis::use_rcpp_armadillo()
+    ```
+    
+- This will add `RcppArmadillo` to the `LinkingTo` field in the `DESCRIPTION` file. It will also create `Makevars` files to set compilation settings.
+
+- At the top of each C++ file, you now include the following (instead of just including Rcpp):
+
+    ``` cpp
+    #include <RcppArmadillo.h>
+    // [[Rcpp::depends(RcppArmadillo)]]
+    using namespace Rcpp;
+    using namespace arma;
+    ```
 
 # Armadillo Vectors
 
