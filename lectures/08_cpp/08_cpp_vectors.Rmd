@@ -47,7 +47,7 @@ using namespace Rcpp;
 
 - The classes are called `LogicalVector`, `IntegerVector`, `NumericVector`, and `CharacterVector`.
 
-- Note, in non Rcpp C++, you typically use `std::vector` objects, like `std::vector<double>`.
+- Note, in regular C++ (without Rcpp), you typically use arrays or `std::vector` objects, like `std::vector<double>`.
 
 - If you have a function that accepts and returns vectors, then you use those types.
 
@@ -72,11 +72,10 @@ using namespace Rcpp;
     NumericVector x(n, 2.0);
     ```
     
-- If you want an `IntegerVector` from `0` to `n - 1`, probably the best way is through `std::iota()`
+- If you want an `IntegerVector` from `0` to `n - 1`, probably the best way is through `Rcpp::seq(0, n-1)` `std::iota()`
 
     ``` cpp
-    IntegerVector x(n);
-    std::iota(x.begin(), x.end(), 0);
+    IntegerVector x = Rcpp::seq(0, n - 1);
     ```
 
 - If you have specific elements you want to create the vector with, use curly braces (requires C++11):
@@ -103,8 +102,7 @@ using namespace Rcpp;
       
       CharacterVector x3(n, "A");
       
-      IntegerVector x4(n);
-      std::iota(x4.begin(), x4.end(), 0);
+      IntegerVector x4 = Rcpp::seq(0, n - 1);
       
       NumericVector x5 = {9.0, 1.2, 4.9};
       
@@ -213,9 +211,9 @@ using namespace Rcpp;
     }
     ```
 
-    - `s1` is code that is executed once before the for-loop.
-    - `s2` is a predicate that, when `true`, allows the for-loop to execute another iteration.
-    - `s3` is code that is evaluated at the end of each for-loop.
+    - `s1` is code that is executed once before the for-loop. Usually this declares an integer index, such as `int i = 0`.
+    - `s2` is a predicate that, when `true`, allows the for-loop to execute another iteration. Usually, this is `i < n` if you want to go through the for-loop `n` times.
+    - `s3` is code that is evaluated at the end of each for-loop. This is usually `i++` to add1 to `i`.
     
 - Almost all for-loops you write will look like this
 

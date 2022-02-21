@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-19" />
+<meta name="date" content="2022-02-21" />
 
 <title>C++ Vectors</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">C++ Vectors</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-19</h4>
+<h4 class="date">2022-02-21</h4>
 
 </div>
 
@@ -399,7 +399,7 @@ $(document).ready(function () {
 <ul>
 <li><p><code>{Rcpp}</code> provides classes of C++ vectors which make programming easier for folks used to R.</p></li>
 <li><p>The classes are called <code>LogicalVector</code>, <code>IntegerVector</code>, <code>NumericVector</code>, and <code>CharacterVector</code>.</p></li>
-<li><p>Note, in non Rcpp C++, you typically use <code>std::vector</code> objects, like <code>std::vector&lt;double&gt;</code>.</p></li>
+<li><p>Note, in regular C++ (without Rcpp), you typically use arrays or <code>std::vector</code> objects, like <code>std::vector&lt;double&gt;</code>.</p></li>
 <li><p>If you have a function that accepts and returns vectors, then you use those types.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>NumericVector fn<span class="op">(</span>IntegerVector x<span class="op">,</span> <span class="dt">bool</span> y<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code to create z</span></span>
@@ -414,9 +414,8 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>NumericVector x<span class="op">(</span>n<span class="op">);</span></span></code></pre></div></li>
 <li><p>You can add default values by including a second argument via</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>NumericVector x<span class="op">(</span>n<span class="op">,</span> <span class="fl">2.0</span><span class="op">);</span></span></code></pre></div></li>
-<li><p>If you want an <code>IntegerVector</code> from <code>0</code> to <code>n - 1</code>, probably the best way is through <code>std::iota()</code></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>IntegerVector x<span class="op">(</span>n<span class="op">);</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>iota<span class="op">(</span>x<span class="op">.</span>begin<span class="op">(),</span> x<span class="op">.</span>end<span class="op">(),</span> <span class="dv">0</span><span class="op">);</span></span></code></pre></div></li>
+<li><p>If you want an <code>IntegerVector</code> from <code>0</code> to <code>n - 1</code>, probably the best way is through <code>Rcpp::seq(0, n-1)</code> <code>std::iota()</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>IntegerVector x <span class="op">=</span> Rcpp<span class="op">::</span>seq<span class="op">(</span><span class="dv">0</span><span class="op">,</span> n <span class="op">-</span> <span class="dv">1</span><span class="op">);</span></span></code></pre></div></li>
 <li><p>If you have specific elements you want to create the vector with, use curly braces (requires C++11):</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>NumericVector x <span class="op">=</span> <span class="op">{</span><span class="fl">9.0</span><span class="op">,</span> <span class="fl">1.2</span><span class="op">,</span> <span class="fl">4.9</span><span class="op">};</span></span></code></pre></div></li>
 <li><p>For older versions of C++, use <code>NumericVector::create()</code>.</p>
@@ -432,20 +431,19 @@ $(document).ready(function () {
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  CharacterVector x3<span class="op">(</span>n<span class="op">,</span> <span class="st">&quot;A&quot;</span><span class="op">);</span></span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  IntegerVector x4<span class="op">(</span>n<span class="op">);</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="bu">std::</span>iota<span class="op">(</span>x4<span class="op">.</span>begin<span class="op">(),</span> x4<span class="op">.</span>end<span class="op">(),</span> <span class="dv">0</span><span class="op">);</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  NumericVector x5 <span class="op">=</span> <span class="op">{</span><span class="fl">9.0</span><span class="op">,</span> <span class="fl">1.2</span><span class="op">,</span> <span class="fl">4.9</span><span class="op">};</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  NumericVector x6 <span class="op">=</span> NumericVector<span class="op">::</span>create<span class="op">(</span><span class="fl">9.0</span><span class="op">,</span> <span class="fl">1.2</span><span class="op">,</span> <span class="fl">4.9</span><span class="op">);</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;x1: &quot;</span> <span class="op">&lt;&lt;</span> x1 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;x2: &quot;</span> <span class="op">&lt;&lt;</span> x2 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;x3: &quot;</span> <span class="op">&lt;&lt;</span> x3 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;x4: &quot;</span> <span class="op">&lt;&lt;</span> x4 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;x5: &quot;</span> <span class="op">&lt;&lt;</span> x5 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;x6: &quot;</span> <span class="op">&lt;&lt;</span> x6 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  IntegerVector x4 <span class="op">=</span> Rcpp<span class="op">::</span>seq<span class="op">(</span><span class="dv">0</span><span class="op">,</span> n <span class="op">-</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  NumericVector x5 <span class="op">=</span> <span class="op">{</span><span class="fl">9.0</span><span class="op">,</span> <span class="fl">1.2</span><span class="op">,</span> <span class="fl">4.9</span><span class="op">};</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  NumericVector x6 <span class="op">=</span> NumericVector<span class="op">::</span>create<span class="op">(</span><span class="fl">9.0</span><span class="op">,</span> <span class="fl">1.2</span><span class="op">,</span> <span class="fl">4.9</span><span class="op">);</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;x1: &quot;</span> <span class="op">&lt;&lt;</span> x1 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;x2: &quot;</span> <span class="op">&lt;&lt;</span> x2 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;x3: &quot;</span> <span class="op">&lt;&lt;</span> x3 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;x4: &quot;</span> <span class="op">&lt;&lt;</span> x4 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;x5: &quot;</span> <span class="op">&lt;&lt;</span> x5 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;x6: &quot;</span> <span class="op">&lt;&lt;</span> x6 <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vec_create</span>()</span></code></pre></div>
 <pre><code>## x1: 0 0 0 0 0
 ## x2: 2 2 2 2 2
@@ -528,9 +526,9 @@ $(document).ready(function () {
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code executed each iteration</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <ul>
-<li><code>s1</code> is code that is executed once before the for-loop.</li>
-<li><code>s2</code> is a predicate that, when <code>true</code>, allows the for-loop to execute another iteration.</li>
-<li><code>s3</code> is code that is evaluated at the end of each for-loop.</li>
+<li><code>s1</code> is code that is executed once before the for-loop. Usually this declares an integer index, such as <code>int i = 0</code>.</li>
+<li><code>s2</code> is a predicate that, when <code>true</code>, allows the for-loop to execute another iteration. Usually, this is <code>i &lt; n</code> if you want to go through the for-loop <code>n</code> times.</li>
+<li><code>s3</code> is code that is evaluated at the end of each for-loop. This is usually <code>i++</code> to add1 to <code>i</code>.</li>
 </ul></li>
 <li><p>Almost all for-loops you write will look like this</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
@@ -554,9 +552,9 @@ $(document).ready(function () {
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">100</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(x)</span></code></pre></div>
-<pre><code>## [1] 49.42</code></pre>
+<pre><code>## [1] 47.87</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum2</span>(x)</span></code></pre></div>
-<pre><code>## [1] 49.42</code></pre></li>
+<pre><code>## [1] 47.87</code></pre></li>
 <li><p>Here are the microbenchmarks:</p>
 <table>
 <thead>
@@ -575,25 +573,25 @@ $(document).ready(function () {
 <tbody>
 <tr class="odd">
 <td align="left">sum(x)</td>
-<td align="right">263.1ns</td>
-<td align="right">319.09ns</td>
-<td align="right">2475281</td>
+<td align="right">260.89ns</td>
+<td align="right">314.9ns</td>
+<td align="right">2779610</td>
 <td align="right">0B</td>
 <td align="right">0</td>
 <td align="right">10000</td>
 <td align="right">0</td>
-<td align="right">4.04ms</td>
+<td align="right">3.6ms</td>
 </tr>
 <tr class="even">
 <td align="left">sum2(x)</td>
-<td align="right">1.21µs</td>
-<td align="right">2.09µs</td>
-<td align="right">504429</td>
+<td align="right">1.27µs</td>
+<td align="right">2.12µs</td>
+<td align="right">504798</td>
 <td align="right">18.2KB</td>
 <td align="right">0</td>
 <td align="right">10000</td>
 <td align="right">0</td>
-<td align="right">19.82ms</td>
+<td align="right">19.8ms</td>
 </tr>
 </tbody>
 </table></li>

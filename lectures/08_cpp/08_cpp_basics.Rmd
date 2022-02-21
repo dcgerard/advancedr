@@ -257,6 +257,24 @@ using namespace Rcpp;
     signC(0)
     signC(11)
     ```
+    
+# Assertions
+
+- You can throw an R error by using `Rcpp::stop()`. This is how you do assertions using Rcpp.
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void errpos(double x) {
+      if (x > 0.0) {
+        Rcpp::stop("only negative values are allowed");
+      }
+    }
+    ```
+    
+    ```{r, error = TRUE}
+    errpos(-3)
+    errpos(2)
+    ```
 
 # Useful Math Functions for Scalars
 
@@ -554,7 +572,7 @@ using namespace Rcpp;
     `square2()` is just a tiny bit faster.
     ```
     
-2. Write a function called `quadform()` in C++ that prints the output (usine `Rcpp::Rcout`) of the [quadratic formula](https://en.wikipedia.org/wiki/Quadratic_formula). That is
+2. Write a function called `quadform()` in C++ that prints the output (using `Rcpp::Rcout`) of the [quadratic formula](https://en.wikipedia.org/wiki/Quadratic_formula). That is
     $$
     x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
     $$
