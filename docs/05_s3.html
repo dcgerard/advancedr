@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-02" />
+<meta name="date" content="2022-02-22" />
 
 <title>S3 Objects</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S3 Objects</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-02</h4>
+<h4 class="date">2022-02-22</h4>
 
 </div>
 
@@ -557,18 +557,18 @@ $(document).ready(function () {
 <li><p>To find all of the methods of a generic, use <code>sloop::s3_methods_generic()</code>.</p>
 <div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_methods_generic</span>(<span class="st">&quot;print&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 314 × 4
-##    generic class       visible source             
-##    &lt;chr&gt;   &lt;chr&gt;       &lt;lgl&gt;   &lt;chr&gt;              
-##  1 print   acf         FALSE   registered S3method
-##  2 print   AES         FALSE   registered S3method
-##  3 print   all_vars    FALSE   registered S3method
-##  4 print   anova       FALSE   registered S3method
-##  5 print   ansi_string FALSE   registered S3method
-##  6 print   ansi_style  FALSE   registered S3method
-##  7 print   any_vars    FALSE   registered S3method
-##  8 print   aov         FALSE   registered S3method
-##  9 print   aovlist     FALSE   registered S3method
-## 10 print   ar          FALSE   registered S3method
+##    generic class    visible source             
+##    &lt;chr&gt;   &lt;chr&gt;    &lt;lgl&gt;   &lt;chr&gt;              
+##  1 print   acf      FALSE   registered S3method
+##  2 print   AES      FALSE   registered S3method
+##  3 print   all_vars FALSE   registered S3method
+##  4 print   anova    FALSE   registered S3method
+##  5 print   any_vars FALSE   registered S3method
+##  6 print   aov      FALSE   registered S3method
+##  7 print   aovlist  FALSE   registered S3method
+##  8 print   ar       FALSE   registered S3method
+##  9 print   Arima    FALSE   registered S3method
+## 10 print   arima0   FALSE   registered S3method
 ## # … with 304 more rows</code></pre></li>
 <li><p>To find all methods for a class, use <code>sloop::s3_methods_class()</code>.</p>
 <div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_methods_class</span>(<span class="st">&quot;data.frame&quot;</span>)</span></code></pre></div>
@@ -616,7 +616,7 @@ $(document).ready(function () {
 <li><p>You can get the class attribute by <code>class()</code> (as long as it is S3).</p>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(x)</span></code></pre></div>
 <pre><code>## [1] &quot;my_class&quot;</code></pre></li>
-<li><p>Thous, it is a little safer to use <code>sloop::s3_class()</code>.</p>
+<li><p>Thus, it is a little safer to use <code>sloop::s3_class()</code>.</p>
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_class</span>(x)</span></code></pre></div>
 <pre><code>## [1] &quot;my_class&quot;</code></pre></li>
 <li><p>You can test that an object is a certain class by <code>inherits()</code>.</p>
@@ -749,22 +749,22 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>mean</span></code></pre></div>
 <pre><code>## function (x, ...) 
 ## UseMethod(&quot;mean&quot;)
-## &lt;bytecode: 0x5599739286d8&gt;
+## &lt;bytecode: 0x557943aeaa50&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>print</span></code></pre></div>
 <pre><code>## function (x, ...) 
 ## UseMethod(&quot;print&quot;)
-## &lt;bytecode: 0x559973a354a0&gt;
+## &lt;bytecode: 0x557943bf9c90&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
 <pre><code>## function (x, y, ...) 
 ## UseMethod(&quot;plot&quot;)
-## &lt;bytecode: 0x55997358c018&gt;
+## &lt;bytecode: 0x55794372b5e8&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>summary</span></code></pre></div>
 <pre><code>## function (object, ...) 
 ## UseMethod(&quot;summary&quot;)
-## &lt;bytecode: 0x55997764abe0&gt;
+## &lt;bytecode: 0x55794779c4c0&gt;
 ## &lt;environment: namespace:base&gt;</code></pre></li>
 <li><p>The key of a generic is its goals. Methods should generally align with the goals of the generic so that R users don’t get unexpected results. E.g. when you type <code>plot()</code> you shouldn’t output a mean (even though S3 makes this valid behavior).</p></li>
 <li><p>How <code>UseMethod()</code> works: If an object has a class vector of <code>c("cl1", "cl2")</code> then <code>UseMethod()</code> will first search for a method for <code>cl1</code>, if it does not exist it will use the method for <code>cl2</code>, and if that does not exist it will use the default method (there is usually one).</p></li>
