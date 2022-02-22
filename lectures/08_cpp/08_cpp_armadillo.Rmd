@@ -63,6 +63,136 @@ using namespace arma;
 
 # Armadillo Vectors
 
+- Armadillo vectors are just double vectors (or other numeric-like vectors). That is, there are no character or logical Armadillo vectors.
+
+- Armadillo vectors are called `Col` objects (for "column vector").
+
+- Initialize with
+
+    ``` cpp
+    arma::vec x(n_elem)
+    ```
+
+- You can specify a default value for the vector with
+
+    ``` cpp
+    // fill with zeros
+    arma::vec x(n_elem, arma::fill::zeros)
+    
+    // fill with ones
+    arma::vec y(3, arma::fill::ones);
+    
+    // fill with specified value
+    arma::vec z(3, arma::fill::value(23.0));
+    ```
+
+- Let's demonstrate:
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void ex1() {
+      vec x(3, fill::zeros);
+      Rcpp::Rcout << x << std::endl;
+    
+      vec y(3, fill::ones);
+      Rcpp::Rcout << y << std::endl;
+    
+      vec z(3, fill::value(23.0));
+      Rcpp::Rcout << z << std::endl;
+    }
+    ```
+    
+    ```{r}
+    ex1()
+    ```
+
+- Of course, you typically get Armadillo vectors from a user.
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    vec ex2(vec x) {
+      return x;
+    }
+    ```
+    
+    ```{r}
+    ex2(c(1, 4, 2))
+    ```
+    
+- You can get the number elements in a vector with
+
+    ``` cpp
+    x.n_elem
+    ```
+
+- You can do arithmetic operations on vectors as you would in R, but note that element-wise multiplication is different.
+
+    ```
+    x + y
+    x - y
+    x % y // element-wise multiplication
+    x / y
+    ```
+
+- You can do lots of miscellaneous element-wise functions (table from [Armadillo docs](http://arma.sourceforge.net/docs.html#operators))
+
+| Armadillo |        Explanation    |
+|-----------|-----------------------|
+| `exp(A)` | base-e exponential: $e^x$ |
+| `exp2(A)` | base-2 exponential: $2^x$ |
+| `exp10(A)` | base-10 exponential: $10^x$ |
+| `expm1(A)` | compute $\exp(A)-1$ accurately for values of A close to zero |
+| `log(A)` | natural log: $\log_e(x)$ |
+| `log2(A)` | base-2 log: $\log_2(x)$ |
+| `log10(A)` | base-10 log: $\log_{10}(x)$ |
+| `log1p(A)` | compute $\log(1+A)$ accurately for values of A close to zero |
+| `pow(A, p)` | raise to the power of p: $x^p$ |
+| `square(A)` | square: $x^2$ |
+| `sqrt(A)` | square root: $\sqrt{x}$ |
+| `floor(A)` | largest integral value that is not greater than the input value |
+| `ceil(A)` | smallest integral value that is not less than the input value |
+| `round(A)` | round to nearest integer, with halfway cases rounded away from zero |
+| `trunc(A)` | round to nearest integer, towards zero |
+| `lgamma(A)` | natural log of the absolute value of gamma function |
+| `sign(A)` | sign function |
+
 # Armadillo Matrices
 
 # Linear Algebra Operations
+
+# R to Armadillo Conversion Table
+
+In the below table, `A` is a matrix and `Q` is a three-dimensional array (or "cube"). This table is based on the Matlab/Octave to Armadillo conversion table [here](http://arma.sourceforge.net/docs.html#syntax).
+
+| R | Armadillo | Notes |
+|---|---|-----|
+| `A[1, 1]` | `A(0, 0)` | indexing in Armadillo starts at 0 | 
+| `A[k, k]` | `A(k-1, k-1)` |  | 
+| `nrow(A)` | `A.n_rows` | read only | 
+| `ncol(A)` | `A.n_cols` |  | 
+| `dim(A)[[3]]` | `Q.n_slices` | `Q` is a cube (3D array) | 
+| `length(A)` | `A.n_elem` |  | 
+| `A[, k]` | `A.col(k)` | this is a conceptual example only; exact conversion from R to Armadillo syntax will require taking into account that indexing starts at 0 | 
+| `A[k, ]` | `A.row(k)` |  | 
+| `A[, p:q]` | `A.cols(p,q)` |  | 
+| `A[p:q, ]` | `A.rows(p,q)` |  | 
+| `A[p:q, r:s]` | `A(span(p,q),span(r,s))` | A(span(first_row,last_row), span(first_col,last_col)) | 
+| `Q[, , k]` | `Q.slice(k)` | `Q` is a cube (3D array) | 
+| `Q[, , t:u]` | `Q.slices(t,u)` |  | 
+| `Q[p:q, r:s, t:u]` | `Q(span(p,q),span(r,s),span(t,u))` |  | 
+| `t(A)` | `A.t()`or`trans(A)` | matrix transpose |
+| `A[] <- 0` | `A.zeros()` | Fill a matrix with 0's | 
+| `A[] <- 1` | `A.ones()` | Fill a matrix with 1's | 
+| `A <- matrix(0, nrow = k, ncol = k)` | `A = zeros<mat>(k,k)` | Initialize a 0 matrix | 
+| `A <- matrix(1, nrow = k, ncol = k)` | `A = ones<mat>(k,k)` | Initialize a 1 matrix | 
+| `A * B` | `A % B` | element-wise multiplication | 
+| `A / B` | `A / B` | element-wise division | 
+| `solve(A, B)` | `solve(A, B)` | Solve linear equation $Ax = B$ for $A$ | 
+| `A <- A + 1;` | `A++` |  | 
+| `A <- A - 1;` | `A--` |  | 
+| `A <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2, byrow = TRUE)` | `A = {{1,2}, {3,4}}` | element initialization | 
+| `X <- c(A)` | `X = vectorise(A)` |  | 
+| `X = cbind(A, B)` | `X = join_horiz(A, B)` |  | 
+| `X = rbind(A, B)` | `X = join_vert(A, B)` |  | 
+| `A` | `cout << A << endl` or `A.print("A=")` |  | 
+

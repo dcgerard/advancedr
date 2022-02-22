@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-21" />
+<meta name="date" content="2022-02-22" />
 
 <title>Armadillo</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Armadillo</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-21</h4>
+<h4 class="date">2022-02-22</h4>
 
 </div>
 
@@ -369,6 +369,7 @@ $(document).ready(function () {
 <li><a href="#armadillo-vectors">Armadillo Vectors</a></li>
 <li><a href="#armadillo-matrices">Armadillo Matrices</a></li>
 <li><a href="#linear-algebra-operations">Linear Algebra Operations</a></li>
+<li><a href="#r-to-armadillo-conversion-table">R to Armadillo Conversion Table</a></li>
 </ul>
 </div>
 
@@ -403,12 +404,316 @@ $(document).ready(function () {
 </div>
 <div id="armadillo-vectors" class="section level1">
 <h1>Armadillo Vectors</h1>
+<ul>
+<li><p>Armadillo vectors are just double vectors (or other numeric-like vectors). That is, there are no character or logical Armadillo vectors.</p></li>
+<li><p>Armadillo vectors are called <code>Col</code> objects (for “column vector”).</p></li>
+<li><p>Initialize with</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>arma<span class="op">::</span>vec x<span class="op">(</span>n_elem<span class="op">)</span></span></code></pre></div></li>
+<li><p>You can specify a default value for the vector with</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// fill with zeros</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>arma<span class="op">::</span>vec x<span class="op">(</span>n_elem<span class="op">,</span> arma<span class="op">::</span>fill<span class="op">::</span>zeros<span class="op">)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">// fill with ones</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>arma<span class="op">::</span>vec y<span class="op">(</span><span class="dv">3</span><span class="op">,</span> arma<span class="op">::</span>fill<span class="op">::</span>ones<span class="op">);</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">// fill with specified value</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>arma<span class="op">::</span>vec z<span class="op">(</span><span class="dv">3</span><span class="op">,</span> arma<span class="op">::</span>fill<span class="op">::</span>value<span class="op">(</span><span class="fl">23.0</span><span class="op">));</span></span></code></pre></div></li>
+<li><p>Let’s demonstrate:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> ex1<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  vec x<span class="op">(</span><span class="dv">3</span><span class="op">,</span> fill<span class="op">::</span>zeros<span class="op">);</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> x <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  vec y<span class="op">(</span><span class="dv">3</span><span class="op">,</span> fill<span class="op">::</span>ones<span class="op">);</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> y <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  vec z<span class="op">(</span><span class="dv">3</span><span class="op">,</span> fill<span class="op">::</span>value<span class="op">(</span><span class="fl">23.0</span><span class="op">));</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> z <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ex1</span>()</span></code></pre></div>
+<pre><code>##         0
+##         0
+##         0
+## 
+##    1.0000
+##    1.0000
+##    1.0000
+## 
+##    23.0000
+##    23.0000
+##    23.0000</code></pre></li>
+<li><p>Of course, you typically get Armadillo vectors from a user.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>vec ex2<span class="op">(</span>vec x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> x<span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ex2</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>))</span></code></pre></div>
+<pre><code>##      [,1]
+## [1,]    1
+## [2,]    4
+## [3,]    2</code></pre></li>
+<li><p>You can get the number elements in a vector with</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>x<span class="op">.</span>n_elem</span></code></pre></div></li>
+<li><p>You can do arithmetic operations on vectors as you would in R, but note that element-wise multiplication is different.</p>
+<pre><code>x + y
+x - y
+x % y // element-wise multiplication
+x / y</code></pre></li>
+<li><p>You can do lots of miscellaneous element-wise functions (table from <a href="http://arma.sourceforge.net/docs.html#operators">Armadillo docs</a>)</p></li>
+</ul>
+<table>
+<colgroup>
+<col width="32%" />
+<col width="67%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Armadillo</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>exp(A)</code></td>
+<td>base-e exponential: <span class="math inline">\(e^x\)</span></td>
+</tr>
+<tr class="even">
+<td><code>exp2(A)</code></td>
+<td>base-2 exponential: <span class="math inline">\(2^x\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>exp10(A)</code></td>
+<td>base-10 exponential: <span class="math inline">\(10^x\)</span></td>
+</tr>
+<tr class="even">
+<td><code>expm1(A)</code></td>
+<td>compute <span class="math inline">\(\exp(A)-1\)</span> accurately for values of A close to zero</td>
+</tr>
+<tr class="odd">
+<td><code>log(A)</code></td>
+<td>natural log: <span class="math inline">\(\log_e(x)\)</span></td>
+</tr>
+<tr class="even">
+<td><code>log2(A)</code></td>
+<td>base-2 log: <span class="math inline">\(\log_2(x)\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>log10(A)</code></td>
+<td>base-10 log: <span class="math inline">\(\log_{10}(x)\)</span></td>
+</tr>
+<tr class="even">
+<td><code>log1p(A)</code></td>
+<td>compute <span class="math inline">\(\log(1+A)\)</span> accurately for values of A close to zero</td>
+</tr>
+<tr class="odd">
+<td><code>pow(A, p)</code></td>
+<td>raise to the power of p: <span class="math inline">\(x^p\)</span></td>
+</tr>
+<tr class="even">
+<td><code>square(A)</code></td>
+<td>square: <span class="math inline">\(x^2\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>sqrt(A)</code></td>
+<td>square root: <span class="math inline">\(\sqrt{x}\)</span></td>
+</tr>
+<tr class="even">
+<td><code>floor(A)</code></td>
+<td>largest integral value that is not greater than the input value</td>
+</tr>
+<tr class="odd">
+<td><code>ceil(A)</code></td>
+<td>smallest integral value that is not less than the input value</td>
+</tr>
+<tr class="even">
+<td><code>round(A)</code></td>
+<td>round to nearest integer, with halfway cases rounded away from zero</td>
+</tr>
+<tr class="odd">
+<td><code>trunc(A)</code></td>
+<td>round to nearest integer, towards zero</td>
+</tr>
+<tr class="even">
+<td><code>lgamma(A)</code></td>
+<td>natural log of the absolute value of gamma function</td>
+</tr>
+<tr class="odd">
+<td><code>sign(A)</code></td>
+<td>sign function</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="armadillo-matrices" class="section level1">
 <h1>Armadillo Matrices</h1>
 </div>
 <div id="linear-algebra-operations" class="section level1">
 <h1>Linear Algebra Operations</h1>
+</div>
+<div id="r-to-armadillo-conversion-table" class="section level1">
+<h1>R to Armadillo Conversion Table</h1>
+<p>In the below table, <code>A</code> is a matrix and <code>Q</code> is a three-dimensional array (or “cube”). This table is based on the Matlab/Octave to Armadillo conversion table <a href="http://arma.sourceforge.net/docs.html#syntax">here</a>.</p>
+<table>
+<colgroup>
+<col width="27%" />
+<col width="27%" />
+<col width="45%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>R</th>
+<th>Armadillo</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>A[1, 1]</code></td>
+<td><code>A(0, 0)</code></td>
+<td>indexing in Armadillo starts at 0</td>
+</tr>
+<tr class="even">
+<td><code>A[k, k]</code></td>
+<td><code>A(k-1, k-1)</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>nrow(A)</code></td>
+<td><code>A.n_rows</code></td>
+<td>read only</td>
+</tr>
+<tr class="even">
+<td><code>ncol(A)</code></td>
+<td><code>A.n_cols</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>dim(A)[[3]]</code></td>
+<td><code>Q.n_slices</code></td>
+<td><code>Q</code> is a cube (3D array)</td>
+</tr>
+<tr class="even">
+<td><code>length(A)</code></td>
+<td><code>A.n_elem</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>A[, k]</code></td>
+<td><code>A.col(k)</code></td>
+<td>this is a conceptual example only; exact conversion from R to Armadillo syntax will require taking into account that indexing starts at 0</td>
+</tr>
+<tr class="even">
+<td><code>A[k, ]</code></td>
+<td><code>A.row(k)</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>A[, p:q]</code></td>
+<td><code>A.cols(p,q)</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>A[p:q, ]</code></td>
+<td><code>A.rows(p,q)</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>A[p:q, r:s]</code></td>
+<td><code>A(span(p,q),span(r,s))</code></td>
+<td>A(span(first_row,last_row), span(first_col,last_col))</td>
+</tr>
+<tr class="even">
+<td><code>Q[, , k]</code></td>
+<td><code>Q.slice(k)</code></td>
+<td><code>Q</code> is a cube (3D array)</td>
+</tr>
+<tr class="odd">
+<td><code>Q[, , t:u]</code></td>
+<td><code>Q.slices(t,u)</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>Q[p:q, r:s, t:u]</code></td>
+<td><code>Q(span(p,q),span(r,s),span(t,u))</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>t(A)</code></td>
+<td><code>A.t()</code>or<code>trans(A)</code></td>
+<td>matrix transpose</td>
+</tr>
+<tr class="even">
+<td><code>A[] &lt;- 0</code></td>
+<td><code>A.zeros()</code></td>
+<td>Fill a matrix with 0’s</td>
+</tr>
+<tr class="odd">
+<td><code>A[] &lt;- 1</code></td>
+<td><code>A.ones()</code></td>
+<td>Fill a matrix with 1’s</td>
+</tr>
+<tr class="even">
+<td><code>A &lt;- matrix(0, nrow = k, ncol = k)</code></td>
+<td><code>A = zeros&lt;mat&gt;(k,k)</code></td>
+<td>Initialize a 0 matrix</td>
+</tr>
+<tr class="odd">
+<td><code>A &lt;- matrix(1, nrow = k, ncol = k)</code></td>
+<td><code>A = ones&lt;mat&gt;(k,k)</code></td>
+<td>Initialize a 1 matrix</td>
+</tr>
+<tr class="even">
+<td><code>A * B</code></td>
+<td><code>A % B</code></td>
+<td>element-wise multiplication</td>
+</tr>
+<tr class="odd">
+<td><code>A / B</code></td>
+<td><code>A / B</code></td>
+<td>element-wise division</td>
+</tr>
+<tr class="even">
+<td><code>solve(A, B)</code></td>
+<td><code>solve(A, B)</code></td>
+<td>Solve linear equation <span class="math inline">\(Ax = B\)</span> for <span class="math inline">\(A\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>A &lt;- A + 1;</code></td>
+<td><code>A++</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>A &lt;- A - 1;</code></td>
+<td><code>A--</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>A &lt;- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2, byrow = TRUE)</code></td>
+<td><code>A = {{1,2}, {3,4}}</code></td>
+<td>element initialization</td>
+</tr>
+<tr class="even">
+<td><code>X &lt;- c(A)</code></td>
+<td><code>X = vectorise(A)</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>X = cbind(A, B)</code></td>
+<td><code>X = join_horiz(A, B)</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>X = rbind(A, B)</code></td>
+<td><code>X = join_vert(A, B)</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>A</code></td>
+<td><code>cout &lt;&lt; A &lt;&lt; endl</code> or <code>A.print("A=")</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </div>
 
 <!DOCTYPE html>
