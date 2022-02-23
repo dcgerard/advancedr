@@ -148,6 +148,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 
 
@@ -370,6 +392,7 @@ $(document).ready(function () {
 <li><a href="#armadillo-matrices">Armadillo Matrices</a></li>
 <li><a href="#linear-algebra-operations">Linear Algebra Operations</a></li>
 <li><a href="#r-to-armadillo-conversion-table">R to Armadillo Conversion Table</a></li>
+<li><a href="#references">References</a></li>
 </ul>
 </div>
 
@@ -729,15 +752,148 @@ $(document).ready(function () {
 <div id="linear-algebra-operations" class="section level1">
 <h1>Linear Algebra Operations</h1>
 <ul>
-<li><p>Matrix multiplication.</p></li>
-<li><p>Transpose.</p></li>
-<li><p>Solving linear systems.</p></li>
-<li><p>Inverse.</p></li>
-<li><p>Extracting diagonal.</p></li>
-<li><p>Trace</p></li>
-<li><p>Cholesky Decomposition.</p></li>
-<li><p>Eigendecomposition</p></li>
-<li><p>Singular Value Decomposition</p></li>
+<li><p>Rcpp has <code>LogicalMatrix</code>, <code>IntegerMatrix</code>, <code>NumericMatrix</code>, and <code>CharacterMatrix</code> objects that I am not covering.</p></li>
+<li><p>This is because you mostly use C++ for numerical computing, so it’s less usual to use a <code>CharacterMatrix</code> in C++ (I would say you are crazy for trying to use C++ when you are mostly dealing with strings). And for numerical computing, linear algebra is king, and Armadillo has nice linear algebra routines.</p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Matrix_multiplication">Matrix multiplication</a>:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">*</span> B<span class="op">;</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Transpose">Matrix transpose</a>:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>A<span class="op">.</span>t<span class="op">();</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/System_of_linear_equations#Solving_a_linear_system">Solving linear systems</a>: Solving for <span class="math inline">\(X\)</span> in <span class="math display">\[
+  AX = B
+  \]</span> results in <span class="math display">\[
+  X = A^{-1}B
+  \]</span> <code>solve()</code> will calculate <span class="math inline">\(A^{-1}B\)</span> numerically stably.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>solve<span class="op">(</span>A<span class="op">,</span> B<span class="op">);</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse">Matrix inverse</a>:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>inv<span class="op">(</span>A<span class="op">);</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse">Moore-Penrose inverse</a>:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>pinv<span class="op">(</span>A<span class="op">);</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Main_diagonal">Extracting diagonal</a>:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>A<span class="op">.</span>diag<span class="op">();</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Trace_(linear_algebra)">Matrix trace</a>:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>trace<span class="op">(</span>A<span class="op">);</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky Decomposition</a>: Find an <a href="https://en.wikipedia.org/wiki/Triangular_matrix">upper triangular</a> matrix <span class="math inline">\(R\)</span> with non-negative diagonal elements such that <span class="math inline">\(X = R^TR\)</span>. Applicable when <span class="math inline">\(X\)</span> is <a href="https://en.wikipedia.org/wiki/Symmetric_matrix">symmetric</a>.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>mat R <span class="op">=</span> chol<span class="op">(</span>X<span class="op">);</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix">Eigendecomposition</a>: Find <a href="https://en.wikipedia.org/wiki/Orthogonal_matrix">orthogonal matrix</a> <span class="math inline">\(U\)</span> and <a href="https://en.wikipedia.org/wiki/Diagonal_matrix">diagonal matrix</a> <span class="math inline">\(D\)</span> such that <span class="math inline">\(X = UDU^T\)</span>. Applicable when <span class="math inline">\(X\)</span> is <a href="https://en.wikipedia.org/wiki/Symmetric_matrix">symmetric</a>.</p>
+<p>You need to create (i) a vector containing the main diagonal of <span class="math inline">\(D\)</span> and (ii) a matrix that will hold the eigenvectors. You do that ahead of time. Then you run <code>eig_sym()</code>.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>vec eigval<span class="op">;</span> <span class="co">// main diagonal of D matrix</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>mat eigvec<span class="op">;</span> <span class="co">// U matrix</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>eig_sym<span class="op">(</span>eigval<span class="op">,</span> eigvec<span class="op">,</span> B<span class="op">);</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">Singular Value Decomposition</a>: Find orthogonal matrices <span class="math inline">\(U\)</span> and <span class="math inline">\(V\)</span>, and diagonal matrix <span class="math inline">\(D\)</span> such that <span class="math inline">\(X = UDV^T\)</span>.</p>
+<p>You need to create (i) a vector containing the main diagonal of <span class="math inline">\(D\)</span> and (ii) matrices that will hold the left and right singular vectors. You do that ahead of time. Then you run <code>svd()</code>.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>mat U<span class="op">;</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>vec s<span class="op">;</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>mat V<span class="op">;</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>svd<span class="op">(</span>U<span class="op">,</span>s<span class="op">,</span>V<span class="op">,</span>X<span class="op">);</span></span></code></pre></div></li>
+<li><p><a href="https://en.wikipedia.org/wiki/QR_decomposition">QR Decomposition</a>: Find an orthogonal matrix <span class="math inline">\(Q\)</span> and an upper triangular matrix <span class="math inline">\(R\)</span> with non-negative diagonal entries, such that <span class="math inline">\(X = QR\)</span>.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>mat Q<span class="op">;</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>mat R<span class="op">;</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>qr<span class="op">(</span>Q<span class="op">,</span> R<span class="op">,</span> X<span class="op">);</span></span></code></pre></div></li>
+<li><p><strong>Example</strong>: This isn’t the most efficient way to find the OLS estimates from a regression, but we can just calculate</p>
+<p><span class="math display">\[
+  \hat{\beta} = (X^TX)^{-1}X^Ty
+  \]</span></p>
+<p>Let’s do this in C++:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>vec stupid_ols<span class="op">(</span>mat X<span class="op">,</span> vec y<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  vec betahat <span class="op">=</span> inv<span class="op">(</span>X<span class="op">.</span>t<span class="op">()</span> <span class="op">*</span> X<span class="op">)</span> <span class="op">*</span> X<span class="op">.</span>t<span class="op">()</span> <span class="op">*</span> y<span class="op">;</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> betahat<span class="op">;</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Let’s verify our results.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Armadillo Way</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> mtcars<span class="sc">$</span>mpg</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stupid_ols</span>(<span class="at">X =</span> X, <span class="at">y =</span> y)</span></code></pre></div>
+<pre><code>##        [,1]
+## [1,] 37.285
+## [2,] -5.344</code></pre>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="do">## R Way</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars))</span></code></pre></div>
+<pre><code>## (Intercept)          wt 
+##      37.285      -5.344</code></pre></li>
+<li><p>I called it <code>stupid_ols()</code> because calculating an inverse is generally a computationally unstable task (but in this scenario, it’s probably OK). It’s better to use <code>solve()</code> here, but folks have thought very hard about this simple problem <span class="citation">(Farebrother 1988)</span>:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>vec arma_ols<span class="op">(</span>mat X<span class="op">,</span> vec y<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  vec betahat <span class="op">=</span> solve<span class="op">(</span>X<span class="op">.</span>t<span class="op">()</span> <span class="op">*</span> X<span class="op">,</span> X<span class="op">.</span>t<span class="op">()</span> <span class="op">*</span> y<span class="op">);</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> betahat<span class="op">;</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">arma_ols</span>(<span class="at">X =</span> X, <span class="at">y =</span> y)</span></code></pre></div>
+<pre><code>##        [,1]
+## [1,] 37.285
+## [2,] -5.344</code></pre></li>
+<li><p>Let’s compare performance when we have a large number of covariates.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(mpg <span class="sc">~</span> ., <span class="at">data =</span> mtcars)</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> mtcars<span class="sc">$</span>mpg</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>bench<span class="sc">::</span><span class="fu">mark</span>(</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coef</span>(<span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)),</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stupid_ols</span>(<span class="at">X =</span> X, <span class="at">y =</span> y),</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arma_ols</span>(<span class="at">X =</span> X, <span class="at">y =</span> y), </span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">check =</span> <span class="cn">FALSE</span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>] <span class="sc">|&gt;</span></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">expression</th>
+<th align="right">min</th>
+<th align="right">median</th>
+<th align="right">itr/sec</th>
+<th align="right">mem_alloc</th>
+<th align="right">gc/sec</th>
+<th align="right">n_itr</th>
+<th align="right">n_gc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">coef(lm(mpg ~ wt, data = mtcars))</td>
+<td align="right">632.9µs</td>
+<td align="right">703µs</td>
+<td align="right">1311</td>
+<td align="right">5.18KB</td>
+<td align="right">13</td>
+<td align="right">605</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">stupid_ols(X = X, y = y)</td>
+<td align="right">53.6µs</td>
+<td align="right">81.8µs</td>
+<td align="right">11596</td>
+<td align="right">18.2KB</td>
+<td align="right">0</td>
+<td align="right">5790</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">arma_ols(X = X, y = y)</td>
+<td align="right">71.1µs</td>
+<td align="right">93.1µs</td>
+<td align="right">10509</td>
+<td align="right">6.62KB</td>
+<td align="right">0</td>
+<td align="right">5253</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table></li>
 </ul>
 </div>
 <div id="r-to-armadillo-conversion-table" class="section level1">
@@ -904,6 +1060,14 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-farebrother1988linear" class="csl-entry">
+Farebrother, Richard William. 1988. <em>Linear Least Squares Computations</em>. Routledge. <a href="https://doi.org/10.1201/9780203748923">https://doi.org/10.1201/9780203748923</a>.
+</div>
+</div>
 </div>
 
 <!DOCTYPE html>

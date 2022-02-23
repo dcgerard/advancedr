@@ -495,28 +495,186 @@ using namespace arma;
     ```{r}
     ex6()
     ```
-    
-
 
 # Linear Algebra Operations
 
-- Matrix multiplication.
+- Rcpp has `LogicalMatrix`, `IntegerMatrix`, `NumericMatrix`, and `CharacterMatrix` objects that I am not covering.
 
-- Transpose.
+- This is because you mostly use C++ for numerical computing, so it's less usual to use a `CharacterMatrix` in C++ (I would say you are crazy for trying to use C++ when you are mostly dealing with strings). And for numerical computing, linear algebra is king, and Armadillo has nice linear algebra routines.
 
-- Solving linear systems.
+- [Matrix multiplication](https://en.wikipedia.org/wiki/Matrix_multiplication):
 
-- Inverse.
+    <mark style="background-color: LightCoral">C++</mark>
 
-- Extracting diagonal.
+    ``` cpp
+    A * B;
+    ```
 
-- Trace
+- [Matrix transpose](https://en.wikipedia.org/wiki/Transpose):
 
-- Cholesky Decomposition.
+    <mark style="background-color: LightCoral">C++</mark>
 
-- Eigendecomposition
+    ``` cpp
+    A.t();
+    ```
 
-- Singular Value Decomposition
+- [Solving linear systems](https://en.wikipedia.org/wiki/System_of_linear_equations#Solving_a_linear_system): Solving for $X$ in
+    $$
+    AX = B
+    $$
+    results in
+    $$
+    X = A^{-1}B
+    $$
+    `solve()` will calculate $A^{-1}B$ numerically stably.
+    
+    <mark style="background-color: LightCoral">C++</mark>
+    
+    ``` cpp
+    solve(A, B);
+    ```
+    
+- [Matrix inverse](https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse):
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    inv(A);
+    ```
+
+- [Moore-Penrose inverse](https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse):
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    pinv(A);
+    ```
+
+- [Extracting diagonal](https://en.wikipedia.org/wiki/Main_diagonal):
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    A.diag();
+    ```
+
+- [Matrix trace](https://en.wikipedia.org/wiki/Trace_(linear_algebra)):
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    trace(A);
+    ```
+
+- [Cholesky Decomposition](https://en.wikipedia.org/wiki/Cholesky_decomposition): Find an [upper triangular](https://en.wikipedia.org/wiki/Triangular_matrix) matrix $R$ with non-negative diagonal elements such that $X = R^TR$. Applicable when $X$ is [symmetric](https://en.wikipedia.org/wiki/Symmetric_matrix).
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    mat R = chol(X);
+    ```
+
+- [Eigendecomposition](https://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix): Find [orthogonal matrix](https://en.wikipedia.org/wiki/Orthogonal_matrix) $U$ and [diagonal matrix](https://en.wikipedia.org/wiki/Diagonal_matrix) $D$ such that $X = UDU^T$. Applicable when $X$ is [symmetric](https://en.wikipedia.org/wiki/Symmetric_matrix).
+
+    You need to create (i) a vector containing the main diagonal of $D$ and (ii) a matrix that will hold the eigenvectors. You do that ahead of time. Then you run `eig_sym()`.
+    
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    vec eigval; // main diagonal of D matrix
+    mat eigvec; // U matrix
+    eig_sym(eigval, eigvec, B);
+    ```
+
+- [Singular Value Decomposition](https://en.wikipedia.org/wiki/Singular_value_decomposition): Find orthogonal matrices $U$ and $V$, and diagonal matrix $D$ such that $X = UDV^T$.
+
+    You need to create (i) a vector containing the main diagonal of $D$ and (ii) matrices that will hold the left and right singular vectors. You do that ahead of time. Then you run `svd()`.
+    
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    mat U;
+    vec s;
+    mat V;
+    svd(U,s,V,X);
+    ```
+    
+- [QR Decomposition](https://en.wikipedia.org/wiki/QR_decomposition): Find an orthogonal matrix $Q$ and an upper triangular matrix $R$ with non-negative diagonal entries, such that $X = QR$.
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    mat Q;
+    mat R;
+    qr(Q, R, X);
+    ```
+
+- **Example**: This isn't the most efficient way to find the OLS estimates from a regression, but we can just calculate
+
+    $$
+    \hat{\beta} = (X^TX)^{-1}X^Ty
+    $$
+
+    Let's do this in C++:
+    
+    <mark style="background-color: LightCoral">C++</mark>
+    
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    vec stupid_ols(mat X, vec y) {
+      vec betahat = inv(X.t() * X) * X.t() * y;
+      return betahat;
+    }
+    ```
+    
+    Let's verify our results.
+    
+    <mark style="background-color: lightblue">R</mark>
+    
+    ```{r}
+    ## Armadillo Way
+    X <- model.matrix(mpg ~ wt, data = mtcars)
+    y <- mtcars$mpg
+    stupid_ols(X = X, y = y)
+    
+    ## R Way
+    coef(lm(mpg ~ wt, data = mtcars))
+    ```
+    
+- I called it `stupid_ols()` because calculating an inverse is generally a computationally unstable task (but in this scenario, it's probably OK). It's better to use `solve()` here, but folks have thought very hard about this simple problem [@farebrother1988linear]:
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    vec arma_ols(mat X, vec y) {
+      vec betahat = solve(X.t() * X, X.t() * y);
+      return betahat;
+    }
+    ```
+
+    <mark style="background-color: lightblue">R</mark>
+      
+    ```{r}
+    arma_ols(X = X, y = y)
+    ```
+    
+- Let's compare performance when we have a large number of covariates.
+
+    <mark style="background-color: lightblue">R</mark>
+    
+    ```{r}
+    X <- model.matrix(mpg ~ ., data = mtcars)
+    y <- mtcars$mpg
+    
+    bench::mark(
+      coef(lm(mpg ~ wt, data = mtcars)),
+      stupid_ols(X = X, y = y),
+      arma_ols(X = X, y = y), 
+      check = FALSE
+    )[1:8] |>
+      knitr::kable()
+    ```
 
 
 # R to Armadillo Conversion Table
@@ -555,3 +713,4 @@ In the below table, `A` and `B` are a matrices and `Q` is a three-dimensional ar
 | `X = rbind(A, B)` | `X = join_vert(A, B)` |  | 
 | `A` | `cout << A << endl` or `A.print("A=")` |  | 
 
+# References
