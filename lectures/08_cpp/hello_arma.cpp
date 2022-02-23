@@ -5,7 +5,8 @@ using namespace arma;
 
 // [[Rcpp::export]]
 void ex() {
-  mat A = { {1, 3, 5},
-          {2, 4, 6} };
-  Rcpp::Rcout << A << std::endl;
+  vec x = {1.0, 2.0, 3.0};
+  Rcpp::Rcout << x << std::endl;
+  x.clear();
+  Rcpp::Rcout << x << std::endl;
 }

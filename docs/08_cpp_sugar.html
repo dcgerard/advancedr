@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-21" />
+<meta name="date" content="2022-02-23" />
 
 <title>Rcpp Sugar</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Rcpp Sugar</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-21</h4>
+<h4 class="date">2022-02-23</h4>
 
 </div>
 
@@ -409,6 +409,7 @@ $(document).ready(function () {
 <h1>Arithmetic Operations</h1>
 <ul>
 <li><p>With Rcpp Sugar, you can do vectorized arithmetic operations as you would in R, as long as you are using Rcpp vectors (examples below from <a href="https://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf">Rcpp-sugar</a>).</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// two numeric vectors of the same size</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>NumericVector x<span class="op">;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>NumericVector y<span class="op">;</span></span>
@@ -430,6 +431,7 @@ $(document).ready(function () {
 <h1>Logical Operations</h1>
 <ul>
 <li><p>You can create <code>LogicalVector</code>s as you would in R using logical operators.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// two integer vectors of the same size</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>NumericVector x<span class="op">;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>NumericVector y<span class="op">;</span></span>
@@ -510,12 +512,14 @@ $(document).ready(function () {
 <li><p>All of these return <code>LogicalVector</code>s, which are built on <code>int</code> not <code>bool</code> (because in R there is <code>NA</code>, but there is no <code>NA</code> equivalent in <code>bool</code>).</p></li>
 <li><p>One consequence is that <code>all()</code> and <code>any()</code> do not return a <code>bool</code> object, so you cannot use them directly in <code>if-else</code> statements.</p></li>
 <li><p>Instead, wrap <code>all()</code> and <code>any()</code> inside <code>is_true()</code> or <code>is_false()</code> to convert it to a <code>bool</code>.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>is_true<span class="op">(</span>all<span class="op">(</span>v<span class="op">)))</span> <span class="op">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
 <li><p>Another consequence is that you should not use individual elements of <code>LogicalVector</code>’s in <code>if-then</code> statements because <code>NA</code>’s will evaluate to the bool type <code>true</code>.</p></li>
 <li><p>Instead, check if an element is <code>TRUE</code> (which is an object defined by Rcpp different from <code>true</code>).</p></li>
 <li><p>E.g. if <code>v</code> is a <code>LogicalVector</code> then do:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>v<span class="op">[</span>i<span class="op">]==</span>TRUE<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>v<span class="op">[</span>i<span class="op">]==</span>FALSE<span class="op">)</span> <span class="op">{</span></span>
@@ -526,6 +530,7 @@ $(document).ready(function () {
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
 <li><p><strong>Example</strong>:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="op">::</span>NumericVector x <span class="op">=</span> <span class="op">{</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">,</span> <span class="fl">3.0</span><span class="op">};</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="op">::</span>LogicalVector z <span class="op">=</span> x <span class="op">&gt;</span> <span class="dv">2</span><span class="op">;</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>z<span class="op">(</span><span class="dv">2</span><span class="op">)</span> <span class="op">==</span> TRUE<span class="op">)</span> <span class="op">{</span></span>
@@ -576,6 +581,7 @@ $(document).ready(function () {
 <h1>Exercises:</h1>
 <ol style="list-style-type: decimal">
 <li><p>Use Rcpp Sugar to create a function called <code>msamp()</code> where the user inputs a sample size <code>n</code> and the output is the mean of a random sample of size <code>n</code> from a standard uniform distribution (over <span class="math inline">\([0,1]\)</span>). E.g.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">msamp</span>(<span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## [1] 0.2655</code></pre>
@@ -589,6 +595,7 @@ $(document).ready(function () {
  \frac{n!}{x_1!x_2!\cdots x_k!}p_1^{x_1}p_2^{x_2}\ldots p_k^{x_k}
  \]</span> Here, <span class="math inline">\(x_i\)</span> is the number of counts in category <span class="math inline">\(i\)</span> and <span class="math inline">\(n\)</span> is the total number of counts, so <span class="math inline">\(n = x_1 + x_2 + \cdots + x_n\)</span>. Also, <span class="math inline">\(p_i\)</span> is the probability of category <span class="math inline">\(i\)</span>. Use Rcpp Sugar to create a function called <code>dmultinom_cpp()</code> that will take as input a <code>NumericVector</code> <code>x</code>, a <code>NumericVector</code> <code>p</code>, and a <code>bool</code> <code>lg</code> and return the log-PMF if <code>lg = true</code> and return the PMF if <code>lg = false</code>. For numerical stability, you should calculate the log values at each step and only exponentiate at the end (this is very typical in numerical computing). You can assume that all values of <span class="math inline">\(p_i\)</span> are non-zero.</p>
 <p><em>Hint</em>: We have the relationship that <span class="math inline">\(\Gamma(n + 1) = n!\)</span>. This is needed for doing log-factorial on scalars.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">log =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## [1] -2.294</code></pre>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom_cpp</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">lg =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
@@ -598,6 +605,7 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom_cpp</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">lg =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## [1] 0.1008</code></pre></li>
 <li><p>Write a function called <code>scale01()</code> that takes as input a <code>NumericVector</code>, subtracts the minimum value, and divides by the maximum value of the resulting vector. So it scales all observations to be between 0 and 1. Use Rcpp Sugar.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">6</span><span class="sc">:</span><span class="dv">10</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">scale01</span>(x)</span></code></pre></div>
 <pre><code>## [1] 0.00 0.25 0.50 0.75 1.00</code></pre></li>

@@ -135,7 +135,7 @@ klippy::klippy()
     mean(x) ## apply mean to x
     ```
     
-    <mark style="background-color: lightblue">Python</mark>
+    <mark style="background-color: GoldenRod">Python</mark>
     ```{python}
     import numpy as np
     x = np.array([19, 22, 31])

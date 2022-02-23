@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-19" />
+<meta name="date" content="2022-02-23" />
 
 <title>Rcpp Setup</title>
 
@@ -380,7 +380,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Rcpp Setup</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-19</h4>
+<h4 class="date">2022-02-23</h4>
 
 </div>
 
@@ -433,6 +433,7 @@ $(document).ready(function () {
 <ul>
 <li><p><code>{Rcpp}</code> is a fantastic R package that makes integrating R and C++ almost painless.</p></li>
 <li><p>In interactive mode, you can write a C++ function by using <code>Rcpp::cppFunction()</code>. You put the source code in quotes.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="sc">::</span><span class="fu">cppFunction</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">  void hello_world() {</span></span>
@@ -441,9 +442,11 @@ $(document).ready(function () {
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">  &#39;</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
 <li><p>You can then use that funciton like you would any usual R function.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hello_world</span>()</span></code></pre></div>
 <pre><code>## Hello World</code></pre></li>
 <li><p>More frequently, you have a C++ file (ending in “.cpp”) that contains the following:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -452,11 +455,13 @@ $(document).ready(function () {
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;Hello World&quot;</span><span class="op">;</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>Suppose this file is called “hello.cpp,” then you can load it into R using</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="sc">::</span><span class="fu">sourceCpp</span>(<span class="at">file =</span> <span class="st">&quot;hello.cpp&quot;</span>)</span></code></pre></div>
 <p>and then use <code>hello_world()</code> as you would any R function.</p></li>
 <li><p>People almost never do either of these in practice. If you are using <code>{Rcpp}</code>, it is almost always in an R package.</p></li>
 <li><p><code>usethis::use_rcpp()</code> will automatically format an R package to have the appropriate structure for interfacing with <code>{Rcpp}</code>.</p></li>
 <li><p>You will have to include these lines in your documentation somewhere. I typically include them in the documentation for the package. Make sure you replace <code>package_name</code> with the name of the package. Follow instructions from <code>{usethis}</code></p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @useDynLib package_name, .registration = TRUE</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @importFrom Rcpp sourceCpp</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div></li>
@@ -472,6 +477,7 @@ Imports:
 <li><p>You place all C++ files in the <code>src</code> directory.</p></li>
 <li><p>All C++ files end in “.cpp.”</p></li>
 <li><p>Every file should generally begin with</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span></code></pre></div></li>
 <li><p>The <code>#include &lt;Rcpp.h&gt;</code> line basically makes Rcpp available to us in C++.</p>
@@ -481,10 +487,11 @@ Imports:
 <li><p>The <code>using namespace Rcpp;</code> line brings the Rcpp namespace into scope so that we can use functions without declaring that they come from Rcpp. E.g., we can use <code>Rcout</code> instead of <code>Rcpp::Rcout</code> (just like importing a function in R).</p></li>
 <li><p>C++ files should be entirely composed of functions (just like R scripts in packages).</p></li>
 <li><p>A C++ function is of the form</p>
-<pre><code>ftype fname(arg1Type arg1, arg2Type arg2 = default2) {
-  // code goes here
-  return retval;
-}</code></pre></li>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ftype fname<span class="op">(</span>arg1Type arg1<span class="op">,</span> arg2Type arg2 <span class="op">=</span> default2<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code goes here</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> retval<span class="op">;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
 <li><p><code>ftype</code> is the type that is returned, such as <code>int</code> or <code>double</code> or <code>Rcpp::NumericVector</code>, etc…</p></li>
 <li><p><code>fname</code> is the function name that you choose.</p></li>
 <li><p><code>arg1Type</code> and <code>arg2Type</code> are the types of the arguments for the function.</p></li>
@@ -492,18 +499,22 @@ Imports:
 <li><p>All C++ functions end with <code>return</code> followed by the object that is being returned.</p></li>
 <li><p>Notice that you don’t use assignment for creating C++ functions.</p></li>
 <li><p>For example, here I return the sum of two integers:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> add2<span class="op">(</span><span class="dt">int</span> x<span class="op">,</span> <span class="dt">int</span> y<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> sum <span class="op">=</span> x <span class="op">+</span> y<span class="op">;</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> sum<span class="op">;</span></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">add2</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span></code></pre></div>
 <pre><code>## [1] 3</code></pre></li>
 <li><p>Comments in C++ are <code>//</code>, not <code>#</code>.</p></li>
 <li><p>If you want R to have access to an C++ function, you must include the exact line right above the function:</p>
-<pre><code>// [[Rcpp::export]]</code></pre></li>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span></code></pre></div></li>
 <li><p>If you don’t include this, it will still be available to your other C++ functions, but not to R.</p></li>
 <li><p>You document C++ functions exactly like R code, except you begin <code>{roxygen2}</code> lines with <code>//'</code>.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">//&#39; @title Add two integers</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">//&#39; </span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">//&#39; @param x Integer 1</span></span>

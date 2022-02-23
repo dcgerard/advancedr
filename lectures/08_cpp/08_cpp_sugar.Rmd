@@ -52,6 +52,8 @@ using namespace Rcpp;
 
 - With Rcpp Sugar, you can do vectorized arithmetic operations as you would in R, as long as you are using Rcpp vectors (examples below from [Rcpp-sugar](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf)).
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     // two numeric vectors of the same size
     NumericVector x;
@@ -73,6 +75,8 @@ using namespace Rcpp;
 # Logical Operations
 
 - You can create `LogicalVector`s as you would in R using logical operators.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     // two integer vectors of the same size
@@ -155,6 +159,8 @@ All of these take a numeric vector in, and return a scalar.
 
 - Instead, wrap `all()` and `any()` inside `is_true()` or `is_false()` to convert it to a `bool`.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     if (is_true(all(v))) {
     
@@ -166,6 +172,8 @@ All of these take a numeric vector in, and return a scalar.
 - Instead, check if an element is `TRUE` (which is an object defined by Rcpp different from `true`).
 
 - E.g. if `v` is a `LogicalVector` then do:
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     if (v[i]==TRUE) {
@@ -180,6 +188,8 @@ All of these take a numeric vector in, and return a scalar.
     ```
     
 - **Example**:
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     Rcpp::NumericVector x = {1.0, 2.0, 3.0};
@@ -250,6 +260,8 @@ Rcpp::cppFunction(
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     set.seed(1)
     msamp(1)
@@ -277,6 +289,8 @@ Rcpp::cppFunction(
       return ret;
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
         
     ```{r}
     dmultinom(x = c(1, 4, 2), p = c(0.1, 0.7, 0.2), log = TRUE)
@@ -297,6 +311,8 @@ Rcpp::cppFunction(
       return x;
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
     
     ```{r}
     x <- 6:10

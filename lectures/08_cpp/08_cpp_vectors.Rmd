@@ -51,6 +51,8 @@ using namespace Rcpp;
 
 - If you have a function that accepts and returns vectors, then you use those types.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     NumericVector fn(IntegerVector x, bool y) {
       // code to create z
@@ -62,11 +64,15 @@ using namespace Rcpp;
 
 - You create an empty vector of length `n` with
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     NumericVector x(n);
     ```
 
 - You can add default values by including a second argument via
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     NumericVector x(n, 2.0);
@@ -74,11 +80,15 @@ using namespace Rcpp;
     
 - If you want an `IntegerVector` from `0` to `n - 1`, probably the best way is through `Rcpp::seq(0, n-1)` `std::iota()`
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     IntegerVector x = Rcpp::seq(0, n - 1);
     ```
 
 - If you have specific elements you want to create the vector with, use curly braces (requires C++11):
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     NumericVector x = {9.0, 1.2, 4.9};
@@ -86,11 +96,16 @@ using namespace Rcpp;
     
 - For older versions of C++, use `NumericVector::create()`.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     NumericVector x = NumericVector::create(9.0, 1.2, 4.9);
     ```
 
 - Let's demonstrate these methods
+
+    <mark style="background-color: LightCoral">C++</mark>
+
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
     void vec_create() {
@@ -117,6 +132,8 @@ using namespace Rcpp;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     vec_create()
     ```
@@ -128,6 +145,8 @@ using namespace Rcpp;
 - Note that in C++, **indexing starts at 0**.
 
 - One more time for emphasis, in **C++ indexing starts at 0**.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
@@ -146,6 +165,8 @@ using namespace Rcpp;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     subset_example(c(14, 38, 29))
     ```
@@ -158,17 +179,23 @@ using namespace Rcpp;
 
 - `length()` or `size()`: Get total number of elements in the vector. These are equivalent.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     x.length();
     ```
 
 - `fill()`: Fill all elements of a vector with scalar value.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     x.fill(2.0);
     ```
 
 - `sort()`: Return a vector that sorts the object.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     x.sort(false); // ascending order
@@ -178,6 +205,8 @@ using namespace Rcpp;
 - `begin()` and `end()` returns iterators pointing to the first and last elements of the vector (we'll talk about this later)
 
 - Let's demonstrate these.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
@@ -195,6 +224,8 @@ using namespace Rcpp;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     method_example()
     ```
@@ -204,6 +235,8 @@ using namespace Rcpp;
 # For-loops
 
 - All for-loops in C++ are of the form
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     for (s1; s2; s3) {
@@ -216,6 +249,8 @@ using namespace Rcpp;
     - `s3` is code that is evaluated at the end of each for-loop. This is usually `i++` to add1 to `i`.
     
 - Almost all for-loops you write will look like this
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     for (int i = 0; i < n; i++) {
@@ -234,6 +269,8 @@ using namespace Rcpp;
     
 - Let's recreate `sum()` using Rcpp.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
     double sum2(NumericVector x) {
@@ -245,6 +282,8 @@ using namespace Rcpp;
       return sval;
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
 
     ```{r}
     x <- runif(100)
@@ -270,6 +309,8 @@ using namespace Rcpp;
 
 - You can use `Rcpp::clone()` to make a copy.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
     void copy_example() {
@@ -288,6 +329,8 @@ using namespace Rcpp;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     copy_example()
     ```
@@ -302,6 +345,8 @@ using namespace Rcpp;
 
 - You can include these in Rcpp vectors without worrying too much.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     Rcpp::NumericVector x(10, NA_REAL)
     ```
@@ -312,12 +357,16 @@ using namespace Rcpp;
 
 - `NA_INTEGER` is  the smallest integer allowed in C++, so `NA_INTEGER + 1` would not longer be considered missing data, e.g.
 
+    <mark style="background-color: lightblue">R</mark>
+
     ```{r}
     Rcpp::evalCpp("NA_INTEGER")
     Rcpp::evalCpp("NA_INTEGER + 1")
     ```
 
 - Coercing `NA_LOGICAL` to a `bool` will evaluate to `true`, since `bool` does not allow for anything except `true` and `false`.
+
+    <mark style="background-color: lightblue">R</mark>
 
     ```{r}
     Rcpp::evalCpp("(bool)NA_LOGICAL")
@@ -326,6 +375,8 @@ using namespace Rcpp;
 # Exercises
 
 1. (from Advanced R) For each of the following functions, read the code and figure out what the corresponding base R function is. You might not understand every part of the code yet, but you should be able to figure out the basics of what the function does.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     double f1(NumericVector x) {
@@ -342,6 +393,8 @@ using namespace Rcpp;
     ```{block, eval = FALSE, echo = FALSE}
     Calculates the mean of `x`. Same as `mean()` in R.
     ```
+    
+    <mark style="background-color: LightCoral">C++</mark>
     
     ``` cpp
     NumericVector f2(NumericVector x) {
@@ -360,6 +413,8 @@ using namespace Rcpp;
     This calculates the cumulative summation of `x`. Same as `cumsum()` in R.
     ```
     
+    <mark style="background-color: LightCoral">C++</mark>
+    
     ``` cpp
     bool f3(LogicalVector x) {
       int n = x.size();
@@ -374,6 +429,8 @@ using namespace Rcpp;
     ```{block, eval = FALSE, echo = FALSE}
     This returns `true` if any value in `x` is `true`, and returns `false` otherwise. Same as `any()` in R.
     ```
+    
+    <mark style="background-color: LightCoral">C++</mark>
     
     ``` cpp
     int f4(Function pred, List x) {
@@ -390,6 +447,8 @@ using namespace Rcpp;
     ```{block, eval = FALSE, echo = FALSE}
     Takes a predicate function `pred` and a list of elements `x` to apply that function to and returns the first position of `x` that a `true` is returned. Same as `Position()` in R.
     ```
+    
+    <mark style="background-color: LightCoral">C++</mark>
     
     ``` cpp
     NumericVector f5(NumericVector x, NumericVector y) {
@@ -440,6 +499,8 @@ using namespace Rcpp;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     fib(1)
     fib(2)
@@ -467,6 +528,8 @@ using namespace Rcpp;
           return true;
         }
         ```
+        
+        <mark style="background-color: lightblue">R</mark>
             
         ```{r}
         all_cpp(c(TRUE, TRUE, FALSE))
@@ -495,6 +558,8 @@ using namespace Rcpp;
           return out;
         }
         ```
+        
+        <mark style="background-color: lightblue">R</mark>
             
         ```{r}
         x <- 1:4
@@ -525,6 +590,8 @@ using namespace Rcpp;
           return out;
         }
         ```
+        
+        <mark style="background-color: lightblue">R</mark>
                 
         ```{r}
         cummin_cpp(double())
@@ -552,6 +619,8 @@ using namespace Rcpp;
           return out;
         }
         ```
+        
+        <mark style="background-color: lightblue">R</mark>
                 
         ```{r}
         cummax_cpp(double())
@@ -577,6 +646,8 @@ using namespace Rcpp;
           return out;
         }
         ```
+        
+        <mark style="background-color: lightblue">R</mark>
         
         ```{r}
         diff_cpp(x = c(1, 5, 10, 20), lag = 1)
@@ -613,6 +684,8 @@ using namespace Rcpp;
           return out;
         }
         ```
+        
+        <mark style="background-color: lightblue">R</mark>
         
         ```{r}
         range_cpp(c(9, 11, 22, 12, 1))

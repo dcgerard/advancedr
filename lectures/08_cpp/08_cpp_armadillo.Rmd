@@ -46,6 +46,9 @@ using namespace arma;
 - It contains fast linear algebra algorithms, as well as a nice interface for working with matrices.
 
 - You can set up an R package to use Armadillo by running the following R:
+
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r, eval = FALSE}
     usethis::use_rcpp_armadillo()
     ```
@@ -54,6 +57,8 @@ using namespace arma;
 
 - At the top of each C++ file, you now include the following (instead of just including Rcpp):
 
+    <mark style="background-color: LightCoral">C++</mark>
+    
     ``` cpp
     #include <RcppArmadillo.h>
     // [[Rcpp::depends(RcppArmadillo)]]
@@ -63,11 +68,15 @@ using namespace arma;
 
 # Armadillo Vectors
 
-- Armadillo vectors are just double vectors (or other numeric-like vectors). That is, there are no character or logical Armadillo vectors.
+- If you are using Armadillo for matrices, you should be using Armadillo vectors instead of `NumericVector`s, so that it is easier to interact between matrices and vectors.
+
+- Armadillo vectors are just like `NumericVector`'s with some minor differences. That is, there are no character or logical Armadillo vectors.
 
 - Armadillo vectors are called `Col` objects (for "column vector").
 
 - Initialize with
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     arma::vec x(n_elem)
@@ -75,15 +84,25 @@ using namespace arma;
 
 - You can specify a default value for the vector with
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     // fill with zeros
-    arma::vec x(n_elem, arma::fill::zeros)
+    arma::vec x(n_elem, arma::fill::zeros);
     
     // fill with ones
     arma::vec y(3, arma::fill::ones);
     
     // fill with specified value
     arma::vec z(3, arma::fill::value(23.0));
+    ```
+    
+- You can create custom vectors with braces
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    arma::vec w = {4.3, 2.2, -9.4};
     ```
 
 - Let's demonstrate:
@@ -99,14 +118,21 @@ using namespace arma;
     
       vec z(3, fill::value(23.0));
       Rcpp::Rcout << z << std::endl;
+      
+      vec w = {4.3, 2.2, -9.4};
+      Rcpp::Rcout << w << std::endl;
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
     
     ```{r}
     ex1()
     ```
 
 - Of course, you typically get Armadillo vectors from a user.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
@@ -115,54 +141,264 @@ using namespace arma;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     ex2(c(1, 4, 2))
     ```
     
-- You can get the number elements in a vector with
+- If you return an Armadillo vector, then R will interpret this as a `matrix` object with one column. But you can pass R vectors as inputs to `Col` objects.
+    
+- You can get and set elements using parentheses notation `()`. You can use brackets as well, but this is more dangerous since Armadillo then won't do a bounds check. So you should always get and set elements by parentheses.
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void ex3() {
+      vec x = {6.2, 5.3, 1.1};
+      Rcpp::Rcout << "x(0): " << x(0) << std::endl;
+      double y = x(1);
+      Rcpp::Rcout << "y: " << y << std::endl;
+      x(2) = 8.9;
+      Rcpp::Rcout << "x(2): " << x(2) << std::endl;
+    }
+    ```
+    
+    <mark style="background-color: lightblue">R</mark>
+    
+    ```{r}
+    ex3()
+    ```
+
+- You get the number elements in a vector with
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     x.n_elem
     ```
 
-- You can do arithmetic operations on vectors as you would in R, but note that element-wise multiplication is different.
+- You do arithmetic operations on vectors as you would in R, but note that element-wise multiplication is different.
 
-    ```
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
     x + y
     x - y
     x % y // element-wise multiplication
     x / y
     ```
 
-- You can do lots of miscellaneous element-wise functions (table from [Armadillo docs](http://arma.sourceforge.net/docs.html#operators))
+- You can do lots of miscellaneous element-wise functions (table from [Armadillo docs](http://arma.sourceforge.net/docs.html#operators)):
 
-| Armadillo |        Explanation    |
-|-----------|-----------------------|
-| `exp(A)` | base-e exponential: $e^x$ |
-| `exp2(A)` | base-2 exponential: $2^x$ |
-| `exp10(A)` | base-10 exponential: $10^x$ |
-| `expm1(A)` | compute $\exp(A)-1$ accurately for values of A close to zero |
-| `log(A)` | natural log: $\log_e(x)$ |
-| `log2(A)` | base-2 log: $\log_2(x)$ |
-| `log10(A)` | base-10 log: $\log_{10}(x)$ |
-| `log1p(A)` | compute $\log(1+A)$ accurately for values of A close to zero |
-| `pow(A, p)` | raise to the power of p: $x^p$ |
-| `square(A)` | square: $x^2$ |
-| `sqrt(A)` | square root: $\sqrt{x}$ |
-| `floor(A)` | largest integral value that is not greater than the input value |
-| `ceil(A)` | smallest integral value that is not less than the input value |
-| `round(A)` | round to nearest integer, with halfway cases rounded away from zero |
-| `trunc(A)` | round to nearest integer, towards zero |
-| `lgamma(A)` | natural log of the absolute value of gamma function |
-| `sign(A)` | sign function |
+    | Armadillo |        Explanation    |
+    |-----------|-----------------------|
+    | `exp(A)` | base-e exponential: $e^x$ |
+    | `exp2(A)` | base-2 exponential: $2^x$ |
+    | `exp10(A)` | base-10 exponential: $10^x$ |
+    | `expm1(A)` | compute $\exp(A)-1$ accurately for values of A close to zero |
+    | `log(A)` | natural log: $\log_e(x)$ |
+    | `log2(A)` | base-2 log: $\log_2(x)$ |
+    | `log10(A)` | base-10 log: $\log_{10}(x)$ |
+    | `log1p(A)` | compute $\log(1+A)$ accurately for values of A close to zero |
+    | `pow(A, p)` | raise to the power of p: $x^p$ |
+    | `square(A)` | square: $x^2$ |
+    | `sqrt(A)` | square root: $\sqrt{x}$ |
+    | `floor(A)` | largest integral value that is not greater than the input value |
+    | `ceil(A)` | smallest integral value that is not less than the input value |
+    | `round(A)` | round to nearest integer, with halfway cases rounded away from zero |
+    | `trunc(A)` | round to nearest integer, towards zero |
+    | `lgamma(A)` | natural log of the absolute value of gamma function |
+    | `sign(A)` | sign function |
+
+
+- The usual statistics functions are available, but note the different name for standard deviation: `mean()`, `median()`, `stddev()`, `var()`, `range()`
+
+- **Exercise**: Implement `cumprod()`, `cummin()`, `cummax()`, and `diff()` using Armadillo vectors instead of `NumericVector`s. You can copy and paste your solutions from the exercises in the [Rcpp vectors lecture](./08_cpp_vectors.html) and then modify them to use armadillo vectors. 
+
+    *Hint*: You can make a length zero `Col` object by
+    
+    <mark style="background-color: LightCoral">C++</mark>
+    
+    ``` cpp
+    vec x(1);
+    x.clear();
+    ```
+    
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    vec cumprod_arma(vec x) {
+      int n = x.n_elem;
+      if (n == 0 || n == 1) {
+        return x;
+      }
+      
+      vec out(n);
+      out(0) = x(0);
+
+      for (int i = 1; i < n; i++) {
+        out(i) = out(i - 1) * x(i);
+      }
+      
+      return out;
+    }
+    ```
+        
+    ```{r, echo = FALSE, eval = FALSE}
+    x <- 1:4
+    cumprod_arma(x)
+    x <- double()
+    cumprod_arma(x)
+    x <- 3
+    cumprod_arma(x)
+    ```
+
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    vec cummin_arma(vec x) {
+      int n = x.n_elem;
+      if (n == 0 || n == 1) {
+        return x;
+      }
+      
+      vec out(n);
+      out(0) = x(0);
+      
+      for (int i = 1; i < n; i++) {
+        out(i) = std::min(out(i - 1), x(i));
+      }
+      
+      return out;
+    }
+    ```
+            
+    ```{r, echo = FALSE, eval = FALSE}
+    cummin_arma(double())
+    cummin_arma(3)
+    cummin_arma(c(10, 11, 3, 4, 5, 1, 2))
+    ```
+
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    vec cummax_arma(vec x) {
+      int n = x.n_elem;
+      if (n == 0 || n == 1) {
+        return x;
+      }
+      
+      vec out(n);
+      out(0) = x(0);
+      
+      for (int i = 1; i < n; i++) {
+        out(i) = std::max(out(i - 1), x(i));
+      }
+      
+      return out;
+    }
+    ```
+            
+    ```{r, echo = FALSE, eval = FALSE}
+    cummax_arma(double())
+    cummax_arma(3)
+    cummax_arma(c(10, 11, 3, 4, 5, 22, 2))
+    ```
+
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    vec diff_arma(vec x, int lag = 1) {
+      int n = x.n_elem;
+      if (lag >= n) {
+        vec out(1);
+        out.clear();
+        return out;
+      }
+      
+      vec out(n - lag);
+      for (int i = 0; i < (n - lag); i++) {
+        out(i) = x(i + lag) - x(i);
+      }
+      return out;
+    }
+    ```
+    
+    ```{r, echo = FALSE, eval = FALSE}
+    diff_arma(x = c(1, 5, 10, 20), lag = 1)
+    diff_arma(x = c(1, 5, 10, 20), lag = 2)
+    diff_arma(x = c(1, 5, 10, 20), lag = 3)
+    diff_arma(x = c(1, 5, 10, 20), lag = 4)
+    ```
 
 # Armadillo Matrices
+
+- You initialize Armadillo matrices with
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    arma::max A(n_rows, n_cols);
+    ```
+
+- You can specify a default value for the vector with
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    // fill with zeros
+    arma::mat A1(n_rows, n_cols, arma::fill::zeros);
+    
+    // fill with ones
+    arma::mat A2(n_rows, n_cols, arma::fill::ones);
+    
+    // fill with specified value
+    arma::mat A3(n_rows, n_cols, arma::fill::value(23.0));
+    ```
+    
+- You can create custom matrices with braces. Internal braces are the rows.
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    // Three rows, two columns
+    arma::mat A4 = {{4.3, 2.2}, {-9.4, 7.0}, {10.0, 11.0}};
+    ```
+
+- Let's demonstrate these    
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void ex4() {
+      int n_rows = 3;
+      int n_cols = 2;
+      
+      arma::mat A1(n_rows, n_cols, arma::fill::zeros);
+      Rcpp::Rcout << A1 << std::endl;
+    
+      arma::mat A2(n_rows, n_cols, arma::fill::ones);
+      Rcpp::Rcout << A2 << std::endl;
+      
+      arma::mat A3(n_rows, n_cols, arma::fill::value(23.0));
+      Rcpp::Rcout << A3 << std::endl;
+      
+      arma::mat A4 = {{4.3, 2.2}, {-9.4, 7.0}, {10.0, 11.0}};
+      Rcpp::Rcout << A4 << std::endl;
+    }
+    ```
+    
+    <mark style="background-color: lightblue">R</mark>
+    
+    ```{r}
+    ex4()
+    ```
+
 
 # Linear Algebra Operations
 
 # R to Armadillo Conversion Table
 
-In the below table, `A` is a matrix and `Q` is a three-dimensional array (or "cube"). This table is based on the Matlab/Octave to Armadillo conversion table [here](http://arma.sourceforge.net/docs.html#syntax).
+In the below table, `A` and `B` are a matrices and `Q` is a three-dimensional array (or "cube"). This table is based on the Matlab/Octave to Armadillo conversion table [here](http://arma.sourceforge.net/docs.html#syntax).
 
 | R | Armadillo | Notes |
 |---|---|-----|

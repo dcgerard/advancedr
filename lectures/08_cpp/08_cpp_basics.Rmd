@@ -68,12 +68,16 @@ using namespace Rcpp;
 
 - You can print out to the console using Rcpp with `Rcpp::Rcout` and the `<<` operator.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
     void hello_world_1() {
       Rcpp::Rcout << "Hello World";
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
 
     ```{r}
     hello_world_1()
@@ -83,6 +87,8 @@ using namespace Rcpp;
 
 - You can chain multiple outputs together.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
     void hello_world_2() {
@@ -90,11 +96,15 @@ using namespace Rcpp;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     hello_world_2()
     ```
     
 - If you want a new line, use `endl` from the `std` namespace.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
@@ -105,6 +115,8 @@ using namespace Rcpp;
                   
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
 
     ```{r}
     hello_world_3()
@@ -121,6 +133,8 @@ using namespace Rcpp;
 # Declaration and Scalar Types
 
 - Let's go through a basic example of the differences between R and C++.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
@@ -141,6 +155,8 @@ using namespace Rcpp;
 - Notice how there is a semicolon after each line (except where curly braces are concerned).
 
 - C++ will error if you forget declarations:
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     // This will not compile
@@ -172,6 +188,8 @@ using namespace Rcpp;
     - `x *= a`: Multiply x by `a`.
     - `x /= a`: Divide `x` by `a`.
     
+    <mark style="background-color: LightCoral">C++</mark>
+    
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
     void arith_example() {
@@ -198,11 +216,15 @@ using namespace Rcpp;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     arith_example()
     ```
     
 - In C++, you do powers with `pow()` from the `std` namespace.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
@@ -210,6 +232,8 @@ using namespace Rcpp;
       return std::pow(x, 2.0);
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
 
     ```{r}
     square(3)
@@ -225,6 +249,8 @@ using namespace Rcpp;
     
 - You can use these in `if-else` statements, which are exactly the same as R:
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     if (condition) {
       // code
@@ -239,6 +265,8 @@ using namespace Rcpp;
 
 - Let's demonstrate this by creating a C++ version of `sign()`.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
     int signC(int x) {
@@ -252,6 +280,8 @@ using namespace Rcpp;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     signC(-3)
     signC(0)
@@ -262,6 +292,8 @@ using namespace Rcpp;
 
 - You can throw an R error by using `Rcpp::stop()`. This is how you do assertions using Rcpp.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
     void errpos(double x) {
@@ -270,6 +302,8 @@ using namespace Rcpp;
       }
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
     
     ```{r, error = TRUE}
     errpos(-3)
@@ -283,6 +317,9 @@ using namespace Rcpp;
 - Most of these are from the `<cmath>` library from the `std` namespace, or from the `<Rmath>` library from the `R` namespace. 
 
 - If you want to check out those R header files where the functions are declared, type in R:
+
+    <mark style="background-color: lightblue">R</mark>
+
     ```{r, eval = FALSE}
     R.home("include")
     ```
@@ -291,9 +328,12 @@ using namespace Rcpp;
 
 - Below, I will write out the return value and arguments like so
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     type lib::name(type, type)
     ```
+    
 ## `<cmath>` from `std`
 
 - `double std::min(double a, double b)`: Minimum of two objects (usually scalars) of same type.
@@ -417,6 +457,8 @@ using namespace Rcpp;
 
 - [Normal Distribution](https://en.wikipedia.org/wiki/Normal_distribution) with mean and standard deviation (*not* variance).
     - In Wikipedia: `mu` = $\mu$, `sigma` = $\sigma$.
+    
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     double R::dnorm(double x, double mu, double sigma, int lg)              
@@ -427,6 +469,8 @@ using namespace Rcpp;
 
 - [Gamma Distribution](https://en.wikipedia.org/wiki/Gamma_distribution) with shape and scale parameters. 
     - In Wikipedia: `shp` = $k$, `scl` = $\theta$.
+    
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     double R::dgamma(double x, double shp, double scl, int lg)     
@@ -437,6 +481,8 @@ using namespace Rcpp;
 
 - [Beta Distribution](https://en.wikipedia.org/wiki/Beta_distribution) with left and right shape parameters. 
     - In Wikipedia: `a` = $\alpha$, `b` = $\beta$.
+    
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     double R::dbeta(double x, double a, double b, int lg)         
@@ -448,6 +494,8 @@ using namespace Rcpp;
 - [Chi-squared Distribution](https://en.wikipedia.org/wiki/Chi-squared_distribution).
     - In Wikipedia: `df` = $k$.
     
+    <mark style="background-color: LightCoral">C++</mark>
+    
     ``` cpp
     double R::dchisq(double x, double df, int lg)          
     double R::pchisq(double x, double df, int lt, int lg)  
@@ -458,6 +506,8 @@ using namespace Rcpp;
 - [$F$-distribution](https://en.wikipedia.org/wiki/F-distribution) with numerator and denominator degrees of freedom.
     - In Wikipedia: `df1` = $d_1$, `df2` = $d_2$.
     
+    <mark style="background-color: LightCoral">C++</mark>
+    
     ``` cpp
     double R::df(double x, double df1, double df2, int lg)      
     double R::pf(double x, double df1, double df2, int lt, int lg)
@@ -467,6 +517,8 @@ using namespace Rcpp;
 
 - [$t$-distribution](https://en.wikipedia.org/wiki/Student%27s_t-distribution) with degrees of freedom.
     - In Wikipedia: `n` = $\nu$.
+    
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     double R::dt(double x, double n, int lg)            
@@ -477,6 +529,8 @@ using namespace Rcpp;
 
 - [Binomial Distribution](https://en.wikipedia.org/wiki/Binomial_distribution) with size and success probability parameters.
     - In Wikipedia: `n` = $n$, `p` = $p$
+    
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     double R::dbinom(double x, double n, double p, int lg)      
@@ -489,6 +543,8 @@ using namespace Rcpp;
 - [Exponential Distribution](https://en.wikipedia.org/wiki/Exponential_distribution) with scale parameter.
     - In Wikipedia: `sl` = $1 / \lambda$ (**not** $\lambda$).
     
+    <mark style="background-color: LightCoral">C++</mark>
+    
     ``` cpp
     double R::dexp(double x, double sl, int lg)     
     double R::pexp(double x, double sl, int lt, int lg)
@@ -496,12 +552,16 @@ using namespace Rcpp;
     double R::rexp(double sl)               
     ```
     
+    <mark style="background-color: LightCoral">C++</mark>
+    
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
     double exp_demo() {
       return R::dexp(1, 2, 0);
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
         
     ```{r}
     exp_demo() ## uses scale
@@ -510,6 +570,8 @@ using namespace Rcpp;
 
 - [Geometric Distribution](https://en.wikipedia.org/wiki/Geometric_distribution) with success probability $p$. This uses the model formulation that counts the number of failures before a success.
     - In Wikipedia: `p` = $p$. 
+    
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     double R::dgeom(double x, double p, int lg)     
@@ -518,12 +580,16 @@ using namespace Rcpp;
     double R::rgeom(double p)               
     ```
     
+    <mark style="background-color: LightCoral">C++</mark>
+    
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
     double g_demo() {
       return R::dgeom(0, 0.7, 0);
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
     
     ```{r}
     g_demo() ## 70% prob of a success on the first trial, so 0 failures.
@@ -535,6 +601,8 @@ using namespace Rcpp;
         - `r` = $K$ = number of white balls in urn.
         - `b` = $N - K$ = number of black balls in urn.
         - `n` = $n$ = number of balls drawn.
+        
+    <mark style="background-color: LightCoral">C++</mark>
     
     ``` cpp
     double R::dhyper(double x, double r, double b, double n, int lg)
@@ -545,6 +613,8 @@ using namespace Rcpp;
     
 - [Poisson Distribution](https://en.wikipedia.org/wiki/Poisson_distribution) with mean parameter.
     - In Wikipedia: `lb` = $\lambda$.
+    
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     double R::dpois(double x, double lb, int lg)        
@@ -599,6 +669,8 @@ using namespace Rcpp;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     quadform(1, 2, 1)
     quadform(2, 2, 1)
@@ -611,6 +683,8 @@ using namespace Rcpp;
     $$
 
     R has its own version
+    
+    <mark style="background-color: lightblue">R</mark>
     
     ```{r}
     beta(1.5, 2.2)
@@ -630,6 +704,8 @@ using namespace Rcpp;
     }
     ```
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r}
     beta2(1.5, 2.2)
     beta2(1.5, 2.2, TRUE)
@@ -643,6 +719,8 @@ using namespace Rcpp;
       return R::dgamma(x, shp, 1.0 / rt, lg);
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
 
     ```{r}
     dgamma_r(x = 1, shp = 2, rt = 3, lg = 0)

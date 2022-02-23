@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-21" />
+<meta name="date" content="2022-02-23" />
 
 <title>C++ Basics</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">C++ Basics</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-21</h4>
+<h4 class="date">2022-02-23</h4>
 
 </div>
 
@@ -371,6 +371,7 @@ $(document).ready(function () {
 <li><a href="#assertions">Assertions</a></li>
 <li><a href="#useful-math-functions-for-scalars">Useful Math Functions for Scalars</a>
 <ul>
+<li><a href="#cmath-from-std"><code>&lt;cmath&gt;</code> from <code>std</code></a></li>
 <li><a href="#rmath-from-r"><code>&lt;Rmath&gt;</code> from <code>R</code></a>
 <ul>
 <li><a href="#math-functions">Math Functions</a></li>
@@ -418,21 +419,26 @@ $(document).ready(function () {
 <h1>Hello World</h1>
 <ul>
 <li><p>You can print out to the console using Rcpp with <code>Rcpp::Rcout</code> and the <code>&lt;&lt;</code> operator.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> hello_world_1<span class="op">()</span> <span class="op">{</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;Hello World&quot;</span><span class="op">;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hello_world_1</span>()</span></code></pre></div>
 <pre><code>## Hello World</code></pre></li>
 <li><p>The <code>void</code> means that our function is not returning anything.</p></li>
 <li><p>You can chain multiple outputs together.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> hello_world_2<span class="op">()</span> <span class="op">{</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;Hello&quot;</span> <span class="op">&lt;&lt;</span> <span class="st">&quot; World&quot;</span><span class="op">;</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hello_world_2</span>()</span></code></pre></div>
 <pre><code>## Hello World</code></pre></li>
 <li><p>If you want a new line, use <code>endl</code> from the <code>std</code> namespace.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> hello_world_3<span class="op">()</span> <span class="op">{</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;Hello&quot;</span> </span>
@@ -440,6 +446,7 @@ $(document).ready(function () {
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="op"> </span>             <span class="op">&lt;&lt;</span> <span class="st">&quot;World&quot;</span><span class="op">;</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hello_world_3</span>()</span></code></pre></div>
 <pre><code>## Hello
 ## World</code></pre></li>
@@ -453,6 +460,7 @@ $(document).ready(function () {
 <h1>Declaration and Scalar Types</h1>
 <ul>
 <li><p>Let’s go through a basic example of the differences between R and C++.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> add2<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> y<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> z<span class="op">;</span> <span class="co">// declare z to be an double</span></span>
@@ -469,6 +477,7 @@ $(document).ready(function () {
 </ol></li>
 <li><p>Notice how there is a semicolon after each line (except where curly braces are concerned).</p></li>
 <li><p>C++ will error if you forget declarations:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">// This will not compile</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> add2<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> y<span class="op">)</span> <span class="op">{</span></span>
@@ -497,6 +506,7 @@ $(document).ready(function () {
 <li><code>x *= a</code>: Multiply x by <code>a</code>.</li>
 <li><code>x /= a</code>: Divide <code>x</code> by <code>a</code>.</li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> arith_example<span class="op">()</span> <span class="op">{</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> x <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
@@ -520,6 +530,7 @@ $(document).ready(function () {
 <span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  x <span class="op">/=</span> <span class="dv">2</span><span class="op">;</span></span>
 <span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;x /= 2: &quot;</span> <span class="op">&lt;&lt;</span> x <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
 <span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">arith_example</span>()</span></code></pre></div>
 <pre><code>## x     : 1
 ## x++   : 2
@@ -529,10 +540,12 @@ $(document).ready(function () {
 ## x *= 3: 12
 ## x /= 2: 6</code></pre></li>
 <li><p>In C++, you do powers with <code>pow()</code> from the <code>std</code> namespace.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> square<span class="op">(</span><span class="dt">double</span> x<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">std::</span>pow<span class="op">(</span>x<span class="op">,</span> <span class="fl">2.0</span><span class="op">);</span></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">square</span>(<span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## [1] 9</code></pre></li>
 <li><p>Logical operations are the same, but no <code>&amp;</code> and <code>|</code></p>
@@ -546,6 +559,7 @@ $(document).ready(function () {
 <li><code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code></li>
 </ul></li>
 <li><p>You can use these in <code>if-else</code> statements, which are exactly the same as R:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>condition<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> <span class="op">{</span></span>
@@ -556,6 +570,7 @@ $(document).ready(function () {
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// code</span></span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
 <li><p>Let’s demonstrate this by creating a C++ version of <code>sign()</code>.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> signC<span class="op">(</span><span class="dt">int</span> x<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>x <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
@@ -566,6 +581,7 @@ $(document).ready(function () {
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">signC</span>(<span class="sc">-</span><span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## [1] -1</code></pre>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">signC</span>(<span class="dv">0</span>)</span></code></pre></div>
@@ -578,12 +594,14 @@ $(document).ready(function () {
 <h1>Assertions</h1>
 <ul>
 <li><p>You can throw an R error by using <code>Rcpp::stop()</code>. This is how you do assertions using Rcpp.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> errpos<span class="op">(</span><span class="dt">double</span> x<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>x <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span></span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    Rcpp<span class="op">::</span>stop<span class="op">(</span><span class="st">&quot;only negative values are allowed&quot;</span><span class="op">);</span></span>
 <span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">errpos</span>(<span class="sc">-</span><span class="dv">3</span>)</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">errpos</span>(<span class="dv">2</span>)</span></code></pre></div>
 <pre><code>## Error in errpos(2): only negative values are allowed</code></pre></li>
@@ -595,11 +613,16 @@ $(document).ready(function () {
 <li><p>Here are a bunch of the math scalar functions I use pretty regularly.</p></li>
 <li><p>Most of these are from the <code>&lt;cmath&gt;</code> library from the <code>std</code> namespace, or from the <code>&lt;Rmath&gt;</code> library from the <code>R</code> namespace.</p></li>
 <li><p>If you want to check out those R header files where the functions are declared, type in R:</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">R.home</span>(<span class="st">&quot;include&quot;</span>)</span></code></pre></div></li>
 <li><p>You can read about the <code>&lt;cmath&gt;</code> library at <a href="https://en.cppreference.com" class="uri">https://en.cppreference.com</a></p></li>
 <li><p>Below, I will write out the return value and arguments like so</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>type lib<span class="op">::</span>name<span class="op">(</span>type<span class="op">,</span> type<span class="op">)</span></span></code></pre></div>
-<h2 id="cmath-from-std"><code>&lt;cmath&gt;</code> from <code>std</code></h2></li>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>type lib<span class="op">::</span>name<span class="op">(</span>type<span class="op">,</span> type<span class="op">)</span></span></code></pre></div></li>
+</ul>
+<div id="cmath-from-std" class="section level2">
+<h2><code>&lt;cmath&gt;</code> from <code>std</code></h2>
+<ul>
 <li><p><code>double std::min(double a, double b)</code>: Minimum of two objects (usually scalars) of same type.</p></li>
 <li><p><code>double std::max(double a, double b)</code>: Maximum of two objects (usually scalars) of same type.</p></li>
 <li><p><code>double std::ceil(double x)</code>: Round a double up.</p></li>
@@ -614,6 +637,7 @@ $(document).ready(function () {
 <li><p><code>double std::log(double x)</code>, <code>double std::log10(double x)</code>, <code>double std::log2(double x)</code>, logs a double with base <span class="math inline">\(e\)</span>, <span class="math inline">\(10\)</span>, or <span class="math inline">\(2\)</span> (respectively).</p></li>
 <li><p><code>double std::lgamma(double arg)</code>: Computes natural log of the <a href="https://en.wikipedia.org/wiki/Gamma_function">gamma function</a>. Note that <code>std::lgamma(x)</code> is <span class="math inline">\(\log[(x-1)!]\)</span> for any integer <span class="math inline">\(x\)</span>, so this can be used to calculate log-factorials.</p></li>
 </ul>
+</div>
 <div id="rmath-from-r" class="section level2">
 <h2><code>&lt;Rmath&gt;</code> from <code>R</code></h2>
 <div id="math-functions" class="section level3">
@@ -648,6 +672,7 @@ $(document).ready(function () {
 <ul>
 <li>In Wikipedia: <code>mu</code> = <span class="math inline">\(\mu\)</span>, <code>sigma</code> = <span class="math inline">\(\sigma\)</span>.</li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dnorm<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> mu<span class="op">,</span> <span class="dt">double</span> sigma<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>              </span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pnorm<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> mu<span class="op">,</span> <span class="dt">double</span> sigma<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>      </span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qnorm<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> mu<span class="op">,</span> <span class="dt">double</span> sigma<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>      </span>
@@ -656,6 +681,7 @@ $(document).ready(function () {
 <ul>
 <li>In Wikipedia: <code>shp</code> = <span class="math inline">\(k\)</span>, <code>scl</code> = <span class="math inline">\(\theta\)</span>.</li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dgamma<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> shp<span class="op">,</span> <span class="dt">double</span> scl<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>     </span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pgamma<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> alp<span class="op">,</span> <span class="dt">double</span> scl<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qgamma<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> alp<span class="op">,</span> <span class="dt">double</span> scl<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
@@ -664,6 +690,7 @@ $(document).ready(function () {
 <ul>
 <li>In Wikipedia: <code>a</code> = <span class="math inline">\(\alpha\)</span>, <code>b</code> = <span class="math inline">\(\beta\)</span>.</li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dbeta<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> a<span class="op">,</span> <span class="dt">double</span> b<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>         </span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pbeta<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> q<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qbeta<span class="op">(</span><span class="dt">double</span> a<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> q<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
@@ -672,6 +699,7 @@ $(document).ready(function () {
 <ul>
 <li>In Wikipedia: <code>df</code> = <span class="math inline">\(k\)</span>.</li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dchisq<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> df<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>          </span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pchisq<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> df<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>  </span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qchisq<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> df<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>  </span>
@@ -680,6 +708,7 @@ $(document).ready(function () {
 <ul>
 <li>In Wikipedia: <code>df1</code> = <span class="math inline">\(d_1\)</span>, <code>df2</code> = <span class="math inline">\(d_2\)</span>.</li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>df<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> df1<span class="op">,</span> <span class="dt">double</span> df2<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>      </span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pf<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> df1<span class="op">,</span> <span class="dt">double</span> df2<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qf<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> df1<span class="op">,</span> <span class="dt">double</span> df2<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
@@ -688,6 +717,7 @@ $(document).ready(function () {
 <ul>
 <li>In Wikipedia: <code>n</code> = <span class="math inline">\(\nu\)</span>.</li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dt<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>            </span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pt<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>        </span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qt<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>        </span>
@@ -696,6 +726,7 @@ $(document).ready(function () {
 <ul>
 <li>In Wikipedia: <code>n</code> = <span class="math inline">\(n\)</span>, <code>p</code> = <span class="math inline">\(p\)</span></li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dbinom<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>      </span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pbinom<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>  </span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qbinom<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">double</span> m<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>  </span>
@@ -704,14 +735,17 @@ $(document).ready(function () {
 <ul>
 <li>In Wikipedia: <code>sl</code> = <span class="math inline">\(1 / \lambda\)</span> (<strong>not</strong> <span class="math inline">\(\lambda\)</span>).</li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb38"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dexp<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> sl<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>     </span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pexp<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> sl<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qexp<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> sl<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
 <span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rexp<span class="op">(</span><span class="dt">double</span> sl<span class="op">)</span>               </span></code></pre></div>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> exp_demo<span class="op">()</span> <span class="op">{</span></span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> R<span class="op">::</span>dexp<span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
 <span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp_demo</span>() <span class="do">## uses scale</span></span></code></pre></div>
 <pre><code>## [1] 0.3033</code></pre>
 <div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dexp</span>(<span class="at">x =</span> <span class="dv">1</span>, <span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>, <span class="at">log =</span> <span class="cn">FALSE</span>) <span class="do">## uses rate</span></span></code></pre></div>
@@ -720,14 +754,17 @@ $(document).ready(function () {
 <ul>
 <li>In Wikipedia: <code>p</code> = <span class="math inline">\(p\)</span>.</li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb44"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dgeom<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>     </span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>pgeom<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> p<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qgeom<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> pb<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
 <span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>rgeom<span class="op">(</span><span class="dt">double</span> p<span class="op">)</span>               </span></code></pre></div>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb45"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> <span class="va">g_demo</span><span class="op">()</span> <span class="op">{</span></span>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> R<span class="op">::</span>dgeom<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="fl">0.7</span><span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
 <span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">g_demo</span>() <span class="do">## 70% prob of a success on the first trial, so 0 failures.</span></span></code></pre></div>
 <pre><code>## [1] 0.7</code></pre></li>
 <li><p><a href="https://en.wikipedia.org/wiki/Hypergeometric_distribution">Hypergeometric Distribution</a></p>
@@ -740,6 +777,7 @@ $(document).ready(function () {
 <li><code>n</code> = <span class="math inline">\(n\)</span> = number of balls drawn.</li>
 </ul></li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb48"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dhyper<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> r<span class="op">,</span> <span class="dt">double</span> b<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>phyper<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> r<span class="op">,</span> <span class="dt">double</span> b<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qhyper<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> r<span class="op">,</span> <span class="dt">double</span> b<span class="op">,</span> <span class="dt">double</span> n<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
@@ -748,6 +786,7 @@ $(document).ready(function () {
 <ul>
 <li>In Wikipedia: <code>lb</code> = <span class="math inline">\(\lambda\)</span>.</li>
 </ul>
+<p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>dpois<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> lb<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span>        </span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>ppois<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> lb<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> R<span class="op">::</span>qpois<span class="op">(</span><span class="dt">double</span> p<span class="op">,</span> <span class="dt">double</span> lb<span class="op">,</span> <span class="dt">int</span> lt<span class="op">,</span> <span class="dt">int</span> lg<span class="op">)</span></span>
@@ -763,6 +802,7 @@ $(document).ready(function () {
 <li><p>Write a function called <code>quadform()</code> in C++ that prints the output (using <code>Rcpp::Rcout</code>) of the <a href="https://en.wikipedia.org/wiki/Quadratic_formula">quadratic formula</a>. That is <span class="math display">\[
  x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
  \]</span> It should print two numbers to the console if <span class="math inline">\(b^2 - 4ac &gt; 0\)</span>, one number if <span class="math inline">\(b^2 - 4ac = 0\)</span>, and should print <code>"No Solution"</code> if <span class="math inline">\(b^2 - 4ac &lt; 0\)</span>.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadform</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## Solution: -1</code></pre>
 <div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadform</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span></code></pre></div>
@@ -774,14 +814,17 @@ $(document).ready(function () {
  \mathrm{B}(x, y) = \frac{\Gamma(x)\Gamma(y)}{\Gamma(x + y)}
  \]</span></p>
 <p>R has its own version</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">beta</span>(<span class="fl">1.5</span>, <span class="fl">2.2</span>)</span></code></pre></div>
 <pre><code>## [1] 0.2341</code></pre>
 <p>Use just <code>std::lgamma()</code> and <code>std::exp()</code> to write your own beta function, called <code>beta2()</code>. You should include an argument <code>lg</code> which is a flag for returning either the log-beta or the beta. <code>lg</code> should default to <code>false</code>. E.g.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">beta2</span>(<span class="fl">1.5</span>, <span class="fl">2.2</span>)</span></code></pre></div>
 <pre><code>## [1] 0.2341</code></pre>
 <div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">beta2</span>(<span class="fl">1.5</span>, <span class="fl">2.2</span>, <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## [1] -1.452</code></pre></li>
 <li><p>Instead of shape and scale, some parameterizations of the <a href="https://en.wikipedia.org/wiki/Gamma_distribution">gamma distribution</a> use shape and rate (1 over the scale). <code>stats::dgamma()</code> implements both of these in R, but <code>R::dgamma()</code> in C++ only implements the scale parameterization. Implement a density function for the gamma that uses shape and rate parameterization. E.g.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dgamma_r</span>(<span class="at">x =</span> <span class="dv">1</span>, <span class="at">shp =</span> <span class="dv">2</span>, <span class="at">rt =</span> <span class="dv">3</span>, <span class="at">lg =</span> <span class="dv">0</span>)</span></code></pre></div>
 <pre><code>## [1] 0.4481</code></pre>
 <div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dgamma</span>(<span class="at">x =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">2</span>, <span class="at">rate =</span> <span class="dv">3</span>, <span class="at">log =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
