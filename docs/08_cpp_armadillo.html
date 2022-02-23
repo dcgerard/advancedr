@@ -390,8 +390,9 @@ $(document).ready(function () {
 <div id="integration-with-r" class="section level1">
 <h1>Integration with R</h1>
 <ul>
-<li><p>If you need to use matrices or arrays in C++, you should use the Armadillo C++ library.</p></li>
-<li><p>It contains fast linear algebra algorithms, as well as a nice interface for working with matrices.</p></li>
+<li><p>If you need to use numeric matrices or arrays in C++, you should use the Armadillo C++ library.</p></li>
+<li><p><a href="https://cran.r-project.org/web/packages/RcppEigen/vignettes/RcppEigen-Introduction.pdf">Eigen</a> is also a really great option, but appears to be less popular in the R community. You can read the docs <a href="https://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">here</a>.</p></li>
+<li><p>Armadillo contains fast linear algebra algorithms, as well as a nice interface for working with matrices.</p></li>
 <li><p>You can set up an R package to use Armadillo by running the following R:</p>
 <p><mark style="background-color: lightblue">R</mark></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_rcpp_armadillo</span>()</span></code></pre></div></li>
@@ -590,6 +591,7 @@ $(document).ready(function () {
 <div id="armadillo-matrices" class="section level1">
 <h1>Armadillo Matrices</h1>
 <ul>
+<li><p>Armadillo calls matrix objects <code>Mat</code>. They contain doubles.</p></li>
 <li><p>You initialize Armadillo matrices with</p>
 <p><mark style="background-color: LightCoral">C++</mark></p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>arma<span class="op">::</span>max A<span class="op">(</span>n_rows<span class="op">,</span> n_cols<span class="op">);</span></span></code></pre></div></li>
@@ -643,10 +645,100 @@ $(document).ready(function () {
 ##     4.3000    2.2000
 ##    -9.4000    7.0000
 ##    10.0000   11.0000</code></pre></li>
+<li><p>Element-wise arithmetic operations are the same as for vectors:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">+</span> B<span class="op">;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>A <span class="op">-</span> B<span class="op">;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>A <span class="op">%</span> B<span class="op">;</span> <span class="co">// element-wise multiplication</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>A <span class="op">/</span> B<span class="op">;</span></span></code></pre></div></li>
+<li><p>Element-wise functions (e.g. <code>log()</code> and <code>exp()</code>) are the exact same as in vectors.</p></li>
+<li><p>You get and set elements by parentheses notation. Always remember that <strong>indexing starts at 0</strong>.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>A<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">2</span><span class="op">);</span> <span class="co">// get (0,2)th element</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> x <span class="op">=</span> A<span class="op">(</span><span class="dv">4</span><span class="op">,</span> <span class="dv">2</span><span class="op">);</span> <span class="co">// get (4,2)th element and assign to x</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>A<span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">)</span> <span class="op">=</span> <span class="fl">12.0</span><span class="op">;</span> <span class="co">// set (1,0)th element</span></span></code></pre></div></li>
+<li><p>Let’s demonstrate these</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> ex5<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  mat A <span class="op">=</span> <span class="op">{{</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">,</span> <span class="fl">3.0</span><span class="op">},</span> <span class="op">{</span><span class="fl">4.0</span><span class="op">,</span> <span class="fl">5.0</span><span class="op">,</span> <span class="fl">6.0</span><span class="op">}};</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;A: &quot;</span> <span class="op">&lt;&lt;</span> A <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;A(0, 2): &quot;</span> <span class="op">&lt;&lt;</span> A<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">2</span><span class="op">)</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  A<span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">)</span> <span class="op">=</span> <span class="fl">12.0</span><span class="op">;</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;A(1, 0): &quot;</span> <span class="op">&lt;&lt;</span> A<span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">)</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  A <span class="op">=</span> A <span class="op">+</span> <span class="fl">2.0</span><span class="op">;</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;A: &quot;</span> <span class="op">&lt;&lt;</span> A <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ex5</span>()</span></code></pre></div>
+<pre><code>## A:    1.0000   2.0000   3.0000
+##    4.0000   5.0000   6.0000
+## 
+## A(0, 2): 3
+## A(1, 0): 12
+## A:     3.0000    4.0000    5.0000
+##    14.0000    7.0000    8.0000</code></pre></li>
+<li><p>Useful fields for <code>Mat</code> fields:</p>
+<ul>
+<li><code>A.n_elem</code>: Number of elements in matrix <code>A</code>.</li>
+<li><code>A.n_rows</code>: Number of rows in matrix <code>A</code>.</li>
+<li><code>A.n_cols</code>: Number of columns in matrix <code>A</code>.</li>
+</ul></li>
+<li><p>Generate matrix of ones.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>mat A <span class="op">=</span> ones<span class="op">&lt;</span>mat<span class="op">&gt;(</span>n_rows<span class="op">,</span> n_cols<span class="op">);</span></span></code></pre></div></li>
+<li><p>Generate <span class="math inline">\(n\times n\)</span> identity matrix.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>mat id <span class="op">=</span> eye<span class="op">(</span>n_rows<span class="op">,</span> n_cols<span class="op">);</span></span></code></pre></div></li>
+<li><p>Diagonal matrix, where <code>v</code> is a <code>Col</code> that you already have defined.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>mat d <span class="op">=</span> diagmat<span class="op">(</span>v<span class="op">);</span></span></code></pre></div></li>
+<li><p>Let’s demonstrate making these special matrices:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> ex6<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  mat A <span class="op">=</span> ones<span class="op">&lt;</span>mat<span class="op">&gt;(</span><span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">);</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;A: &quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op"> &lt;&lt;</span> A <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  mat id <span class="op">=</span> eye<span class="op">(</span><span class="dv">4</span><span class="op">,</span> <span class="dv">4</span><span class="op">);</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;id: &quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op"> &lt;&lt;</span> id <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  vec v <span class="op">=</span> <span class="op">{</span><span class="fl">3.0</span><span class="op">,</span> <span class="fl">2.2</span><span class="op">,</span> <span class="fl">5.5</span><span class="op">};</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  mat d <span class="op">=</span> diagmat<span class="op">(</span>v<span class="op">);</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>Rcout <span class="op">&lt;&lt;</span> <span class="st">&quot;d: &quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op"> &lt;&lt;</span> d <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ex6</span>()</span></code></pre></div>
+<pre><code>## A: 
+##    1.0000   1.0000   1.0000
+##    1.0000   1.0000   1.0000
+## 
+## id: 
+##    1.0000        0        0        0
+##         0   1.0000        0        0
+##         0        0   1.0000        0
+##         0        0        0   1.0000
+## 
+## d: 
+##    3.0000        0        0
+##         0   2.2000        0
+##         0        0   5.5000</code></pre></li>
 </ul>
 </div>
 <div id="linear-algebra-operations" class="section level1">
 <h1>Linear Algebra Operations</h1>
+<ul>
+<li><p>Matrix multiplication.</p></li>
+<li><p>Transpose.</p></li>
+<li><p>Solving linear systems.</p></li>
+<li><p>Inverse.</p></li>
+<li><p>Extracting diagonal.</p></li>
+<li><p>Trace</p></li>
+<li><p>Cholesky Decomposition.</p></li>
+<li><p>Eigendecomposition</p></li>
+<li><p>Singular Value Decomposition</p></li>
+</ul>
 </div>
 <div id="r-to-armadillo-conversion-table" class="section level1">
 <h1>R to Armadillo Conversion Table</h1>

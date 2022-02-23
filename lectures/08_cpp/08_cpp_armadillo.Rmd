@@ -41,9 +41,11 @@ using namespace arma;
     
 # Integration with R
 
-- If you need to use matrices or arrays in C++, you should use the Armadillo C++ library.
+- If you need to use numeric matrices or arrays in C++, you should use the Armadillo C++ library.
 
-- It contains fast linear algebra algorithms, as well as a nice interface for working with matrices.
+- [Eigen](https://cran.r-project.org/web/packages/RcppEigen/vignettes/RcppEigen-Introduction.pdf) is also a really great option, but appears to be less popular in the R community. You can read the docs [here](https://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html).
+
+- Armadillo contains fast linear algebra algorithms, as well as a nice interface for working with matrices.
 
 - You can set up an R package to use Armadillo by running the following R:
 
@@ -331,6 +333,8 @@ using namespace arma;
 
 # Armadillo Matrices
 
+- Armadillo calls matrix objects `Mat`. They contain doubles.
+
 - You initialize Armadillo matrices with
 
     <mark style="background-color: LightCoral">C++</mark>
@@ -393,8 +397,127 @@ using namespace arma;
     ex4()
     ```
 
+- Element-wise arithmetic operations are the same as for vectors:
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    A + B;
+    A - B;
+    A % B; // element-wise multiplication
+    A / B;
+    ```
+    
+- Element-wise functions (e.g. `log()` and `exp()`) are the exact same as in vectors.
+
+- You get and set elements by parentheses notation. Always remember that **indexing starts at 0**.
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    A(0, 2); // get (0,2)th element
+    double x = A(4, 2); // get (4,2)th element and assign to x
+    A(1, 0) = 12.0; // set (1,0)th element
+    ```
+
+- Let's demonstrate these
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void ex5() {
+      mat A = {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}};
+      
+      Rcpp::Rcout << "A: " << A << std::endl;
+      
+      Rcpp::Rcout << "A(0, 2): " << A(0, 2) << std::endl;
+      
+      A(1, 0) = 12.0;
+      Rcpp::Rcout << "A(1, 0): " << A(1, 0) << std::endl;
+      
+      A = A + 2.0;
+      Rcpp::Rcout << "A: " << A << std::endl;
+    }
+    ```
+    
+    <mark style="background-color: lightblue">R</mark>
+    
+    ```{r}
+    ex5()
+    ```
+
+- Useful fields for `Mat` fields:
+
+    - `A.n_elem`: Number of elements in matrix `A`.
+    - `A.n_rows`: Number of rows in matrix `A`.
+    - `A.n_cols`: Number of columns in matrix `A`.
+    
+- Generate matrix of ones.
+
+    ``` cpp
+    mat A = ones<mat>(n_rows, n_cols);
+    ```
+
+- Generate $n\times n$ identity matrix.
+
+    ``` cpp
+    mat id = eye(n_rows, n_cols);
+    ```
+
+- Diagonal matrix, where `v` is a `Col` that you already have defined.
+
+    ``` cpp
+    mat d = diagmat(v);
+    ```
+    
+- Let's demonstrate making these special matrices:
+    
+    <mark style="background-color: LightCoral">C++</mark>
+    
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void ex6() {
+      mat A = ones<mat>(2, 3);
+      Rcpp::Rcout << "A: " << std::endl << A << std::endl;
+      
+      mat id = eye(4, 4);
+      Rcpp::Rcout << "id: " << std::endl << id << std::endl;
+      
+      vec v = {3.0, 2.2, 5.5};
+      mat d = diagmat(v);
+      Rcpp::Rcout << "d: " << std::endl << d << std::endl;
+    }
+    ```
+    
+    <mark style="background-color: lightblue">R</mark>
+        
+    ```{r}
+    ex6()
+    ```
+    
+
 
 # Linear Algebra Operations
+
+- Matrix multiplication.
+
+- Transpose.
+
+- Solving linear systems.
+
+- Inverse.
+
+- Extracting diagonal.
+
+- Trace
+
+- Cholesky Decomposition.
+
+- Eigendecomposition
+
+- Singular Value Decomposition
+
 
 # R to Armadillo Conversion Table
 
