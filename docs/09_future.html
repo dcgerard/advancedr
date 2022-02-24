@@ -365,7 +365,11 @@ $(document).ready(function () {
 <div id="TOC">
 <ul>
 <li><a href="#learning-objectives">Learning Objectives</a></li>
-<li><a href="#overview">Overview</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#future-overview">Future Overview</a></li>
+<li><a href="#evaluation-plans">Evaluation Plans</a></li>
+<li><a href="#foreach"><code>{foreach}</code></a></li>
+<li><a href="#furrr"><code>{furrr}</code></a></li>
 <li><a href="#new-functions">New Functions</a></li>
 </ul>
 </div>
@@ -381,37 +385,81 @@ $(document).ready(function () {
 <li><a href="https://future.futureverse.org/articles/future-1-overview.html">Comprehensive Overview of Futures</a></li>
 <li><a href="https://cran.r-project.org/web/packages/doFuture/vignettes/doFuture.html"><code>{doFuture}</code> Vignette</a></li>
 <li><a href="https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html"><code>{foreach}</code> Vignette</a></li>
+<li><a href="https://furrr.futureverse.org/"><code>{furrr}</code> Website</a></li>
 </ul>
 </div>
-<div id="overview" class="section level1">
-<h1>Overview</h1>
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
+<ul>
+<li><p><a href="https://en.wikipedia.org/wiki/Parallel_computing">Parallel computing</a> is where you run many processes at the same time.</p></li>
+<li><p>E.g., suppose I run this code to calculate the mean of a sample of 10 uniformly distributed observations.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>nsamp <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>nind <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>outvec <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA_real_</span>, <span class="at">length.out =</span> nsamp)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(nsamp)) {</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  outvec[[i]] <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">runif</span>(nind))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Each iteration does not depend on any other iteration, so we could potentially run each iteration independently and simultaneously.</p></li>
+<li><p>This could potentially speed things up:</p>
+<p><img src="09_figs/parallel.png" width="50%" style="display: block; margin: auto;" /></p></li>
+<li><p>Parallel processing can be beneficial if</p>
+<ol style="list-style-type: decimal">
+<li>You have independent iterations (though this can be relaxed in more complicated computations).</li>
+<li>Each iteration takes awhile (not a millionth of a second).</li>
+<li>You aren’t passing huge datasets around each iteration.</li>
+</ol></li>
+<li><p>Sometimes, if you have a quick for-loop, the overhead of parallelization actually can slow things down. This is why parts 2 and 3 are important.</p></li>
+<li><p>We will talk about a relatively new approach to parallel processing in R through the use of “futures”.</p></li>
+</ul>
+</div>
+<div id="future-overview" class="section level1">
+<h1>Future Overview</h1>
 <ul>
 <li><p>A <a href="https://en.wikipedia.org/wiki/Futures_and_promises"><strong>future</strong></a> is a value that may be available at some point in the future. This value is the result of an (either evaluated or unevaluated) expression.</p></li>
 <li><p>The <a href="https://future.futureverse.org/"><code>{future}</code></a> package implements a nice future data structure built on top of environments.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future)</span></code></pre></div></li>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future)</span></code></pre></div></li>
 <li><p>When you create a future, you create something that may eventually have a value.</p></li>
 <li><p>When you use a future, you evaluate the expression, obtain that value, and use that value.</p></li>
 <li><p>Futures can be evaluated sequentially or in parallel, on the same machine or on a distributed cluster of machines.</p></li>
 <li><p>The idea of a future is that you can write the <strong>same R code</strong> for sequential single computer jobs, as well as for large parallel jobs on the supercomputer, and the R code will work in both scenarios. This is pretty awesome.</p></li>
 <li><p>This is also great because different types of parallel processing sometimes require different types of code. Using a future means that you don’t need to worry about the parallel processing environment.</p></li>
 <li><p>Example: Below, we do normal evaluation, binding <code>x</code> to 10. This is evaluated right away, and so <code>"Hello World"</code> is printed.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> {</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="st">&quot;Hello World</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>      <span class="dv">10</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>     }</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="st">&quot;Hello World</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>      <span class="dv">10</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>     }</span></code></pre></div>
 <pre><code>## Hello World</code></pre>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
 <pre><code>## [1] 11</code></pre>
 <p>Below, we create a future that is not evaluated right away, so <code>"Hello World"</code> is not printed. It just can be evaluated at some point.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">%&lt;-%</span> {</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cat</span>(<span class="st">&quot;Hello World</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="dv">10</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>       }</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">%&lt;-%</span> {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cat</span>(<span class="st">&quot;Hello World</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="dv">10</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>       }</span></code></pre></div>
 <p>When we use <code>x</code>, then the future is evaluated, the expression runs, and “Hello World” is printed.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div>
 <pre><code>## Hello World</code></pre>
 <pre><code>## [1] 11</code></pre></li>
+<li><p>You can create futures using <code>%&lt;-%</code>, like I did above, but it is more common to use a the <code>{future}</code> package as a backend to a more familiar API.</p>
+<ul>
+<li><a href="https://cran.r-project.org/package=furrr"><code>{furrr}</code></a>: Using the <code>{purrr}</code> API.</li>
+<li><a href="https://cran.r-project.org/web/packages/foreach/index.html"><code>{foreach}</code></a>: Uses a for-loop API.</li>
+<li><a href="https://cran.r-project.org/package=future.apply"><code>{future.apply}</code></a>: Uses base R vectorization API (like <code>apply()</code>, <code>sapply()</code>, <code>vapply()</code>, etc)</li>
+</ul></li>
 </ul>
+</div>
+<div id="evaluation-plans" class="section level1">
+<h1>Evaluation Plans</h1>
+<ul>
+<li><p>You use <code>future::plan()</code> to dtermine if a future will be evaluated sequentially or in parallel using a particular strategy.</p></li>
+<li><p><code>plan("sequential")</code> is the default and basically just runs R like you normall would.</p></li>
+</ul>
+</div>
+<div id="foreach" class="section level1">
+<h1><code>{foreach}</code></h1>
+</div>
+<div id="furrr" class="section level1">
+<h1><code>{furrr}</code></h1>
 </div>
 <div id="new-functions" class="section level1">
 <h1>New Functions</h1>

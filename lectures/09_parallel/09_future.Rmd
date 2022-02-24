@@ -28,8 +28,41 @@ klippy::klippy()
 - [Comprehensive Overview of Futures](https://future.futureverse.org/articles/future-1-overview.html)
 - [`{doFuture}` Vignette](https://cran.r-project.org/web/packages/doFuture/vignettes/doFuture.html)
 - [`{foreach}` Vignette](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html)
+- [`{furrr}` Website](https://furrr.futureverse.org/)
 
-# Overview
+# Motivation
+
+- [Parallel computing](https://en.wikipedia.org/wiki/Parallel_computing) is where you run many processes at the same time.
+
+- E.g., suppose I run this code to calculate the mean of a sample of 10 uniformly distributed observations.
+
+    ```{r}
+    nsamp <- 1000
+    nind <- 10
+    outvec <- rep(NA_real_, length.out = nsamp)
+    for (i in seq_len(nsamp)) {
+      outvec[[i]] <- mean(runif(nind))
+    }
+    ```
+    Each iteration does not depend on any other iteration, so we could potentially run each iteration independently and simultaneously.
+    
+- This could potentially speed things up:
+
+    ```{r, echo = FALSE, out.width = "50%"}
+    knitr::include_graphics(path = "./09_figs/parallel.png")
+    ```
+
+    
+- Parallel processing can be beneficial if
+    1. You have independent iterations (though this can be relaxed in more complicated computations).
+    2. Each iteration takes awhile (not a millionth of a second).
+    3. You aren't passing huge datasets around each iteration.
+    
+- Sometimes, if you have a quick for-loop, the overhead of parallelization actually can slow things down. This is why parts 2 and 3 are important.
+
+- We will talk about a relatively new approach to parallel processing in R through the use of "futures".
+
+# Future Overview
 
 - A [**future**](https://en.wikipedia.org/wiki/Futures_and_promises) is a value that may be available at some point in the future. This value is the result of an (either evaluated or unevaluated) expression.
 
@@ -68,6 +101,21 @@ klippy::klippy()
     ```{r}
     x + 1
     ```
+
+- You can create futures using `%<-%`, like I did above, but it is more common to use a the `{future}` package as a backend to a more familiar API. 
+    - [`{furrr}`](https://cran.r-project.org/package=furrr): Using the `{purrr}` API.
+    - [`{foreach}`](https://cran.r-project.org/web/packages/foreach/index.html): Uses a for-loop API.
+    - [`{future.apply}`](https://cran.r-project.org/package=future.apply): Uses base R vectorization API (like `apply()`, `sapply()`, `vapply()`, etc)
+
+# Evaluation Plans
+
+- You use `future::plan()` to dtermine if a future will be evaluated sequentially or in parallel using a particular strategy.
+
+- `plan("sequential")` is the default and basically just runs R like you normall would.
+
+# `{foreach}`
+
+# `{furrr}`
 
 # New Functions
 
