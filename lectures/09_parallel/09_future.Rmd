@@ -26,16 +26,48 @@ klippy::klippy()
 
 - Futures, batch jobs, parallel processing.
 - [Comprehensive Overview of Futures](https://future.futureverse.org/articles/future-1-overview.html)
+- [`{doFuture}` Vignette](https://cran.r-project.org/web/packages/doFuture/vignettes/doFuture.html)
+- [`{foreach}` Vignette](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html)
 
 # Overview
 
-- **future** is the result of an expression that may or may not have been evaluated.
+- A [**future**](https://en.wikipedia.org/wiki/Futures_and_promises) is a value that may be available at some point in the future. This value is the result of an (either evaluated or unevaluated) expression.
 
-- When you use a future, you evaluate the expression and get the result.
+- The [`{future}`](https://future.futureverse.org/) package implements a nice future data structure built on top of environments.
+
+    ```{r}
+    library(future)
+    ```
+
+- When you create a future, you create something that may eventually have a value.
+
+- When you use a future, you evaluate the expression, obtain that value, and use that value.
 
 - Futures can be evaluated sequentially or in parallel, on the same machine or on a distributed cluster of machines.
 
 - The idea of a future is that you can write the **same R code** for sequential single computer jobs, as well as for large parallel jobs on the supercomputer, and the R code will work in both scenarios. This is pretty awesome.
+
+- This is also great because different types of parallel processing sometimes require different types of code. Using a future means that you don't need to worry about the parallel processing environment.
+
+- Example: Below, we do normal evaluation, binding `x` to 10. This is evaluated right away, and so `"Hello World"` is printed.
+    ```{r}
+    x <- {
+          cat("Hello World\n")
+          10
+         }
+    x + 1
+    ```
+    Below, we create a future that is not evaluated right away, so `"Hello World"` is not printed. It just can be evaluated at some point.
+    ```{r}
+    x %<-% {
+            cat("Hello World\n")
+            10
+           }
+    ```
+    When we use `x`, then the future is evaluated, the expression runs, and "Hello World" is printed.
+    ```{r}
+    x + 1
+    ```
 
 # New Functions
 
