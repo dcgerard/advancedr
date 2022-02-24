@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-23" />
+<meta name="date" content="2022-02-24" />
 
 <title>Rcpp Sugar</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Rcpp Sugar</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-23</h4>
+<h4 class="date">2022-02-24</h4>
 
 </div>
 
@@ -376,6 +376,7 @@ $(document).ready(function () {
 <li><a href="#utility-funtions">Utility Funtions</a></li>
 <li><a href="#statistical-functions">Statistical Functions</a></li>
 </ul></li>
+<li><a href="#lists">Lists</a></li>
 <li><a href="#exercises">Exercises:</a></li>
 </ul>
 </div>
@@ -387,7 +388,7 @@ $(document).ready(function () {
 <div id="learning-objectives" class="section level1">
 <h1>Learning Objectives</h1>
 <ul>
-<li>Chapters 11, 21–22 of <a href="https://teuder.github.io/rcpp4everyone_en/">Rcpp for Everyone</a></li>
+<li>Chapters 11, 13, 21–22 of <a href="https://teuder.github.io/rcpp4everyone_en/">Rcpp for Everyone</a></li>
 <li>Chapter 25 of <a href="https://adv-r.hadley.nz/rcpp.html">Advanced R</a></li>
 <li><a href="https://dirk.eddelbuettel.com/code/rcpp/Rcpp-quickref.pdf">Rcpp Quick Reference Guide</a></li>
 <li><a href="https://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf">Rcpp syntactic sugar</a></li>
@@ -577,37 +578,110 @@ $(document).ready(function () {
 </ul>
 </div>
 </div>
+<div id="lists" class="section level1">
+<h1>Lists</h1>
+<ul>
+<li><p>Rcpp provides a <code>List</code> class that you can use to return (named) lists to R. I know three ways to create them:</p></li>
+<li><p>Create an unnamed list:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="op">::</span>List L1 <span class="op">=</span> Rcpp<span class="op">::</span>List<span class="op">::</span>create<span class="op">(</span>x<span class="op">,</span> y<span class="op">,</span> z<span class="op">);</span></span></code></pre></div></li>
+<li><p>Create a named list:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="op">::</span>List L2 <span class="op">=</span> Rcpp<span class="op">::</span>List<span class="op">::</span>create<span class="op">(</span>Rcpp<span class="op">::</span>Named<span class="op">(</span><span class="st">&quot;name1&quot;</span><span class="op">)</span> <span class="op">=</span> x<span class="op">,</span> _<span class="op">[</span><span class="st">&quot;name2&quot;</span><span class="op">]</span> <span class="op">=</span> y<span class="op">,</span> _<span class="op">[</span><span class="st">&quot;name3&quot;</span><span class="op">]</span> <span class="op">=</span> z<span class="op">);</span></span></code></pre></div></li>
+<li><p>Create a list then add elements.</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="op">::</span>List L3<span class="op">;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>L3<span class="op">[</span><span class="st">&quot;x&quot;</span><span class="op">]</span> <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>L3<span class="op">[</span><span class="st">&quot;y&quot;</span><span class="op">]</span> <span class="op">=</span> y<span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>L3<span class="op">[</span><span class="st">&quot;z&quot;</span><span class="op">]</span> <span class="op">=</span> z<span class="op">;</span></span></code></pre></div></li>
+<li><p>Let’s demonstrate these:</p>
+<p><mark style="background-color: LightCoral">C++</mark></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>List gl1<span class="op">(</span>NumericVector x<span class="op">,</span> <span class="dt">bool</span> y<span class="op">,</span> CharacterVector z<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  List L1 <span class="op">=</span> List<span class="op">::</span>create<span class="op">(</span>x<span class="op">,</span> y<span class="op">,</span> z<span class="op">);</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> L1<span class="op">;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>List gl2<span class="op">(</span>NumericVector x<span class="op">,</span> <span class="dt">bool</span> y<span class="op">,</span> CharacterVector z<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  List L2 <span class="op">=</span> List<span class="op">::</span>create<span class="op">(</span>Named<span class="op">(</span><span class="st">&quot;x&quot;</span><span class="op">)</span> <span class="op">=</span> x<span class="op">,</span> _<span class="op">[</span><span class="st">&quot;y&quot;</span><span class="op">]</span> <span class="op">=</span> y<span class="op">,</span> _<span class="op">[</span><span class="st">&quot;z&quot;</span><span class="op">]</span> <span class="op">=</span> z<span class="op">);</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> L2<span class="op">;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>List gl3<span class="op">(</span>NumericVector x<span class="op">,</span> <span class="dt">bool</span> y<span class="op">,</span> CharacterVector z<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  List L3<span class="op">;</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  L3<span class="op">[</span><span class="st">&quot;x&quot;</span><span class="op">]</span> <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  L3<span class="op">[</span><span class="st">&quot;y&quot;</span><span class="op">]</span> <span class="op">=</span> y<span class="op">;</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  L3<span class="op">[</span><span class="st">&quot;z&quot;</span><span class="op">]</span> <span class="op">=</span> z<span class="op">;</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> L3<span class="op">;</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">2.1</span>, <span class="dv">43</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;hello&quot;</span>, <span class="st">&quot;world&quot;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">gl1</span>(x, y, z)</span></code></pre></div>
+<pre><code>## [[1]]
+## [1]  1.0  2.1 43.0
+## 
+## [[2]]
+## [1] TRUE
+## 
+## [[3]]
+## [1] &quot;hello&quot; &quot;world&quot;</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gl2</span>(x, y, z)</span></code></pre></div>
+<pre><code>## $x
+## [1]  1.0  2.1 43.0
+## 
+## $y
+## [1] TRUE
+## 
+## $z
+## [1] &quot;hello&quot; &quot;world&quot;</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gl3</span>(x, y, z)</span></code></pre></div>
+<pre><code>## $x
+## [1]  1.0  2.1 43.0
+## 
+## $y
+## [1] TRUE
+## 
+## $z
+## [1] &quot;hello&quot; &quot;world&quot;</code></pre></li>
+<li><p>You usually only create <code>List</code>s at the very end of a function that you then want to return to R.</p></li>
+</ul>
+</div>
 <div id="exercises" class="section level1">
 <h1>Exercises:</h1>
 <ol style="list-style-type: decimal">
 <li><p>Use Rcpp Sugar to create a function called <code>msamp()</code> where the user inputs a sample size <code>n</code> and the output is the mean of a random sample of size <code>n</code> from a standard uniform distribution (over <span class="math inline">\([0,1]\)</span>). E.g.</p>
 <p><mark style="background-color: lightblue">R</mark></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">msamp</span>(<span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">msamp</span>(<span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## [1] 0.2655</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">msamp</span>(<span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">msamp</span>(<span class="dv">10</span>)</span></code></pre></div>
 <pre><code>## [1] 0.5456</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">msamp</span>(<span class="dv">100</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">msamp</span>(<span class="dv">100</span>)</span></code></pre></div>
 <pre><code>## [1] 0.5229</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">msamp</span>(<span class="dv">1000</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">msamp</span>(<span class="dv">1000</span>)</span></code></pre></div>
 <pre><code>## [1] 0.4957</code></pre></li>
 <li><p>The <a href="https://en.wikipedia.org/wiki/Multinomial_distribution">multinomial distribution</a> has PMF <span class="math display">\[
  \frac{n!}{x_1!x_2!\cdots x_k!}p_1^{x_1}p_2^{x_2}\ldots p_k^{x_k}
  \]</span> Here, <span class="math inline">\(x_i\)</span> is the number of counts in category <span class="math inline">\(i\)</span> and <span class="math inline">\(n\)</span> is the total number of counts, so <span class="math inline">\(n = x_1 + x_2 + \cdots + x_n\)</span>. Also, <span class="math inline">\(p_i\)</span> is the probability of category <span class="math inline">\(i\)</span>. Use Rcpp Sugar to create a function called <code>dmultinom_cpp()</code> that will take as input a <code>NumericVector</code> <code>x</code>, a <code>NumericVector</code> <code>p</code>, and a <code>bool</code> <code>lg</code> and return the log-PMF if <code>lg = true</code> and return the PMF if <code>lg = false</code>. For numerical stability, you should calculate the log values at each step and only exponentiate at the end (this is very typical in numerical computing). You can assume that all values of <span class="math inline">\(p_i\)</span> are non-zero.</p>
 <p><em>Hint</em>: We have the relationship that <span class="math inline">\(\Gamma(n + 1) = n!\)</span>. This is needed for doing log-factorial on scalars.</p>
 <p><mark style="background-color: lightblue">R</mark></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">log =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">log =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## [1] -2.294</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom_cpp</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">lg =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom_cpp</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">lg =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## [1] -2.294</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">log =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">log =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## [1] 0.1008</code></pre>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom_cpp</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">lg =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmultinom_cpp</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">0.2</span>), <span class="at">lg =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## [1] 0.1008</code></pre></li>
 <li><p>Write a function called <code>scale01()</code> that takes as input a <code>NumericVector</code>, subtracts the minimum value, and divides by the maximum value of the resulting vector. So it scales all observations to be between 0 and 1. Use Rcpp Sugar.</p>
 <p><mark style="background-color: lightblue">R</mark></p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">6</span><span class="sc">:</span><span class="dv">10</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">scale01</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">6</span><span class="sc">:</span><span class="dv">10</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">scale01</span>(x)</span></code></pre></div>
 <pre><code>## [1] 0.00 0.25 0.50 0.75 1.00</code></pre></li>
 </ol>
 </div>

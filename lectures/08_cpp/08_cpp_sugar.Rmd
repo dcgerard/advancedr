@@ -33,7 +33,7 @@ using namespace Rcpp;
 
 # Learning Objectives
 
-- Chapters 11, 21--22 of [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
+- Chapters 11, 13, 21--22 of [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
 - Chapter 25 of [Advanced R](https://adv-r.hadley.nz/rcpp.html)
 - [Rcpp Quick Reference Guide](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-quickref.pdf)
 - [Rcpp syntactic sugar](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf)
@@ -246,6 +246,79 @@ Rcpp::cppFunction(
 - `dpois()`, `qpois()`, `ppois()`, `rpois()`: [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution).
 - `dt()`, `qt()`, `pt()`, `rt()`: [$t$-distribution](https://en.wikipedia.org/wiki/Student%27s_t-distribution).
 - `dunif()`, `qunif()`, `punif()`, `runif()`: [Uniform distribution](https://en.wikipedia.org/wiki/Continuous_uniform_distribution).
+
+
+# Lists
+
+- Rcpp provides a `List` class that you can use to return (named) lists to R. I know three ways to create them:
+
+- Create an unnamed list:
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    Rcpp::List L1 = Rcpp::List::create(x, y, z);
+    ```
+
+- Create a named list:
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    Rcpp::List L2 = Rcpp::List::create(Rcpp::Named("name1") = x, _["name2"] = y, _["name3"] = z);
+    ```
+    
+- Create a list then add elements.
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    Rcpp::List L3;
+    L3["x"] = x;
+    L3["y"] = y;
+    L3["z"] = z;
+    ```
+
+- Let's demonstrate these:
+
+    <mark style="background-color: LightCoral">C++</mark>
+    
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    List gl1(NumericVector x, bool y, CharacterVector z) {
+      List L1 = List::create(x, y, z);
+      return L1;
+    }
+    
+    // [[Rcpp::export]]
+    List gl2(NumericVector x, bool y, CharacterVector z) {
+      List L2 = List::create(Named("x") = x, _["y"] = y, _["z"] = z);
+      return L2;
+    }
+    
+    // [[Rcpp::export]]
+    List gl3(NumericVector x, bool y, CharacterVector z) {
+      List L3;
+      L3["x"] = x;
+      L3["y"] = y;
+      L3["z"] = z;
+      return L3;
+    }
+    ```
+    
+    <mark style="background-color: lightblue">R</mark>
+    
+    ```{r}
+    x <- c(1, 2.1, 43)
+    y <- TRUE
+    z <- c("hello", "world")
+    
+    gl1(x, y, z)
+    gl2(x, y, z)
+    gl3(x, y, z)
+    ```
+
+- You usually only create `List`s at the very end of a function that you then want to return to R.
 
 # Exercises:
 

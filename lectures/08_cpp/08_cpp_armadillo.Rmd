@@ -446,8 +446,38 @@ using namespace arma;
     ```{r}
     ex5()
     ```
+    
+- You can extract columns and rows with `A.col()` and `A.row(s)`. When you do this, it uses value semantics, not reference semantics, so you can edit any newly defined Armadillo vectors without modifying `A`. You can also set columns with `A.col(col_num) = x`.
 
-- Useful fields for `Mat` fields:
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    void ex6() {
+      mat A = {{1.0, 2.0}, {3.0, 4.0}, {5.0, 6.0}};
+      Rcpp::Rcout << "A:" << std::endl << A << std::endl;
+      
+      vec x = A.col(1); // second column
+      Rcpp::Rcout << "x:" << std::endl << x << std::endl;
+      
+      x(0) = 10.0;
+      Rcpp::Rcout << "x:" << std::endl << x << std::endl; // changed
+      Rcpp::Rcout << "A:" << std::endl << A << std::endl; // unchanged
+      
+      vec a = {7.0, 8.0, 9.0};
+      A.col(0) = a;
+      Rcpp::Rcout << "A:" << std::endl << A << std::endl; // unchanged
+    }
+    ```
+    
+    <mark style="background-color: lightblue">R</mark>
+    
+    ```{r}
+    ex6()
+    ```
+
+
+- Number of rows/columns/elements from a `Mat` object:
 
     - `A.n_elem`: Number of elements in matrix `A`.
     - `A.n_rows`: Number of rows in matrix `A`.
@@ -477,7 +507,7 @@ using namespace arma;
     
     ```{Rcpp, eval = FALSE}
     // [[Rcpp::export]]
-    void ex6() {
+    void ex7() {
       mat A = ones<mat>(2, 3);
       Rcpp::Rcout << "A: " << std::endl << A << std::endl;
       
@@ -493,8 +523,9 @@ using namespace arma;
     <mark style="background-color: lightblue">R</mark>
         
     ```{r}
-    ex6()
+    ex7()
     ```
+
 
 # Linear Algebra Operations
 
@@ -608,6 +639,13 @@ using namespace arma;
     mat R;
     qr(Q, R, X);
     ```
+    
+- Sometimes, you want to convert a $1\times 1$ matrix to a double. This usually happens when you do a [dot product](https://en.wikipedia.org/wiki/Dot_product). You can do that with `arma::as_scalar()`.
+
+    ``` cpp
+    vec x = {1.0, 2.0, 3.0};
+    double ss = as_scalar(x.t() * x);
+    ```
 
 - **Example**: This isn't the most efficient way to find the OLS estimates from a regression, but we can just calculate
 
@@ -641,7 +679,9 @@ using namespace arma;
     coef(lm(mpg ~ wt, data = mtcars))
     ```
     
-- I called it `stupid_ols()` because calculating an inverse is generally a computationally unstable task (but in this scenario, it's probably OK). It's better to use `solve()` here, but folks have thought very hard about this simple problem [@farebrother1988linear]:
+- I called it `stupid_ols()` because calculating an inverse is generally a computationally unstable task (but in this scenario, it's probably OK). In numerical computing, you try to avoid calculating an inverse unless you are returning the inverse to a user. In which case, you should calculate the inverse only during the final step.
+
+- It's better to use `solve()` here, but folks have thought very hard about this seemingly simple problem [@farebrother1988linear]:
 
     <mark style="background-color: LightCoral">C++</mark>
 
@@ -659,7 +699,7 @@ using namespace arma;
     arma_ols(X = X, y = y)
     ```
     
-- Let's compare performance when we have a large number of covariates.
+- Let's compare performance when we have a large number of covariates (note: `lm()` returns a lot more stuff, so this only says that when we only want coefficient estimates we can do better).
 
     <mark style="background-color: lightblue">R</mark>
     
@@ -674,6 +714,65 @@ using namespace arma;
       check = FALSE
     )[1:8] |>
       knitr::kable()
+    ```
+    
+- **Exercise**: The fitted values are defined as
+    $$
+    \hat{y} = X\hat{\beta} = X(X^TX)^{-1}X^Ty.
+    $$
+    The residuals are defined as
+    $$
+    e = y - \hat{y} = (I_n - X(X^TX)^{-1}X^T)y.
+    $$
+    The MSE is defined as
+    $$
+    \hat{\sigma}^2 = e^Te / (n - p),
+    $$
+    where $n$ is the samples size (number of rows in $X$) and $p$ is the number of parameters (number of columns in $X$). The estimated [covariance matrix](https://en.wikipedia.org/wiki/Covariance_matrix) of $\hat{\beta}$ is
+    $$
+    \hat{\sigma}^2 (X^TX)^{-1}.
+    $$
+    Implement all of these equations in Armadillo in one function and return the result as a list. Compare your calculations to the result of `stats::lm()`.
+    
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    List lm_cpp(mat X, vec y) {
+      mat xxi = inv(X.t() * X);
+      vec betahat = xxi * X.t() * y;
+      vec yhat = X * betahat;
+      vec e = y - yhat;
+      double df = (double)X.n_rows - (double)X.n_cols;
+      double sigma2 = as_scalar(e.t() * e) / df;
+      mat vcov = sigma2 * xxi;
+      
+      
+      List ret;
+      ret["betahat"] = betahat;
+      ret["yhat"] = yhat;
+      ret["e"] = e;
+      ret["sigma"] = std::sqrt(sigma2);
+      ret["df"] = df;
+      ret["vcov"] = vcov;
+      return ret;
+    }
+    ```
+    
+    ```{r, echo = FALSE, eval = FALSE}
+    X <- model.matrix(mpg ~ ., data = mtcars)
+    y <- mtcars$mpg
+    cout <- lm_cpp(X = X, y = y)
+    lout <- lm(mpg ~ ., data = mtcars)
+    cout$sigma
+    sigma(lout)
+    
+    cout$vcov
+    vcov(lout)
+    
+    bench::mark(
+      cout <- lm_cpp(X = X, y = y),
+      lout <- lm(mpg ~ ., data = mtcars),
+      check = FALSE
+    )
     ```
 
 
