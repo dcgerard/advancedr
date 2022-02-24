@@ -237,7 +237,7 @@ tcl = -.25)
     1. If your code changes in a breaking way, your unit tests will alert you. This makes you more confident to make robust changes to your code.
     2. I often find bugs while I create unit tests. Describing what I expect and testing out corner cases formally lowers the chance of a bug ending up in your final product.
 
-- `{testthat}` is one of the R package that implements unit tests in R. The second most popular one is probably `{RUnit}`.
+- `{testthat}` is one of the R package that implements unit tests in R. The other popular ones are probably [`{RUnit}`](https://cran.r-project.org/package=RUnit) and [`{tinytest}`](https://cran.r-project.org/package=tinytest).
 
     ```{r}
     library(testthat)

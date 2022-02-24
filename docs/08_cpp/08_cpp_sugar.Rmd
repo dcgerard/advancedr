@@ -33,10 +33,362 @@ using namespace Rcpp;
 
 # Learning Objectives
 
-- Chapters 21--22 of [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
+- Chapters 11, 13, 21--22 of [Rcpp for Everyone](https://teuder.github.io/rcpp4everyone_en/)
 - Chapter 25 of [Advanced R](https://adv-r.hadley.nz/rcpp.html)
 - [Rcpp Quick Reference Guide](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-quickref.pdf)
 - [Rcpp syntactic sugar](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf)
 - Learning Objectives:
     - R-like functions implemented by Rcpp
 
+# Motivation
+
+- C++ is pretty esoteric --- you have to keep track of a lot of boilerplate to implement anything.
+
+- Rcpp Sugar is a set of functions that comes with Rcpp to allow you to code in C++ in ways that looks like R code.
+
+- This is not how C++ programmers do things, but it makes it easy for you (an expert R programmer) to code in C++ when you want just something to help your R code.
+
+# Arithmetic Operations
+
+- With Rcpp Sugar, you can do vectorized arithmetic operations as you would in R, as long as you are using Rcpp vectors (examples below from [Rcpp-sugar](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf)).
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    // two numeric vectors of the same size
+    NumericVector x;
+    NumericVector y;
+    
+    // expressions involving two vectors
+    NumericVector res = x + y;
+    NumericVector res = x - y;
+    NumericVector res = x * y;
+    NumericVector res = x / y;
+    
+    // one vector, one single value
+    NumericVector res = x + 2.0;
+    NumericVector res = 2.0 - x;
+    NumericVector res = y * 2.0;
+    NumericVector res = 2.0 / y;
+    ```
+
+# Logical Operations
+
+- You can create `LogicalVector`s as you would in R using logical operators.
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    // two integer vectors of the same size
+    NumericVector x;
+    NumericVector y;
+    
+    // expressions involving two vectors
+    LogicalVector res = x < y;
+    LogicalVector res = x > y;
+    LogicalVector res = x <= y;
+    LogicalVector res = x >= y;
+    LogicalVector res = x == y;
+    LogicalVector res = x != y;
+    
+    // one vector, one single value
+    LogicalVector res = x < 2;
+    LogicalVector res = 2 > x;
+    LogicalVector res = y <= 2;
+    LogicalVector res = 2 != y;
+    ```
+
+# R-like Functions
+
+- There are tons of R-like functions that work on these vectors. These are the ones I use most often:
+
+## Vector to Vector Math Functions
+
+All of these take a numeric vector in, and return a numeric vector.
+
+- `abs()`: Absolute value
+- `ceil()`: Round up.
+- `cummax()`: Cumulative maximum.
+- `cummin()`: Cumulative minimum.
+- `cumprod()`: Cumulative product.
+- `cumsum()`: Cumulative summation.
+- `exp()`: Exponentiation $e^x$.
+- `expm1()`: Exponentiation minus 1 (numerically stable for `x` close to 0). $e^x - 1$.
+- `factorial()`: $x!$
+- `floor()`: Round down.
+- `gamma()`: [Gamma function](https://en.wikipedia.org/wiki/Gamma_function).
+- `lbeta()`: Log of the [beta function](https://en.wikipedia.org/wiki/Beta_function).
+- `lchoose()`: Log of [combination](https://en.wikipedia.org/wiki/Combination).
+- `lfactorial()`: Log of [factorial](https://en.wikipedia.org/wiki/Factorial).
+- `lgamma()`: Log of [gamma function](https://en.wikipedia.org/wiki/Gamma_function)
+- `log()`: Natural logarithm.
+- `log10()`: Base 10 logarithm.
+- `log1p()`: Log of one plus (numerically stable for `x` close to 0). $\log(1 + x)$.
+- `pmin()`: Point-wise minimum of two-vectors.
+- `pmax()`: Point-wise maximum of two-vectors.
+- `pow()`: Powers.
+- `round()`: Round to nearest integer.
+- `sqrt()`: Square root
+
+## Summary Math Functions
+
+All of these take a numeric vector in, and return a scalar.
+
+- `max()`: Maximum.
+- `mean()`: Sample arithmetic mean.
+- `median()`: Median.
+- `min()`: Minimum.
+- `range()`: Returns a `NumericVector` of length 2 that contains the minimum and the maximum.
+- `sd()`: Standard deviation.
+- `sum()`: Summation.
+- `var()`: Variance.
+
+## Predicate Functions
+
+- `all()`: returns `TRUE` if all object elements are `TRUE`.
+- `any()`: Returns `TRUE` if any of the elements are `TRUE`.
+- `ifelse()`: Vectorized `if-else` statements.
+- `is_finite()`: Returns `TRUE` if not infinite.
+- `is_infinite()`: Returns `TRUE` if infinite.
+- `is_na()`: Returns `TRUE` if missing.
+- `is_nan()`: Returns `TRUE` if `nan`.
+
+- All of these return `LogicalVector`s, which are built on `int` not `bool` (because in R there is `NA`, but there is no `NA` equivalent in `bool`).
+
+- One consequence is that `all()` and `any()` do not return a `bool` object, so you cannot use them directly in `if-else` statements. 
+
+- Instead, wrap `all()` and `any()` inside `is_true()` or `is_false()` to convert it to a `bool`.
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    if (is_true(all(v))) {
+    
+    }
+    ```
+    
+- Another consequence is that you should not use individual elements of `LogicalVector`'s in `if-then` statements because `NA`'s will evaluate to the bool type `true`. 
+
+- Instead, check if an element is `TRUE` (which is an object defined by Rcpp different from `true`).
+
+- E.g. if `v` is a `LogicalVector` then do:
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    if (v[i]==TRUE) {
+    
+    } else if (v[i]==FALSE) {
+    
+    } else if (v[i]==NA_LOGICAL) {
+    
+    } else {
+    
+    }
+    ```
+    
+- **Example**:
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    Rcpp::NumericVector x = {1.0, 2.0, 3.0};
+    Rcpp::LogicalVector z = x > 2;
+    if (z(2) == TRUE) {
+      Rcpp::Rcout << "Hello" << std::endl;
+    }
+    ```
+
+## Utility Funtions
+
+- `diff(x)`: Lagged differences.
+- `match(v, table)`: Same as R's `match()` function. Note that the indexing starts at 1 (R style), not 0, in what is returned.
+- `rep(x, n)`: Repeat a vector `n` times.
+- `rev(x)`: Return a vector whose elements are in reverse order.
+- `sample(Vector x, int size, replace = false, probs = R_NilValue)`: Sample from a vector. Same as the R function `sample()`.
+- `seq(start, end)`: Returns a vector of consecutive integers from start to end.
+- `seq_along(x)`: Returns a vector of consecutive integers from `1` to the length of a vector (does not start at 0).
+- `seq_len(n)`: Returns a vector of consecutive integers from `1` to `n` (does not start at 0).
+- `setdiff(v1, v2)`: Returns a vector of differences.
+- `setequal(v1, v2)`: Returns `true` if unique elements in `v1` equal unique elements in `v2`.
+- `unique(v)`: Returns a vector of unique values of v.
+- `which_max(v)`: Returns the numerical index of the largest element. This is C-style indices, so starts at 0.
+- `which_min(v)`: Returns the numerical index of the smallest element. This is C-style indices, so starts at 0.
+
+```{r, eval = FALSE, echo = FALSE}
+Rcpp::cppFunction(
+  code = '
+  int temp() {
+    Rcpp::IntegerVector vec = {1, 5, 2};
+    int x = Rcpp::which_max(vec);
+    return x;
+  }
+  '
+)
+```
+
+## Statistical Functions
+
+- `d`/`q`/`p`/`r` (density/quantile/probability/random generation) functions exist for a variety of distributions. These allow for inputting and outputting `NumericVector`s (whereas the `Rmath` library only allows for scalar inputs and outputs).
+
+- See [Distribution functions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Distribution-functions) for details on parameterizations.
+
+- `dbeta()`, `qbeta()`, `pbeta()`, `rbeta()`: [Beta distribution](https://en.wikipedia.org/wiki/Beta_distribution).
+- `dbinom()`, `qbinom()`, `pbinom()`, `rbinom()`: [Binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution).
+- `dchisq()`, `qchisq()`, `pchisq()`, `rchisq()`: [Chi-squared distribution](https://en.wikipedia.org/wiki/Chi-squared_distribution).
+- `dexp()`, `qexp()`, `pexp()`, `rexp()`: [Exponential distribution](https://en.wikipedia.org/wiki/Exponential_distribution) using scale (and **not** rate) parameterization.
+- `df()`, `qf()`, `pf()`, `rf()`: [$F$-distribution](https://en.wikipedia.org/wiki/F-distribution).
+- `dgamma()`, `qgamma()`, `pgamma()`, `rgamma()`: [Gamma distribution](https://en.wikipedia.org/wiki/Gamma_distribution) using the shape and scale parameterization.
+- `dgeom()`, `qgeom()`, `pgeom()`, `rgeom()`: [Geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution).
+- `dhyper()`, `qhyper()`, `phyper()`, `rhyper()`: [Hypergeometric distribution](https://en.wikipedia.org/wiki/Hypergeometric_distribution).
+- `dnbinom()`, `qnbinom()`, `pnbinom()`, `rnbinom()`: [Negative Binomial distribution](https://en.wikipedia.org/wiki/Negative_binomial_distribution).
+- `dnorm4()`, `qnorm5()`, `pnorm5()`, `rnorm()`: [Normal distribution](https://en.wikipedia.org/wiki/Normal_distribution).
+- `dpois()`, `qpois()`, `ppois()`, `rpois()`: [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution).
+- `dt()`, `qt()`, `pt()`, `rt()`: [$t$-distribution](https://en.wikipedia.org/wiki/Student%27s_t-distribution).
+- `dunif()`, `qunif()`, `punif()`, `runif()`: [Uniform distribution](https://en.wikipedia.org/wiki/Continuous_uniform_distribution).
+
+
+# Lists
+
+- Rcpp provides a `List` class that you can use to return (named) lists to R. I know three ways to create them:
+
+- Create an unnamed list:
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    Rcpp::List L1 = Rcpp::List::create(x, y, z);
+    ```
+
+- Create a named list:
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    Rcpp::List L2 = Rcpp::List::create(Rcpp::Named("name1") = x, _["name2"] = y, _["name3"] = z);
+    ```
+    
+- Create a list then add elements.
+
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
+    Rcpp::List L3;
+    L3["x"] = x;
+    L3["y"] = y;
+    L3["z"] = z;
+    ```
+
+- Let's demonstrate these:
+
+    <mark style="background-color: LightCoral">C++</mark>
+    
+    ```{Rcpp, eval = FALSE}
+    // [[Rcpp::export]]
+    List gl1(NumericVector x, bool y, CharacterVector z) {
+      List L1 = List::create(x, y, z);
+      return L1;
+    }
+    
+    // [[Rcpp::export]]
+    List gl2(NumericVector x, bool y, CharacterVector z) {
+      List L2 = List::create(Named("x") = x, _["y"] = y, _["z"] = z);
+      return L2;
+    }
+    
+    // [[Rcpp::export]]
+    List gl3(NumericVector x, bool y, CharacterVector z) {
+      List L3;
+      L3["x"] = x;
+      L3["y"] = y;
+      L3["z"] = z;
+      return L3;
+    }
+    ```
+    
+    <mark style="background-color: lightblue">R</mark>
+    
+    ```{r}
+    x <- c(1, 2.1, 43)
+    y <- TRUE
+    z <- c("hello", "world")
+    
+    gl1(x, y, z)
+    gl2(x, y, z)
+    gl3(x, y, z)
+    ```
+
+- You usually only create `List`s at the very end of a function that you then want to return to R.
+
+# Exercises:
+
+1. Use Rcpp Sugar to create a function called `msamp()` where the user inputs a sample size `n` and the output is the mean of a random sample of size `n` from a standard uniform distribution (over $[0,1]$). E.g.
+
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    double msamp(int n) {
+      Rcpp::NumericVector x = Rcpp::runif(n);
+      double m = Rcpp::mean(x);
+      return m;
+    }
+    ```
+    
+    <mark style="background-color: lightblue">R</mark>
+    
+    ```{r}
+    set.seed(1)
+    msamp(1)
+    msamp(10)
+    msamp(100)
+    msamp(1000)
+    ```
+
+2. The [multinomial distribution](https://en.wikipedia.org/wiki/Multinomial_distribution) has PMF
+    $$
+    \frac{n!}{x_1!x_2!\cdots x_k!}p_1^{x_1}p_2^{x_2}\ldots p_k^{x_k}
+    $$
+    Here, $x_i$ is the number of counts in category $i$ and $n$ is the total number of counts, so $n = x_1 + x_2 + \cdots + x_n$. Also, $p_i$ is the probability of category $i$. Use Rcpp Sugar to create a function called `dmultinom_cpp()` that will take as input a `NumericVector` `x`, a `NumericVector` `p`, and a `bool` `lg` and return the log-PMF if `lg = true` and return the PMF if `lg = false`. For numerical stability, you should calculate the log values at each step and only exponentiate at the end (this is very typical in numerical computing). You can assume that all values of $p_i$ are non-zero.
+    
+    *Hint*: We have the relationship that $\Gamma(n + 1) = n!$. This is needed for doing log-factorial on scalars.
+    
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    double dmultinom_cpp(NumericVector x, NumericVector p, bool lg = false) {
+      double n = sum(x);
+      double ret = std::lgamma(n + 1.0) - sum(lfactorial(x)) + sum(x * log(p));
+      if (!lg) {
+        ret = std::exp(ret);
+      }
+      return ret;
+    }
+    ```
+    
+    <mark style="background-color: lightblue">R</mark>
+        
+    ```{r}
+    dmultinom(x = c(1, 4, 2), p = c(0.1, 0.7, 0.2), log = TRUE)
+    dmultinom_cpp(x = c(1, 4, 2), p = c(0.1, 0.7, 0.2), lg = TRUE)
+    
+    dmultinom(x = c(1, 4, 2), p = c(0.1, 0.7, 0.2), log = FALSE)
+    dmultinom_cpp(x = c(1, 4, 2), p = c(0.1, 0.7, 0.2), lg = FALSE)
+    ```
+   
+3. Write a function called `scale01()` that takes as input a `NumericVector`, subtracts the minimum value, and divides by the maximum value of the resulting vector. So it scales all observations to be between 0 and 1. Use Rcpp Sugar.
+
+    ```{Rcpp, eval = FALSE, echo = FALSE}
+    // [[Rcpp::export]]
+    NumericVector scale01(NumericVector x) {
+      double minx = min(x);
+      double maxx = max(x);
+      x = (x - minx) / (maxx - minx);
+      return x;
+    }
+    ```
+    
+    <mark style="background-color: lightblue">R</mark>
+    
+    ```{r}
+    x <- 6:10
+    scale01(x)
+    ```
+    

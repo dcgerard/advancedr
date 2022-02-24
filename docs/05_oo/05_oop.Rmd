@@ -68,17 +68,26 @@ klippy::klippy()
     and then create a specific method for the `data.frame` class
     ```{r}
     col_means.data.frame <- function(x) {
-      mean_vec <- rep(NA_real_, length.out = length(x))
-      names(mean_vec) <- names(x)
-      for (i in seq_along(x)) {
-        mean_vec[[i]] <- mean(x[[i]])
-      }
-      mean_vec
+      sapply(x, mean)
     }
     ```
     Finally, we would call the generic function on a object of class `data.frame`.
     ```{r}
     col_means(mtcars)
+    ```
+
+- E.g.: To calculate the column means in S4 OOP is very similar, just more formal:
+
+    ```{r, message = FALSE}
+    setOldClass(Classes = "data.frame")
+    setGeneric(name = "col_means_s4", def = function(x) standardGeneric("col_means_s4"))
+    setMethod(f = "col_means_s4", 
+              signature = "data.frame", 
+              definition = function(x) {
+                sapply(x, mean)
+              }
+    )
+    col_means_s4(mtcars)
     ```
 
 - E.g.: To calculate the column means in R6 OOP, we would probably create a new class that has the `$col_means()` method that we could call.
@@ -92,8 +101,7 @@ klippy::klippy()
         self$df <- df
       },
       col_means = function() {
-        self$mean_vec <- rep(NA_real_, length.out = length(self$df))
-        for (i in seq_along(self$df)) self$mean_vec[[i]] <- mean(self$df[[i]])
+        self$mean_vec <- sapply(self$df, mean)
       }
     )
     )
@@ -127,7 +135,7 @@ klippy::klippy()
     mean(x) ## apply mean to x
     ```
     
-    <mark style="background-color: lightblue">Python</mark>
+    <mark style="background-color: GoldenRod">Python</mark>
     ```{python}
     import numpy as np
     x = np.array([19, 22, 31])
@@ -142,7 +150,7 @@ klippy::klippy()
 
 - **Polymorphism**: Use the same function name for different types of input, but have the function evaluate differently based on the types of input.
 
-- An **object** is a specific instance of a **class**. E.g. below, `x` is an object of class `factor`.
+- An **object** is a specific **instance** of a **class**. E.g. below, `x` is an object of class `factor`.
 
     ```{r}
     x <- factor(c(119, 22, 31))
@@ -198,7 +206,7 @@ klippy::klippy()
     attr(y, "class")
     ```
 
-- `class()` will return the result of `typeof()` if an object has no `class` attribute (so it is not the most useful for determining class).
+- `class()` will return the result of `typeof()` if an object has no `class` attribute, this is called its **implicit class**.
 
     ```{r}
     class(x)

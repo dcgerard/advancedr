@@ -254,7 +254,7 @@ klippy::klippy()
     class(x)
     ```
     
-- Thous, it is a little safer to use `sloop::s3_class()`.
+- Thus, it is a little safer to use `sloop::s3_class()`.
 
     ```{r}
     sloop::s3_class(x)

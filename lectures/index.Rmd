@@ -60,7 +60,7 @@ This repository contains material based upon work supported by the National Scie
   - [Rcpp Sugar](./08_cpp_sugar.html)
   - [Matrices / Matrix Operations](./08_cpp_armadillo.html)
 - 09 Parallel Processing
-  - Futures and Running R in Batch
+  - [Futures and Running R in Batch](./09_future.html)
   - Schedulers and LSF
 
 # Final Project

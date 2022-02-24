@@ -54,6 +54,8 @@ klippy::klippy()
 
 - In interactive mode, you can write a C++ function by using `Rcpp::cppFunction()`. You put the source code in quotes.
 
+    <mark style="background-color: lightblue">R</mark>
+
     ```{r}
     Rcpp::cppFunction(
       '
@@ -66,11 +68,15 @@ klippy::klippy()
 
 - You can then use that funciton like you would any usual R function.
 
+    <mark style="background-color: lightblue">R</mark>
+
     ```{r}
     hello_world()
     ```
 
 - More frequently, you have a C++ file (ending in ".cpp") that contains the following:
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ```{Rcpp, eval = FALSE}
     #include <Rcpp.h>
@@ -84,6 +90,8 @@ klippy::klippy()
     
     Suppose this file is called "hello.cpp", then you can load it into R using
     
+    <mark style="background-color: lightblue">R</mark>
+    
     ```{r, eval = FALSE}
     Rcpp::sourceCpp(file = "hello.cpp")
     ```
@@ -95,6 +103,9 @@ klippy::klippy()
 - `usethis::use_rcpp()` will automatically format an R package to have the appropriate structure for interfacing with `{Rcpp}`.
 
 - You will have to include these lines in your documentation somewhere. I typically include them in the documentation for the package. Make sure you replace `package_name` with the name of the package. Follow instructions from `{usethis}`
+
+    <mark style="background-color: lightblue">R</mark>
+
     ```{r, eval = FALSE}
     #' @useDynLib package_name, .registration = TRUE
     #' @importFrom Rcpp sourceCpp
@@ -118,6 +129,9 @@ klippy::klippy()
 - All C++ files end in ".cpp".
 
 - Every file should generally begin with
+
+    <mark style="background-color: LightCoral">C++</mark>
+
     ```{Rcpp, eval = FALSE}
     #include <Rcpp.h>
     using namespace Rcpp;
@@ -132,7 +146,9 @@ klippy::klippy()
 
 - A C++ function is of the form
 
-    ```
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
     ftype fname(arg1Type arg1, arg2Type arg2 = default2) {
       // code goes here
       return retval;
@@ -153,6 +169,8 @@ klippy::klippy()
 
 - For example, here I return the sum of two integers:
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ```{Rcpp}
     // [[Rcpp::export]]
     int add2(int x, int y) {
@@ -160,6 +178,8 @@ klippy::klippy()
       return sum;
     }
     ```
+    
+    <mark style="background-color: lightblue">R</mark>
     
     ```{r}
     add2(1, 2)
@@ -169,13 +189,17 @@ klippy::klippy()
 
 - If you want R to have access to an C++ function, you must include the exact line right above the function:
 
-    ```
+    <mark style="background-color: LightCoral">C++</mark>
+
+    ``` cpp
     // [[Rcpp::export]]
     ```
 
 - If you don't include this, it will still be available to your other C++ functions, but not to R.
 
 - You document C++ functions exactly like R code, except you begin `{roxygen2}` lines with `//'`.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ```{Rcpp, eval = FALSE}
     //' @title Add two integers
