@@ -34,7 +34,7 @@ klippy::klippy()
 
 - [Parallel computing](https://en.wikipedia.org/wiki/Parallel_computing) is where you run many processes at the same time.
 
-- E.g., suppose I run this code to calculate the mean of a sample of 10 uniformly distributed observations.
+- E.g., suppose I run this code to calculate the mean of a sample of 10 uniformly distributed observations, and repeat this 1000 times.
 
     ```{r}
     nsamp <- 1000
@@ -53,18 +53,20 @@ klippy::klippy()
     ```
 
     
-- Parallel processing can be beneficial if
-    1. You have independent iterations (though this can be relaxed in more complicated computations).
+- Parallel processing can be beneficial if all of the following are true:
+    1. You have independent iterations (though this can be relaxed in sophisticated and clever ways).
     2. Each iteration takes awhile (not a millionth of a second).
     3. You aren't passing huge datasets around each iteration.
     
 - Sometimes, if you have a quick for-loop, the overhead of parallelization actually can slow things down. This is why parts 2 and 3 are important.
 
+- E.g., we would never parallelize the for-loop example above.
+
 - We will talk about a relatively new approach to parallel processing in R through the use of "futures".
 
 # Future Overview
 
-- A [**future**](https://en.wikipedia.org/wiki/Futures_and_promises) is a value that may be available at some point in the future. This value is the result of an (either evaluated or unevaluated) expression.
+- A [**future**](https://en.wikipedia.org/wiki/Futures_and_promises) is a value that may be available at some point in the future. This value is the result of an expression (either evaluated or unevaluated).
 
 - The [`{future}`](https://future.futureverse.org/) package implements a nice future data structure built on top of environments.
 
@@ -101,21 +103,392 @@ klippy::klippy()
     ```{r}
     x + 1
     ```
+    
+- Alternatively, we can explicitly create a future with `future::future()`
+    ```{r}
+    f <- future({
+      cat("Hello World\n")
+      10
+    })
+    ```
+    and evaluate it with `future::value()`.
+    ```{r}
+    value(f) + 1
+    ```
 
-- You can create futures using `%<-%`, like I did above, but it is more common to use a the `{future}` package as a backend to a more familiar API. 
-    - [`{furrr}`](https://cran.r-project.org/package=furrr): Using the `{purrr}` API.
+
+- You can create futures using `%<-%` or `future::future()`, like I did above. But it is more common to use a the `{future}` package as a backend to a more familiar API. 
+    - [`{furrr}`](https://cran.r-project.org/package=furrr): Uses the `{purrr}` API.
     - [`{foreach}`](https://cran.r-project.org/web/packages/foreach/index.html): Uses a for-loop API.
     - [`{future.apply}`](https://cran.r-project.org/package=future.apply): Uses base R vectorization API (like `apply()`, `sapply()`, `vapply()`, etc)
 
 # Evaluation Plans
 
-- You use `future::plan()` to dtermine if a future will be evaluated sequentially or in parallel using a particular strategy.
+- You use `future::plan()` to determine if a future will be evaluated sequentially or in parallel using a particular strategy.
 
-- `plan("sequential")` is the default and basically just runs R like you normall would.
+- You basically just run `future::plan()` once, and the `{future}` package will automatically run processes according to your plan.
 
-# `{foreach}`
+- I am going to demonstrate plans by using the `Sys.getpid()` function, which returns the process ID of the R session. So different ID's means that the evaluation occurs on different processes.
+
+- Using this, the following with run `Sys.getpid()` three times:
+    ```{r}
+    purrr::map_int(c(1, 1, 1), ~Sys.getpid())
+    ```
+    
+- We will use `furrr::future_map_int()` instead to run these as futures.
+
+- `plan("sequential")` is the default and basically just runs R like you normally would. So all evaluation occurs in the same R process/session.
+    
+    ```{r}
+    plan("sequential")
+    furrr::future_map_int(c(1,1,1), ~Sys.getpid())
+    ```
+    
+- If your computer has multiprocessing or multithreading capabilities, then you can run your code in parallel. 
+
+- See how many cores you have available by
+
+    ```{r}
+    future::availableCores()
+    ```
+
+- Whatever number you get is the **maximum** that you should try. However, if you are on a super computer, then you typically want to use much fewer than that number, otherwise you will be using up too much resources and the admins will frown on that (always be nice to your admins). Always read the documentation your admins give you to determine your resource allowances.
+    
+- `plan("multisession", workers = n)`: Creates `n` new R sessions, and evaluates futures on these new R sessions. This allows for parallel computing.
+    
+    ```{r}
+    plan("multisession", workers = 3)
+    furrr::future_map_int(c(1,1,1), ~Sys.getpid())
+    ```
+
+- `plan("multicore", workers = n)`: Creates `n` copies of your current R process (called "forking"), and evaluates futures on these new R processes. This allows for parallel computing. 
+    - Not available on Windows machines.
+    - Strongly discouraged while running RStudio.
+
+    ```{r, echo = FALSE}
+    ## DON'T RUN THIS LINE. 
+    ## I just like to live dangerously
+    options(parallelly.fork.enable = TRUE) 
+    ```
+
+    ```{r}
+    plan("multicore", workers = 3)
+    furrr::future_map_int(c(1,1,1), ~Sys.getpid())
+    ```
+
+- My understanding is that forking (using "multicore") means that the processes share the same memory addresses for objects (these objects are read-only in the child processes). While creating new R sessions means that everything needs to be copied over to a new R session. So forking can be faster. But I guess forking can also be dangerous because it can cause the process to "lock" (stall) in some rare cases (for technical reasons). But my understanding is tenuous, so if you know better, let me know.
+
+- So you should typically use `plan("multisession", workers = n)` if you are doing parallelization on one computer.
 
 # `{furrr}`
 
+- We used `{furrr}` for the examples above. If you know `{purrr}` then switching to parallel computing should be pretty easy.
+
+- Here are the steps:
+    1. Implement the code you want to parallelize using functional programming as you would with `{purrr}`. But use the `{furrr}` drop-in replacements.
+    2. Use the appropriate `plan()` call.
+    3. Run the code.
+    
+- Implemented functions:
+    - `future_map()` 
+    - `future_map2()` 
+    - `future_pmap()`
+    - `future_walk()`
+    - `future_imap()`
+    - `future_modify()`
+
+- You usually create a function that you want to call repeatedly    
+    ```{r}
+    f <- function(x) {
+      Sys.sleep(1)
+      return(x)
+    }
+    ```
+    Then you call `{furrr}` functions on it.
+
+- Let's compare sequential and parallel processing times:
+    ```{r}
+    plan("sequential")
+    system.time(
+      x <- furrr::future_map_dbl(1:3, f)
+    )
+    
+    plan("multisession", workers = 3)
+    system.time(
+      x <- furrr::future_map_dbl(1:3, f)
+    )
+    ```
+    
+# `{foreach}`
+
+- `{foreach}` is a package that gives another API for doing a for-loop.
+
+    ```{r, message = FALSE}
+    library(foreach)
+    ```
+
+- The biggest difference is that in a `{foreach}` for-loop, you save the output to a final destination. In a regular for-loop, each iteration produces side effects.
+
+- The syntax for a `{foreach}` for-loop is:
+
+    ```{r, eval = FALSE}
+    x <- foreach(i = 1:n) %do% {
+      ## code that returns some element each iteration.
+      ## These will be combined in some way and assigned to x
+    }
+    ```
+
+- The `{foreach}` for-loop by default combines the outputs in a list.
+
+    ```{r}
+    x <- foreach(i = 1:3) %do% {
+      sqrt(i)
+    }
+    x
+    ```
+
+- You can change how the outputs are combined by the `.combine` argument. Typically, you combine either using `c`, `rbind`, or `cbind`.
+
+- Using `c` returns a vector
+    ```{r}
+    x <- foreach(i = 1:3, .combine = c) %do% {
+      sqrt(i)
+    }
+    x
+    ```
+    
+- Using `rbind` will make each returned vector a row.
+    ```{r}
+    x <- foreach(i = 1:3, .combine = rbind) %do% {
+      c(sqrt = sqrt(i), square = i^2)
+    }
+    x
+    ```
+
+- To do parallel processing with `foreach()`:
+    1. Attach the `{doFuture}` package.
+    2. Run `doFuture::registerDoFuture()`. 
+        - This makes it so that `{foreach}` knows to use the parallelization backend from `{future}`.
+        - It's possible to use other backends. E.g., if you run `doParallel::registerDoParallel()` then `{foreach}` will use the `{parallel}` backend. 
+    3. Run `future::plan()`
+    4. Replace `%do%` with `%dopar%`.
+
+    ```{r}
+    library(doFuture)
+    registerDoFuture()
+    plan("multisession", workers = 3)
+    x <- foreach(i = 1:3, .combine = c) %dopar% {
+      Sys.getpid()
+    }
+    x
+    ```
+
+- If you are simulating anything inside a `{foreach}` for-loop (or using the random number generator in any way), then you need to use the `{doRNG}` package.
+    1. Attach the `{doRNG}` package.
+    2. Run `doFuture::registerDoFuture()`
+    3. Run `doRNG::registerDoRNG()`
+    4. Run `future::plan()`
+    5. Replace `%do%` with `%dopar%`.
+
+- Doing this makes reproducibility possible.
+    ```{r, message = FALSE}
+    library(doRNG)
+    registerDoFuture()
+    registerDoRNG()
+    plan("multisession", workers = 3)
+    
+    set.seed(2)
+    x <- foreach(i = 1:3, .combine = c) %dopar% {
+      runif(1)
+    }
+    
+    set.seed(2)
+    y <- foreach(i = 1:3, .combine = c) %dopar% {
+      runif(1)
+    }
+    
+    x == y
+    ```
+
+- If you don't do this, then reproducibility is impossible, even if you set the seed to the same value each time:
+
+    ```{r, warning = FALSE}
+    doFuture::registerDoFuture()
+    plan("multisession", workers = 3)
+    
+    set.seed(2)
+    x <- foreach(i = 1:3, .combine = c) %dopar% {
+      runif(1)
+    }
+    
+    set.seed(2)
+    y <- foreach(i = 1:3, .combine = c) %dopar% {
+      runif(1)
+    }
+    
+    x
+    y
+    ```
+
+# Simulation Study Example
+
+- The `{HardyWeinberg}` package contains four tests for [Hardy-Weinberg Equilibrium](https://en.wikipedia.org/wiki/Hardy%E2%80%93Weinberg_principle), a $\chi^2$-test, a likelihood ratio test, an exact test, and a permutation test.
+
+- The following will simulate genotype frequencies under different sample sizes `n`, allele frequencies `af` (between 0 and 1), and fixation indices `fx` (between 0 and 1, but typically less than 0.15). HWE is fulfilled when `fx = 0`.
+
+    ```{r}
+    #' @param n Sample size
+    #' @param af Allele frequency
+    #' @param fx Fixation index. Null hypothesis of HWE is true if fx = 0.
+    hwesim <- function(n, af, fx) {
+      probvec <- c(
+        af ^ 2 + af * (1 - af) * fx,
+        2 * af * (1 - af) * (1 - fx),
+        (1 - af) ^ 2 + af * (1 - af) * fx
+      )
+      retvec <- c(rmultinom(n = 1, size = n, prob = probvec))
+      names(retvec) <- c("AA", "AB", "BB")
+      return(retvec)
+    }
+    ```
+
+- We can then run the HWE tests from the package:
+    ```{r}
+    x <- hwesim(n = 100, af = 0.5, fx = 0.1)
+    HardyWeinberg::HWChisq(X = x)
+    HardyWeinberg::HWLratio(X = x)
+    HardyWeinberg::HWExact(X = x)
+    ```
+
+- If we want to explore the performance between these three methods (I'll discuss the permutation approach soon), we would probably vary
+    - `n` $\in \{10, 100, 1000, 10000\}$
+    - `af` $\in \{0.01, 0.1, 0.25, 0.5\}$
+    - `fx` $\in \{0, 0.05, 0.1, 0.15\}$
+    
+- This is $3 * 4^2 = 48$ unique combinations, and in each combination we would probably want to run 1000 replications. So that's 48000 replications.
+
+- Let's first create a data frame containing the possible parameter values:
+
+    ```{r}
+    nrep <- 1000
+    nvec <- c(10, 100, 1000)
+    afvec <- c(0.01, 0.1, 0.25, 0.5)
+    fxvec <- c(0, 0.05, 0.1, 0.15)
+    paramdf <- expand.grid(seed = 1:nrep,
+                           n = nvec,
+                           af = afvec,
+                           fx = fxvec)
+    dim(paramdf)
+    head(paramdf)
+    ```
+
+- If we were doing a for-loop, we would probably first populate the data frame with all of the output we want. Here, let's say we want the $p$-values for each test:
+    ```{r}
+    paramdf$p_chisq <- NA_real_
+    paramdf$p_lratio <- NA_real_
+    paramdf$p_exact <- NA_real_
+    ```
+
+- We would then iterate through this data frame, populating the output
+    ```{r, eval = FALSE, warning = FALSE}
+    pb <- progress::progress_bar$new(total = nrow(paramdf))
+    for (i in seq_len(nrow(paramdf))) {
+      pb$tick()
+      set.seed(paramdf$seed[[i]])
+      n <- paramdf$n[[i]]
+      af <- paramdf$af[[i]]
+      fx <- paramdf$fx[[i]]
+      x <- hwesim(n = n, af = af, fx = fx)
+      
+      paramdf$p_chisq[[i]]  <- HardyWeinberg::HWChisq(X = x, verbose = FALSE)$pval
+      paramdf$p_lratio[[i]] <- HardyWeinberg::HWLratio(X = x, verbose = FALSE)$pval
+      paramdf$p_exact[[i]]  <- HardyWeinberg::HWExact(X = x, verbose = FALSE)$pval
+    }
+    ```
+
+- When I ran this on my laptop, it took about a minute, which isn't that bad, so I wouldn't bother parallelizing here.
+
+- But if I also wanted to compare `HardyWeinberg::HWPerm()`, this one function alone takes about 5 seconds by itself
+    ```{r}
+    x <- hwesim(n = 1000, af = 0.5, fx = 0.15)
+    system.time(
+      HardyWeinberg::HWPerm(x = x, verbose = FALSE)
+    )
+    ```
+    
+    So if I had to include that in the simulation study, it could take up to $5 \times 48000 / 60 / 60 = 66.7$ hours, and I would totally parallelize in this scenario.
+
+- The code for parallelization looks like this:
+
+    ```{r, cache = TRUE, warning = FALSE}
+    paramdf <- expand.grid(seed = 1:nrep,
+                           n = nvec,
+                           af = afvec,
+                           fx = fxvec)
+    
+    registerDoFuture()
+    registerDoRNG()
+    plan("multisession", workers = availableCores())
+    
+    pmat <- foreach(i = seq_len(nrow(paramdf)), .combine = rbind) %dopar% {
+      set.seed(paramdf$seed[[i]])
+      n <- paramdf$n[[i]]
+      af <- paramdf$af[[i]]
+      fx <- paramdf$fx[[i]]
+      x <- hwesim(n = n, af = af, fx = fx)
+      
+      pvec <- rep(NA_real_, length.out = 3)
+      names(pvec) <- c("p_chisq", "p_lratio", "p_exact")
+      pvec[[1]] <- HardyWeinberg::HWChisq(X = x, verbose = FALSE)$pval
+      pvec[[2]] <- HardyWeinberg::HWLratio(X = x, verbose = FALSE)$pval
+      pvec[[3]] <- HardyWeinberg::HWExact(X = x, verbose = FALSE)$pval
+      pvec
+    }
+    
+    paramdf <- cbind(paramdf, pmat)
+    ```
+
+- Using 8 cores on my laptop, the above took about 20 seconds, which is about 3 times faster than sequential processing.
+
+- There are some small optimizations I could do to improve performance even more. E.g. in the above I am passing around that large data frame `paramdf` to each new R session.
+    - If you are curious on how to solve this, read about using the [`{iterators}`](https://cran.r-project.org/package=iterators) in the [`{foreach}` vignette](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html).
+
+- Side note: The simulation results indicate that the chi-square is not appropriate for small counts for small allele frequencies. The likelihood ratio and exact tests perform similarly.
+    ```{r, message=FALSE, fig.width = 7, fig.height = 7}
+    library(tidyverse)
+    paramdf %>%
+      gather(p_chisq, p_lratio, p_exact, key = "method", value = "pvalue") %>%
+      group_by(n, af, fx, method) %>%
+      summarize(power = mean(pvalue < 0.05), .groups = "drop") %>%
+      mutate(method = str_remove(method, "p_")) %>%
+      mutate(af = factor(af), fx = factor(fx)) %>%
+      ggplot(aes(x = n, y = power, color = method)) +
+      facet_grid(af ~ fx) +
+      geom_line() +
+      geom_point() +
+      scale_x_log10() +
+      scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"))
+    ```
+
+# Bash notes:
+
+- You can see if your R processes are running by using [`top`](https://en.wikipedia.org/wiki/Top_(software)) in Bash (not for Windows).
+
+    ```{bash, eval = FALSE}
+    top
+    ```
+    
+- It will open a running list of processes, and if your parallelization is successful you should see multiple processes called `R`.
+
+- You can exit the `top` list by typing `q`.
+
+- If you want to be fancy, you can try downloading [`htop`](https://en.wikipedia.org/wiki/Htop).
+
 # New Functions
 
+- `future::availableCores()`: See how many cores are available.
+- `future::plan()`: Set the evaluation plan (`"sequential"`/`"multisession"`/`"multicore"`).
+- `furrr::map()` and variants.
+- `doFuture::registerDoFuture()`: Register a parallel backend so that `{foreach}` knows how to use `%dopar%`.
+- `doRNG::registerDoRNG()`: Register a parallel backend that is reproducible when using `%dopar%`.
+- `foreach()` used with `%do%` or `%dopar%`.
