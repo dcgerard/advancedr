@@ -27,6 +27,7 @@ klippy::klippy()
 - Batch Processing
 - Schedulars
 - LSF ("load sharing facility")
+- [`{future.batchtools}` Vignette](https://cran.r-project.org/web/packages/future.batchtools/vignettes/future.batchtools.html)
 
 # Running R in Batch
 
