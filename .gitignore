@@ -21,3 +21,14 @@ readings/
 raw_data/
 sensitive/
 readings/
+
+## Extra files
+docs/01_git/
+docs/02_packages/
+docs/03_practices/
+docs/04_foundations/
+docs/05_oo/
+docs/06_meta/
+docs/07_profiling/
+docs/08_cpp/
+docs/09_parallel/

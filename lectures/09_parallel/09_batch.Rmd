@@ -1,0 +1,46 @@
+---
+title: "Batch Processing and LSF"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output:  
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    highlight: pygments
+urlcolor: "blue"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo       = TRUE, 
+                      fig.align  = "center",
+                      fig.height = 3, fig.width = 4)
+ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
+
+# Learning Objectives
+
+- Batch Processing
+- Schedulars
+- LSF ("load sharing facility")
+
+# Running R in Batch
+
+- `R CMD BATCH`
+
+# LSF
+
+- American University has a supercomputer called [Zorro](https://www.american.edu/cas/hpc/)
+
+- To use it, you have to submit jobs via a [schedular](https://en.wikipedia.org/wiki/Job_scheduler).
+
+- The schedular Zorro uses is [LSF](https://en.wikipedia.org/wiki/IBM_Spectrum_LSF), so we'll learn that.
+
+- There are many other, popular schedulars. The syntax is all different, but they all operate on similar ideas.
+
+# New Functions
+

@@ -61,7 +61,7 @@ This repository contains material based upon work supported by the National Scie
   - [Matrices / Matrix Operations](./08_cpp_armadillo.html)
 - 09 Parallel Processing
   - [Futures and Running R in Batch](./09_future.html)
-  - Schedulers and LSF
+  - [Batch Processing and LSF](./09_batch.html)
 
 # Final Project
 
