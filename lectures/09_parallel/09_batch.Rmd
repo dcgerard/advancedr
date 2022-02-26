@@ -25,17 +25,107 @@ klippy::klippy()
 # Learning Objectives
 
 - Batch Processing
-- Schedulars
-- LSF ("load sharing facility")
+- Schedulars and LSF ("load sharing facility")
 - [`{future.batchtools}` Vignette](https://cran.r-project.org/web/packages/future.batchtools/vignettes/future.batchtools.html)
 
 # Running R in Batch
 
-- `R CMD BATCH`
+- You can run an R script file in [batch mode](https://en.wikipedia.org/wiki/Batch_processing) (i.e. in the background) from bash by using the following command:
+
+    ```{bash, eval = FALSE}
+    R CMD BATCH --no-save --no-restore input_file.R output_file.Rout
+    ```
+    
+    Make sure to change "input_file.R" and "output_file.Rout"
+
+    - The `--no-save --no-restore` options make sure that you are working with a clean environment and that you don’t save this environment after the command is executed. This is a good thing for reproducibility.
+
+- The newer way is to use `Rscript`. The following command will do mostly what `R CMD BATCH` will do, except only the output of `print()` will be sent to "output_file.Rout", and the console output will not be sent.
+
+    ```{bash, eval = FALSE}
+    Rscript input_file.R > output_file.Rout
+    ```
+    
+- Even though `R CMD BATCH` is an older way to run R scripts in batch mode, I like it better because:
+    1. `Rscript` forces the `--no-echo` option, so console output is not printed.
+    2. I've had stability issues with `Rscript` when using it on the super computer. But that was a few years ago and they might have fixed things by now.
+    
+- One nice thing about `Rscript` is that you can run one-liners of R code from bash using `-e`:
+
+    ```{bash, eval = FALSE}
+    Rscript -e 'print("hello world")'
+    ```
+
+- This allows you to knit an R markdown file from bash by using the following command:
+
+    ```{bash, eval = FALSE}
+    Rscript -e "library(rmarkdown);render('rmarkdown_file.Rmd')"
+    ```
+
+- On Windows machines, the above commands should also work on [Windows PowerShell](https://en.wikipedia.org/wiki/PowerShell), but not Git Bash for Windows.
+
+- **Exercise**: Write an R script that:
+    1. Loads `mtcars`
+    2. Makes a scatterplot of `mpg` on `wt`
+    3. Saves the output to a file called "plot.pdf"
+    
+    Then run this script in batch mode.
+
+# Executable R Scripts
+
+- On Unix-like machines (e.g. Ubuntu and Mac), you can make an R file executable using [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)).
+
+- At the very top of your R script, place the following
+    ```{r, eval = FALSE}
+    #!/path/to/Rscript --vanilla
+    ```
+    where "/path/to/Rscript" is replaced with where Rscript is installed on your machine.
+    
+    - The `--vanilla` option makes sure that your script is reproducible in other users' computing environments.
+    
+- You can find where `Rscript` is located by running the following in bash:
+
+    ```{bash}
+    which Rscript
+    ```
+
+- It is common for "/usr/bin/Rscript" to be your `Rscript` location, unless you changed the defaults.
+    
+- Then change the mode to executable using [`chmod`](https://en.wikipedia.org/wiki/Chmod)
+
+    ```{bash, eval = FALSE}
+    chmod +x filename.R
+    ```
+
+- Then you can execute it by running the following in bash
+    ```{bash, eval = FALSE}
+    ./filename.R
+    ```
+
+- You can make it so that you can execute this file anywhere on your computer by [adding it to the `$PATH`](https://stackoverflow.com/questions/14637979/how-to-permanently-set-path-on-linux-unix).
+
+- This makes creating command line interfaces for your R code relatively simple.
+
+- Suppose I have the following R script file called "ex1.R"
+
+    ```{r, eval = FALSE}
+    #!/usr/bin/Rscript --vanilla
+    cat("Hello World\n", file = "hello.txt")
+    ```
+
+- Then I run
+    ```{bash, eval = FALSE}
+    chmod +x ex1.R
+    ```
+
+- Then, whenever I run the following, that script will run:
+    ```{bash, eval = FALSE}
+    ./ex1.R
+    ```
 
 # LSF
 
-- American University has a supercomputer called [Zorro](https://www.american.edu/cas/hpc/)
+- American University has a supercomputer called [Zorro](https://www.american.edu/cas/hpc/).
 
 - To use it, you have to submit jobs via a [schedular](https://en.wikipedia.org/wiki/Job_scheduler).
 
@@ -45,3 +135,5 @@ klippy::klippy()
 
 # New Functions
 
+- `R CMD BATCH`: Run R in batch mode (classic way).
+- `Rscript`: Run R in batch mode (newer way).
