@@ -485,17 +485,23 @@ using namespace arma;
     
 - Generate matrix of ones.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     mat A = ones<mat>(n_rows, n_cols);
     ```
 
 - Generate $n\times n$ identity matrix.
 
+    <mark style="background-color: LightCoral">C++</mark>
+
     ``` cpp
     mat id = eye(n_rows, n_cols);
     ```
 
 - Diagonal matrix, where `v` is a `Col` that you already have defined.
+
+    <mark style="background-color: LightCoral">C++</mark>
 
     ``` cpp
     mat d = diagmat(v);

@@ -484,6 +484,29 @@ klippy::klippy()
 
 - If you want to be fancy, you can try downloading [`htop`](https://en.wikipedia.org/wiki/Htop).
 
+# Exercise
+
+Recall the normal simple linear regression model:
+    $$
+    y_i = \beta_0 + \beta_1x_i + \epsilon_i\\
+    \epsilon_i \overset{iid}{\sim} N(0, \sigma^2)
+    $$
+
+Write a simulation study where you fix $x_i \sim N(0, 1)$ and vary
+
+- $n \in \{10, 100, 1000\}$
+- $\beta_0 \in \{0, 10, 100\}$
+- $\beta_1 \in \{0, 1, 2\}$
+- $\sigma^2 \sim \{1, 10, 20\}$
+
+Each unique combination of parameters should have 200 replicates.
+
+You are exploring the estimation of $\beta_1$ by ordinary least squares.
+
+Use `{foreach}` to implement this simulation study in parallel.
+
+What factors seem to affect estimates of $\beta_1$?
+
 # New Functions
 
 - `future::availableCores()`: See how many cores are available.
