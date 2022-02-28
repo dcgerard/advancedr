@@ -26,7 +26,7 @@ klippy::klippy()
 
 - Batch Processing
 - Schedulars and LSF ("load sharing facility")
-- [`{future.batchtools}` Vignette](https://cran.r-project.org/web/packages/future.batchtools/vignettes/future.batchtools.html)
+- [LSF bsub options](https://www.ibm.com/docs/en/spectrum-lsf/10.1.0?topic=bsub-options)
 
 # Running R in Batch
 
@@ -137,7 +137,7 @@ klippy::klippy()
 
 - You need faculty sponsorship to get access to Zorro. Once you have a sponsorship, fill out a request form from the [Zorro Website](https://www.american.edu/cas/hpc/).
 
-- After you have permission to access Zorro, you interface with it using [SSH](https://en.wikipedia.org/wiki/Secure_Shell) and 
+- After you have permission to access Zorro, you interface with it using [SSH](https://en.wikipedia.org/wiki/Secure_Shell).
     - Windows users should download and install [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) to use SSH.
     - Mac users already have SSH installed in bash.
 
@@ -164,9 +164,239 @@ klippy::klippy()
         where "username" is your AU username.
     2. Type in your AU password and hit enter.
     
-- Once you are connected to Zorro, you use [bash](./01_basic_bash.html) to navigate, run programs, submit jobs, etc...
+- Once you are connected to Zorro, you use [bash](./01_basic_bash.html) to navigate, run programs, submit jobs, etc..
+
+## LSF Files
+
+- You format the properties of a job in terms of a LSF file.
+
+- Example LSF File:
+
+    ```{bash, eval = FALSE}
+    #BSUB -J minimal_example
+    #BSUB -q normal
+    #BSUB -o minimal_out.txt
+    #BSUB -e minimal_err.txt
+    #BSUB -u "youremail@american.edu"
+    #BSUB -B
+    #BSUB -N
+    #BSUB n=2
+    /path/to/R CMD BATCH --no-save --no-restore '--args nc=2' minimal.R minimal.Rout
+    ```
+
+- You have a list of LSF options. Each option begins with `#BSUB`
+
+- You then have a bash command. In this case we are running R in batch mode via
+    ```{bash, eval = FALSE}
+    /path/to/R CMD BATCH --no-save --no-restore '--args nc=2' minimal.R minimal.Rout
+    ```
+    
+- The "path/to/R" can be found by typing the following in bash:
+    ```{bash, eval = FALSE}
+    which R
+    ```
+
+- This might not be the version of R that you want. Zorro has a few copies or R installed. You can see these versions by typing in bash:
+
+    ```{bash, eval = FALSE}
+    ls -d /app/R-*
+    ```
+
+- As of the writing of this document, they have versions 3.6.0, 3.6.1, 4.0.2, and 4.1.0
+    
+- You can use a specific version of R (e.g. 4.0.2) by using
+
+    ```{bash, eval = FALSE}
+    /app/R-4.0.2/bin/R CMD BATCH --no-save --no-restore '--args nc=2' minimal.R minimal.Rout
+    ```
+
+- That `'--args nc=2'` trick is a way to pass arbitrary arguments to an R script. See [here](https://www.r-bloggers.com/2007/08/including-arguments-in-r-cmd-batch-mode/).
+
+- Typical options are:
+    - `#BSUB -J job_name`: Name of the job, so that you can see that name when you check the status of your job.
+    - `#BSUB -q normal`: The queue to submit your job to. You shouldn't change this for Zorro.
+    - `#BSUB -o job_out.txt`: Where to send the job's output.
+    - `#BSUB -e job_err.txt`: Where to send the job's error messages.
+    - `#BSUB -u "youremail@american.edu"`: Send mail to the specified user.
+    - `#BSUB -B`: Emails you when the job begins.
+    - `#BSUB -N`: Emails you when the job ends.
+    - `#BSUB n=2`: Submits a parallel job and specifies the number of tasks in the job (in this case, 2).
+
+- A full list of options can be found [here](https://www.ibm.com/docs/en/spectrum-lsf/10.1.0?topic=bsub-options)
+
+
+## Paired R script
+
+- You need to format your R script to be able to run in parallel.
+
+- Example R Script
+
+    ```{r, eval = FALSE}
+    ## Set library for R packages ----
+    .libPaths(c("/home/dgerard/R/4.0.2/", .libPaths()))
+    
+    ## Attach packages for parallel computing ----
+    library(foreach)
+    library(doFuture)
+    
+    ## Determine number of cores ----
+    args <- commandArgs(trailingOnly = TRUE)
+    if (length(args) == 0) {
+      nc <- 1
+    } else {
+      eval(parse(text = args[[1]]))
+    }
+    cat(nc, "\n")
+    
+    ## Register workers ----
+    if (nc == 1) {
+      registerDoSEQ()
+      plan(sequential)
+    } else {
+      registerDoFuture()
+      plan(multisession, workers = nc)
+      if (getDoParWorkers() == 1) {
+        stop("nc > 1, but only one core registered")
+      }
+    }
+    
+    ## Run R script ----
+    x <- foreach(i = 1:2, .combine = c) %dopar% {
+      Sys.sleep(1)
+      i
+    }
+    x
+    
+    ## Unregister workers ----
+    if (nc > 1) {
+      plan(sequential)
+    }
+    ```
+
+- The above is the template I use.
+
+- The above only allows to run on multiple cores on one node. So the above does not allow for multi-node processing.
+
+- You should only need to modify the code right after `## Run R script ----`.
+
+## `bsub` commands
+
+- You submit and control jobs with the `bsub` command in bash.
+
+- The following will submit the job in `"minimal.lsf"`
+
+    ```{bash, eval = FALSE}
+    bsub < minimal.lsf
+    ```
+
+    - The above says to pipe the `minimal.lsf` file to the bsub command. 
+    - Otherwise, you would need to use `bsub` like `bsub -q normal -n 2 ...` 
+
+- Use `bjobs` to display information on the jobs that you have submitted.
+    - Display all of your jobs:
+        ```{bash, eval = FALSE}
+        bjobs -a
+        ``` 
+    - Display all of the jobs of a user:
+        ```{bash, eval = FALSE}
+        bjobs -u user_name
+        ```
+    - Display information about a particular job
+        ```{bash, eval = FALSE}
+        bjobs job_id
+        ```
+
+- Use `bkill` to kill a job.
+    ```{bash, eval = FALSE}
+    bkill job_id
+    ```
+
+## Installing R Packages
+
+- You can see what packages are already install on Zorro by typing
+
+    ```{bash, eval = FALSE}
+    ls /app/R-4.0.2/lib64/R/library
+    ```
+
+    - It's not a lot.
+
+- You need to install R packages in a local directory, since global install is not supported (because not everyone wants your R packages).
+
+- You should create an R directory where you put all things R:
+
+    ```{bash, eval = FALSE}
+    mkdir R
+    ```
+
+- Then inside this directory, create a directory where you can place your packages for a specific version of R
+
+    ```{bash, eval = FALSE}
+    mkdir 4.0.2
+    ```
+
+- Then create the following R file, called "install.R", which can be used to install R packages into that directory (but change my username to yours):
+    ```{r, eval = FALSE}
+    .libPaths(c("/home/dgerard/R/4.0.2/", .libPaths()))
+    install.packages(c("tidyverse", 
+                       "future",
+                       "doFuture",
+                       "foreach"),
+                     lib = "/home/dgerard/R/4.0.2/",
+                     repos = "http://cran.us.r-project.org")
+    ```
+    - In the above, I install `{tidyverse}`, `{future}`, `{doFuture}`, and `{foreach}` packages. But you can add more.
+    
+- If you want to use Bioconductor packages in R Version 4.0.2, run the following:
+
+    ```{r, eval = FALSE}
+    .libPaths(c("/home/dgerard/R/4.0.2/", .libPaths()))
+    install.packages("BiocManager",
+                     lib = "/home/dgerard/R/4.0.2/",
+                     repos = "http://cran.us.r-project.org")
+    BiocManager::install(version = "3.12", lib = "/home/dgerard/R/4.0.2/", ask = FALSE)
+    BiocManager::install(c("tidyverse",
+                           "future",
+                           "doFuture",
+                           "foreach"),
+                         lib = "/home/dgerard/R/4.0.2/",
+                         ask = FALSE)
+    ```
+
+
+- Set up an LSF file to run this script, called "install.lsf":
+
+    ```{bash, eval = FALSE}
+    #BSUB -J install_r_pkgs
+    #BSUB -q normal
+    #BSUB -o install_out.txt
+    #BSUB -e install_err.txt
+    #BSUB -u "youremail@american.edu"
+    #BSUB -B
+    #BSUB -N
+    #BSUB n=1
+    /app/R-4.0.2/bin/R CMD BATCH --no-save --no-restore install.R install.Rout
+    ```
+    
+- Then run this job
+
+    ```{bash, eval = FALSE}
+    bsub < install.lsf
+    ```
+
+    ```{bash, eval = FALSE, echo = FALSE}
+    bsub -q normal R CMD BATCH install.R install_out.txt
+    ```
+
+- At the top of every R file from now on, put the following (but change my username to yours):
+    ```{r, eval = FALSE}
+    .libPaths(c("/home/dgerard/R/4.0.2/", .libPaths()))
+    ```
+
+- Now you have access to those packages that you installed in "R-packages" directory.
 
 # New Functions
 
 - `R CMD BATCH`: Run R in batch mode (classic way).
 - `Rscript`: Run R in batch mode (newer way).
+- `.libPaths()`: Set and get the paths where R will search for installed packages.
