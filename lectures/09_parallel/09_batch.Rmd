@@ -27,6 +27,7 @@ klippy::klippy()
 - Batch Processing
 - Schedulars and LSF ("load sharing facility")
 - [LSF bsub options](https://www.ibm.com/docs/en/spectrum-lsf/10.1.0?topic=bsub-options)
+- [Minimal LSF Example](https://github.com/dcgerard/minmin)
 
 # Running R in Batch
 

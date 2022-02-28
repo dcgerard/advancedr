@@ -62,6 +62,7 @@ This repository contains material based upon work supported by the National Scie
 - 09 Parallel Processing
   - [Futures and Parallel Processing](./09_future.html)
   - [Batch Processing and LSF](./09_batch.html)
+  - [Minimal LSF Example for Zorro and R](https://github.com/dcgerard/minmin)
 
 # Final Project
 
