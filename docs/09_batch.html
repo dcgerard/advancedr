@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-26" />
+<meta name="date" content="2022-02-28" />
 
 <title>Batch Processing and LSF</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Batch Processing and LSF</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-26</h4>
+<h4 class="date">2022-02-28</h4>
 
 </div>
 
@@ -367,7 +367,11 @@ $(document).ready(function () {
 <li><a href="#learning-objectives">Learning Objectives</a></li>
 <li><a href="#running-r-in-batch">Running R in Batch</a></li>
 <li><a href="#executable-r-scripts">Executable R Scripts</a></li>
-<li><a href="#lsf">LSF</a></li>
+<li><a href="#lsf">LSF</a>
+<ul>
+<li><a href="#preparations">Preparations</a></li>
+<li><a href="#connecting-to-zorro">Connecting to Zorro</a></li>
+</ul></li>
 <li><a href="#new-functions">New Functions</a></li>
 </ul>
 </div>
@@ -401,9 +405,10 @@ $(document).ready(function () {
 <li>I’ve had stability issues with <code>Rscript</code> when using it on the super computer. But that was a few years ago and they might have fixed things by now.</li>
 </ol></li>
 <li><p>One nice thing about <code>Rscript</code> is that you can run one-liners of R code from bash using <code>-e</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">&#39;print(&quot;hello world&quot;)&#39;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">&#39;print(&quot;hello world&quot;)&#39;</span></span></code></pre></div>
+<pre><code>## [1] &quot;hello world&quot;</code></pre></li>
 <li><p>This allows you to knit an R markdown file from bash by using the following command:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">&quot;library(rmarkdown);render(&#39;rmarkdown_file.Rmd&#39;)&quot;</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">&quot;library(rmarkdown);render(&#39;rmarkdown_file.Rmd&#39;)&quot;</span></span></code></pre></div></li>
 <li><p>On Windows machines, the above commands should also work on <a href="https://en.wikipedia.org/wiki/PowerShell">Windows PowerShell</a>, but not Git Bash for Windows.</p></li>
 <li><p><strong>Exercise</strong>: Write an R script that:</p>
 <ol style="list-style-type: decimal">
@@ -419,28 +424,28 @@ $(document).ready(function () {
 <ul>
 <li><p>On Unix-like machines (e.g. Ubuntu and Mac), you can make an R file executable using <a href="https://en.wikipedia.org/wiki/Shebang_(Unix)">shebang</a>.</p></li>
 <li><p>At the very top of your R script, place the following</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/path/to/Rscript --vanilla</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/path/to/Rscript --vanilla</span></span></code></pre></div>
 <p>where “/path/to/Rscript” is replaced with where Rscript is installed on your machine.</p>
 <ul>
 <li>The <code>--vanilla</code> option makes sure that your script is reproducible in other users’ computing environments.</li>
 </ul></li>
 <li><p>You can find where <code>Rscript</code> is located by running the following in bash:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span> Rscript</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span> Rscript</span></code></pre></div>
 <pre><code>## /usr/bin/Rscript</code></pre></li>
 <li><p>It is common for “/usr/bin/Rscript” to be your <code>Rscript</code> location, unless you changed the defaults.</p></li>
 <li><p>Then change the mode to executable using <a href="https://en.wikipedia.org/wiki/Chmod"><code>chmod</code></a></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x filename.R</span></code></pre></div></li>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x filename.R</span></code></pre></div></li>
 <li><p>Then you can execute it by running the following in bash</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./filename.R</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./filename.R</span></span></code></pre></div></li>
 <li><p>You can make it so that you can execute this file anywhere on your computer by <a href="https://stackoverflow.com/questions/14637979/how-to-permanently-set-path-on-linux-unix">adding it to the <code>$PATH</code></a>.</p></li>
-<li><p>This makes creating command line interfaces for your R code relatively simple.</p></li>
+<li><p>This makes creating <a href="https://en.wikipedia.org/wiki/Command-line_interface">command line interfaces</a> for your R code relatively simple.</p></li>
 <li><p>Suppose I have the following R script file called “ex1.R”</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/Rscript --vanilla</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Hello World</span><span class="sc">\n</span><span class="st">&quot;</span>, <span class="at">file =</span> <span class="st">&quot;hello.txt&quot;</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/Rscript --vanilla</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Hello World</span><span class="sc">\n</span><span class="st">&quot;</span>, <span class="at">file =</span> <span class="st">&quot;hello.txt&quot;</span>)</span></code></pre></div></li>
 <li><p>Then I run</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x ex1.R</span></code></pre></div></li>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x ex1.R</span></code></pre></div></li>
 <li><p>Then, whenever I run the following, that script will run:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./ex1.R</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./ex1.R</span></span></code></pre></div></li>
 </ul>
 </div>
 <div id="lsf" class="section level1">
@@ -451,6 +456,43 @@ $(document).ready(function () {
 <li><p>The schedular Zorro uses is <a href="https://en.wikipedia.org/wiki/IBM_Spectrum_LSF">LSF</a>, so we’ll learn that.</p></li>
 <li><p>There are many other, popular schedulars. The syntax is all different, but they all operate on similar ideas.</p></li>
 </ul>
+<div id="preparations" class="section level2">
+<h2>Preparations</h2>
+<ul>
+<li><p>You need faculty sponsorship to get access to Zorro. Once you have a sponsorship, fill out a request form from the <a href="https://www.american.edu/cas/hpc/">Zorro Website</a>.</p></li>
+<li><p>After you have permission to access Zorro, you interface with it using <a href="https://en.wikipedia.org/wiki/Secure_Shell">SSH</a> and</p>
+<ul>
+<li>Windows users should download and install <a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html">PuTTY</a> to use SSH.</li>
+<li>Mac users already have SSH installed in bash.</li>
+</ul></li>
+<li><p>You transfer files between the supercomputer and your computer through <a href="https://en.wikipedia.org/wiki/File_Transfer_Protocol">FTP</a>.</p>
+<ul>
+<li>Windows users should download and install <a href="www.winscp.net">WinSCP</a> to do use FTP. I sometimes also use <a href="https://filezilla-project.org/">FileZilla</a></li>
+<li>Mac users can already use FTP through the terminal. But using <a href="https://filezilla-project.org/">FileZilla</a> might be a little easier.</li>
+</ul></li>
+<li><p>You are required to use the AU VPN while accessing Zorro. All users should follow the AU instructions <a href="https://www.american.edu/oit/network/vpn.cfm">here</a> to connect to the AU VPN.</p></li>
+</ul>
+</div>
+<div id="connecting-to-zorro" class="section level2">
+<h2>Connecting to Zorro</h2>
+<ul>
+<li><p>Connect to the <a href="https://www.american.edu/oit/network/vpn.cfm">AU VPN</a>.</p></li>
+<li><p>Windows Users:</p>
+<ol style="list-style-type: decimal">
+<li>Open PuTTY</li>
+<li>Under Host Name, type <code>zorro.american.edu</code> to connect to the server. Press Enter</li>
+<li>A black screen will appear where you need to enter your AU username and password.</li>
+</ol></li>
+<li><p>Mac Users:</p>
+<ol style="list-style-type: decimal">
+<li><p>In the terminal, type:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="at">-l</span> username zorro.american.edu</span></code></pre></div>
+<p>where “username” is your AU username.</p></li>
+<li><p>Type in your AU password and hit enter.</p></li>
+</ol></li>
+<li><p>Once you are connected to Zorro, you use <a href="./01_basic_bash.html">bash</a> to navigate, run programs, submit jobs, etc…</p></li>
+</ul>
+</div>
 </div>
 <div id="new-functions" class="section level1">
 <h1>New Functions</h1>

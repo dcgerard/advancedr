@@ -52,7 +52,7 @@ klippy::klippy()
     
 - One nice thing about `Rscript` is that you can run one-liners of R code from bash using `-e`:
 
-    ```{bash, eval = FALSE}
+    ```{bash}
     Rscript -e 'print("hello world")'
     ```
 
@@ -104,7 +104,7 @@ klippy::klippy()
 
 - You can make it so that you can execute this file anywhere on your computer by [adding it to the `$PATH`](https://stackoverflow.com/questions/14637979/how-to-permanently-set-path-on-linux-unix).
 
-- This makes creating command line interfaces for your R code relatively simple.
+- This makes creating [command line interfaces](https://en.wikipedia.org/wiki/Command-line_interface) for your R code relatively simple.
 
 - Suppose I have the following R script file called "ex1.R"
 
@@ -132,6 +132,39 @@ klippy::klippy()
 - The schedular Zorro uses is [LSF](https://en.wikipedia.org/wiki/IBM_Spectrum_LSF), so we'll learn that.
 
 - There are many other, popular schedulars. The syntax is all different, but they all operate on similar ideas.
+
+## Preparations
+
+- You need faculty sponsorship to get access to Zorro. Once you have a sponsorship, fill out a request form from the [Zorro Website](https://www.american.edu/cas/hpc/).
+
+- After you have permission to access Zorro, you interface with it using [SSH](https://en.wikipedia.org/wiki/Secure_Shell) and 
+    - Windows users should download and install [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) to use SSH.
+    - Mac users already have SSH installed in bash.
+
+- You transfer files between the supercomputer and your computer through [FTP](https://en.wikipedia.org/wiki/File_Transfer_Protocol).
+    - Windows users should download and install [WinSCP](www.winscp.net) to do use FTP. I sometimes also use [FileZilla](https://filezilla-project.org/)
+    - Mac users can already use FTP through the terminal. But using [FileZilla](https://filezilla-project.org/) might be a little easier.
+
+- You are required to use the AU VPN while accessing Zorro. All users should follow the AU instructions [here](https://www.american.edu/oit/network/vpn.cfm) to connect to the AU VPN.
+
+## Connecting to Zorro
+
+- Connect to the [AU VPN](https://www.american.edu/oit/network/vpn.cfm).
+
+- Windows Users: 
+    1. Open PuTTY
+    2. Under Host Name, type `zorro.american.edu` to connect to the server. Press Enter
+    3. A black screen will appear where you need to enter your AU username and password.
+    
+- Mac Users:
+    1. In the terminal, type:
+        ```{bash, eval = FALSE}
+        ssh -l username zorro.american.edu
+        ```
+        where "username" is your AU username.
+    2. Type in your AU password and hit enter.
+    
+- Once you are connected to Zorro, you use [bash](./01_basic_bash.html) to navigate, run programs, submit jobs, etc...
 
 # New Functions
 
