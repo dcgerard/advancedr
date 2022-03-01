@@ -95,21 +95,18 @@ klippy::klippy()
     ```{r}
     datFrame <- R6::R6Class(classname = "datFrame", public = list(
       df = NULL,
-      mean_vec = NULL,
       initialize = function(df) {
         stopifnot(is.data.frame(df))
         self$df <- df
       },
       col_means = function() {
-        self$mean_vec <- sapply(self$df, mean)
+        sapply(self$df, mean)
       }
     )
     )
     
     mtcars_df <- datFrame$new(df = mtcars)
-    mtcars_df$mean_vec
     mtcars_df$col_means()
-    mtcars_df$mean_vec
     ```
 
 - Because R programmers are not OOP programmers, you should be coding mostly in S3 and S4 when using OOP. We'll spend most of our time on these.
