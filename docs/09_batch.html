@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-28" />
+<meta name="date" content="2022-03-01" />
 
 <title>Batch Processing and LSF</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Batch Processing and LSF</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-28</h4>
+<h4 class="date">2022-03-01</h4>
 
 </div>
 
@@ -376,6 +376,7 @@ $(document).ready(function () {
 <li><a href="#bsub-commands"><code>bsub</code> commands</a></li>
 <li><a href="#installing-r-packages">Installing R Packages</a></li>
 </ul></li>
+<li><a href="#installing-other-software-locally">Installing other software locally</a></li>
 <li><a href="#new-functions">New Functions</a></li>
 </ul>
 </div>
@@ -583,7 +584,11 @@ $(document).ready(function () {
 <span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></li>
 <li><p>The above is the template I use.</p></li>
 <li><p>The above only allows to run on multiple cores on one node. So the above does not allow for multi-node processing.</p></li>
-<li><p>You should only need to modify the code right after <code>## Run R script ----</code>.</p></li>
+<li><p>You should only need to modify two things in the above code:</p>
+<ol style="list-style-type: decimal">
+<li>The code right after <code>## Run R script ----</code>, where you implement the your computations.</li>
+<li>The path for your R library, in the <code>.libPaths()</code> call. This is where your R packages are locally stored (see below).</li>
+</ol></li>
 </ul>
 </div>
 <div id="bsub-commands" class="section level2">
@@ -605,6 +610,13 @@ $(document).ready(function () {
 <li><p>Display information about a particular job</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">bjobs</span> job_id</span></code></pre></div></li>
 </ul></li>
+<li><p>Different job states that you will see:</p>
+<ul>
+<li><code>PEND</code>: Waiting in a queue.</li>
+<li><code>RUN</code>: Currently running.</li>
+<li><code>DONE</code>: Successfully finished with no errors.</li>
+<li><code>EXIT</code>: Errored, did not finish successfully.</li>
+</ul></li>
 <li><p>Use <code>bkill</code> to kill a job.</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">bkill</span> job_id</span></code></pre></div></li>
 </ul>
@@ -612,7 +624,7 @@ $(document).ready(function () {
 <div id="installing-r-packages" class="section level2">
 <h2>Installing R Packages</h2>
 <ul>
-<li><p>You can see what packages are already install on Zorro by typing</p>
+<li><p>You can see what packages are already installed on Zorro by typing</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /app/R-4.0.2/lib64/R/library</span></code></pre></div>
 <ul>
 <li>It’s not a lot.</li>
@@ -644,7 +656,10 @@ $(document).ready(function () {
 <span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>                       <span class="st">&quot;doFuture&quot;</span>,</span>
 <span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>                       <span class="st">&quot;foreach&quot;</span>),</span>
 <span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lib =</span> <span class="st">&quot;/home/dgerard/R/4.0.2/&quot;</span>,</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ask =</span> <span class="cn">FALSE</span>)</span></code></pre></div></li>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ask =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<ul>
+<li>I got the version of Bioconductor corresponding to R 4.0.2 from <a href="https://www.bioconductor.org/about/release-announcements/#release-versions">here</a></li>
+</ul></li>
 <li><p>Set up an LSF file to run this script, called “install.lsf”:</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#BSUB -J install_r_pkgs</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co">#BSUB -q normal</span></span>
@@ -659,9 +674,29 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb32"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">bsub</span> <span class="op">&lt;</span> install.lsf</span></code></pre></div></li>
 <li><p>At the top of every R file from now on, put the following (but change my username to yours):</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">.libPaths</span>(<span class="fu">c</span>(<span class="st">&quot;/home/dgerard/R/4.0.2/&quot;</span>, <span class="fu">.libPaths</span>()))</span></code></pre></div></li>
-<li><p>Now you have access to those packages that you installed in “R-packages” directory.</p></li>
+<li><p>Now you have access to those packages that you installed in the “R/4.0.2” directory.</p></li>
 </ul>
 </div>
+</div>
+<div id="installing-other-software-locally" class="section level1">
+<h1>Installing other software locally</h1>
+<ul>
+<li><p>For some R packages, you need to have additional software installed. But global install is not allowed on the super computer.</p></li>
+<li><p>Here are the general steps:</p></li>
+</ul>
+<ol style="list-style-type: decimal">
+<li><p>Download a tar file using <code>wget &lt;software_url&gt;</code></p></li>
+<li><p>Decompress the tar file using <code>tar -zxvf &lt;tar_file&gt;</code></p></li>
+<li><p>Move into the newly decompressed file using <code>cd &lt;new_file&gt;</code></p></li>
+<li><p>Look at the README for further steps. Usually there is a makefile and it’s as easy as running <code>make</code> and/or <code>make install</code>. But read the README first.</p></li>
+<li><p>Add the location to the <code>PATH</code> by using something like <code>export PATH=$HOME/path/to/software:$PATH</code></p></li>
+<li><p>Source the <code>.bash_profile</code> with <code>. ~/.bash_profile</code></p></li>
+<li><p>Confirm that the software is installed with <code>which &lt;software&gt;</code></p></li>
+</ol>
+<ul>
+<li><p>You can see an example of this pipeline <a href="https://help.dreamhost.com/hc/en-us/articles/360001435926-Installing-OpenSSL-locally-under-your-username">here</a></p></li>
+<li><p>This pipeline won’t work all of the time. You need to read the docs.</p></li>
+</ul>
 </div>
 <div id="new-functions" class="section level1">
 <h1>New Functions</h1>
@@ -669,6 +704,9 @@ $(document).ready(function () {
 <li><code>R CMD BATCH</code>: Run R in batch mode (classic way).</li>
 <li><code>Rscript</code>: Run R in batch mode (newer way).</li>
 <li><code>.libPaths()</code>: Set and get the paths where R will search for installed packages.</li>
+<li><code>bsub</code>: Submit an LSF job.</li>
+<li><code>bjobs</code>: See status of LSF jobs.</li>
+<li><code>bkill</code>: Kill an LSF job.</li>
 </ul>
 </div>
 

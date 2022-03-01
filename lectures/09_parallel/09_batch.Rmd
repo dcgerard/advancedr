@@ -278,7 +278,9 @@ klippy::klippy()
 
 - The above only allows to run on multiple cores on one node. So the above does not allow for multi-node processing.
 
-- You should only need to modify the code right after `## Run R script ----`.
+- You should only need to modify two things in the above code:
+    1. The code right after `## Run R script ----`, where you implement the your computations.
+    2. The path for your R library, in the `.libPaths()` call. This is where your R packages are locally stored (see below).
 
 ## `bsub` commands
 
@@ -307,6 +309,12 @@ klippy::klippy()
         bjobs job_id
         ```
 
+- Different job states that you will see:
+    - `PEND`: Waiting in a queue.
+    - `RUN`: Currently running.
+    - `DONE`: Successfully finished with no errors.
+    - `EXIT`: Errored, did not finish successfully.
+
 - Use `bkill` to kill a job.
     ```{bash, eval = FALSE}
     bkill job_id
@@ -314,7 +322,7 @@ klippy::klippy()
 
 ## Installing R Packages
 
-- You can see what packages are already install on Zorro by typing
+- You can see what packages are already installed on Zorro by typing
 
     ```{bash, eval = FALSE}
     ls /app/R-4.0.2/lib64/R/library
@@ -363,7 +371,8 @@ klippy::klippy()
                          lib = "/home/dgerard/R/4.0.2/",
                          ask = FALSE)
     ```
-
+    
+    - I got the version of Bioconductor corresponding to R 4.0.2 from [here](https://www.bioconductor.org/about/release-announcements/#release-versions)
 
 - Set up an LSF file to run this script, called "install.lsf":
 
@@ -394,10 +403,48 @@ klippy::klippy()
     .libPaths(c("/home/dgerard/R/4.0.2/", .libPaths()))
     ```
 
-- Now you have access to those packages that you installed in "R-packages" directory.
+- Now you have access to those packages that you installed in the "R/4.0.2" directory.
+
+# Installing other software locally
+
+- For some R packages, you need to have additional software installed. But global install is not allowed on the super computer.
+
+- Here are the general steps:
+
+1. Download a tar file using `wget <software_url>`
+
+2. Decompress the tar file using `tar -zxvf <tar_file>`
+
+3. Move into the newly decompressed file using `cd <new_file>`
+
+4. Look at the README for further steps. Usually there is a makefile and it's as easy as running `make` and/or `make install`. But read the README first.
+
+5. Add the location to the `PATH` by using something like `export PATH=$HOME/path/to/software:$PATH`
+
+6. Source the `.bash_profile` with `. ~/.bash_profile`
+
+7. Confirm that the software is installed with `which <software>`
+
+- You can see an example of this pipeline [here](https://help.dreamhost.com/hc/en-us/articles/360001435926-Installing-OpenSSL-locally-under-your-username)
+
+- This pipeline won't work all of the time. You need to read the docs.
+
+```{block, eval = FALSE, echo = FALSE}
+- This worked to install `sl` locally
+
+yumdownloader --source sl
+
+This downloaded the file "sl-5.02-1.e17.src.rpm"
+
+rpm -i --prefix=/myapps/ sl-5.02-1.e17.src.rpm
+```
+
 
 # New Functions
 
 - `R CMD BATCH`: Run R in batch mode (classic way).
 - `Rscript`: Run R in batch mode (newer way).
 - `.libPaths()`: Set and get the paths where R will search for installed packages.
+- `bsub`: Submit an LSF job.
+- `bjobs`: See status of LSF jobs.
+- `bkill`: Kill an LSF job.
