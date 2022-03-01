@@ -471,11 +471,11 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">size =</span> <span class="dv">100</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(x)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##    1.00    2.75    5.00    5.29    7.00   10.00</code></pre>
+##     1.0     3.0     6.0     5.6     8.0    10.0</code></pre>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">factor</span>(x)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(y)</span></code></pre></div>
 <pre><code>##  1  2  3  4  5  6  7  8  9 10 
-## 10 15  7  9 14  8 13  4  9 11</code></pre></li>
+##  5 10 13  7 11 12 15 13  8  6</code></pre></li>
 <li><p>R6 and RC use <strong>encapsulated OOP</strong> where objects are the center of everything, holding fields (data) and methods (functions) that operate on those values. These are closest to what you would be used to if you are coming from an OOP language. Try not to use them.</p></li>
 <li><p>E.g. in R we apply a function, like <code>mean()</code> to a vector, like <code>x</code>. But in an encapsulated object oriented programming system would have the function <code>mean()</code> attached to a vector <code>x</code>. That’s one difference between R and Python.</p>
 <p><mark style="background-color: lightblue">R</mark></p>
@@ -499,8 +499,16 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="dv">119</span>, <span class="dv">22</span>, <span class="dv">31</span>))</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(x)</span></code></pre></div>
 <pre><code>## [1] &quot;factor&quot;</code></pre></li>
-<li><p>A function for a specific class is a <strong>method</strong>. Like the <code>col_means()</code> method for our R6 class above.</p></li>
-<li><p>A <strong>field</strong> is data that belongs to an object. In our R6 example, we had the <code>df</code> and <code>mean_vec</code> fields.</p></li>
+<li><p>A function for a specific class is a <strong>method</strong>.</p>
+<ul>
+<li>In R6, methods belong to objects, like the <code>col_means()</code> method for our R6 class above.</li>
+<li>In S3 and S4, methods are specific versions of <strong>generics</strong>. Like in S3, <code>print.factor()</code> is the print method for factor objects.</li>
+</ul></li>
+<li><p>A <strong>field</strong> is data that belongs to an object. In our R6 example, we had the <code>df</code> and <code>mean_vec</code> fields.</p>
+<ul>
+<li>In S3, fields are called <em>attributes</em>.</li>
+<li>In S4, fields are called <em>slots</em>.</li>
+</ul></li>
 <li><p>Classes are defined in a hierarchy. So if a method does not exist in one class it is searched for in the parent class. It is said that the child class <strong>inherits</strong> the behavior the parent class.</p></li>
 <li><p>E.g. <code>tibbles</code> inherit the behavior of data frames.</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="at">a =</span> <span class="dv">1</span>))</span></code></pre></div>
