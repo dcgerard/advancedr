@@ -774,8 +774,8 @@ klippy::klippy()
       f = "+", 
       signature = "Rational", 
       definition = function(e1, e2) {
-        num <- e1@num + e2@num
-        den <- e1@den + e2@den
+        num <- e1@num * e2@den + e2@num * e1@den
+        den <- e1@den * e2@den
         return(new(Class = "Rational", num = num, den = den))
       }
     )

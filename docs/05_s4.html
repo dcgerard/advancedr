@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-03" />
+<meta name="date" content="2022-03-15" />
 
 <title>S4 Objects</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S4 Objects</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-03</h4>
+<h4 class="date">2022-03-15</h4>
 
 </div>
 
@@ -663,8 +663,8 @@ $(document).ready(function () {
 ## 
 ## function (x, values, after = length(x)) 
 ## standardGeneric(&quot;append&quot;)
-## &lt;bytecode: 0x55d54518a638&gt;
-## &lt;environment: 0x55d545184ec0&gt;
+## &lt;bytecode: 0x55c014dcc818&gt;
+## &lt;environment: 0x55c014dc34a0&gt;
 ## Methods may be defined for arguments: x, values
 ## Use  showMethods(append)  for currently available ones.</code></pre>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>dims</span></code></pre></div>
@@ -672,8 +672,8 @@ $(document).ready(function () {
 ## 
 ## function (x) 
 ## standardGeneric(&quot;dims&quot;)
-## &lt;bytecode: 0x55d545a35fb8&gt;
-## &lt;environment: 0x55d545a31dc0&gt;
+## &lt;bytecode: 0x55c015592978&gt;
+## &lt;environment: 0x55c01558e358&gt;
 ## Methods may be defined for arguments: x
 ## Use  showMethods(dims)  for currently available ones.</code></pre>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>get</span></code></pre></div>
@@ -682,8 +682,8 @@ $(document).ready(function () {
 ## function (x, pos = -1L, envir = as.environment(pos), mode = &quot;any&quot;, 
 ##     inherits = TRUE) 
 ## standardGeneric(&quot;get&quot;)
-## &lt;bytecode: 0x55d545c70f18&gt;
-## &lt;environment: 0x55d545c68150&gt;
+## &lt;bytecode: 0x55c0158a1f38&gt;
+## &lt;environment: 0x55c0158993a0&gt;
 ## Methods may be defined for arguments: x, pos, envir
 ## Use  showMethods(get)  for currently available ones.</code></pre></li>
 <li><p>The only other argument you should usually use in <code>setGeneric()</code> is <code>signature</code>.</p>
@@ -742,8 +742,8 @@ $(document).ready(function () {
 ## 
 ## function (object) 
 ## standardGeneric(&quot;show&quot;)
-## &lt;bytecode: 0x55d541a3ab40&gt;
-## &lt;environment: 0x55d5419708b0&gt;
+## &lt;bytecode: 0x55c01188f578&gt;
+## &lt;environment: 0x55c0117c52e8&gt;
 ## Methods may be defined for arguments: object
 ## Use  showMethods(show)  for currently available ones.
 ## (This generic function excludes non-simple inheritance; see ?setIs)</code></pre></li>
@@ -758,7 +758,7 @@ $(document).ready(function () {
 ##     cat(&quot;\nCoefficients:\n&quot;)
 ##     print(coef(object))
 ## }
-## &lt;bytecode: 0x55d544547be8&gt;
+## &lt;bytecode: 0x55c011985f38&gt;
 ## &lt;environment: namespace:stats4&gt;
 ## 
 ## Signatures:
@@ -1090,17 +1090,17 @@ $(document).ready(function () {
 <span id="cb129-2"><a href="#cb129-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="st">&quot;+&quot;</span>, </span>
 <span id="cb129-3"><a href="#cb129-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">signature =</span> <span class="st">&quot;Rational&quot;</span>, </span>
 <span id="cb129-4"><a href="#cb129-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">definition =</span> <span class="cf">function</span>(e1, e2) {</span>
-<span id="cb129-5"><a href="#cb129-5" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> e1<span class="sc">@</span>num <span class="sc">+</span> e2<span class="sc">@</span>num</span>
-<span id="cb129-6"><a href="#cb129-6" aria-hidden="true" tabindex="-1"></a>    den <span class="ot">&lt;-</span> e1<span class="sc">@</span>den <span class="sc">+</span> e2<span class="sc">@</span>den</span>
+<span id="cb129-5"><a href="#cb129-5" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> e1<span class="sc">@</span>num <span class="sc">*</span> e2<span class="sc">@</span>den <span class="sc">+</span> e2<span class="sc">@</span>num <span class="sc">*</span> e1<span class="sc">@</span>den</span>
+<span id="cb129-6"><a href="#cb129-6" aria-hidden="true" tabindex="-1"></a>    den <span class="ot">&lt;-</span> e1<span class="sc">@</span>den <span class="sc">*</span> e2<span class="sc">@</span>den</span>
 <span id="cb129-7"><a href="#cb129-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">new</span>(<span class="at">Class =</span> <span class="st">&quot;Rational&quot;</span>, <span class="at">num =</span> num, <span class="at">den =</span> den))</span>
 <span id="cb129-8"><a href="#cb129-8" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb129-9"><a href="#cb129-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
 <li><p>Now let’s try it out</p>
 <div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> y</span></code></pre></div>
-<pre><code>## 6/20 4/6 9/4</code></pre></li>
+<pre><code>## 56/99 12/5 18/4</code></pre></li>
 <li><p>Now <code>1</code> is just <code>9/9</code> or <code>5/5</code> etc…, But we cannot just add an integer to a <code>Rational</code>?</p>
 <div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">+</span> 1L</span></code></pre></div>
-<pre><code>## Error in x + 1L: trying to get slot &quot;num&quot; from an object of a basic class (&quot;integer&quot;) with no slots</code></pre></li>
+<pre><code>## Error in x + 1L: trying to get slot &quot;den&quot; from an object of a basic class (&quot;integer&quot;) with no slots</code></pre></li>
 <li><p>We need to define a method based on <strong>double dispatch</strong>, where one input is a <code>Rational</code> and one is an <code>integer</code>.</p>
 <ul>
 <li>In the signature, you tell R which class each argument is.</li>
@@ -1233,9 +1233,9 @@ $(document).ready(function () {
 <span id="cb156-5"><a href="#cb156-5" aria-hidden="true" tabindex="-1"></a>  USCounties <span class="sc">%*%</span> ones</span>
 <span id="cb156-6"><a href="#cb156-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## Unit: microseconds
-##                 expr   min      lq    mean  median    uq   max neval
-##    densemat %*% ones 12807 19303.5 21228.6 20743.4 22273 41184   100
-##  USCounties %*% ones   209   237.3   347.6   358.6   408  1104   100</code></pre>
+##                 expr     min      lq    mean median      uq   max neval
+##    densemat %*% ones 13400.5 19466.1 20955.3  20425 22356.9 38141   100
+##  USCounties %*% ones   208.7   241.6   388.5    359   415.3  2278   100</code></pre>
 <ul>
 <li>This application doesn’t really demonstrate its abilities. It can be even more orders of magnitude faster.</li>
 </ul></li>
