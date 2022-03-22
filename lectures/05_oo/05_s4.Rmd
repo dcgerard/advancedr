@@ -355,6 +355,8 @@ klippy::klippy()
 
 - The `age()<-` method is called a **replacement function** or, more informally, a **setter**.
 
+- **Note**: in a setter, you need to use the variable name `value` for the replacement value. Don't use a different name.
+
 # Getting Help
 
 - To read the help file of an S4 class, put `class?` before the name of the class. E.g. the following will open up the help file of the `GRanges` class from the `{GenomicRanges}` package from Bioconductor.
@@ -893,7 +895,7 @@ klippy::klippy()
 
 - You can use `@describeIn` to simplify documentation of S4 methods by combining them with the generic or the class documentation.
 
-- In an R package, the files are loaded in alphabetical order. However, for S4 objects, you need to super superclasses before you are allowed to create subclasses.
+- In an R package, the files are loaded in alphabetical order. However, for S4 objects, you need to load superclasses before you are allowed to create subclasses.
 
 - To force another file to load before the current file, put this at the top of the current file
 

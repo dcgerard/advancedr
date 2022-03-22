@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-03-15" />
+<meta name="date" content="2022-03-22" />
 
 <title>S4 Objects</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">S4 Objects</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-03-15</h4>
+<h4 class="date">2022-03-22</h4>
 
 </div>
 
@@ -663,8 +663,8 @@ $(document).ready(function () {
 ## 
 ## function (x, values, after = length(x)) 
 ## standardGeneric(&quot;append&quot;)
-## &lt;bytecode: 0x55c014dcc818&gt;
-## &lt;environment: 0x55c014dc34a0&gt;
+## &lt;bytecode: 0x5613b2bc4e60&gt;
+## &lt;environment: 0x5613b2bbbae8&gt;
 ## Methods may be defined for arguments: x, values
 ## Use  showMethods(append)  for currently available ones.</code></pre>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>dims</span></code></pre></div>
@@ -672,8 +672,8 @@ $(document).ready(function () {
 ## 
 ## function (x) 
 ## standardGeneric(&quot;dims&quot;)
-## &lt;bytecode: 0x55c015592978&gt;
-## &lt;environment: 0x55c01558e358&gt;
+## &lt;bytecode: 0x5613b338afc0&gt;
+## &lt;environment: 0x5613b33869a0&gt;
 ## Methods may be defined for arguments: x
 ## Use  showMethods(dims)  for currently available ones.</code></pre>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>BiocGenerics<span class="sc">::</span>get</span></code></pre></div>
@@ -682,8 +682,8 @@ $(document).ready(function () {
 ## function (x, pos = -1L, envir = as.environment(pos), mode = &quot;any&quot;, 
 ##     inherits = TRUE) 
 ## standardGeneric(&quot;get&quot;)
-## &lt;bytecode: 0x55c0158a1f38&gt;
-## &lt;environment: 0x55c0158993a0&gt;
+## &lt;bytecode: 0x5613b369a580&gt;
+## &lt;environment: 0x5613b36919e8&gt;
 ## Methods may be defined for arguments: x, pos, envir
 ## Use  showMethods(get)  for currently available ones.</code></pre></li>
 <li><p>The only other argument you should usually use in <code>setGeneric()</code> is <code>signature</code>.</p>
@@ -726,6 +726,7 @@ $(document).ready(function () {
 <pre><code>## [1] 21</code></pre></li>
 <li><p>The <code>age()</code> method is called an <strong>accessor</strong> or, more informally, a <strong>getter</strong>.</p></li>
 <li><p>The <code>age()&lt;-</code> method is called a <strong>replacement function</strong> or, more informally, a <strong>setter</strong>.</p></li>
+<li><p><strong>Note</strong>: in a setter, you need to use the variable name <code>value</code> for the replacement value. Don’t use a different name.</p></li>
 </ul>
 </div>
 <div id="getting-help" class="section level1">
@@ -742,8 +743,8 @@ $(document).ready(function () {
 ## 
 ## function (object) 
 ## standardGeneric(&quot;show&quot;)
-## &lt;bytecode: 0x55c01188f578&gt;
-## &lt;environment: 0x55c0117c52e8&gt;
+## &lt;bytecode: 0x5613af672568&gt;
+## &lt;environment: 0x5613af5a82d8&gt;
 ## Methods may be defined for arguments: object
 ## Use  showMethods(show)  for currently available ones.
 ## (This generic function excludes non-simple inheritance; see ?setIs)</code></pre></li>
@@ -758,7 +759,7 @@ $(document).ready(function () {
 ##     cat(&quot;\nCoefficients:\n&quot;)
 ##     print(coef(object))
 ## }
-## &lt;bytecode: 0x55c011985f38&gt;
+## &lt;bytecode: 0x5613af76ac18&gt;
 ## &lt;environment: namespace:stats4&gt;
 ## 
 ## Signatures:
@@ -1192,7 +1193,7 @@ $(document).ready(function () {
 <span id="cb145-17"><a href="#cb145-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
 <li><p>S4 generics are regular functions, so document them like usual.</p></li>
 <li><p>You can use <code>@describeIn</code> to simplify documentation of S4 methods by combining them with the generic or the class documentation.</p></li>
-<li><p>In an R package, the files are loaded in alphabetical order. However, for S4 objects, you need to super superclasses before you are allowed to create subclasses.</p></li>
+<li><p>In an R package, the files are loaded in alphabetical order. However, for S4 objects, you need to load superclasses before you are allowed to create subclasses.</p></li>
 <li><p>To force another file to load before the current file, put this at the top of the current file</p>
 <div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @include foo.R bar.R</span></span>
 <span id="cb146-2"><a href="#cb146-2" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div>
@@ -1233,9 +1234,9 @@ $(document).ready(function () {
 <span id="cb156-5"><a href="#cb156-5" aria-hidden="true" tabindex="-1"></a>  USCounties <span class="sc">%*%</span> ones</span>
 <span id="cb156-6"><a href="#cb156-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## Unit: microseconds
-##                 expr     min      lq    mean median      uq   max neval
-##    densemat %*% ones 13400.5 19466.1 20955.3  20425 22356.9 38141   100
-##  USCounties %*% ones   208.7   241.6   388.5    359   415.3  2278   100</code></pre>
+##                 expr     min      lq    mean  median      uq   max neval
+##    densemat %*% ones 13477.0 18498.5 19398.3 18974.8 19894.7 28210   100
+##  USCounties %*% ones   114.8   221.4   327.3   279.9   413.7  1082   100</code></pre>
 <ul>
 <li>This application doesn’t really demonstrate its abilities. It can be even more orders of magnitude faster.</li>
 </ul></li>
