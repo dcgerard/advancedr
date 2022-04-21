@@ -78,7 +78,7 @@ using namespace Rcpp;
     NumericVector x(n, 2.0);
     ```
     
-- If you want an `IntegerVector` from `0` to `n - 1`, probably the best way is through `Rcpp::seq(0, n-1)` `std::iota()`
+- If you want an `IntegerVector` from `0` to `n - 1`, probably the best way is through `Rcpp::seq(0, n-1)`:
 
     <mark style="background-color: LightCoral">C++</mark>
 

@@ -11,7 +11,7 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-03-01" />
+<meta name="date" content="2022-04-21" />
 
 <title>Batch Processing and LSF</title>
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Batch Processing and LSF</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-03-01</h4>
+<h4 class="date">2022-04-21</h4>
 
 </div>
 
@@ -685,16 +685,16 @@ $(document).ready(function () {
 <li><p>Here are the general steps:</p></li>
 </ul>
 <ol style="list-style-type: decimal">
-<li><p>Download a tar file using <code>wget &lt;software_url&gt;</code></p></li>
+<li><p>Download a tar file using <code>wget &lt;software_url&gt;</code>. You should download this into a common directory for all of your local installs, like “apps”.</p></li>
 <li><p>Decompress the tar file using <code>tar -zxvf &lt;tar_file&gt;</code></p></li>
 <li><p>Move into the newly decompressed file using <code>cd &lt;new_file&gt;</code></p></li>
 <li><p>Look at the README for further steps. Usually there is a makefile and it’s as easy as running <code>make</code> and/or <code>make install</code>. But read the README first.</p></li>
-<li><p>Add the location to the <code>PATH</code> by using something like <code>export PATH=$HOME/path/to/software:$PATH</code></p></li>
-<li><p>Source the <code>.bash_profile</code> with <code>. ~/.bash_profile</code></p></li>
+<li><p>Add the location to the <code>PATH</code> by using something like <code>export PATH=$HOME/path/to/software:$PATH</code>. You should put this in your “.bashrc”</p></li>
+<li><p>Source your “.bashrc” file with <code>. ~/.bashrc.</code></p></li>
 <li><p>Confirm that the software is installed with <code>which &lt;software&gt;</code></p></li>
 </ol>
 <ul>
-<li><p>You can see an example of this pipeline <a href="https://help.dreamhost.com/hc/en-us/articles/360001435926-Installing-OpenSSL-locally-under-your-username">here</a></p></li>
+<li><p>You can see an example of this pipeline <a href="https://help.dreamhost.com/hc/en-us/articles/360001435926-Installing-OpenSSL-locally-under-your-username">here</a> and <a href="https://github.com/ncbi/sra-tools/wiki/02.-Installing-SRA-Toolkit">here</a>.</p></li>
 <li><p>This pipeline won’t work all of the time. You need to read the docs.</p></li>
 </ul>
 </div>

@@ -411,7 +411,7 @@ klippy::klippy()
 
 - Here are the general steps:
 
-1. Download a tar file using `wget <software_url>`
+1. Download a tar file using `wget <software_url>`. You should download this into a common directory for all of your local installs, like "apps".
 
 2. Decompress the tar file using `tar -zxvf <tar_file>`
 
@@ -419,13 +419,13 @@ klippy::klippy()
 
 4. Look at the README for further steps. Usually there is a makefile and it's as easy as running `make` and/or `make install`. But read the README first.
 
-5. Add the location to the `PATH` by using something like `export PATH=$HOME/path/to/software:$PATH`
+5. Add the location to the `PATH` by using something like `export PATH=$HOME/path/to/software:$PATH`. You should put this in your ".bashrc"
 
-6. Source the `.bash_profile` with `. ~/.bash_profile`
+6. Source your ".bashrc" file with `. ~/.bashrc.`
 
 7. Confirm that the software is installed with `which <software>`
 
-- You can see an example of this pipeline [here](https://help.dreamhost.com/hc/en-us/articles/360001435926-Installing-OpenSSL-locally-under-your-username)
+- You can see an example of this pipeline [here](https://help.dreamhost.com/hc/en-us/articles/360001435926-Installing-OpenSSL-locally-under-your-username) and [here](https://github.com/ncbi/sra-tools/wiki/02.-Installing-SRA-Toolkit).
 
 - This pipeline won't work all of the time. You need to read the docs.
 
