@@ -67,3 +67,12 @@ This repository contains material based upon work supported by the National Scie
 # Final Project
 
 - [Final project description](./ff_project_description.html)
+
+## Student Final Projects
+
+All students listed as maintainers in the following repos provided their permission for their packages to be made public.
+
+- [{marvalr}](https://github.com/advanced-r-spring-2022/marvalr): An R package for interfacing with the [Marval API](https://developer.marvel.com/) through R.
+- [{roeis}](https://github.com/advanced-r-spring-2022/roeis): An R package for interfacing with the On-Line Encyclopedia of Integer Sequences.
+- [{sgroupr}](https://github.com/advanced-r-spring-2022/sgroupr): An R package for implementations of [small finite groups](https://en.wikipedia.org/wiki/List_of_small_groups) as S3 vectors.
+- [{ggedf}](https://github.com/advanced-r-spring-2022/ggedf): A {ggplot2} extension for visualizing the [empirical distribution function](https://en.wikipedia.org/wiki/Empirical_distribution_function).

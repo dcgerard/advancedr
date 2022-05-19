@@ -11,11 +11,11 @@
 
 <meta name="author" content="David Gerard" />
 
-<meta name="date" content="2022-02-28" />
+<meta name="date" content="2022-05-18" />
 
 <title>Advanced R</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
@@ -65,6 +65,7 @@ if (window.hljs) {
 
 
 
+
 <style type = "text/css">
 .main-container {
   max-width: 940px;
@@ -85,6 +86,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -237,7 +241,7 @@ $(document).ready(function () {
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -271,7 +275,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Advanced R</h1>
 <h4 class="author">David Gerard</h4>
-<h4 class="date">2022-02-28</h4>
+<h4 class="date">2022-05-18</h4>
 
 </div>
 
@@ -356,6 +360,16 @@ $(document).ready(function () {
 <ul>
 <li><a href="./ff_project_description.html">Final project description</a></li>
 </ul>
+<div id="student-final-projects" class="section level2">
+<h2>Student Final Projects</h2>
+<p>All students listed as maintainers in the following repos provided their permission for their packages to be made public.</p>
+<ul>
+<li><a href="https://github.com/advanced-r-spring-2022/marvalr">{marvalr}</a>: An R package for interfacing with the <a href="https://developer.marvel.com/">Marval API</a> through R.</li>
+<li><a href="https://github.com/advanced-r-spring-2022/roeis">{roeis}</a>: An R package for interfacing with the On-Line Encyclopedia of Integer Sequences.</li>
+<li><a href="https://github.com/advanced-r-spring-2022/sgroupr">{sgroupr}</a>: An R package for implementations of <a href="https://en.wikipedia.org/wiki/List_of_small_groups">small finite groups</a> as S3 vectors.</li>
+<li><a href="https://github.com/advanced-r-spring-2022/ggedf">{ggedf}</a>: A {ggplot2} extension for visualizing the <a href="https://en.wikipedia.org/wiki/Empirical_distribution_function">empirical distribution function</a>.</li>
+</ul>
+</div>
 </div>
 
 <!DOCTYPE html>
